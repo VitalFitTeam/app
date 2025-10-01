@@ -9,7 +9,7 @@
 		"ios": "expo start --ios",
 		"web": "expo start --web",
 		"lint": "eslint",
-		"prepare": "husky && husky install"
+		"prepare": "husky"
 	},
 	"dependencies": {
 		"@expo/vector-icons": "^15.0.2",
