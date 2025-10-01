@@ -61,11 +61,11 @@
 	},
 	"lint-staged": {
 		"*.{ts,tsx}": [
-			"eslint --fix",
+			"eslint --fix --config ./eslint.config.js --max-warnings=0",
 			"prettier --write"
 		],
 		"*.{js,jsx}": [
-			"eslint --fix",
+			"eslint --fix --config ./eslint.config.js --max-warnings=0",
 			"prettier --write"
 		],
 		"*.{json,css,scss,md}": [

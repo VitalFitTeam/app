@@ -1,0 +1,2 @@
+echo ">>> Husky corriendo lint-staged en VitalFit..."
+npm --prefix VitalFit exec -- lint-staged
