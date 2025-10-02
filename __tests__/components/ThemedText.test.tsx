@@ -3,27 +3,27 @@ import React from 'react';
 import { ThemedText } from '../../components/themed-text';
 
 describe('ThemedText', () => {
-  it('renders correctly with default props', () => {
-    const { getByText } = render(<ThemedText>Hola Mundo</ThemedText>);
-    
-    const textElement = getByText('Hola Mundo');
-    
-    expect(textElement).toBeTruthy();
-  });
+	it('renders correctly with default props', () => {
+		const { getByText } = render(<ThemedText>Hola Mundo</ThemedText>);
 
-  it('applies the correct style for the "title" type', () => {
-    const { getByText } = render(<ThemedText type="title">Título de Prueba</ThemedText>);
-    const textElement = getByText('Título de Prueba');
+		const textElement = getByText('Hola Mundo');
 
-    // Verifica que el estilo del título se haya aplicado
-    expect(textElement.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          // VALOR CORREGIDO AQUÍ
-          fontSize: 32,
-          fontWeight: 'bold',
-        }),
-      ])
-    );
-  });
+		expect(textElement).toBeTruthy();
+	});
+
+	it('applies the correct style for the "title" type', () => {
+		const { getByText } = render(<ThemedText type='title'>Título de Prueba</ThemedText>);
+		const textElement = getByText('Título de Prueba');
+
+		// Verifica que el estilo del título se haya aplicado
+		expect(textElement.props.style).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					// VALOR CORREGIDO AQUÍ
+					fontSize: 32,
+					fontWeight: 'bold',
+				}),
+			]),
+		);
+	});
 });
