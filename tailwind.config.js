@@ -1,8 +1,14 @@
+// tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	content: [],
-	theme: {
-		extend: {},
-	},
-	plugins: [],
+  content: [
+    './app/**/*.{js,jsx,ts,tsx}',
+    './components/**/*.{js,jsx,ts,tsx}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+  // Esta línea es la que soluciona el problema
+  presets: [require('nativewind/preset')],
 };
