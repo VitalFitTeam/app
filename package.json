@@ -72,11 +72,13 @@
 	"lint-staged": {
 		"**/*.{ts,tsx}": [
 			"eslint --fix --max-warnings=0 --no-warn-ignored",
-			"prettier --write"
+			"prettier --write",
+			"jest --bail --findRelatedTests --passWithNoTests"
 		],
 		"**/*.{js,jsx}": [
 			"eslint --fix --max-warnings=0 --no-warn-ignored",
-			"prettier --write"
+			"prettier --write",
+			"jest --bail --findRelatedTests --passWithNoTests"
 		],
 		"**/*.{json,css,scss,md}": [
 			"prettier --write"
