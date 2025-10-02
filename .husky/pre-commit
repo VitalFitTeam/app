@@ -1,4 +1,4 @@
-export PATH="$PATH:./node_modules/.bin"
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
 
-echo ">>> Husky corriendo lint-staged en el proyecto..."
-npx lint-stagednpx lint-staged
+npx lint-staged
