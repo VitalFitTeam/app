@@ -1,47 +1,47 @@
-name: PR Preview
+name: 🏗 EAS Production Build
 
 on:
-    pull_request:
-        types: [opened, synchronize, reopened]
-
-permissions:
-    contents: read
-    pull-requests: write
-
-concurrency:
-    group: pr-preview-${{ github.event.pull_request.number }}
-    cancel-in-progress: true
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build for'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - android
+          - ios
+      profile:
+        description: 'EAS profile to use'
+        required: true
+        default: 'production'
+        type: string
 
 jobs:
-    preview:
-        if: ${{ !github.event.pull_request.head.repo.fork }}
-        runs-on: ubuntu-latest
-        steps:
-            - name: 🏗 Checkout
-              uses: actions/checkout@v4
+  build:
+    name: 🚀 Start EAS Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Set up project
+        uses: actions/checkout@v4
 
-            - name: 🟦 Setup Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 20
-                  cache: npm
-                  cache-dependency-path: package-lock.json
+      - name: 🏗 Set up Node.js
+        # ✅ CORRECCIÓN: Se actualizó a la versión v4 para compatibilidad y evitar advertencias.
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
 
-            - name: 🧰 Setup EAS
-              uses: expo/expo-github-action@v8
-              with:
-                  eas-version: latest
-                  token: ${{ secrets.EXPO_TOKEN }}
+      - name: 🏗 Set up Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
 
-            - name: 📦 Install deps
-              run: npm ci
+      - name: 📦 Install dependencies
+        run: npm install
 
-            - name: Create preview
-              uses: expo/expo-github-action/preview@v8
-              with:
-                  command: |
-                      eas update \
-                        --branch pr-${{ github.event.pull_request.number }} \
-                        --message "PR #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }} @ ${{ github.sha }}" \
-                        --non-interactive
-                  comment: true
+      - name: 🚀 Start build
+        run: eas build --platform ${{ inputs.platform }} --profile ${{ inputs.profile }} --non-interactive
