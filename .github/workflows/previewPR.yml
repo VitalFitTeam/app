@@ -1,50 +1,47 @@
 name: PR Preview
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+    pull_request:
+        types: [opened, synchronize, reopened]
 
 permissions:
-  contents: read
-  pull-requests: write
+    contents: read
+    pull-requests: write
 
 concurrency:
-  group: pr-preview-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+    group: pr-preview-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
 
 jobs:
-  preview:
+    preview:
+        if: ${{ !github.event.pull_request.head.repo.fork }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: 🏗 Checkout
+              uses: actions/checkout@v4
 
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🏗 Checkout
-        uses: actions/checkout@v4
+            - name: 🟦 Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+                  cache-dependency-path: package-lock.json
 
-      - name: 🟦 Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: package-lock.json
+            - name: 🧰 Setup EAS
+              uses: expo/expo-github-action@v8
+              with:
+                  eas-version: latest
+                  token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: 🧰 Setup EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+            - name: 📦 Install deps
+              run: npm ci
 
-      - name: 📦 Install deps
-        run: npm ci
-
-
-      - name: Create preview
-        uses: expo/expo-github-action/preview@v8
-        with:
-
-          command: |
-            eas update \
-              --branch pr-${{ github.event.pull_request.number }} \
-              --message "PR #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }} @ ${{ github.sha }}" \
-              --non-interactive
-          comment: true
+            - name: Create preview
+              uses: expo/expo-github-action/preview@v8
+              with:
+                  command: |
+                      eas update \
+                        --branch pr-${{ github.event.pull_request.number }} \
+                        --message "PR #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }} @ ${{ github.sha }}" \
+                        --non-interactive
+                  comment: true
