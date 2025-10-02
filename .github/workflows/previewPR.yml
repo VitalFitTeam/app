@@ -1,47 +1,47 @@
 name: 🏗 EAS Production Build
 
 on:
-  workflow_dispatch:
-    inputs:
-      platform:
-        description: 'Platform to build for'
-        required: true
-        default: 'all'
-        type: choice
-        options:
-          - all
-          - android
-          - ios
-      profile:
-        description: 'EAS profile to use'
-        required: true
-        default: 'production'
-        type: string
+    workflow_dispatch:
+        inputs:
+            platform:
+                description: 'Platform to build for'
+                required: true
+                default: 'all'
+                type: choice
+                options:
+                    - all
+                    - android
+                    - ios
+            profile:
+                description: 'EAS profile to use'
+                required: true
+                default: 'production'
+                type: string
 
 jobs:
-  build:
-    name: 🚀 Start EAS Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🏗 Set up project
-        uses: actions/checkout@v4
+    build:
+        name: 🚀 Start EAS Build
+        runs-on: ubuntu-latest
+        steps:
+            - name: 🏗 Set up project
+              uses: actions/checkout@v4
 
-      - name: 🏗 Set up Node.js
-        # ✅ CORRECCIÓN: Se actualizó a la versión v4 para compatibilidad y evitar advertencias.
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18.x'
-          cache: 'npm'
+            - name: 🏗 Set up Node.js
+              # ✅ CORRECCIÓN: Se actualizó a la versión v4 para compatibilidad y evitar advertencias.
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '18.x'
+                  cache: 'npm'
 
-      - name: 🏗 Set up Expo and EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+            - name: 🏗 Set up Expo and EAS
+              uses: expo/expo-github-action@v8
+              with:
+                  eas-version: latest
+                  expo-version: latest
+                  token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: 📦 Install dependencies
-        run: npm install
+            - name: 📦 Install dependencies
+              run: npm install
 
-      - name: 🚀 Start build
-        run: eas build --platform ${{ inputs.platform }} --profile ${{ inputs.profile }} --non-interactive
+            - name: 🚀 Start build
+              run: eas build --platform ${{ inputs.platform }} --profile ${{ inputs.profile }} --non-interactive

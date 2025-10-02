@@ -70,11 +70,11 @@ export default defineConfig({
 		// },
 	],
 
-		// ...
-		webServer: {
+	// ...
+	webServer: {
 		command: 'npm run web',
 		url: 'http://localhost:8081',
 		reuseExistingServer: !process.env.CI,
-		},
-		// ...
+	},
+	// ...
 });
