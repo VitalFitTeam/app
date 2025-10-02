@@ -1,4 +1,4 @@
 export PATH="$PATH:./node_modules/.bin"
 
 echo ">>> Husky corriendo lint-staged en el proyecto..."
-npx lint-staged
+npx lint-stagednpx lint-staged
