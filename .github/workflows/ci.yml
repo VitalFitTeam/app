@@ -71,8 +71,11 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Build the Project
-        run: npm run build # Las pruebas E2E deben correr sobre la build de producción
+      - name: Start dev server (background)
+        run: npx expo start --web --port 19006 --tunnel &
+
+      - name: Wait for dev server
+        run: npx wait-on http://localhost:19006
 
       - name: Run Playwright Tests
         run: npx playwright test
