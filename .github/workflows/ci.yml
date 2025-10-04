@@ -1,0 +1,86 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, development ]
+  pull_request:
+    branches: [ main, development ]
+
+jobs:
+  # Job 1: Verificación de Calidad de Código (Linting)
+  linting:
+    name:  Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm' # Habilita el caché para instalaciones más rápidas
+
+      - name: Install Dependencies
+        run: npm ci # 'ci' es más rápido y seguro para CI que 'install'
+
+      - name: Run ESLint
+        run: npm run lint
+
+  # Job 2: Pruebas Unitarias y de Componentes
+  unit-tests:
+    name: Unit Tests (Jest)
+    needs: [linting]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Unit Tests
+        run: npm test
+
+  # Job 3: Pruebas End-to-End
+  e2e-tests:
+    name: E2E Tests (Playwright)
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    # Ejecutar sólo después de que unit-tests pase
+    needs: [unit-tests]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Build the Project
+        run: npm run build # Las pruebas E2E deben correr sobre la build de producción
+
+      - name: Run Playwright Tests
+        run: npx playwright test
+
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        if: always() # Sube el reporte incluso si las pruebas fallan
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
