@@ -5,7 +5,7 @@ export function Logo() {
 	return (
 		<Image
 			source={require('@/assets/images/logovitalfit.png')}
-			style={{ width: 60, height: 60, marginBottom: 24 }}
+			style={{ width: 200, height: 200, marginBottom: 24 }}
 			contentFit='contain'
 		/>
 	);
