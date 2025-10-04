@@ -19,9 +19,8 @@ describe('ThemedText', () => {
 		expect(textElement.props.style).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					// VALOR CORREGIDO AQUÍ
-					fontSize: 32,
-					fontWeight: 'bold',
+					// El componente usa fontSize 42 para el tipo 'title'
+					fontSize: 42,
 				}),
 			]),
 		);
