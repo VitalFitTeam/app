@@ -52,6 +52,8 @@ jobs:
   e2e-tests:
     name: E2E Tests (Playwright)
     timeout-minutes: 60
+    # Ejecutar sólo si se habilita explícitamente (evita pruebas web para apps móviles)
+    if: ${{ secrets.RUN_E2E == 'true' }}
     runs-on: ubuntu-latest
     # Ejecutar sólo después de que unit-tests pase
     needs: [unit-tests]
@@ -75,7 +77,13 @@ jobs:
         run: npx expo start --web --port 19006 --tunnel &
 
       - name: Wait for dev server
+        if: ${{ secrets.RUN_WAIT == 'true' }}
         run: npx wait-on http://localhost:19006
+
+      - name: ℹ️ Skip waiting for dev server
+        if: ${{ secrets.RUN_WAIT != 'true' }}
+        run: |
+          echo "RUN_WAIT not set to 'true' — skipping wait-on for dev server."
 
       - name: Run Playwright Tests
         run: npx playwright test
