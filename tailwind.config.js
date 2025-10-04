@@ -3,9 +3,13 @@
 module.exports = {
 	content: ['./app/**/*.{js,jsx,ts,tsx}', './components/**/*.{js,jsx,ts,tsx}'],
 	theme: {
-		extend: {},
+		extend: {
+			fontFamily: {
+				'montserrat-medium': ['Montserrat_500Medium', 'sans-serif'],
+				'montserrat-bold': ['Montserrat_700Bold', 'sans-serif'],
+			},
+		},
 	},
 	plugins: [],
-	// Esta línea es la que soluciona el problema
 	presets: [require('nativewind/preset')],
 };
