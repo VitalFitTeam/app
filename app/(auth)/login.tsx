@@ -60,11 +60,11 @@ export default function LoginScreen() {
 							onValueChange={setChecked}
 							color={isChecked ? '#F27F2A' : undefined}
 						/>
-						<ThemedText className='ml-2 text-gray-600'>Mantener sesión</ThemedText>
+						<ThemedText className='ml-2 text-gray-400'>Mantener sesión</ThemedText>
 					</View>
 					<Link href='/(auth)/forgot-password'>
 						<Text style={{ color: Colors.light.tint, fontWeight: '600' }}>
-							¿Olvidaste tu contraseña?
+							Recuperar
 						</Text>
 					</Link>
 				</View>

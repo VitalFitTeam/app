@@ -4,8 +4,8 @@ import { Image } from 'expo-image';
 export function Logo() {
 	return (
 		<Image
-			source={require('@/assets/images/logovitalfit.png')}
-			style={{ width: 200, height: 200, marginBottom: 24 }}
+			source={require('@/assets/images/logoo.png')}
+			style={{ width: 190, height: 200, marginBottom: 24 }}
 			contentFit='contain'
 		/>
 	);
