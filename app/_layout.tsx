@@ -12,7 +12,7 @@ import '../global.css';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export const unstable_settings = {
-	anchor: '(tabs)',
+	anchor: '(tabs)', // Esto indica que las tabs son el layout principal tras login
 };
 
 SplashScreen.preventAutoHideAsync();
@@ -20,7 +20,6 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
 	const colorScheme = useColorScheme();
 	const [loaded] = useFonts({
-		// Carga ambas fuentes aquí
 		'BebasNeue-Regular': require('../assets/fonts/BebasNeue-Regular.ttf'),
 		'Montserrat-ExtraBold': require('../assets/fonts/Montserrat-ExtraBold.ttf'),
 	});
@@ -38,16 +37,14 @@ export default function RootLayout() {
 	return (
 		<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
 			<Stack>
-				<Stack.Screen name='index' options={{ headerShown: false }} />
-				<Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+				{/* Layout de autenticación */}
 				<Stack.Screen name='(auth)' options={{ headerShown: false }} />
-				<Stack.Screen name='modal' options={{ presentation: 'modal', title: 'Modal' }} />
+
+				{/* Layout principal: Tabs */}
+				<Stack.Screen name='(tabs)' options={{ headerShown: false }} />
 			</Stack>
+
 			<StatusBar style='auto' />
 		</ThemeProvider>
 	);
 }
-
-//
-
-//husky test 4/10/2025

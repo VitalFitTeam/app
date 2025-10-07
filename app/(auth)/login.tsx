@@ -17,7 +17,7 @@ export default function LoginScreen() {
 	const [isChecked, setChecked] = useState(false);
 
 	const handleLogin = () => {
-		router.replace('/(tabs)');
+		router.replace('/(tabs)/dashboard');
 	};
 
 	return (
