@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function Step1Gender({ control, errors, onNextStep }: Props) {
-  // ... el resto del componente se mantiene igual
+
   return (
     <>
       <Controller
@@ -26,3 +26,5 @@ export function Step1Gender({ control, errors, onNextStep }: Props) {
     </>
   );
 }
+
+
