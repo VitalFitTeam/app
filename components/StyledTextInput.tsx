@@ -15,9 +15,9 @@ export const StyledTextInput = forwardRef<TextInput, Props>(
 		const isError = Boolean(error);
 
 		return (
-			<View className="w-full">
+			<View className='w-full'>
 				{label && (
-					<Text className="text-sm text-gray-500 dark:text-gray-400 mb-1 font-semibold">
+					<Text className='text-sm text-gray-500 dark:text-gray-400 mb-1 font-semibold'>
 						{label}
 					</Text>
 				)}
@@ -32,7 +32,7 @@ export const StyledTextInput = forwardRef<TextInput, Props>(
 					placeholderTextColor={Colors.light.icon}
 					{...props}
 				/>
-                {/* 👇 LÍNEA CORREGIDA AQUÍ 👇 */}
+				{/* 👇 LÍNEA CORREGIDA AQUÍ 👇 */}
 				{(helperText || error) && (
 					<Text className={`mt-1 text-xs ${isError ? 'text-red-500' : 'text-gray-500'}`}>
 						{isError ? error : helperText}
