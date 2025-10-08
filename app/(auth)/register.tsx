@@ -18,7 +18,12 @@ export default function RegisterScreen() {
 	const router = useRouter();
 	const [step, setStep] = useState(1);
 
-	const { control, handleSubmit, trigger, formState: { errors } } = useForm<RegisterData>({
+	const {
+		control,
+		handleSubmit,
+		trigger,
+		formState: { errors },
+	} = useForm<RegisterData>({
 		resolver: zodResolver(RegisterSchema),
 		defaultValues: { acceptTerms: false },
 	});
@@ -30,7 +35,8 @@ export default function RegisterScreen() {
 	};
 
 	const nextStep = async () => {
-		const fieldsToValidate: (keyof RegisterData)[] = step === 1 ? ['gender'] : ['email', 'password', 'confirmPassword'];
+		const fieldsToValidate: (keyof RegisterData)[] =
+			step === 1 ? ['gender'] : ['email', 'password', 'confirmPassword'];
 		const isValid = await trigger(fieldsToValidate);
 		if (isValid) setStep(step + 1);
 	};
@@ -49,14 +55,27 @@ export default function RegisterScreen() {
 				)}
 
 				<View style={styles.stepContainer}>
-                    {step === 1 && <Step1Gender control={control} errors={errors} onNextStep={nextStep} />}
-                    {step === 2 && <Step2Credentials control={control} errors={errors} onNextStep={nextStep} />}
-                    {step === 3 && <Step3PersonalDetails control={control} errors={errors} onSubmit={handleSubmit(onSubmit)} />}
-                </View>
+					{step === 1 && (
+						<Step1Gender control={control} errors={errors} onNextStep={nextStep} />
+					)}
+					{step === 2 && (
+						<Step2Credentials control={control} errors={errors} onNextStep={nextStep} />
+					)}
+					{step === 3 && (
+						<Step3PersonalDetails
+							control={control}
+							errors={errors}
+							onSubmit={handleSubmit(onSubmit)}
+						/>
+					)}
+				</View>
 
 				<View style={styles.footer}>
-					<Link href="/(auth)/login">
-						<Text style={styles.footerText}>¿Ya tienes una cuenta?<Text style={styles.footerLink}> Iniciar sesión</Text></Text>
+					<Link href='/(auth)/login'>
+						<Text style={styles.footerText}>
+							¿Ya tienes una cuenta?
+							<Text style={styles.footerLink}> Iniciar sesión</Text>
+						</Text>
 					</Link>
 				</View>
 			</View>
@@ -66,7 +85,13 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
 	container: { flex: 1, alignItems: 'center', backgroundColor: 'white', paddingTop: 60 },
-	formContainer: { width: '100%', maxWidth: 384, paddingHorizontal: 24, alignItems: 'center', flex: 1 },
+	formContainer: {
+		width: '100%',
+		maxWidth: 384,
+		paddingHorizontal: 24,
+		alignItems: 'center',
+		flex: 1,
+	},
 	stepContainer: { width: '100%', alignItems: 'center', gap: 16 },
 	mainTitle: { fontSize: 32, marginBottom: 8, textAlign: 'center' },
 	subtitle: { fontSize: 16, color: '#5C5E60', marginBottom: 24, textAlign: 'center' },

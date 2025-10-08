@@ -25,8 +25,8 @@ export function ThemedText({
 		type === 'title'
 			? Fonts.title
 			: type === 'subtitle' || type === 'defaultSemiBold'
-			  ? Fonts.subtitle
-			  : Fonts.default;
+				? Fonts.subtitle
+				: Fonts.default;
 
 	return (
 		<Text
