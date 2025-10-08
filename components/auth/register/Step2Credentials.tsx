@@ -12,7 +12,6 @@ interface Props {
 }
 
 export function Step2Credentials({ control, errors, onNextStep }: Props) {
-	// ... el resto del componente se mantiene igual
 	return (
 		<>
 			<Controller
