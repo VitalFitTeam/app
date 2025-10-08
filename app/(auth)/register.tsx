@@ -1,5 +1,3 @@
-// app/(auth)/register.tsx
-
 import { Logo } from '@/components/auth/Logo';
 import { Step1Gender } from '@/components/auth/register/Step1Gender';
 import { Step2Credentials } from '@/components/auth/register/Step2Credentials';
@@ -8,7 +6,9 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors, Fonts } from '@/constants/theme';
 import { RegisterData, RegisterSchema } from '@/schemas/register';
+import api from '@/services/api';
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -28,10 +28,64 @@ export default function RegisterScreen() {
 		defaultValues: { acceptTerms: false },
 	});
 
-	const onSubmit = (data: RegisterData) => {
-		console.log('Datos de registro completos:', data);
-		Alert.alert('¡Registro Exitoso!', 'Tu cuenta ha sido creada.');
-		router.push('/(tabs)');
+	const onSubmit = async (data: RegisterData) => {
+		console.log('Enviando datos:', data);
+
+		const allowedKeys = [
+			'gender',
+			'email',
+			'password',
+			'confirmPassword',
+			'name',
+			'lastName',
+			'documentId',
+			'birthDate',
+			'phone',
+			'acceptTerms',
+		] as const;
+
+		const cleanedData: Pick<RegisterData, (typeof allowedKeys)[number]> = Object.fromEntries(
+			allowedKeys.map((key) => [key, data[key]]),
+		) as Pick<RegisterData, (typeof allowedKeys)[number]>;
+
+		try {
+			const payload = {
+				email: cleanedData.email,
+				password: cleanedData.password,
+				gender: cleanedData.gender,
+				first_name: cleanedData.name,
+				last_name: cleanedData.lastName,
+				identity_document: cleanedData.documentId,
+				birth_date: `${cleanedData.birthDate}`,
+				phone: cleanedData.phone,
+				profile_picture_url: '',
+			};
+
+			const response = await api.post('/auth/register', payload);
+
+			const token =
+				response.data?.token || response.data?.access_token || response.data?.jwt || null;
+
+			if (token) {
+				console.log('Token JWT recibido:', token);
+			} else {
+				console.warn('');
+			}
+
+			Alert.alert('¡Registro exitoso!', 'Redirigiendo a tu perfil...');
+			router.replace('/(tabs)/dashboard');
+		} catch (error: unknown) {
+			if (axios.isAxiosError(error)) {
+				console.error('Error al registrar:', error);
+				const message =
+					error.response?.data?.message ||
+					'Hubo un error al registrar. Intenta nuevamente.';
+				Alert.alert('Error de registro', message);
+			} else {
+				console.error(error);
+				Alert.alert('Error de registro', 'Error inesperado');
+			}
+		}
 	};
 
 	const nextStep = async () => {
@@ -65,7 +119,20 @@ export default function RegisterScreen() {
 						<Step3PersonalDetails
 							control={control}
 							errors={errors}
-							onSubmit={handleSubmit(onSubmit)}
+							onSubmit={async () => {
+								const isValid = await trigger([
+									'name',
+									'lastName',
+									'documentId',
+									'birthDate',
+									'phone',
+									'acceptTerms',
+								]);
+
+								if (isValid) {
+									handleSubmit(onSubmit)();
+								}
+							}}
 						/>
 					)}
 				</View>
