@@ -1,4 +1,3 @@
-
 // --- Nueva Paleta de Colores VitalFit ---
 const naranjaVital = '#F27F2A';
 const negroCarbon = '#1A1A1A';
