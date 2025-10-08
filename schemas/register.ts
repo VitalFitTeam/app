@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 export const RegisterSchema = z
 	.object({
-		gender: z.enum(['Mujer', 'Hombre', 'Otro'], {
+		gender: z.enum(['female', 'male', 'prefer-not-to-say'], {
 			errorMap: () => ({ message: 'Por favor, selecciona un género.' }),
 		}),
 		email: z.string().email('El correo no es válido.'),
