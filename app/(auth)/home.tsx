@@ -1,12 +1,10 @@
+import { Montserrat_500Medium, Montserrat_700Bold, useFonts } from '@expo-google-fonts/montserrat';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, StatusBar, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import { BackgroundCarousel, SignInButton, SignUpButton } from '../../components/auth/home';
-
-import { Montserrat_500Medium, Montserrat_700Bold, useFonts } from '@expo-google-fonts/montserrat';
 
 const SLIDES = [
 	{
@@ -38,7 +36,7 @@ export default function HomeScreen() {
 		<View className='flex-1 bg-black'>
 			<StatusBar barStyle='light-content' backgroundColor='#000' />
 
-			{/* ====== CARRUSEL A PANTALLA COMPLETA ====== */}
+			{/* Carrusel a pantalla completa */}
 			<BackgroundCarousel images={SLIDES.map((s) => s.image)} onIndexChange={setIndex} />
 
 			{/* Logo centrado */}
@@ -53,7 +51,7 @@ export default function HomeScreen() {
 				/>
 			</View>
 
-			{/* ====== DEGRADADO INFERIOR + CONTENIDO ====== */}
+			{/* Degradado inferior + contenido */}
 			<LinearGradient
 				colors={['transparent', 'rgba(0,0,0,0.7)', 'black']}
 				style={{
@@ -82,10 +80,26 @@ export default function HomeScreen() {
 					))}
 				</View>
 
-				{/* Botones */}
-				<View className='flex-row justify-between w-full'>
-					<SignInButton label='Acceder' onPress={() => router.push('/login')} />
-					<SignUpButton label='Registrarse' onPress={() => router.push('/register')} />
+				{/* Botones alineados y con separación uniforme */}
+				<View
+					style={{
+						flexDirection: 'row',
+						justifyContent: 'space-between',
+						alignItems: 'center',
+						width: '100%',
+						paddingHorizontal: 10, // separación respecto a los bordes
+						marginTop: 16,
+					}}>
+					<View style={{ flex: 1, marginRight: 8 }}>
+						<SignInButton label='Acceder' onPress={() => router.push('/login')} />
+					</View>
+
+					<View style={{ flex: 1, marginLeft: 8 }}>
+						<SignUpButton
+							label='Registrarse'
+							onPress={() => router.push('/register')}
+						/>
+					</View>
 				</View>
 			</LinearGradient>
 		</View>
