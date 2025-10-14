@@ -84,11 +84,8 @@ export default function HomeScreen() {
 
 				{/* Botones */}
 				<View className='flex-row justify-between w-full'>
-					<SignInButton label='Acceder' onPress={() => router.push('/(auth)/login')} />
-					<SignUpButton
-						label='Registrarse'
-						onPress={() => router.push('/(auth)/register')}
-					/>
+					<SignInButton label='Acceder' onPress={() => router.push('/login')} />
+					<SignUpButton label='Registrarse' onPress={() => router.push('/register')} />
 				</View>
 			</LinearGradient>
 		</View>
