@@ -15,7 +15,7 @@ export function LogoSimple() {
 	return (
 		<Image
 			source={require('@/assets/images/isotipo.png')}
-			style={{ width: 120, height: 120, marginBottom: 16 }}
+			style={{ width: 200, height: 200, marginBottom: 16 }}
 			contentFit='contain'
 		/>
 	);
