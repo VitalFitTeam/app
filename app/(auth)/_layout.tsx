@@ -7,7 +7,7 @@ export default function AuthLayout() {
 		<Stack>
 			<Stack.Screen name='login' options={{ headerShown: false }} />
 			<Stack.Screen name='register' options={{ headerShown: false }} />
-			<Stack.Screen name='forgot-password' options={{ title: 'Recuperar Contraseña' }} />
+			<Stack.Screen name='forgot-password' options={{ headerShown: false }} />
 
 			{/* Puedes agregar más pantallas aquí a medida que las crees */}
 		</Stack>
