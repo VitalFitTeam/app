@@ -1,6 +1,26 @@
 // schemas/register.ts
 import { z } from 'zod';
 
+// Esquema para el Paso 1: Género
+export const Step1Schema = z.object({
+	gender: z.enum(['female', 'male', 'prefer-not-to-say'], {
+		errorMap: () => ({ message: 'Por favor, selecciona un género.' }),
+	}),
+});
+
+// Esquema para el Paso 2: Credenciales
+export const Step2Schema = z
+	.object({
+		email: z.string().email('El correo no es válido.'),
+		password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
+		confirmPassword: z.string(),
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: 'Las contraseñas no coinciden.',
+		path: ['confirmPassword'],
+	});
+
+// Esquema completo para el registro
 export const RegisterSchema = z
 	.object({
 		gender: z.enum(['female', 'male', 'prefer-not-to-say'], {
