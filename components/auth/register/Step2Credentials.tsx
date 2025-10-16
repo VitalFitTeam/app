@@ -37,7 +37,7 @@ export function Step2Credentials({ control, errors, onNextStep }: Props) {
 						onChangeText={onChange}
 						value={value}
 						error={errors.password?.message}
-						secureTextEntry
+						isPasswordInput // Activa el ícono del ojo
 					/>
 				)}
 			/>
@@ -51,7 +51,7 @@ export function Step2Credentials({ control, errors, onNextStep }: Props) {
 						onChangeText={onChange}
 						value={value}
 						error={errors.confirmPassword?.message}
-						secureTextEntry
+						isPasswordInput // Activa el ícono del ojo
 					/>
 				)}
 			/>
