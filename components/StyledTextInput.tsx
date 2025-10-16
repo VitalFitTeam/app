@@ -1,18 +1,25 @@
 // components/auth/StyledTextInput.tsx
 
 import { Colors } from '@/constants/theme';
-import { forwardRef } from 'react';
-import { Text, TextInput, View, type TextInputProps } from 'react-native';
+import { Eye, EyeOff } from 'lucide-react-native'; // Importa los íconos
+import { forwardRef, useState } from 'react';
+import { Text, TextInput, TouchableOpacity, View, type TextInputProps } from 'react-native';
 
 interface Props extends TextInputProps {
 	label?: string;
 	error?: string;
 	helperText?: string;
+	isPasswordInput?: boolean; // Nuevo prop para indicar si es un campo de contraseña
 }
 
 export const StyledTextInput = forwardRef<TextInput, Props>(
-	({ label, error, helperText, ...props }, ref) => {
+	({ label, error, helperText, isPasswordInput, ...props }, ref) => {
 		const isError = Boolean(error);
+		const [isPasswordVisible, setIsPasswordVisible] = useState(false); // Estado para controlar la visibilidad de la contraseña
+
+		const togglePasswordVisibility = () => {
+			setIsPasswordVisible(!isPasswordVisible);
+		};
 
 		return (
 			<View className='w-full'>
@@ -21,17 +28,33 @@ export const StyledTextInput = forwardRef<TextInput, Props>(
 						{label}
 					</Text>
 				)}
-				<TextInput
-					ref={ref}
-					className={`
-            border h-14 px-4 rounded-lg text-base
-            text-black dark:text-white
-            bg-white dark:bg-gray-800
-            ${isError ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'}
-          `}
-					placeholderTextColor={Colors.light.icon}
-					{...props}
-				/>
+				<View className='relative flex-row items-center'>
+					<TextInput
+						ref={ref}
+						className={`
+              flex-1 border h-14 px-4 rounded-lg text-base
+              text-black dark:text-white
+              bg-white dark:bg-gray-800
+              ${isError ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'}
+              ${isPasswordInput ? 'pr-10' : ''} // Añade padding a la derecha si es campo de contraseña
+            `}
+						placeholderTextColor={Colors.light.icon}
+						secureTextEntry={isPasswordInput ? !isPasswordVisible : false} // Controla la seguridad del texto
+						{...props}
+					/>
+					{isPasswordInput && (
+						<TouchableOpacity
+							onPress={togglePasswordVisibility}
+							className='absolute right-3 p-2'
+							activeOpacity={0.7}>
+							{isPasswordVisible ? (
+								<Eye size={20} color={Colors.light.icon} />
+							) : (
+								<EyeOff size={20} color={Colors.light.icon} />
+							)}
+						</TouchableOpacity>
+					)}
+				</View>
 				{/* 👇 LÍNEA CORREGIDA AQUÍ 👇 */}
 				{(helperText || error) && (
 					<Text className={`mt-1 text-xs ${isError ? 'text-red-500' : 'text-gray-500'}`}>

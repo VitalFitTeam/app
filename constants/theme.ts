@@ -32,5 +32,6 @@ export const Colors = {
 export const Fonts = {
 	title: 'BebasNeue-Regular',
 	subtitle: 'Montserrat-ExtraBold',
+	medium: 'Montserrat_500Medium', // Añadido para el estilo de texto mediano
 	default: 'Montserrat-ExtraBold', // Usamos Montserrat como fuente por defecto para el resto del texto
 };

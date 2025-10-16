@@ -5,7 +5,7 @@ import { Step3PersonalDetails } from '@/components/auth/register/Step3PersonalDe
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors, Fonts } from '@/constants/theme';
-import { RegisterData, RegisterSchema } from '@/schemas/register';
+import { RegisterData, RegisterSchema, Step1Schema, Step2Schema } from '@/schemas/register';
 import api from '@/services/api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
@@ -23,6 +23,8 @@ export default function RegisterScreen() {
 		handleSubmit,
 		trigger,
 		formState: { errors },
+		getValues, // getValues is now available
+		setError, // setError is now available
 	} = useForm<RegisterData>({
 		resolver: zodResolver(RegisterSchema),
 		defaultValues: { acceptTerms: false },
@@ -72,18 +74,28 @@ export default function RegisterScreen() {
 				console.warn('');
 			}
 
-			Alert.alert('¡Registro exitoso!', 'Redirigiendo a tu perfil...');
-			router.replace('/(tabs)/dashboard');
+			Alert.alert('¡Registro exitoso!', 'Verifica tu correo electrónico para continuar.');
+			router.replace('/(auth)/confirm-email'); // Redirigir a la pantalla de confirmación de correo
 		} catch (error: unknown) {
 			if (axios.isAxiosError(error)) {
 				console.error('Error al registrar:', error);
-				const message =
-					error.response?.data?.message ||
-					'Hubo un error al registrar. Intenta nuevamente.';
-				Alert.alert('Error de registro', message);
+				// Manejo específico para el error 409 (Conflicto)
+				if (error.response?.status === 409) {
+					Alert.alert(
+						'Error de registro',
+						'Este correo electrónico ya está registrado. Por favor, inicia sesión o utiliza un correo diferente.',
+					);
+				} else {
+					// Mensaje genérico para otros errores de Axios
+					const message =
+						error.response?.data?.message ||
+						'Hubo un error al registrar. Intenta nuevamente.';
+					Alert.alert('Error de registro', message);
+				}
 			} else {
-				console.error(error);
-				Alert.alert('Error de registro', 'Error inesperado');
+				// Manejo para errores no relacionados con Axios
+				console.error('Error inesperado:', error);
+				Alert.alert('Error de registro', 'Ocurrió un error inesperado.');
 			}
 		}
 	};
@@ -91,8 +103,29 @@ export default function RegisterScreen() {
 	const nextStep = async () => {
 		const fieldsToValidate: (keyof RegisterData)[] =
 			step === 1 ? ['gender'] : ['email', 'password', 'confirmPassword'];
-		const isValid = await trigger(fieldsToValidate);
-		if (isValid) setStep(step + 1);
+
+		// Ejecuta la validación para mostrar errores en la UI rápidamente
+		await trigger(fieldsToValidate);
+
+		// Obtiene el esquema correcto para el paso actual
+		const currentSchema = step === 1 ? Step1Schema : Step2Schema;
+		const values = getValues();
+
+		// Realiza una validación robusta con el esquema del paso
+		const result = currentSchema.safeParse(values);
+
+		if (result.success) {
+			// Si la validación es exitosa, avanza al siguiente paso
+			setStep(step + 1);
+		} else {
+			// Si hay errores, los muestra en los campos correspondientes
+			result.error.issues.forEach((issue: import('zod').ZodIssue) => {
+				setError(issue.path[0] as keyof RegisterData, {
+					type: 'manual',
+					message: issue.message,
+				});
+			});
+		}
 	};
 
 	return (
@@ -119,20 +152,7 @@ export default function RegisterScreen() {
 						<Step3PersonalDetails
 							control={control}
 							errors={errors}
-							onSubmit={async () => {
-								const isValid = await trigger([
-									'name',
-									'lastName',
-									'documentId',
-									'birthDate',
-									'phone',
-									'acceptTerms',
-								]);
-
-								if (isValid) {
-									handleSubmit(onSubmit)();
-								}
-							}}
+							onSubmit={handleSubmit(onSubmit)}
 						/>
 					)}
 				</View>
