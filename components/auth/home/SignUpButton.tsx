@@ -28,7 +28,7 @@ export function SignUpButton({
 	);
 }
 
-const BUTTON_W = 180;
+const BUTTON_W = 150;
 const BUTTON_H = 46;
 const PADDING_V = 8;
 
