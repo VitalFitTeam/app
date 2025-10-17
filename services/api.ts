@@ -13,7 +13,6 @@ if (!API_URL) {
 
 const api = axios.create({
 	baseURL: API_URL,
-	timeout: 30000, // Tiempo de espera en milisegundos (30 segundos)
 	headers: {
 		'Content-Type': 'application/json',
 	},

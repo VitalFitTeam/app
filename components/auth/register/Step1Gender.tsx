@@ -1,15 +1,14 @@
 // components/auth/register/Step1Gender.tsx
-import { RegisterData } from '@/schemas/register'; // Asegúrate de importar esto
-import { Control, Controller, FieldErrors } from 'react-hook-form'; // <-- AÑADE 'Controller' AQUÍ
+import { RegisterData } from '@/schemas/register';
+import { Control, Controller, FieldErrors } from 'react-hook-form';
 import { Text } from 'react-native';
 import { PrimaryButton } from '../../PrimaryButton';
 import { GenderSelector } from '../GenderSelector';
 
-
 interface Props {
-  control: Control<RegisterData>;
-  errors: FieldErrors<RegisterData>;
-  onNextStep: () => void;
+	control: Control<RegisterData>;
+	errors: FieldErrors<RegisterData>;
+	onNextStep: () => void;
 }
 
 export function Step1Gender({ control, errors, onNextStep }: Props) {

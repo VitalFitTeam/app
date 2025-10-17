@@ -8,9 +8,9 @@ import { PrimaryButton } from '../../PrimaryButton';
 import { StyledTextInput } from '../../StyledTextInput';
 
 interface Props {
-  control: Control<RegisterData>;
-  errors: FieldErrors<RegisterData>;
-  onSubmit: () => void;
+	control: Control<RegisterData>;
+	errors: FieldErrors<RegisterData>;
+	onSubmit: () => void;
 }
 
 export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
