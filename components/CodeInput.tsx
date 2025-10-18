@@ -49,6 +49,7 @@ export function CodeInput({ onComplete, hasError }: Props) {
               w-12 h-14 border rounded-lg text-center text-2xl font-bold text-black dark:text-white
               ${hasError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
             `}
+						style={{ color: '#000' }}
 						keyboardType='number-pad'
 						maxLength={1}
 						value={code[index]}
