@@ -12,18 +12,18 @@ interface Props {
 }
 
 export function Step1Gender({ control, errors, onNextStep }: Props) {
-	return (
-		<>
-			<Controller
-				control={control}
-				name='gender'
-				render={({ field: { onChange, value } }) => (
-					<GenderSelector onSelect={onChange} selected={value} />
-				)}
-			/>
 
-			{errors.gender && <Text style={{ color: 'red' }}>{errors.gender.message}</Text>}
-			<PrimaryButton title='Continuar' onPress={onNextStep} />
-		</>
-	);
+  return (
+    <>
+      <Controller
+        control={control}
+        name="gender"
+        render={({ field: { onChange } }) => <GenderSelector onSelect={onChange} />}
+      />
+      {errors.gender && <Text style={{ color: 'red' }}>{errors.gender.message}</Text>}
+      <PrimaryButton title="Continuar" onPress={onNextStep} />
+    </>
+  );
 }
+
+

@@ -20,3 +20,13 @@ export function LogoSimple() {
 		/>
 	);
 }
+
+export function LogoVitalFit() {
+	return (
+		<Image
+			source={require('@/assets/images/logoVitalFitH.png')}
+			style={{ width: 200, height: 200, marginBottom: 16 }}
+			contentFit='contain'
+		/>
+	);
+}
