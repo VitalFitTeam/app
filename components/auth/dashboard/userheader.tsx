@@ -1,4 +1,3 @@
-import { ThemedText } from '@/components/themed-text';
 import { Bell } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
@@ -11,14 +10,14 @@ interface Notification {
 
 interface Props {
 	name: string;
-	message: string;
+	message?: string;
 	avatarUrl?: string;
 	notifications?: Notification[];
 }
 
 export const UserHeader: React.FC<Props> = ({
 	name,
-	message,
+	message = 'Es hora de desafiar tus límites',
 	avatarUrl,
 	notifications = [
 		{ id: '1', title: 'Tu clase comienza en 10 minutos', time: 'Hace 5 min' },
@@ -36,13 +35,34 @@ export const UserHeader: React.FC<Props> = ({
 						source={
 							avatarUrl ? { uri: avatarUrl } : require('@/assets/images/usuario.png')
 						}
-						className='w-14 h-14 rounded-full bg-gray-300 mr-3'
+						style={{
+							width: 70,
+							height: 70,
+							borderRadius: 35,
+							backgroundColor: '#D1D5DB',
+							marginRight: 12,
+						}}
 					/>
 					<View>
-						<ThemedText className='text-lg font-semibold'>
+						<Text
+							style={{
+								fontFamily: 'BebasNeue-Regular',
+								fontWeight: '400',
+								fontSize: 31,
+								color: '#000',
+							}}>
 							Bienvenido, {name}
-						</ThemedText>
-						<Text className='text-gray-500 text-sm'>{message}</Text>
+						</Text>
+
+						<Text
+							style={{
+								fontFamily: 'Montserrat_500Medium',
+								fontWeight: '500',
+								fontSize: 13,
+								color: '#6B7280',
+							}}>
+							{message}
+						</Text>
 					</View>
 				</View>
 
@@ -61,7 +81,7 @@ export const UserHeader: React.FC<Props> = ({
 				</View>
 			</View>
 
-			{/* Panel flotante */}
+			{/* Panel flotante de notificaciones */}
 			{showNotifications && (
 				<View className='absolute right-0 top-16 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-2xl shadow-lg p-3 w-72 z-50'>
 					<Text className='text-base font-semibold mb-2'>Notificaciones</Text>

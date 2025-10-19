@@ -1,40 +1,90 @@
-import { Card, CardContent } from '@/components/card';
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Image, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { QrCodeIcon } from 'react-native-heroicons/outline';
 
 interface Props {
 	daysRemaining: number;
-	qrCodeUrl: string;
 }
 
-export const MembershipCard: React.FC<Props> = ({ daysRemaining, qrCodeUrl }) => {
+export const MembershipCard: React.FC<Props> = ({ daysRemaining }) => {
+	const { width } = Dimensions.get('window');
+	const cardWidth = Math.min(width - 32, 380); // responsive, máx. 380px
+
 	return (
-		<Card className='mb-6'>
-			<CardContent>
-				<View className='flex-row justify-between items-center mb-3'>
-					<View>
-						<Text className='text-lg font-semibold text-gray-900 dark:text-gray-100'>
-							Acceso al Gimnasio
-						</Text>
-						<Text className='text-sm text-gray-500 dark:text-gray-400'>
-							Escanea para ingresar
-						</Text>
-					</View>
-					<Image
-						source={{ uri: qrCodeUrl }} //apartado para el QR
-						className='w-20 h-20 rounded-lg'
-						resizeMode='contain'
-					/>
+		<LinearGradient
+			colors={['#8C4918', '#F27F2A']}
+			locations={[0, 0.7]}
+			start={{ x: 0, y: 0.1 }}
+			end={{ x: 1, y: 0.2 }}
+			style={[styles.card, { width: cardWidth }]}>
+			{/* Contenido principal */}
+			<View style={styles.contentContainer}>
+				{/* Icono QR */}
+				<View style={styles.iconContainer}>
+					<QrCodeIcon size={56} color='#FFFFFF' strokeWidth={0.5} />
 				</View>
-				<View className='border-t border-gray-200 dark:border-neutral-700 pt-2'>
-					<Text className='text-sm text-gray-600 dark:text-gray-300'>
-						Membresía activa:{' '}
-						<Text className='font-semibold text-gray-900 dark:text-gray-100'>
-							{daysRemaining} días restantes
-						</Text>
-					</Text>
+
+				{/* Texto derecho */}
+				<View style={styles.textContainer}>
+					<Text style={styles.title}>Acceso al Gimnasio</Text>
+					<Text style={styles.subtitle}>Escanea para ingresar</Text>
 				</View>
-			</CardContent>
-		</Card>
+			</View>
+
+			{/* Texto inferior */}
+			<Text style={styles.footerText}>Membresía activa: {daysRemaining} días restantes</Text>
+		</LinearGradient>
 	);
 };
+
+const styles = StyleSheet.create({
+	card: {
+		borderRadius: 16,
+		borderWidth: 0.5,
+		borderColor: '#E8E8E8',
+		paddingHorizontal: 16,
+		paddingVertical: 14,
+		alignSelf: 'center',
+		justifyContent: 'space-between',
+		marginVertical: 10,
+	},
+	contentContainer: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		marginBottom: 10,
+	},
+	iconContainer: {
+		width: 145,
+		alignItems: 'center',
+		marginLeft: -30,
+		justifyContent: 'center',
+	},
+	textContainer: {
+		width: 200,
+		justifyContent: 'center',
+		marginLeft: 60,
+	},
+	title: {
+		fontFamily: 'Inter_700Bold',
+		fontSize: 14,
+		fontWeight: '700',
+		color: '#FFFFFF',
+	},
+	subtitle: {
+		fontFamily: 'Inter_400Regular',
+		fontSize: 12,
+		fontWeight: '400',
+		color: '#FFFFFF',
+		letterSpacing: 0.5,
+		marginTop: 4,
+	},
+	footerText: {
+		fontFamily: 'Montserrat_500Medium',
+		fontSize: 16,
+		fontWeight: '500',
+		textAlign: 'center',
+		color: '#FFFFFF',
+	},
+});

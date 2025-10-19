@@ -1,4 +1,5 @@
 // app/(auth)/login.tsx
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Checkbox from 'expo-checkbox';
 import { Link, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -50,7 +51,17 @@ export default function LoginScreen() {
 		try {
 			const response = await api.post('/auth/login', { email, password });
 			console.log('Login exitoso:', response.data);
-			// const { token } = response.data; // Guardar token si es necesario
+
+			// ✅ Guarda el token JWT de la respuesta
+			const token = response.data?.access_token || response.data?.token;
+			if (token) {
+				await AsyncStorage.setItem('token', token);
+				console.log('Token guardado en AsyncStorage');
+			} else {
+				console.warn('No se recibió token en la respuesta del backend.');
+			}
+
+			// 🔄 Redirigir al dashboard
 			router.replace('/(tabs)/dashboard');
 		} catch (error: unknown) {
 			let errorMessage = 'No se pudo conectar al servidor. Inténtalo de nuevo.';
@@ -201,5 +212,3 @@ export default function LoginScreen() {
 		</KeyboardAvoidingView>
 	);
 }
-
-

@@ -1,6 +1,9 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { SecondaryButton } from '@/components/SecondaryButton';
-import { Fonts } from '@/constants/theme'; // Asumiendo que estos existen
+import { Fonts } from '@/constants/theme';
+import api from '@/services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AxiosError } from 'axios';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -15,45 +18,81 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-// Placeholder for the logo component if needed, or use an Image directly
-// import { LogoSimple } from '@/components/auth/Logo';
-
 export default function ConfirmEmailScreen() {
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const [code, setCode] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 
-	// Placeholder for the code input fields if we want to replicate the image's input style
-	// For now, a single TextInput will suffice for simplicity.
-	// In a real app, you'd likely have multiple inputs for each digit.
-
 	const handleConfirmCode = async () => {
-		if (!code) {
-			// Basic validation
+		if (!code.trim()) {
 			alert('Por favor, ingresa el código de confirmación.');
 			return;
 		}
 
 		setIsLoading(true);
-		// TODO: Implement actual API call to verify the code
-		console.log('Código ingresado:', code);
 
 		try {
-			// Example: await api.post('/auth/verify-email', { email: userEmail, code });
-			// For now, we'll just navigate to the next step (e.g., login or dashboard)
-			alert('¡Correo electrónico confirmado!');
-			router.replace('/(tabs)/dashboard'); // Redirigir al dashboard
-		} catch (error) {
-			console.error('Error al confirmar el código:', error);
-			alert('Hubo un error al confirmar el código. Inténtalo de nuevo.');
+			const verifyResponse = await api.put('/auth/activate', { code: code.trim() });
+
+			if (verifyResponse.status !== 200 && verifyResponse.status !== 204) {
+				console.warn('⚠️ Estado inesperado al activar:', verifyResponse.status);
+				alert('Código inválido o expirado. Intenta nuevamente.');
+				return;
+			}
+
+			alert('¡Tu cuenta ha sido activada con éxito!');
+
+			alert('¡Tu cuenta ha sido activada con éxito!');
+
+			const email = await AsyncStorage.getItem('temp_email');
+			const password = await AsyncStorage.getItem('temp_password');
+
+			if (!email || !password) {
+				alert(
+					'No se encontraron las credenciales del registro. Inicia sesión manualmente.',
+				);
+				router.replace('/(auth)/login');
+				return;
+			}
+
+			const loginResponse = await api.post('/auth/login', { email, password });
+
+			const token =
+				loginResponse.data?.token ||
+				loginResponse.data?.access_token ||
+				loginResponse.data?.jwt ||
+				null;
+
+			if (!token) {
+				console.error('❌ No se recibió token después del login automático');
+				alert('No se pudo obtener el token. Inicia sesión manualmente.');
+				router.replace('/(auth)/login');
+				return;
+			}
+
+			await AsyncStorage.setItem('token', token);
+			await AsyncStorage.multiRemove(['temp_email', 'temp_password']);
+
+			router.replace('/(tabs)/dashboard');
+		} catch (err) {
+			const error = err as AxiosError<{ message?: string; error?: string }>;
+			console.error('❌ Error al confirmar o iniciar sesión:', error);
+
+			const backendMessage =
+				error.response?.data?.message ||
+				error.response?.data?.error ||
+				(error.response?.status === 404
+					? 'El endpoint /auth/activate no existe o fue movido.'
+					: 'Hubo un error inesperado.');
+
+			alert(backendMessage);
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
 	const handleResendCode = () => {
-		// TODO: Implement logic to resend the confirmation code
 		alert('Se ha reenviado el código de confirmación.');
 	};
 
@@ -73,8 +112,8 @@ export default function ConfirmEmailScreen() {
 				{/* Logo */}
 				<View className='items-center mb-8'>
 					<Image
-						source={require('../../assets/images/Component_7.png')} // Adjust path if necessary
-						className='w-32 h-32' // Adjust size as needed
+						source={require('../../assets/images/Component_7.png')}
+						className='w-32 h-32'
 						resizeMode='contain'
 					/>
 				</View>
@@ -82,8 +121,7 @@ export default function ConfirmEmailScreen() {
 				{/* Title */}
 				<Text
 					className='text-3xl font-bold text-center mb-4'
-					style={{ fontFamily: Fonts.title }} // Assuming Fonts.title is defined
-				>
+					style={{ fontFamily: Fonts.title }}>
 					Confirma tu Correo Electrónico
 				</Text>
 
@@ -92,7 +130,7 @@ export default function ConfirmEmailScreen() {
 					Te hemos enviado un código a tu correo electrónico.
 				</Text>
 
-				{/* Code Input - Simplified for now */}
+				{/* Code Input */}
 				<View className='w-full max-w-xs mb-8'>
 					<Text className='text-sm text-gray-500 mb-1 font-semibold'>
 						Código de confirmación
@@ -100,14 +138,13 @@ export default function ConfirmEmailScreen() {
 					<TextInput
 						value={code}
 						onChangeText={setCode}
-						keyboardType='default' // Allow alphanumeric input
+						keyboardType='default'
 						autoComplete='off'
 						autoCapitalize='none'
 						className='border border-gray-300 rounded-lg px-4 py-3 text-center text-lg'
-						style={{ fontFamily: Fonts.medium }} // Assuming Fonts.medium exists
+						style={{ fontFamily: Fonts.medium }}
 						placeholder='----'
 					/>
-					{/* You might want to add more sophisticated input fields here for each digit */}
 				</View>
 
 				{/* Resend Code Link */}
@@ -124,10 +161,7 @@ export default function ConfirmEmailScreen() {
 						onPress={handleConfirmCode}
 						disabled={isLoading}
 					/>
-					<SecondaryButton
-						title='Cancelar'
-						onPress={() => router.back()} // Or navigate to a different screen
-					/>
+					<SecondaryButton title='Cancelar' onPress={() => router.back()} />
 				</View>
 			</ScrollView>
 		</KeyboardAvoidingView>
