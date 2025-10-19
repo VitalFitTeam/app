@@ -6,10 +6,11 @@ import { UserHeader } from '@/components/auth/dashboard/userheader';
 import { WeekCalendar } from '@/components/auth/dashboard/weekcalendar';
 import { ThemedView } from '@/components/themed-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView } from 'react-native';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+const API_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL || process.env.EXPO_PUBLIC_API_URL;
 
 export default function DashboardScreen() {
 	const [firstName, setFirstName] = useState<string | null>(null);
@@ -21,11 +22,11 @@ export default function DashboardScreen() {
 				const token = await AsyncStorage.getItem('token');
 
 				if (!token) {
-					console.error('No se encontró token en AsyncStorage');
+					console.error('❌ No se encontró token en AsyncStorage');
 					return;
 				}
 
-				const response = await fetch(`${API_URL}/user/whoami`, {
+				const response = await fetch(`${API_URL.replace(/\/+$/, '')}/user/whoami`, {
 					method: 'GET',
 					headers: {
 						Accept: 'application/json',
@@ -37,14 +38,15 @@ export default function DashboardScreen() {
 				const text = await response.text();
 
 				if (!response.ok) {
-					console.error('Error al obtener el usuario:', response.status);
+					console.error('❌ Error al obtener el usuario:', response.status);
 					return;
 				}
 
 				const data = JSON.parse(text);
+
 				setFirstName(data?.user?.first_name || 'Usuario');
 			} catch (error) {
-				console.error('Error en la solicitud:', error);
+				console.error('💥 Error en la solicitud whoami:', error);
 			} finally {
 				setLoading(false);
 			}
@@ -67,7 +69,7 @@ export default function DashboardScreen() {
 				<UserHeader
 					name={firstName ?? 'Usuario'}
 					message='Es hora de desafiar tus límites'
-					avatarUrl='https://randomuser.me/api/portraits/women/45.jpg'
+					avatarUrl='https://randomuser.me/api/portraits/men/32.jpg'
 				/>
 				<WeekCalendar />
 				<MembershipCard daysRemaining={15} />

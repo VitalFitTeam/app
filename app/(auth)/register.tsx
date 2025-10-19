@@ -8,7 +8,8 @@ import { Colors, Fonts } from '@/constants/theme';
 import { RegisterData, RegisterSchema, Step1Schema, Step2Schema } from '@/schemas/register';
 import api from '@/services/api';
 import { zodResolver } from '@hookform/resolvers/zod';
-import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AxiosError } from 'axios';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -23,15 +24,15 @@ export default function RegisterScreen() {
 		handleSubmit,
 		trigger,
 		formState: { errors },
-		getValues, // getValues is now available
-		setError, // setError is now available
+		getValues,
+		setError,
 	} = useForm<RegisterData>({
 		resolver: zodResolver(RegisterSchema),
 		defaultValues: { acceptTerms: false },
 	});
 
 	const onSubmit = async (data: RegisterData) => {
-		console.log('Enviando datos:', data);
+		console.log('📤 Enviando datos:', data);
 
 		const allowedKeys = [
 			'gender',
@@ -63,39 +64,35 @@ export default function RegisterScreen() {
 				profile_picture_url: '',
 			};
 
-			const response = await api.post('/auth/register', payload);
+			// 🔹 Registro del usuario
+			await api.post('/auth/register', payload);
 
-			const token =
-				response.data?.token || response.data?.access_token || response.data?.jwt || null;
+			// 🔹 Guardamos las credenciales temporalmente para el login post-activación
+			await AsyncStorage.setItem('temp_email', cleanedData.email);
+			await AsyncStorage.setItem('temp_password', cleanedData.password);
 
-			if (token) {
-				console.log('Token JWT recibido:', token);
+			console.log('✅ Registro exitoso, credenciales temporales guardadas.');
+
+			Alert.alert(
+				'¡Registro exitoso!',
+				'Verifica tu correo electrónico para continuar con la activación.',
+			);
+			router.replace('/(auth)/confirm-email');
+		} catch (err) {
+			const error = err as AxiosError<{ message?: string; error?: string }>;
+			console.error('❌ Error al registrar:', error);
+
+			if (error.response?.status === 409) {
+				Alert.alert(
+					'Error de registro',
+					'Este correo electrónico ya está registrado. Por favor, inicia sesión o utiliza un correo diferente.',
+				);
 			} else {
-				console.warn('');
-			}
-
-			Alert.alert('¡Registro exitoso!', 'Verifica tu correo electrónico para continuar.');
-			router.replace('/(auth)/confirm-email'); // Redirigir a la pantalla de confirmación de correo
-		} catch (error: unknown) {
-			if (axios.isAxiosError(error)) {
-				console.error('Error al registrar:', error);
-				// Manejo específico para el error 409 (Conflicto)
-				if (error.response?.status === 409) {
-					Alert.alert(
-						'Error de registro',
-						'Este correo electrónico ya está registrado. Por favor, inicia sesión o utiliza un correo diferente.',
-					);
-				} else {
-					// Mensaje genérico para otros errores de Axios
-					const message =
-						error.response?.data?.message ||
-						'Hubo un error al registrar. Intenta nuevamente.';
-					Alert.alert('Error de registro', message);
-				}
-			} else {
-				// Manejo para errores no relacionados con Axios
-				console.error('Error inesperado:', error);
-				Alert.alert('Error de registro', 'Ocurrió un error inesperado.');
+				const message =
+					error.response?.data?.message ||
+					error.response?.data?.error ||
+					'Hubo un error al registrar. Intenta nuevamente.';
+				Alert.alert('Error de registro', message);
 			}
 		}
 	};
@@ -104,22 +101,17 @@ export default function RegisterScreen() {
 		const fieldsToValidate: (keyof RegisterData)[] =
 			step === 1 ? ['gender'] : ['email', 'password', 'confirmPassword'];
 
-		// Ejecuta la validación para mostrar errores en la UI rápidamente
 		await trigger(fieldsToValidate);
 
-		// Obtiene el esquema correcto para el paso actual
 		const currentSchema = step === 1 ? Step1Schema : Step2Schema;
 		const values = getValues();
 
-		// Realiza una validación robusta con el esquema del paso
 		const result = currentSchema.safeParse(values);
 
 		if (result.success) {
-			// Si la validación es exitosa, avanza al siguiente paso
 			setStep(step + 1);
 		} else {
-			// Si hay errores, los muestra en los campos correspondientes
-			result.error.issues.forEach((issue: import('zod').ZodIssue) => {
+			result.error.issues.forEach((issue) => {
 				setError(issue.path[0] as keyof RegisterData, {
 					type: 'manual',
 					message: issue.message,
