@@ -1,43 +1,13 @@
 import { MembershipCard } from '@/components/auth/dashboard/membershipcard';
+import { ProgressCard } from '@/components/auth/dashboard/progresscard';
+import { ReservedClassesCard } from '@/components/auth/dashboard/reservedclasses';
+import { TodayRoutineCard } from '@/components/auth/dashboard/todayroutinecard';
 import { UserHeader } from '@/components/auth/dashboard/userheader';
 import { WeekCalendar } from '@/components/auth/dashboard/weekcalendar';
-import { PrimaryButton } from '@/components/PrimaryButton';
-import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedView } from '@/components/themed-view';
-import axios from 'axios';
-import { useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 
 export default function DashboardScreen() {
-	const [code, setCode] = useState('');
-	const API_URL = process.env.EXPO_PUBLIC_API_URL;
-
-	const handleActivate = async () => {
-		if (!code.trim()) {
-			Alert.alert('Error', 'Por favor ingresa tu código de activación.');
-			return;
-		}
-
-		try {
-			const response = await axios.put(`${API_URL}/auth/activate`, {
-				code,
-			});
-
-			Alert.alert('Activación', response.data?.message || 'Activación exitosa ✅');
-		} catch (error: unknown) {
-			if (axios.isAxiosError(error)) {
-				console.error('Error al activar:', error);
-				const message =
-					error.response?.data?.message ||
-					'Hubo un error al activar. Intenta nuevamente.';
-				Alert.alert('Error', message);
-			} else {
-				console.error(error);
-				Alert.alert('Error', 'Error inesperado');
-			}
-		}
-	};
-
 	return (
 		<ThemedView className='flex-1 bg-white dark:bg-neutral-950 px-4 pt-10'>
 			<ScrollView showsVerticalScrollIndicator={false}>
@@ -47,20 +17,14 @@ export default function DashboardScreen() {
 					avatarUrl='https://randomuser.me/api/portraits/women/45.jpg'
 				/>
 				<WeekCalendar />
-				<MembershipCard
-					daysRemaining={15}
-					qrCodeUrl='https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=gym-access'
+				<MembershipCard daysRemaining={15} />
+				<ProgressCard weekProgress={0.8} calories={1200} completed='4/5' />
+				<ReservedClassesCard reserved={0} />
+				<TodayRoutineCard
+					title='Day 05 - Warm Up'
+					time='07:00 - 08:00 AM'
+					date='Mon 26 Apr'
 				/>
-
-				{/* Bloque de activación */}
-				<View className='mt-8'>
-					<StyledTextInput
-						placeholder='Ingresa tu código de activación'
-						value={code}
-						onChangeText={setCode}
-					/>
-					<PrimaryButton title='Activar cuenta' onPress={handleActivate} />
-				</View>
 			</ScrollView>
 		</ThemedView>
 	);
