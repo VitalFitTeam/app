@@ -2,19 +2,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Checkbox from 'expo-checkbox';
 import { Link, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { Eye, EyeOff, SlidersVertical } from 'lucide-react-native';
+import { useState } from 'react';
 import {
 	Alert,
 	Keyboard,
 	KeyboardAvoidingView,
-	KeyboardEvent,
 	Platform,
-	ScrollView,
 	Text,
 	TextInput,
+	TouchableOpacity,
 	TouchableWithoutFeedback,
 	View,
-} from 'react-native';
+} from 'react-native'; // <ScrollView> removed
 
 // Componentes personalizados
 import { LogoSimple } from '@/components/auth/Logo';
@@ -28,12 +28,12 @@ import api from '@/services/api';
 export default function LoginScreen() {
 	const router = useRouter();
 	const [isChecked, setChecked] = useState(false);
-	const [keyboardHeight, setKeyboardHeight] = useState(0);
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
 
-	// --- 🔐 Manejo de login con backend ---
+	//  Manejo de login con backend ---
 	const handleLogin = async () => {
 		if (!email || !password) {
 			Alert.alert('Error', 'Por favor, ingresa tu correo y contraseña.');
@@ -52,7 +52,7 @@ export default function LoginScreen() {
 			const response = await api.post('/auth/login', { email, password });
 			console.log('Login exitoso:', response.data);
 
-			// ✅ Guarda el token JWT de la respuesta
+			// Guarda el token JWT de la respuesta
 			const token = response.data?.access_token || response.data?.token;
 			if (token) {
 				await AsyncStorage.setItem('token', token);
@@ -61,7 +61,7 @@ export default function LoginScreen() {
 				console.warn('No se recibió token en la respuesta del backend.');
 			}
 
-			// 🔄 Redirigir al dashboard
+			// Redirigir al dashboard
 			router.replace('/(tabs)/dashboard');
 		} catch (error: unknown) {
 			let errorMessage = 'No se pudo conectar al servidor. Inténtalo de nuevo.';
@@ -79,135 +79,133 @@ export default function LoginScreen() {
 		}
 	};
 
-	// --- ⌨️ Altura del teclado ---
-	useEffect(() => {
-		const showListener = Keyboard.addListener('keyboardDidShow', (e: KeyboardEvent) =>
-			setKeyboardHeight(e.endCoordinates.height),
-		);
-		const hideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardHeight(0));
-
-		return () => {
-			showListener.remove();
-			hideListener.remove();
-		};
-	}, []);
-
-	// --- 🎨 UI principal (basada en el diseño estético del primero) ---
 	return (
 		<KeyboardAvoidingView
 			style={{ flex: 1 }}
-			behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-				<ScrollView
-					contentContainerStyle={{
-						flexGrow: 1,
-						paddingBottom: keyboardHeight,
+				<View // Reemplazado ScrollView por View
+					style={{
+						flex: 1, // Añadir flex: 1 para ocupar todo el espacio
+						justifyContent: 'center',
+						paddingHorizontal: 32,
+						paddingVertical: 16,
 					}}
-					keyboardShouldPersistTaps='handled'>
-					<View className='flex-1 bg-white px-8 pt-16'>
-						<View className='w-full max-w-sm self-center'>
-							{/* Logo */}
-							<View className='items-center mb-6'>
-								<LogoSimple />
+					className='bg-white'>
+					<View className='w-full max-w-sm self-center'>
+						{/* Logo */}
+						<View className='items-center mb-2'>
+							<LogoSimple size={250} />
+						</View>
+
+						{/* Título */}
+						<Text
+							className='text-4xl text-black mb-2 uppercase text-center'
+							style={{ fontFamily: Fonts.title }}>
+							Iniciar Sesión
+						</Text>
+
+						{/* Subtítulo */}
+						<Text className='text-gray-500 text-center mb-8 text-lg'>
+							Ingresa tus credenciales para iniciar sesión
+						</Text>
+
+						{/* Inputs */}
+						<View className='px-2 mt-6 gap-6'>
+							{/* Correo */}
+							<View className='mb-4'>
+								<Text className='text-black font-bold text-sm mb-1 ml-1'>
+									Correo electrónico
+								</Text>
+								<TextInput
+									placeholder='Ingresa tu correo electrónico'
+									value={email}
+									onChangeText={setEmail}
+									keyboardType='email-address'
+									autoCapitalize='none'
+									className='border border-gray-300 rounded-md px-4 py-3'
+								/>
 							</View>
 
-							{/* Línea separadora */}
-							<View className='h-[1px] w-full bg-gray-300 mb-6 bottom-20' />
-
-							{/* Título */}
-							<Text
-								className='text-4xl text-black mb-2 uppercase text-center bottom-20'
-								style={{ fontFamily: Fonts.title }}>
-								Iniciar Sesión
-							</Text>
-
-							{/* Subtítulo */}
-							<Text className='text-gray-500 text-center mb-8 text-lg bottom-20'>
-								Ingresa tus credenciales para iniciar sesión
-							</Text>
-
-							{/* Inputs */}
-							<View className='px-2 mt-6 gap-6 bottom-20'>
-								{/* Correo */}
-								<View className='mb-4'>
-									<Text className='text-black font-bold text-sm mb-1 ml-1'>
-										Correo electrónico
-									</Text>
-									<TextInput
-										placeholder='Ingresa tu correo electrónico'
-										value={email}
-										onChangeText={setEmail}
-										keyboardType='email-address'
-										autoCapitalize='none'
-										className='border border-gray-300 rounded-md px-4 py-3'
+							{/* Contraseña */}
+							<View className='mb-4'>
+								<View className='flex-row items-center mb-1 ml-1'>
+									<SlidersVertical
+										size={16}
+										color={Colors.light.text}
+										className='mr-2'
 									/>
+									<Text className='text-black font-bold text-sm'>Contraseña</Text>
 								</View>
-
-								{/* Contraseña */}
-								<View className='mb-4'>
-									<Text className='text-black font-bold text-sm mb-1 ml-1'>
-										Contraseña
-									</Text>
+								<View className='flex-row items-center border border-gray-300 rounded-md px-4 py-3'>
 									<TextInput
 										placeholder='Ingresa tu contraseña'
-										secureTextEntry
+										secureTextEntry={!showPassword}
 										value={password}
 										onChangeText={setPassword}
-										className='border border-gray-300 rounded-md px-4 py-3'
+										className='flex-1'
 									/>
+									<TouchableOpacity
+										onPress={() => setShowPassword(!showPassword)}>
+										{showPassword ? (
+											<EyeOff size={20} color={Colors.light.icon} />
+										) : (
+											<Eye size={20} color={Colors.light.icon} />
+										)}
+									</TouchableOpacity>
 								</View>
-							</View>
-
-							{/* Checkbox y link */}
-							<View className='w-full flex-row gap-4 items-center my-4 bottom-20'>
-								<View className='flex-row items-center'>
-									<Checkbox
-										value={isChecked}
-										onValueChange={setChecked}
-										color={isChecked ? Colors.light.tint : undefined}
-										style={{
-											transform: [{ scale: 0.7 }],
-											borderRadius: 5,
-										}}
-									/>
-									<Text className='ml-2 text-gray-600 text-xs'>
-										Mantener sesión
-									</Text>
-								</View>
-								<Link href='/(auth)/forgot-password'>
-									<View className='flex-row items-center gap-1'>
-										<Text className='text-blue-500 font-semibold text-xs'>
-											¿Olvidaste tu contraseña?
-										</Text>
-										<Text className='text-orange-500 text-xs'>Recuperar</Text>
-									</View>
-								</Link>
-							</View>
-
-							{/* Botones */}
-							<View className='gap-4 mb-4 bottom-20'>
-								<PrimaryButton
-									title={isLoading ? 'Iniciando...' : 'Iniciar sesión'}
-									onPress={handleLogin}
-									disabled={isLoading}
-								/>
-								<SocialButton title='Sign in with Google' iconName='google' />
-							</View>
-
-							{/* Registro */}
-							<View className='mt-8 flex-row justify-center bottom-20'>
-								<Text className='text-gray-600'>
-									¿No tienes cuenta aún?{' '}
-									<Link href='/(auth)/register'>
-										<Text className='text-blue-500 font-semibold'>
-											Regístrate
-										</Text>
-									</Link>
-								</Text>
 							</View>
 						</View>
+
+						{/* Checkbox y link */}
+						<View className='w-full flex-row justify-between items-center my-4'>
+							<View className='flex-row items-center'>
+								<Checkbox
+									value={isChecked}
+									onValueChange={setChecked}
+									color={isChecked ? Colors.light.tint : undefined}
+									style={{
+										transform: [{ scale: 0.7 }],
+										borderRadius: 5,
+									}}
+								/>
+								<Text className='ml-2 text-gray-600 text-xs'>Mantener sesión</Text>
+							</View>
+							<Link href='/(auth)/forgot-password' asChild>
+								<TouchableOpacity>
+									<View className='flex-row items-center'>
+										<Text className='text-xs text-gray-600'>
+											¿Olvidaste tu contraseña?{' '}
+										</Text>
+										<Text className='text-[#F27F2A] font-semibold text-xs'>
+											Recuperar
+										</Text>
+									</View>
+								</TouchableOpacity>
+							</Link>
+						</View>
+
+						{/* Botones */}
+						<View className='gap-4 mb-4'>
+							<PrimaryButton
+								title={isLoading ? 'Iniciando...' : 'Iniciar sesión'}
+								onPress={handleLogin}
+								disabled={isLoading}
+							/>
+							<SocialButton title='Sign in with Google' iconName='google' />
+						</View>
+
+						{/* Registro (Margin ajustado) */}
+						<View className='mt-1 flex-row justify-center items-center'>
+							<Text className='text-gray-600'>¿No tienes cuenta aún? </Text>
+							<Link href='/(auth)/register' asChild>
+								<TouchableOpacity>
+									<Text className='font-semibold text-[#F27F2A]'>Regístrate</Text>
+								</TouchableOpacity>
+							</Link>
+						</View>
 					</View>
-				</ScrollView>
+				</View>
 			</TouchableWithoutFeedback>
 		</KeyboardAvoidingView>
 	);
