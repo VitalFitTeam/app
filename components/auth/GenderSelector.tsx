@@ -15,8 +15,8 @@ type Option = {
 };
 
 const options: readonly Option[] = [
-	{ id: 'female', label: 'Mujer' },
-	{ id: 'male', label: 'Hombre' },
+	{ id: 'female', label: 'Mujer', image: require('@/assets/images/Female.svg') },
+	{ id: 'male', label: 'Hombre', image: require('@/assets/images/Man.svg') },
 	{ id: 'prefer-not-to-say', label: 'Prefiero no especificarlo' },
 ];
 
@@ -33,33 +33,43 @@ export function GenderSelector({ onSelect, selected }: Props) {
 	}, [selected]);
 
 	return (
-		<View className='w-full gap-y-3'>
+		<View className='w-full gap-y-4'>
 			{options.map((option) => (
 				<TouchableOpacity
 					key={option.id}
 					onPress={() => handlePress(option.id)}
 					className={`
-            h-16 w-full flex-row items-center justify-between rounded-lg border px-4
+            w-full flex-row items-center justify-between rounded-2xl p-4
             ${
-				internalSelected === option.id
-					? 'border-orange-500 bg-gray-800'
-					: 'border-gray-300 bg-gray-100 dark:bg-gray-800 dark:border-gray-600'
+				internalSelected === option.id ? 'bg-gray-800' : 'bg-white' // Puedes ajustar el color de fondo para no seleccionados si es necesario
 			}
           `}>
-					<Text
-						className={`text-lg ${
-							internalSelected === option.id
-								? 'text-white'
-								: 'text-black dark:text-white'
-						}`}>
-						{option.label ?? option.id}
-					</Text>
-					{option.image && (
-						<Image
-							source={option.image}
-							style={{ width: 50, height: 50, resizeMode: 'contain' }}
-						/>
-					)}
+					<View className='flex-row items-center'>
+						<Text
+							className={`text-lg font-bold ${
+								internalSelected === option.id ? 'text-white' : 'text-black'
+							}`}>
+							{option.label ?? option.id}
+						</Text>
+					</View>
+					<View className='flex-row items-center'>
+						{option.image && (
+							<Image
+								source={option.image}
+								style={{ width: 60, height: 60, resizeMode: 'contain' }}
+							/>
+						)}
+						<View
+							className={`ml-4 h-6 w-6 items-center justify-center rounded-full border-2 ${
+								internalSelected === option.id
+									? 'border-green-500'
+									: 'border-gray-400'
+							}`}>
+							{internalSelected === option.id && (
+								<View className='h-3 w-3 rounded-full bg-green-500' />
+							)}
+						</View>
+					</View>
 				</TouchableOpacity>
 			))}
 		</View>

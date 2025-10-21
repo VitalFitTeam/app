@@ -1,9 +1,12 @@
+// RegisterScreen.tsx
+
 import { Logo } from '@/components/auth/Logo';
 import { Step1Gender } from '@/components/auth/register/Step1Gender';
 import { Step2Credentials } from '@/components/auth/register/Step2Credentials';
 import { Step3PersonalDetails } from '@/components/auth/register/Step3PersonalDetails';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ToastNotification } from '@/components/ToastNotification';
 import { Colors, Fonts } from '@/constants/theme';
 import { RegisterData, RegisterSchema, Step1Schema, Step2Schema } from '@/schemas/register';
 import api from '@/services/api';
@@ -13,11 +16,22 @@ import { AxiosError } from 'axios';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
 
 export default function RegisterScreen() {
 	const router = useRouter();
 	const [step, setStep] = useState(1);
+	const [toast, setToast] = useState<{
+		visible: boolean;
+		type: 'success' | 'error';
+		title: string;
+		message: string;
+	}>({
+		visible: false,
+		type: 'success',
+		title: '',
+		message: '',
+	});
 
 	const {
 		control,
@@ -31,7 +45,8 @@ export default function RegisterScreen() {
 		defaultValues: { acceptTerms: false },
 	});
 
-	const onSubmit = async (data: RegisterData) => {
+	const handleRegistration = async (data: RegisterData) => {
+		// ⬅️ Renombrada para claridad
 		console.log('📤 Enviando datos:', data);
 
 		const allowedKeys = [
@@ -73,29 +88,47 @@ export default function RegisterScreen() {
 
 			console.log('✅ Registro exitoso, credenciales temporales guardadas.');
 
-			Alert.alert(
-				'¡Registro exitoso!',
-				'Verifica tu correo electrónico para continuar con la activación.',
-			);
-			router.replace('/(auth)/confirm-email');
+			// Mostrar toast de éxito
+			setToast({
+				visible: true,
+				type: 'success',
+				title: 'Revisa tu correo',
+				message: 'Codigo enviado correctamente',
+			});
+
+			// Redirigir después de 2 segundos
+			setTimeout(() => {
+				router.replace('/(auth)/confirm-email');
+			}, 2000);
 		} catch (err) {
 			const error = err as AxiosError<{ message?: string; error?: string }>;
 			console.error('❌ Error al registrar:', error);
 
 			if (error.response?.status === 409) {
-				Alert.alert(
-					'Error de registro',
-					'Este correo electrónico ya está registrado. Por favor, inicia sesión o utiliza un correo diferente.',
-				);
+				setToast({
+					visible: true,
+					type: 'error',
+					title: 'Error al enviar el correo',
+					message: 'Revisa el correo ingresado',
+				});
 			} else {
 				const message =
 					error.response?.data?.message ||
 					error.response?.data?.error ||
-					'Hubo un error al registrar. Intenta nuevamente.';
-				Alert.alert('Error de registro', message);
+					'Revisa el correo ingresado';
+				setToast({
+					visible: true,
+					type: 'error',
+					title: 'Error al enviar el correo',
+					message: message,
+				});
 			}
 		}
 	};
+
+	// 💡 Función de utilidad de React Hook Form para manejar el envío y la validación.
+	// Esta es la función que debe ser llamada por el botón del Paso 3.
+	const onSubmitPress = handleSubmit(handleRegistration); // ⬅️ Nueva función
 
 	const nextStep = async () => {
 		const fieldsToValidate: (keyof RegisterData)[] =
@@ -120,17 +153,36 @@ export default function RegisterScreen() {
 		}
 	};
 
-	return (
+	const content = (
 		<ThemedView style={styles.container}>
+			<ToastNotification
+				type={toast.type}
+				title={toast.title}
+				message={toast.message}
+				visible={toast.visible}
+				onClose={() => setToast({ ...toast, visible: false })}
+			/>
 			<View style={styles.formContainer}>
 				<Logo />
-				<ThemedText style={{ fontFamily: Fonts.title, ...styles.mainTitle }}>
-					{step === 1 ? '¿CUÁL ES TU GÉNERO?' : 'CREA TU CUENTA'}
-				</ThemedText>
-				{step > 1 && (
-					<ThemedText style={styles.subtitle}>
-						{step === 2 ? 'Ingresa tus credenciales' : 'Ingresa tus datos personales'}
+				{step === 1 && (
+					<ThemedText style={[styles.mainTitle, { fontFamily: Fonts.title }]}>
+						¿CUÁL ES TU GÉNERO?
 					</ThemedText>
+				)}
+				{step === 2 && (
+					<>
+						<ThemedText style={[styles.mainTitle, { fontFamily: Fonts.title }]}>
+							CREA TU CUENTA
+						</ThemedText>
+						<Text className='text-gray-500 text-center mb-8 text-lg'>
+							Ingresa tus credenciales para registrarte
+						</Text>
+					</>
+				)}
+				{step === 3 && (
+					<Text className='text-gray-500 text-center mb-8 text-lg'>
+						Completa tus datos para crear tu cuenta
+					</Text>
 				)}
 
 				<View style={styles.stepContainer}>
@@ -144,7 +196,7 @@ export default function RegisterScreen() {
 						<Step3PersonalDetails
 							control={control}
 							errors={errors}
-							onSubmit={handleSubmit(onSubmit)}
+							onSubmit={onSubmitPress} // ⬅️ CORRECCIÓN: Se usa la función de manejo de envío final
 						/>
 					)}
 				</View>
@@ -160,6 +212,16 @@ export default function RegisterScreen() {
 			</View>
 		</ThemedView>
 	);
+
+	if (Platform.OS === 'ios') {
+		return (
+			<KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
+				{content}
+			</KeyboardAvoidingView>
+		);
+	}
+
+	return content;
 }
 
 const styles = StyleSheet.create({
@@ -171,9 +233,14 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		flex: 1,
 	},
-	stepContainer: { width: '100%', alignItems: 'center', gap: 16 },
-	mainTitle: { fontSize: 32, marginBottom: 8, textAlign: 'center' },
-	subtitle: { fontSize: 16, color: '#5C5E60', marginBottom: 24, textAlign: 'center' },
+	stepContainer: { flex: 1, width: '100%', alignItems: 'center', gap: 16 },
+	mainTitle: {
+		fontSize: 32,
+		marginBottom: 8,
+		textAlign: 'center',
+		color: '#F27F2A',
+		lineHeight: 38,
+	},
 	footer: { marginTop: 'auto', paddingBottom: 40 },
 	footerText: { color: '#5C5E60' },
 	footerLink: { color: Colors.light.tint, fontWeight: '600' },
