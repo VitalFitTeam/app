@@ -16,7 +16,7 @@ import { AxiosError } from 'axios';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function RegisterScreen() {
 	const router = useRouter();
@@ -46,7 +46,6 @@ export default function RegisterScreen() {
 	});
 
 	const handleRegistration = async (data: RegisterData) => {
-		// ⬅️ Renombrada para claridad
 		console.log('📤 Enviando datos:', data);
 
 		const allowedKeys = [
@@ -126,9 +125,7 @@ export default function RegisterScreen() {
 		}
 	};
 
-	// 💡 Función de utilidad de React Hook Form para manejar el envío y la validación.
-	// Esta es la función que debe ser llamada por el botón del Paso 3.
-	const onSubmitPress = handleSubmit(handleRegistration); // ⬅️ Nueva función
+	const onSubmitPress = handleSubmit(handleRegistration);
 
 	const nextStep = async () => {
 		const fieldsToValidate: (keyof RegisterData)[] =
@@ -153,79 +150,99 @@ export default function RegisterScreen() {
 		}
 	};
 
-	const content = (
-		<ThemedView style={styles.container}>
-			<ToastNotification
-				type={toast.type}
-				title={toast.title}
-				message={toast.message}
-				visible={toast.visible}
-				onClose={() => setToast({ ...toast, visible: false })}
-			/>
-			<View style={styles.formContainer}>
-				<Logo />
-				{step === 1 && (
-					<ThemedText style={[styles.mainTitle, { fontFamily: Fonts.title }]}>
-						¿CUÁL ES TU GÉNERO?
-					</ThemedText>
-				)}
-				{step === 2 && (
-					<>
-						<ThemedText style={[styles.mainTitle, { fontFamily: Fonts.title }]}>
-							CREA TU CUENTA
-						</ThemedText>
-						<Text className='text-gray-500 text-center mb-8 text-lg'>
-							Ingresa tus credenciales para registrarte
-						</Text>
-					</>
-				)}
-				{step === 3 && (
-					<Text className='text-gray-500 text-center mb-8 text-lg'>
-						Completa tus datos para crear tu cuenta
-					</Text>
-				)}
+	return (
+		<KeyboardAvoidingView
+			style={styles.keyboardView}
+			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
+			<ScrollView
+				contentContainerStyle={styles.scrollContent}
+				keyboardShouldPersistTaps='handled'
+				showsVerticalScrollIndicator={false}>
+				<ThemedView style={styles.container}>
+					<ToastNotification
+						type={toast.type}
+						title={toast.title}
+						message={toast.message}
+						visible={toast.visible}
+						onClose={() => setToast({ ...toast, visible: false })}
+					/>
+					<View style={styles.formContainer}>
+						<Logo />
+						{step === 1 && (
+							<ThemedText style={[styles.mainTitle, { fontFamily: Fonts.title }]}>
+								¿CUÁL ES TU GÉNERO?
+							</ThemedText>
+						)}
+						{step === 2 && (
+							<>
+								<ThemedText style={[styles.mainTitle, { fontFamily: Fonts.title }]}>
+									CREA TU CUENTA
+								</ThemedText>
+								<Text className='text-gray-500 text-center mb-8 text-lg'>
+									Ingresa tus credenciales para registrarte
+								</Text>
+							</>
+						)}
+						{step === 3 && (
+							<Text className='text-gray-500 text-center mb-8 text-lg'>
+								Completa tus datos para crear tu cuenta
+							</Text>
+						)}
 
-				<View style={styles.stepContainer}>
-					{step === 1 && (
-						<Step1Gender control={control} errors={errors} onNextStep={nextStep} />
-					)}
-					{step === 2 && (
-						<Step2Credentials control={control} errors={errors} onNextStep={nextStep} />
-					)}
-					{step === 3 && (
-						<Step3PersonalDetails
-							control={control}
-							errors={errors}
-							onSubmit={onSubmitPress} // ⬅️ CORRECCIÓN: Se usa la función de manejo de envío final
-						/>
-					)}
-				</View>
+						<View style={styles.stepContainer}>
+							{step === 1 && (
+								<Step1Gender
+									control={control}
+									errors={errors}
+									onNextStep={nextStep}
+								/>
+							)}
+							{step === 2 && (
+								<Step2Credentials
+									control={control}
+									errors={errors}
+									onNextStep={nextStep}
+								/>
+							)}
+							{step === 3 && (
+								<Step3PersonalDetails
+									control={control}
+									errors={errors}
+									onSubmit={onSubmitPress}
+								/>
+							)}
+						</View>
 
-				<View style={styles.footer}>
-					<Link href='/(auth)/login'>
-						<Text style={styles.footerText}>
-							¿Ya tienes una cuenta?
-							<Text style={styles.footerLink}> Iniciar sesión</Text>
-						</Text>
-					</Link>
-				</View>
-			</View>
-		</ThemedView>
+						<View style={styles.footer}>
+							<Link href='/(auth)/login'>
+								<Text style={styles.footerText}>
+									¿Ya tienes una cuenta?
+									<Text style={styles.footerLink}> Iniciar sesión</Text>
+								</Text>
+							</Link>
+						</View>
+					</View>
+				</ThemedView>
+			</ScrollView>
+		</KeyboardAvoidingView>
 	);
-
-	if (Platform.OS === 'ios') {
-		return (
-			<KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
-				{content}
-			</KeyboardAvoidingView>
-		);
-	}
-
-	return content;
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, alignItems: 'center', backgroundColor: 'white', paddingTop: 60 },
+	keyboardView: {
+		flex: 1,
+		backgroundColor: 'white',
+	},
+	scrollContent: {
+		flexGrow: 1,
+	},
+	container: {
+		flex: 1,
+		alignItems: 'center',
+		backgroundColor: 'white',
+		paddingTop: 60,
+	},
 	formContainer: {
 		width: '100%',
 		maxWidth: 384,
@@ -233,7 +250,12 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		flex: 1,
 	},
-	stepContainer: { flex: 1, width: '100%', alignItems: 'center', gap: 16 },
+	stepContainer: {
+		flex: 1,
+		width: '100%',
+		alignItems: 'center',
+		gap: 16,
+	},
 	mainTitle: {
 		fontSize: 32,
 		marginBottom: 8,
@@ -241,7 +263,15 @@ const styles = StyleSheet.create({
 		color: '#F27F2A',
 		lineHeight: 38,
 	},
-	footer: { marginTop: 'auto', paddingBottom: 40 },
-	footerText: { color: '#5C5E60' },
-	footerLink: { color: Colors.light.tint, fontWeight: '600' },
+	footer: {
+		marginTop: 'auto',
+		paddingBottom: 40,
+	},
+	footerText: {
+		color: '#5C5E60',
+	},
+	footerLink: {
+		color: Colors.light.tint,
+		fontWeight: '600',
+	},
 });

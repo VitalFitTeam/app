@@ -1,5 +1,7 @@
 // components/auth/register/Step2Credentials.tsx
+import { Colors } from '@/constants/theme';
 import { RegisterData } from '@/schemas/register'; // Asegúrate de importar esto
+import { SlidersVertical } from 'lucide-react-native';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 import { PrimaryButton } from '../../PrimaryButton';
 import { StyledTextInput } from '../../StyledTextInput';
@@ -38,6 +40,7 @@ export function Step2Credentials({ control, errors, onNextStep }: Props) {
 						value={value}
 						error={errors.password?.message}
 						isPasswordInput // Activa el ícono del ojo
+						icon={<SlidersVertical size={16} color={Colors.light.icon} />}
 					/>
 				)}
 			/>
@@ -52,6 +55,7 @@ export function Step2Credentials({ control, errors, onNextStep }: Props) {
 						value={value}
 						error={errors.confirmPassword?.message}
 						isPasswordInput // Activa el ícono del ojo
+						icon={<SlidersVertical size={16} color={Colors.light.icon} />}
 					/>
 				)}
 			/>

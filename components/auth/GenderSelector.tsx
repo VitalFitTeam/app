@@ -15,8 +15,8 @@ type Option = {
 };
 
 const options: readonly Option[] = [
-	{ id: 'female', label: 'Mujer', image: require('@/assets/images/Female.svg') },
-	{ id: 'male', label: 'Hombre', image: require('@/assets/images/Man.svg') },
+	{ id: 'female', label: 'Mujer', image: require('@/assets/images/female_black.png') },
+	{ id: 'male', label: 'Hombre', image: require('@/assets/images/man_black.png') },
 	{ id: 'prefer-not-to-say', label: 'Prefiero no especificarlo' },
 ];
 
