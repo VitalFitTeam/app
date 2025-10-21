@@ -155,18 +155,20 @@ export default function RegisterScreen() {
 			style={styles.keyboardView}
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
+			{/* 🔹 ToastNotification FUERA del ScrollView */}
+			<ToastNotification
+				type={toast.type}
+				title={toast.title}
+				message={toast.message}
+				visible={toast.visible}
+				onClose={() => setToast({ ...toast, visible: false })}
+			/>
+
 			<ScrollView
 				contentContainerStyle={styles.scrollContent}
 				keyboardShouldPersistTaps='handled'
 				showsVerticalScrollIndicator={false}>
 				<ThemedView style={styles.container}>
-					<ToastNotification
-						type={toast.type}
-						title={toast.title}
-						message={toast.message}
-						visible={toast.visible}
-						onClose={() => setToast({ ...toast, visible: false })}
-					/>
 					<View style={styles.formContainer}>
 						<Logo />
 						{step === 1 && (
