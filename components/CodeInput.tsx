@@ -41,7 +41,6 @@ export function CodeInput({ onComplete, hasError }: Props) {
 				.map((_, index) => (
 					<TextInput
 						key={index}
-						// 👇 LA CORRECCIÓN DEFINITIVA ESTÁ AQUÍ 👇
 						ref={(el) => {
 							inputs.current[index] = el;
 						}}
@@ -49,11 +48,12 @@ export function CodeInput({ onComplete, hasError }: Props) {
               w-12 h-14 border rounded-lg text-center text-2xl font-bold text-black dark:text-white
               ${hasError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
             `}
-						keyboardType='number-pad'
+						keyboardType='default' // 👈 CAMBIO: de 'number-pad' a 'default'
 						maxLength={1}
 						value={code[index]}
 						onChangeText={(text) => handleTextChange(text, index)}
 						onKeyPress={(e) => handleKeyPress(e, index)}
+						autoCapitalize='characters' // Opcional: para mostrar letras en mayúsculas
 					/>
 				))}
 		</View>

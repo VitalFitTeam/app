@@ -29,8 +29,14 @@ export const RegisterSchema = z
 		email: z.string().email('El correo no es válido.'),
 		password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
 		confirmPassword: z.string(),
-		name: z.string().min(1, 'El nombre es requerido.'),
-		lastName: z.string().min(1, 'El apellido es requerido.'),
+		name: z
+			.string()
+			.min(1, 'El nombre es requerido.')
+			.regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/, 'El nombre solo puede contener letras.'),
+		lastName: z
+			.string()
+			.min(1, 'El apellido es requerido.')
+			.regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/, 'El apellido solo puede contener letras.'),
 		documentId: z.string().min(1, 'El documento es requerido.'),
 		birthDate: z.string().min(1, 'La fecha de nacimiento es requerida.'),
 		phone: z.string().min(1, 'El teléfono es requerido.'),
