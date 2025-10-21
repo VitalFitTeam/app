@@ -123,7 +123,8 @@ export default function LoginScreen() {
 									onChangeText={setEmail}
 									keyboardType='email-address'
 									autoCapitalize='none'
-									className='border border-gray-300 rounded-md px-4 py-3'
+									style={{ height: 48 }}
+									className='border border-gray-300 rounded-md px-4'
 								/>
 							</View>
 
@@ -137,7 +138,9 @@ export default function LoginScreen() {
 									/>
 									<Text className='text-black font-bold text-sm'>Contraseña</Text>
 								</View>
-								<View className='flex-row items-center border border-gray-300 rounded-md px-4 py-3'>
+								<View
+									style={{ height: 48 }}
+									className='flex-row items-center border border-gray-300 rounded-md px-4'>
 									<TextInput
 										placeholder='Ingresa tu contraseña'
 										secureTextEntry={!showPassword}
