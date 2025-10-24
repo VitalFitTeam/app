@@ -10,10 +10,11 @@ interface Props extends TextInputProps {
 	error?: string;
 	helperText?: string;
 	isPasswordInput?: boolean; // Nuevo prop para indicar si es un campo de contraseña
+	icon?: React.ReactNode; // Prop para el ícono
 }
 
 export const StyledTextInput = forwardRef<TextInput, Props>(
-	({ label, error, helperText, isPasswordInput, ...props }, ref) => {
+	({ label, error, helperText, isPasswordInput, icon, ...props }, ref) => {
 		const isError = Boolean(error);
 		const [isPasswordVisible, setIsPasswordVisible] = useState(false); // Estado para controlar la visibilidad de la contraseña
 
@@ -24,9 +25,12 @@ export const StyledTextInput = forwardRef<TextInput, Props>(
 		return (
 			<View className='w-full'>
 				{label && (
-					<Text className='text-sm text-gray-500 dark:text-gray-400 mb-1 font-semibold'>
-						{label}
-					</Text>
+					<View className='flex-row items-center mb-1'>
+						{icon}
+						<Text className='text-sm text-gray-500 dark:text-gray-400 font-semibold ml-2'>
+							{label}
+						</Text>
+					</View>
 				)}
 				<View className='relative flex-row items-center'>
 					<TextInput

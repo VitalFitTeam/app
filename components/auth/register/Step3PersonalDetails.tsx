@@ -4,9 +4,10 @@ import { RegisterData } from '@/schemas/register';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import Checkbox from 'expo-checkbox';
+import { Calendar } from 'lucide-react-native';
 import { useState } from 'react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { PrimaryButton } from '../../PrimaryButton';
 import { StyledTextInput } from '../../StyledTextInput';
 
@@ -20,7 +21,13 @@ export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
 	const [showPicker, setShowPicker] = useState(false);
 
 	return (
-		<>
+		<ScrollView
+			style={{ width: '100%' }}
+			contentContainerStyle={{
+				alignItems: 'center',
+				paddingVertical: 16,
+				gap: 16,
+			}}>
 			<Controller
 				control={control}
 				name='name'
@@ -61,7 +68,7 @@ export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
 				)}
 			/>
 
-			{/*Campo con DateTimePicker para fecha de nacimiento */}
+			{/* Campo con DateTimePicker para fecha de nacimiento */}
 			<Controller
 				control={control}
 				name='birthDate'
@@ -70,7 +77,9 @@ export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
 
 					return (
 						<View style={{ width: '100%' }}>
-							<TouchableOpacity onPress={() => setShowPicker(true)}>
+							<TouchableOpacity
+								onPress={() => setShowPicker(true)}
+								style={{ position: 'relative' }}>
 								<StyledTextInput
 									label='Fecha de nacimiento'
 									value={value ? format(date, 'yyyy-MM-dd') : ''}
@@ -78,6 +87,14 @@ export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
 									pointerEvents='none'
 									error={errors.birthDate?.message}
 								/>
+								<View
+									style={{
+										position: 'absolute',
+										right: 12,
+										bottom: 12,
+									}}>
+									<Calendar size={20} color={Colors.light.icon} />
+								</View>
 							</TouchableOpacity>
 							{showPicker && (
 								<DateTimePicker
@@ -87,7 +104,6 @@ export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
 									onChange={(event, selectedDate) => {
 										setShowPicker(false);
 										if (selectedDate) {
-											// Guardamos en formato ISO con zona horaria
 											onChange(selectedDate.toISOString());
 										}
 									}}
@@ -143,6 +159,6 @@ export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
 			)}
 
 			<PrimaryButton title='Crear cuenta' onPress={onSubmit} />
-		</>
+		</ScrollView>
 	);
 }
