@@ -1,0 +1,271 @@
+import { PrimaryButton } from '@/components/PrimaryButton';
+import { StyledTextInput } from '@/components/StyledTextInput';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { ToastNotification } from '@/components/ToastNotification';
+import { Colors, Fonts } from '@/constants/theme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
+import Constants from 'expo-constants';
+import { Image } from 'expo-image';
+import { Stack, useRouter } from 'expo-router';
+import { Calendar } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
+import { ChevronLeftIcon, PencilSquareIcon } from 'react-native-heroicons/solid';
+
+const API_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL || process.env.EXPO_PUBLIC_API_URL;
+
+interface User {
+	first_name: string;
+	last_name: string;
+	email: string;
+	identity_document: string;
+	birth_date: string;
+	phone: string;
+}
+
+export default function MyProfileScreen() {
+	const router = useRouter();
+	const [isEditing, setIsEditing] = useState(false);
+	const [loading, setLoading] = useState(true);
+	const [userData, setUserData] = useState<User | null>(null);
+	const [showPicker, setShowPicker] = useState(false);
+	const [toast, setToast] = useState<{
+		visible: boolean;
+		type: 'success' | 'error';
+		title: string;
+		message: string;
+	}>({
+		visible: false,
+		type: 'success',
+		title: '',
+		message: '',
+	});
+
+	// Estados para los campos editables
+	const [firstName, setFirstName] = useState('');
+	const [lastName, setLastName] = useState('');
+	const [birthDate, setBirthDate] = useState('');
+	const [phone, setPhone] = useState('');
+
+	useEffect(() => {
+		const fetchUser = async () => {
+			try {
+				const token = await AsyncStorage.getItem('token');
+				if (!token) return;
+
+				const response = await fetch(`${API_URL.replace(/\/+$/, '')}/user/whoami`, {
+					headers: { Authorization: `Bearer ${token}` },
+				});
+				if (!response.ok) return;
+
+				const data = await response.json();
+				setUserData(data.user);
+				setFirstName(data.user.first_name || '');
+				setLastName(data.user.last_name || '');
+				setBirthDate(data.user.birth_date || '');
+				setPhone(data.user.phone || '');
+			} catch (error) {
+				console.error('Failed to fetch user data:', error);
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchUser();
+	}, []);
+
+	const handleSaveChanges = async () => {
+		try {
+			const token = await AsyncStorage.getItem('token');
+			if (!token) return;
+
+			const payload = {
+				first_name: firstName,
+				last_name: lastName,
+				birth_date: birthDate,
+				phone: phone,
+			};
+
+			const response = await fetch(`${API_URL.replace(/\/+$/, '')}/user/update`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify(payload),
+			});
+
+			if (!response.ok) {
+				throw new Error('Error al actualizar el perfil');
+			}
+
+			const data = await response.json();
+			setUserData(data.user);
+			setIsEditing(false);
+
+			setToast({
+				visible: true,
+				type: 'success',
+				title: '¡Perfil actualizado!',
+				message: 'Tus cambios se guardaron correctamente',
+			});
+		} catch (error) {
+			console.error('Error updating profile:', error);
+			setToast({
+				visible: true,
+				type: 'error',
+				title: 'Error',
+				message: 'No se pudieron guardar los cambios',
+			});
+		}
+	};
+
+	if (loading) {
+		return (
+			<ThemedView className='flex-1 justify-center items-center'>
+				<ActivityIndicator size='large' color='#F27F2A' />
+			</ThemedView>
+		);
+	}
+
+	const fullName = `${userData?.first_name || ''} ${userData?.last_name || ''}`.toUpperCase();
+	const date = birthDate ? new Date(birthDate) : new Date();
+
+	return (
+		<ThemedView className='flex-1 bg-white dark:bg-neutral-950'>
+			<Stack.Screen options={{ headerShown: false }} />
+
+			<ToastNotification
+				type={toast.type}
+				title={toast.title}
+				message={toast.message}
+				visible={toast.visible}
+				onClose={() => setToast({ ...toast, visible: false })}
+			/>
+
+			{/* Header */}
+			<View className='flex-row items-center justify-center pt-14 pb-4 px-4 bg-white dark:bg-neutral-900 relative'>
+				<TouchableOpacity onPress={() => router.back()} className='absolute left-4 top-14'>
+					<ChevronLeftIcon size={28} color='#F27F2A' />
+				</TouchableOpacity>
+				<ThemedText className='text-xl font-bold' style={{ fontFamily: Fonts.title }}>
+					MI PERFIL
+				</ThemedText>
+			</View>
+
+			<ScrollView className='flex-1 bg-white dark:bg-neutral-950'>
+				{/* Profile Image Section */}
+				<View className='items-center py-8 bg-white dark:bg-neutral-900'>
+					<View className='relative'>
+						<View className='w-32 h-32 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-800'>
+							<Image
+								source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+								style={{ width: '100%', height: '100%' }}
+								contentFit='cover'
+							/>
+						</View>
+						{isEditing && (
+							<TouchableOpacity className='absolute bottom-0 right-0 bg-orange-500 w-10 h-10 rounded-full items-center justify-center'>
+								<PencilSquareIcon size={20} color='white' />
+							</TouchableOpacity>
+						)}
+					</View>
+					<ThemedText
+						className='text-xl font-bold mt-4'
+						style={{ fontFamily: Fonts.title }}>
+						{fullName}
+					</ThemedText>
+					<ThemedText className='text-sm text-neutral-500 dark:text-neutral-400 mt-1'>
+						Cuenta personal
+					</ThemedText>
+				</View>
+
+				{/* Form Section */}
+				<View className='px-6 py-4'>
+					<StyledTextInput
+						label='Nombre'
+						value={firstName}
+						onChangeText={setFirstName}
+						editable={isEditing}
+					/>
+					<View className='mb-4' />
+
+					<StyledTextInput
+						label='Apellido'
+						value={lastName}
+						onChangeText={setLastName}
+						editable={isEditing}
+					/>
+					<View className='mb-4' />
+
+					<StyledTextInput
+						label='Correo electrónico'
+						value={userData?.email || ''}
+						editable={false}
+					/>
+					<View className='mb-4' />
+
+					<StyledTextInput
+						label='Documento de identidad'
+						value={userData?.identity_document || ''}
+						editable={false}
+					/>
+					<View className='mb-4' />
+
+					{/* Campo de fecha de nacimiento con calendario */}
+					<TouchableOpacity
+						onPress={() => isEditing && setShowPicker(true)}
+						style={{ position: 'relative' }}
+						disabled={!isEditing}>
+						<StyledTextInput
+							label='Fecha de nacimiento'
+							value={birthDate ? format(date, 'yyyy-MM-dd') : ''}
+							editable={false}
+							pointerEvents='none'
+						/>
+						<View
+							style={{
+								position: 'absolute',
+								right: 12,
+								bottom: 12,
+							}}>
+							<Calendar size={20} color={Colors.light.icon} />
+						</View>
+					</TouchableOpacity>
+					{showPicker && (
+						<DateTimePicker
+							value={date}
+							mode='date'
+							display='default'
+							onChange={(event, selectedDate) => {
+								setShowPicker(false);
+								if (selectedDate) {
+									setBirthDate(selectedDate.toISOString());
+								}
+							}}
+						/>
+					)}
+					<View className='mb-4' />
+
+					<StyledTextInput
+						label='Teléfono'
+						value={phone}
+						onChangeText={setPhone}
+						editable={isEditing}
+						keyboardType='phone-pad'
+					/>
+				</View>
+
+				{/* Action Button */}
+				<View className='px-6 mt-2 mb-10'>
+					<PrimaryButton
+						title={isEditing ? 'Guardar cambios' : 'Editar'}
+						onPress={() => (isEditing ? handleSaveChanges() : setIsEditing(true))}
+					/>
+				</View>
+			</ScrollView>
+		</ThemedView>
+	);
+}

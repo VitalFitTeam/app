@@ -2,9 +2,9 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Home } from 'lucide-react-native';
+import { Dumbbell } from 'lucide-react-native';
+import { CalendarIcon, HomeIcon, UserIcon, UsersIcon } from 'react-native-heroicons/solid';
 
 export default function TabLayout() {
 	const colorScheme = useColorScheme();
@@ -12,15 +12,50 @@ export default function TabLayout() {
 	return (
 		<Tabs
 			screenOptions={{
-				tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+				tabBarActiveTintColor: '#f97316',
+				tabBarInactiveTintColor: '#a1a1aa',
 				headerShown: false,
 				tabBarButton: HapticTab,
+				tabBarStyle: {
+					backgroundColor: colorScheme === 'dark' ? '#000' : '#fff',
+					borderTopWidth: 0,
+				},
 			}}>
 			<Tabs.Screen
 				name='dashboard'
 				options={{
 					title: 'Inicio',
-					tabBarIcon: ({ color }) => <Home color={color} size={28} strokeWidth={1.5} />,
+					tabBarIcon: ({ color }) => <HomeIcon color={color} size={28} />,
+				}}
+			/>
+			<Tabs.Screen
+				name='schedule'
+				options={{
+					title: 'Horarios',
+					tabBarIcon: ({ color }) => <CalendarIcon color={color} size={28} />,
+				}}
+			/>
+			<Tabs.Screen
+				name='training'
+				options={{
+					title: 'Entrenamiento',
+					tabBarIcon: ({ color }) => (
+						<Dumbbell color={color} size={28} strokeWidth={1.5} />
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name='community'
+				options={{
+					title: 'Comunidad',
+					tabBarIcon: ({ color }) => <UsersIcon color={color} size={28} />,
+				}}
+			/>
+			<Tabs.Screen
+				name='profile'
+				options={{
+					title: 'Perfil',
+					tabBarIcon: ({ color }) => <UserIcon color={color} size={28} />,
 				}}
 			/>
 		</Tabs>
