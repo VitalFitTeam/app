@@ -1,5 +1,6 @@
 import { MembershipCard } from '@/components/auth/dashboard/membershipcard';
 import { ProgressCard } from '@/components/auth/dashboard/progresscard';
+import { QRModal } from '@/components/auth/dashboard/QRModal';
 import { ReservedClassesCard } from '@/components/auth/dashboard/reservedclasses';
 import { TodayRoutineCard } from '@/components/auth/dashboard/todayroutinecard';
 import { UserHeader } from '@/components/auth/dashboard/userheader';
@@ -15,6 +16,8 @@ const API_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL || process.env.
 export default function DashboardScreen() {
 	const [firstName, setFirstName] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [qrModalVisible, setQrModalVisible] = useState(false); // 👈 Estado del modal
+	const [userToken, setUserToken] = useState<string>(''); // 👈 Estado del token
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -25,6 +28,8 @@ export default function DashboardScreen() {
 					console.error('❌ No se encontró token en AsyncStorage');
 					return;
 				}
+
+				setUserToken(token); // 👈 Guardar token
 
 				const response = await fetch(`${API_URL.replace(/\/+$/, '')}/user/whoami`, {
 					method: 'GET',
@@ -72,7 +77,13 @@ export default function DashboardScreen() {
 					avatarUrl='https://randomuser.me/api/portraits/men/32.jpg'
 				/>
 				<WeekCalendar />
-				<MembershipCard daysRemaining={15} />
+
+				{/* MembershipCard ahora abre el modal QR */}
+				<MembershipCard
+					daysRemaining={15}
+					onQRPress={() => setQrModalVisible(true)} // 👈 Abrir modal
+				/>
+
 				<ProgressCard weekProgress={0.8} calories={1200} completed='4/5' />
 				<ReservedClassesCard reserved={0} />
 				<TodayRoutineCard
@@ -81,6 +92,13 @@ export default function DashboardScreen() {
 					date='Mon 26 Apr'
 				/>
 			</ScrollView>
+
+			{/* Modal QR */}
+			<QRModal
+				visible={qrModalVisible}
+				onClose={() => setQrModalVisible(false)}
+				token={userToken}
+			/>
 		</ThemedView>
 	);
 }

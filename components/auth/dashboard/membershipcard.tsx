@@ -1,15 +1,16 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { QrCodeIcon } from 'react-native-heroicons/outline';
 
 interface Props {
 	daysRemaining: number;
+	onQRPress: () => void; // 👈 Nueva prop para abrir el modal
 }
 
-export const MembershipCard: React.FC<Props> = ({ daysRemaining }) => {
+export const MembershipCard: React.FC<Props> = ({ daysRemaining, onQRPress }) => {
 	const { width } = Dimensions.get('window');
-	const cardWidth = Math.min(width - 32, 380); // responsive, máx. 380px
+	const cardWidth = Math.min(width - 32, 380);
 
 	return (
 		<LinearGradient
@@ -18,8 +19,11 @@ export const MembershipCard: React.FC<Props> = ({ daysRemaining }) => {
 			start={{ x: 0, y: 0.1 }}
 			end={{ x: 1, y: 0.2 }}
 			style={[styles.card, { width: cardWidth }]}>
-			{/* Contenido principal */}
-			<View style={styles.contentContainer}>
+			{/* Contenido principal - AHORA ES TOUCHABLE */}
+			<TouchableOpacity
+				style={styles.contentContainer}
+				onPress={onQRPress}
+				activeOpacity={0.8}>
 				{/* Icono QR */}
 				<View style={styles.iconContainer}>
 					<QrCodeIcon size={56} color='#FFFFFF' strokeWidth={0.5} />
@@ -30,7 +34,7 @@ export const MembershipCard: React.FC<Props> = ({ daysRemaining }) => {
 					<Text style={styles.title}>Acceso al Gimnasio</Text>
 					<Text style={styles.subtitle}>Escanea para ingresar</Text>
 				</View>
-			</View>
+			</TouchableOpacity>
 
 			{/* Texto inferior */}
 			<Text style={styles.footerText}>Membresía activa: {daysRemaining} días restantes</Text>
