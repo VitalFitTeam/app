@@ -29,14 +29,14 @@ export default function TabLayout() {
 				}}
 			/>
 			<Tabs.Screen
-				name='horarios'
+				name='schedule'
 				options={{
 					title: 'Horarios',
 					tabBarIcon: ({ color }) => <CalendarIcon color={color} size={28} />,
 				}}
 			/>
 			<Tabs.Screen
-				name='entrenamiento'
+				name='training'
 				options={{
 					title: 'Entrenamiento',
 					tabBarIcon: ({ color }) => (
@@ -45,14 +45,14 @@ export default function TabLayout() {
 				}}
 			/>
 			<Tabs.Screen
-				name='comunidad'
+				name='community'
 				options={{
 					title: 'Comunidad',
 					tabBarIcon: ({ color }) => <UsersIcon color={color} size={28} />,
 				}}
 			/>
 			<Tabs.Screen
-				name='perfil'
+				name='profile'
 				options={{
 					title: 'Perfil',
 					tabBarIcon: ({ color }) => <UserIcon color={color} size={28} />,
