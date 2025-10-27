@@ -151,7 +151,7 @@ export default function MyProfileScreen() {
 					<ChevronLeftIcon size={28} color='#F27F2A' />
 				</TouchableOpacity>
 				<ThemedText className='text-xl font-bold' style={{ fontFamily: Fonts.title }}>
-					MI PERFIL
+					Mi perfil
 				</ThemedText>
 			</View>
 

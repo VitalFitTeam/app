@@ -11,7 +11,7 @@ import { ToastNotification } from '@/components/ToastNotification';
 import { Colors } from '@/constants/theme';
 import api from '@/services/api';
 import { AxiosError } from 'axios';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SlidersVertical } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
@@ -44,6 +44,15 @@ export default function ForgotPasswordScreen() {
 	const [customAlertTitle, setCustomAlertTitle] = useState('');
 	const [customAlertMessage, setCustomAlertMessage] = useState('');
 	const router = useRouter();
+	const params = useLocalSearchParams();
+
+	const handleCancel = () => {
+		if (params.from === 'settings') {
+			router.back();
+		} else {
+			router.push('/(auth)/login');
+		}
+	};
 
 	const titles = ['RECUPERA TU CONTRASEÑA', 'VERIFICAR CÓDIGO', 'NUEVA CONTRASEÑA'];
 	const subtitles = [
@@ -151,7 +160,7 @@ export default function ForgotPasswordScreen() {
 								/>
 								<SecondaryButton
 									title='Cancelar'
-									onPress={() => router.push('/(auth)/login')}
+									onPress={handleCancel}
 									style={{ marginTop: 12 }}
 								/>
 							</>
@@ -170,7 +179,7 @@ export default function ForgotPasswordScreen() {
 								<PrimaryButton title='Verificar' onPress={() => setStep(3)} />
 								<SecondaryButton
 									title='Cancelar'
-									onPress={() => router.push('/(auth)/login')}
+									onPress={handleCancel}
 									style={{ marginTop: 12 }}
 								/>
 							</>
@@ -200,7 +209,7 @@ export default function ForgotPasswordScreen() {
 								/>
 								<SecondaryButton
 									title='Cancelar'
-									onPress={() => router.push('/(auth)/login')}
+									onPress={handleCancel}
 									style={{ marginTop: 12 }}
 								/>
 							</>
