@@ -12,7 +12,13 @@ export const Step1Schema = z.object({
 export const Step2Schema = z
 	.object({
 		email: z.string().email('El correo no es válido.'),
-		password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
+		password: z
+			.string()
+			.min(8, 'La contraseña debe tener al menos 8 caracteres.')
+			.regex(/[A-Z]/, 'La contraseña debe tener al menos una mayúscula.')
+			.regex(/[a-z]/, 'La contraseña debe tener al menos una minúscula.')
+			.regex(/[0-9]/, 'La contraseña debe tener al menos un número.')
+			.regex(/[^a-zA-Z0-9]/, 'La contraseña debe tener al menos un caracter especial.'),
 		confirmPassword: z.string(),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
@@ -27,7 +33,13 @@ export const RegisterSchema = z
 			errorMap: () => ({ message: 'Por favor, selecciona un género.' }),
 		}),
 		email: z.string().email('El correo no es válido.'),
-		password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres.'),
+		password: z
+			.string()
+			.min(8, 'La contraseña debe tener al menos 8 caracteres.')
+			.regex(/[A-Z]/, 'La contraseña debe tener al menos una mayúscula.')
+			.regex(/[a-z]/, 'La contraseña debe tener al menos una minúscula.')
+			.regex(/[0-9]/, 'La contraseña debe tener al menos un número.')
+			.regex(/[^a-zA-Z0-9]/, 'La contraseña debe tener al menos un caracter especial.'),
 		confirmPassword: z.string(),
 		name: z
 			.string()

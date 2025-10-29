@@ -9,22 +9,24 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
 import { Colors } from '@/constants/theme';
+import { ForgotPasswordSchema, type ForgotPasswordData } from '@/schemas/forgot-password';
 import api from '@/services/api';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SlidersVertical } from 'lucide-react-native';
 import React, { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
 	Alert,
-	KeyboardAvoidingView, // Importado
-	Platform, // Importado
+	KeyboardAvoidingView,
+	Platform,
 	ScrollView,
 	StyleSheet,
 	Text,
 	View,
 } from 'react-native';
 
-// Tipado para errores del backend
 interface ApiErrorResponse {
 	message?: string;
 }
@@ -33,8 +35,6 @@ export default function ForgotPasswordScreen() {
 	const [step, setStep] = useState<number>(1);
 	const [email, setEmail] = useState<string>('');
 	const [token, setToken] = useState<string>('');
-	const [password, setPassword] = useState<string>('');
-	const [confirmPassword, setConfirmPassword] = useState<string>('');
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [toastVisible, setToastVisible] = useState(false);
 	const [toastType, setToastType] = useState<'success' | 'error'>('success');
@@ -45,6 +45,18 @@ export default function ForgotPasswordScreen() {
 	const [customAlertMessage, setCustomAlertMessage] = useState('');
 	const router = useRouter();
 	const params = useLocalSearchParams();
+
+	const {
+		control,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<ForgotPasswordData>({
+		resolver: zodResolver(ForgotPasswordSchema),
+		defaultValues: {
+			password: '',
+			confirmPassword: '',
+		},
+	});
 
 	const handleCancel = () => {
 		if (params.from === 'settings') {
@@ -61,7 +73,6 @@ export default function ForgotPasswordScreen() {
 		'Ingresa tu nueva contraseña',
 	];
 
-	// Paso 1: Solicitar envío de correo
 	const handleSendEmail = async (): Promise<void> => {
 		if (!email) {
 			Alert.alert('Error', 'Por favor, ingresa tu correo.');
@@ -88,28 +99,17 @@ export default function ForgotPasswordScreen() {
 		}
 	};
 
-	// Paso 3: Enviar nueva contraseña al backend
-	const handleResetPassword = async (): Promise<void> => {
-		if (!password || !confirmPassword) {
-			Alert.alert('Error', 'Completa todos los campos.');
-			return;
-		}
-		if (password !== confirmPassword) {
-			Alert.alert('Error', 'Las contraseñas no coinciden.');
-			return;
-		}
-
+	const handleResetPassword = async (data: ForgotPasswordData): Promise<void> => {
 		setIsLoading(true);
 		try {
 			await api.post('/auth/password/reset', {
 				token,
-				password,
-				confirm_password: confirmPassword,
+				password: data.password,
+				confirm_password: data.confirmPassword,
 			});
 			setCustomAlertTitle('¡Éxito!');
 			setCustomAlertMessage('Tu contraseña ha sido restablecida correctamente.');
 			setCustomAlertVisible(true);
-			// La navegación se hará después de que el usuario confirme el alert
 		} catch (error) {
 			const err = error as AxiosError<ApiErrorResponse>;
 			console.error('Error al restablecer contraseña:', err.message);
@@ -125,7 +125,7 @@ export default function ForgotPasswordScreen() {
 	return (
 		<ThemedView style={styles.container}>
 			<KeyboardAvoidingView
-				style={{ flex: 1, width: '100%', alignItems: 'center' }} // Estilos para que ocupe todo el espacio
+				style={{ flex: 1, width: '100%', alignItems: 'center' }}
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 				keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
 				<ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView}>
@@ -143,7 +143,6 @@ export default function ForgotPasswordScreen() {
 
 						<ProgressIndicator currentStep={step} />
 
-						{/* ----- PASO 1: Ingresar Correo ----- */}
 						{step === 1 && (
 							<>
 								<StyledTextInput
@@ -166,7 +165,6 @@ export default function ForgotPasswordScreen() {
 							</>
 						)}
 
-						{/* ----- PASO 2: Verificar Código ----- */}
 						{step === 2 && (
 							<>
 								<CodeInput
@@ -185,26 +183,51 @@ export default function ForgotPasswordScreen() {
 							</>
 						)}
 
-						{/* ----- PASO 3: Nueva Contraseña ----- */}
 						{step === 3 && (
 							<>
-								<StyledTextInput
-									label='Nueva contraseña'
-									isPasswordInput
-									icon={<SlidersVertical size={16} color={Colors.light.icon} />}
-									value={password}
-									onChangeText={setPassword}
+								<Controller
+									control={control}
+									name='password'
+									render={({ field: { onChange, onBlur, value } }) => (
+										<StyledTextInput
+											label='Nueva contraseña'
+											isPasswordInput
+											icon={
+												<SlidersVertical
+													size={16}
+													color={Colors.light.icon}
+												/>
+											}
+											value={value}
+											onBlur={onBlur}
+											onChangeText={onChange}
+											error={errors.password?.message}
+										/>
+									)}
 								/>
-								<StyledTextInput
-									label='Confirmar contraseña'
-									isPasswordInput
-									icon={<SlidersVertical size={16} color={Colors.light.icon} />}
-									value={confirmPassword}
-									onChangeText={setConfirmPassword}
+								<Controller
+									control={control}
+									name='confirmPassword'
+									render={({ field: { onChange, onBlur, value } }) => (
+										<StyledTextInput
+											label='Confirmar contraseña'
+											isPasswordInput
+											icon={
+												<SlidersVertical
+													size={16}
+													color={Colors.light.icon}
+												/>
+											}
+											value={value}
+											onBlur={onBlur}
+											onChangeText={onChange}
+											error={errors.confirmPassword?.message}
+										/>
+									)}
 								/>
 								<PrimaryButton
 									title={isLoading ? 'Guardando...' : 'Guardar'}
-									onPress={handleResetPassword}
+									onPress={handleSubmit(handleResetPassword)}
 									disabled={isLoading}
 								/>
 								<SecondaryButton
@@ -243,10 +266,10 @@ const styles = StyleSheet.create({
 		width: '100%',
 	},
 	scrollContent: {
-		flexGrow: 1, // Permite que el contenido crezca y centre
+		flexGrow: 1,
 		alignItems: 'center',
-		paddingTop: 0, // El paddingTop se mantiene en el ThemedView/Container
-		paddingBottom: 40, // Espacio inferior para evitar que el teclado oculte el último campo
+		paddingTop: 0,
+		paddingBottom: 40,
 	},
 	formContainer: {
 		width: '100%',
