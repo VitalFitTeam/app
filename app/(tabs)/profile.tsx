@@ -99,7 +99,9 @@ export default function ProfileScreen() {
 				<Link href='/my-profile' asChild>
 					<ProfileMenuItem title='Mi perfil' />
 				</Link>
-				<ProfileMenuItem title='Membresía' onPress={() => console.log('Membresía')} />
+				<Link href='/cancel-membership' asChild>
+					<ProfileMenuItem title='Membresía' />
+				</Link>
 				<ProfileMenuItem
 					title='Historial pago'
 					onPress={() => console.log('Historial pago')}

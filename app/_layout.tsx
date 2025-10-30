@@ -30,6 +30,30 @@ export default function RootLayout() {
 				<Stack.Screen name='index' options={{ headerShown: false }} />
 				<Stack.Screen name='(auth)' options={{ headerShown: false }} />
 				<Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+				<Stack.Screen
+					name='cancel-membership'
+					options={{
+						title: 'Membresía',
+						headerShown: true,
+						headerBackTitle: 'Volver',
+					}}
+				/>
+				<Stack.Screen
+					name='memberships'
+					options={{
+						title: 'Membresía',
+						headerShown: true,
+						headerBackTitle: 'Volver',
+					}}
+				/>
+				<Stack.Screen
+					name='class-details'
+					options={{
+						title: 'Detalles de la Clase',
+						headerShown: true,
+						headerBackTitle: 'Volver',
+					}}
+				/>
 			</Stack>
 			<StatusBar style='auto' />
 		</ThemeProvider>
