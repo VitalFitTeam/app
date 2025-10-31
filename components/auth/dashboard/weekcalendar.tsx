@@ -1,75 +1,178 @@
-import React, { useState } from 'react';
-import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { DateData } from 'react-native-calendars';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const days = [
-	{ label: 'MO', date: 19 },
-	{ label: 'TU', date: 20 },
-	{ label: 'WE', date: 21 },
-	{ label: 'TH', date: 22 },
-	{ label: 'FR', date: 23 },
-	{ label: 'SA', date: 24 },
-	{ label: 'SU', date: 25 },
-];
+interface DayData {
+	label: string;
+	date: number;
+	dateString: string;
+	fullDate: Date;
+	hasEvent?: boolean;
+}
 
-export const WeekCalendar: React.FC = () => {
-	const [selectedDay, setSelectedDay] = useState('SU');
+interface WeekCalendarProps {
+	onDateSelect?: (date: DateData) => void;
+	markedDates?: { [date: string]: { marked?: boolean; dotColor?: string } };
+	initialDate?: string;
+}
+
+// Definimos la constante con el tipo correcto para que TypeScript no se queje
+const EMPTY_MARKED_DATES: { [date: string]: { marked?: boolean; dotColor?: string } } = {};
+
+export const WeekCalendar: React.FC<WeekCalendarProps> = ({
+	onDateSelect,
+	markedDates = EMPTY_MARKED_DATES,
+	initialDate,
+}) => {
+	const [selectedDateString, setSelectedDateString] = useState(
+		initialDate || new Date().toISOString().split('T')[0],
+	);
+	const [weekDays, setWeekDays] = useState<DayData[]>([]);
+
+	// Generar días de la semana actual basado en la fecha de hoy
+	useEffect(() => {
+		const generateWeekDays = () => {
+			const today = new Date();
+			const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+			const monday = new Date(today);
+
+			// Ajustar al lunes de la semana actual
+			const diff = currentDay === 0 ? -6 : 1 - currentDay;
+			monday.setDate(today.getDate() + diff);
+
+			const days: DayData[] = [];
+			const dayLabels = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM'];
+
+			for (let i = 0; i < 7; i++) {
+				const date = new Date(monday);
+				date.setDate(monday.getDate() + i);
+
+				const dateString = date.toISOString().split('T')[0];
+				const hasEvent = markedDates[dateString]?.marked || false;
+
+				days.push({
+					label: dayLabels[i],
+					date: date.getDate(),
+					dateString: dateString,
+					fullDate: date,
+					hasEvent,
+				});
+			}
+
+			setWeekDays(days);
+		};
+
+		generateWeekDays();
+	}, [markedDates]);
+
+	const handleDayPress = (day: DayData) => {
+		setSelectedDateString(day.dateString);
+
+		// Crear objeto DateData compatible con react-native-calendars
+		const dateData: DateData = {
+			dateString: day.dateString,
+			day: day.date,
+			month: day.fullDate.getMonth() + 1,
+			year: day.fullDate.getFullYear(),
+			timestamp: day.fullDate.getTime(),
+		};
+
+		onDateSelect?.(dateData);
+	};
+
+	const isSelected = (day: DayData) => {
+		return day.dateString === selectedDateString;
+	};
+
+	const isToday = (day: DayData) => {
+		const today = new Date().toISOString().split('T')[0];
+		return day.dateString === today;
+	};
 
 	return (
-		<View
-			style={{
-				flexDirection: 'row',
-				justifyContent: 'space-between',
-				alignItems: 'center',
-				borderWidth: 0.75,
-				borderColor: '#BBBBBB',
-				borderRadius: 10,
-				padding: 16,
-				width: screenWidth - 32,
-				alignSelf: 'center',
-				height: 94,
-				backgroundColor: '#FFFFFF',
-			}}>
-			{days.map((day) => {
-				const isSelected = day.label === selectedDay;
+		<View style={styles.container}>
+			{weekDays.map((day) => {
+				const selected = isSelected(day);
+				const today = isToday(day);
 
 				return (
 					<TouchableOpacity
 						key={day.label}
-						onPress={() => setSelectedDay(day.label)}
+						onPress={() => handleDayPress(day)}
 						activeOpacity={0.8}
-						style={{
-							alignItems: 'center',
-							justifyContent: 'center',
-							width: (screenWidth - 32 - 6 * 4) / 7,
-							height: 62,
-							borderRadius: 16,
-							paddingVertical: 12,
-							gap: 4,
-							backgroundColor: isSelected ? '#F27F2A' : 'transparent',
-						}}>
-						<Text
-							style={{
-								fontFamily: 'Montserrat_500Medium',
-								fontSize: 13,
-								fontWeight: '500',
-								color: isSelected ? '#FFFFFF' : '#8F9098',
-							}}>
+						style={[styles.dayButton, selected && styles.selectedDay]}>
+						<Text style={[styles.dayLabel, selected && styles.selectedText]}>
 							{day.label}
 						</Text>
 						<Text
-							style={{
-								fontFamily: 'Montserrat_600SemiBold',
-								fontSize: 15,
-								fontWeight: '600',
-								color: isSelected ? '#FFFFFF' : '#494A50',
-							}}>
+							style={[
+								styles.dateNumber,
+								selected && styles.selectedText,
+								today && !selected && styles.todayText,
+							]}>
 							{day.date}
 						</Text>
+						{day.hasEvent && !selected && <View style={styles.eventDot} />}
 					</TouchableOpacity>
 				);
 			})}
 		</View>
 	);
 };
+
+const styles = StyleSheet.create({
+	container: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		borderWidth: 0.75,
+		borderColor: '#BBBBBB',
+		borderRadius: 10,
+		padding: 16,
+		width: screenWidth - 32,
+		alignSelf: 'center',
+		height: 94,
+		backgroundColor: '#FFFFFF',
+	},
+	dayButton: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		width: (screenWidth - 32 - 6 * 4) / 7,
+		height: 62,
+		borderRadius: 16,
+		paddingVertical: 12,
+		gap: 4,
+		backgroundColor: 'transparent',
+	},
+	selectedDay: {
+		backgroundColor: '#F27F2A',
+	},
+	dayLabel: {
+		fontFamily: 'Montserrat_500Medium',
+		fontSize: 13,
+		fontWeight: '500',
+		color: '#8F9098',
+	},
+	dateNumber: {
+		fontFamily: 'Montserrat_600SemiBold',
+		fontSize: 15,
+		fontWeight: '600',
+		color: '#494A50',
+	},
+	selectedText: {
+		color: '#FFFFFF',
+	},
+	todayText: {
+		color: '#F27F2A',
+	},
+	eventDot: {
+		position: 'absolute',
+		bottom: 8,
+		width: 4,
+		height: 4,
+		borderRadius: 2,
+		backgroundColor: '#F27F2A',
+	},
+});
