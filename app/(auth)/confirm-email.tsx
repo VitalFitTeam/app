@@ -1,10 +1,11 @@
 import { Logo } from '@/components/auth/Logo';
 import { CodeInput } from '@/components/CodeInput';
-import { CustomAlert } from '@/components/CustomAlert'; // Importa el componente
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { ThemedText } from '@/components/themed-text';
+import { ToastNotification } from '@/components/ToastNotification';
 import { Colors, Fonts } from '@/constants/theme';
+import { useToast } from '@/hooks/useToast';
 import api from '@/services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AxiosError } from 'axios';
@@ -25,23 +26,11 @@ export default function ConfirmEmailScreen() {
 	const insets = useSafeAreaInsets();
 	const [code, setCode] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
-
-	// Estados para el CustomAlert
-	const [alertVisible, setAlertVisible] = useState(false);
-	const [alertTitle, setAlertTitle] = useState('');
-	const [alertMessage, setAlertMessage] = useState('');
-	const [alertAction, setAlertAction] = useState<(() => void) | null>(null);
-
-	const showAlert = (title: string, message?: string, action?: () => void) => {
-		setAlertTitle(title);
-		setAlertMessage(message || '');
-		setAlertAction(() => action || (() => setAlertVisible(false)));
-		setAlertVisible(true);
-	};
+	const { toastState, showToast, hideToast } = useToast();
 
 	const handleConfirmCode = async () => {
 		if (!code.trim()) {
-			showAlert('Por favor, ingresa el código de confirmación.');
+			showToast('error', 'Error', 'Por favor, ingresa el código de confirmación.');
 			return;
 		}
 
@@ -52,67 +41,57 @@ export default function ConfirmEmailScreen() {
 
 			if (verifyResponse.status !== 200 && verifyResponse.status !== 204) {
 				console.warn('⚠️ Estado inesperado al activar:', verifyResponse.status);
-				showAlert('Código inválido o expirado. Intenta nuevamente.');
+				showToast('error', 'Error', 'Código inválido o expirado. Intenta nuevamente.');
 				return;
 			}
 
-			// Mostrar alerta de éxito y continuar con el login
-			showAlert('¡Te has registrado exitosamente!', '', async () => {
-				setAlertVisible(false);
+			showToast('success', '¡Éxito!', '¡Te has registrado exitosamente!');
 
-				const email = await AsyncStorage.getItem('temp_email');
-				const password = await AsyncStorage.getItem('temp_password');
+			const email = await AsyncStorage.getItem('temp_email');
+			const password = await AsyncStorage.getItem('temp_password');
 
-				if (!email || !password) {
-					showAlert(
-						'No se encontraron las credenciales del registro.',
-						'Inicia sesión manualmente.',
-						() => {
-							setAlertVisible(false);
-							router.replace('/(auth)/login');
-						},
+			if (!email || !password) {
+				showToast(
+					'error',
+					'Error',
+					'No se encontraron las credenciales. Inicia sesión manualmente.',
+				);
+				setTimeout(() => router.replace('/(auth)/login'), 2000);
+				return;
+			}
+
+			try {
+				const loginResponse = await api.post('/auth/login', { email, password });
+				const token =
+					loginResponse.data?.token ||
+					loginResponse.data?.access_token ||
+					loginResponse.data?.jwt ||
+					null;
+
+				if (!token) {
+					console.error('❌ No se recibió token después del login automático');
+					showToast(
+						'error',
+						'Error',
+						'No se pudo obtener el token. Inicia sesión manualmente.',
 					);
+					setTimeout(() => router.replace('/(auth)/login'), 2000);
 					return;
 				}
 
-				try {
-					const loginResponse = await api.post('/auth/login', { email, password });
+				await AsyncStorage.setItem('token', token);
+				await AsyncStorage.multiRemove(['temp_email', 'temp_password']);
 
-					const token =
-						loginResponse.data?.token ||
-						loginResponse.data?.access_token ||
-						loginResponse.data?.jwt ||
-						null;
-
-					if (!token) {
-						console.error('❌ No se recibió token después del login automático');
-						showAlert(
-							'No se pudo obtener el token.',
-							'Inicia sesión manualmente.',
-							() => {
-								setAlertVisible(false);
-								router.replace('/(auth)/login');
-							},
-						);
-						return;
-					}
-
-					await AsyncStorage.setItem('token', token);
-					await AsyncStorage.multiRemove(['temp_email', 'temp_password']);
-
-					router.replace('/(tabs)/dashboard');
-				} catch (loginErr) {
-					console.error('❌ Error en login automático:', loginErr);
-					showAlert(
-						'Error al iniciar sesión',
-						'Por favor, inicia sesión manualmente.',
-						() => {
-							setAlertVisible(false);
-							router.replace('/(auth)/login');
-						},
-					);
-				}
-			});
+				router.replace('/(tabs)/dashboard');
+			} catch (loginErr) {
+				console.error('❌ Error en login automático:', loginErr);
+				showToast(
+					'error',
+					'Error',
+					'Error al iniciar sesión. Por favor, inicia sesión manualmente.',
+				);
+				setTimeout(() => router.replace('/(auth)/login'), 2000);
+			}
 		} catch (err) {
 			const error = err as AxiosError<{ message?: string; error?: string }>;
 			console.error('❌ Error al confirmar o iniciar sesión:', error);
@@ -124,14 +103,18 @@ export default function ConfirmEmailScreen() {
 					? 'El endpoint /auth/activate no existe o fue movido.'
 					: 'Hubo un error inesperado.');
 
-			showAlert(backendMessage);
+			showToast('error', 'Error', backendMessage);
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
 	const handleResendCode = () => {
-		showAlert('Código reenviado', 'Se ha reenviado el código de confirmación a tu correo.');
+		showToast(
+			'success',
+			'Código reenviado',
+			'Se ha reenviado el código de confirmación a tu correo.',
+		);
 	};
 
 	return (
@@ -147,6 +130,13 @@ export default function ConfirmEmailScreen() {
 					paddingBottom: insets.bottom + 32,
 				}}
 				keyboardShouldPersistTaps='handled'>
+				<ToastNotification
+					visible={toastState.visible}
+					type={toastState.type}
+					title={toastState.title}
+					message={toastState.message}
+					onClose={hideToast}
+				/>
 				{/* Logo */}
 				<View className='items-center mb-8'>
 					<Logo />
@@ -210,20 +200,6 @@ export default function ConfirmEmailScreen() {
 					<SecondaryButton title='Cancelar' onPress={() => router.back()} />
 				</View>
 			</ScrollView>
-
-			{/* Custom Alert */}
-			<CustomAlert
-				visible={alertVisible}
-				title={alertTitle}
-				message={alertMessage}
-				onConfirm={() => {
-					if (alertAction) {
-						alertAction();
-					} else {
-						setAlertVisible(false);
-					}
-				}}
-			/>
 		</KeyboardAvoidingView>
 	);
 }
