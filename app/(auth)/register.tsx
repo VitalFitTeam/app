@@ -8,6 +8,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
 import { Colors, Fonts } from '@/constants/theme';
+import { useToast } from '@/hooks/useToast';
 import { RegisterData, RegisterSchema, Step1Schema, Step2Schema } from '@/schemas/register';
 import api from '@/services/api';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,17 +22,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } fr
 export default function RegisterScreen() {
 	const router = useRouter();
 	const [step, setStep] = useState(1);
-	const [toast, setToast] = useState<{
-		visible: boolean;
-		type: 'success' | 'error';
-		title: string;
-		message: string;
-	}>({
-		visible: false,
-		type: 'success',
-		title: '',
-		message: '',
-	});
+	const { toastState, showToast, hideToast } = useToast();
 
 	const {
 		control,
@@ -88,12 +79,7 @@ export default function RegisterScreen() {
 			console.log('✅ Registro exitoso, credenciales temporales guardadas.');
 
 			// Mostrar toast de éxito
-			setToast({
-				visible: true,
-				type: 'success',
-				title: 'Revisa tu correo',
-				message: 'Codigo enviado correctamente',
-			});
+			showToast('success', 'Revisa tu correo', 'Codigo enviado correctamente');
 
 			// Redirigir después de 2 segundos
 			setTimeout(() => {
@@ -104,23 +90,13 @@ export default function RegisterScreen() {
 			console.error('❌ Error al registrar:', error);
 
 			if (error.response?.status === 409) {
-				setToast({
-					visible: true,
-					type: 'error',
-					title: 'Error al enviar el correo',
-					message: 'Revisa el correo ingresado',
-				});
+				showToast('error', 'Error al enviar el correo', 'Revisa el correo ingresado');
 			} else {
 				const message =
 					error.response?.data?.message ||
 					error.response?.data?.error ||
 					'Revisa el correo ingresado';
-				setToast({
-					visible: true,
-					type: 'error',
-					title: 'Error al enviar el correo',
-					message: message,
-				});
+				showToast('error', 'Error al enviar el correo', message);
 			}
 		}
 	};
@@ -157,11 +133,11 @@ export default function RegisterScreen() {
 			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
 			{/* 🔹 ToastNotification FUERA del ScrollView */}
 			<ToastNotification
-				type={toast.type}
-				title={toast.title}
-				message={toast.message}
-				visible={toast.visible}
-				onClose={() => setToast({ ...toast, visible: false })}
+				visible={toastState.visible}
+				type={toastState.type}
+				title={toastState.title}
+				message={toastState.message}
+				onClose={hideToast}
 			/>
 
 			<ScrollView

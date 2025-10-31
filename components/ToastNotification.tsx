@@ -1,10 +1,11 @@
 // components/ToastNotification.tsx
-import { CheckCircle, X, XCircle } from 'lucide-react-native';
+import { AlertCircle, CheckCircle, XCircle } from 'lucide-react-native';
 import { useCallback, useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 
+// Se ha añadido el tipo 'warning' para coincidir con el diseño
 interface Props {
-	type: 'success' | 'error';
+	type: 'success' | 'error' | 'warning';
 	title: string;
 	message: string;
 	visible: boolean;
@@ -20,12 +21,12 @@ export function ToastNotification({
 	onClose,
 	duration = 5000,
 }: Props) {
-	const translateY = useRef(new Animated.Value(-100)).current;
+	const translateY = useRef(new Animated.Value(-150)).current;
 
 	const handleClose = useCallback(() => {
 		Animated.timing(translateY, {
-			toValue: -100,
-			duration: 200,
+			toValue: -150,
+			duration: 300,
 			useNativeDriver: true,
 		}).start(onClose);
 	}, [onClose, translateY]);
@@ -47,24 +48,46 @@ export function ToastNotification({
 
 	if (!visible) return null;
 
-	const isSuccess = type === 'success';
-	const backgroundColor = isSuccess ? '#D1F4E0' : '#FFE5E5';
-	const iconColor = isSuccess ? '#22C55E' : '#EF4444';
-	const Icon = isSuccess ? CheckCircle : XCircle;
+	// Lógica para seleccionar colores e íconos según el tipo
+	let backgroundColor: string;
+	let iconBackgroundColor: string;
+	let IconComponent: React.ElementType;
+	const titleColor = '#111827'; // Un color de título más oscuro por defecto
+	let messageColor = '#6B7280';
+
+	switch (type) {
+		case 'success':
+			backgroundColor = '#F0FDF4';
+			iconBackgroundColor = '#22C55E';
+			IconComponent = CheckCircle;
+			break;
+		case 'warning':
+			backgroundColor = '#FFFBEB';
+			iconBackgroundColor = '#F59E0B';
+			IconComponent = AlertCircle;
+			break;
+		case 'error':
+			backgroundColor = '#FEF2F2';
+			iconBackgroundColor = '#EF4444';
+			IconComponent = XCircle;
+			messageColor = '#B91C1C';
+			break;
+		default:
+			backgroundColor = '#FFFFFF';
+			iconBackgroundColor = '#6B7280';
+			IconComponent = AlertCircle;
+	}
 
 	return (
 		<Animated.View style={[styles.container, { backgroundColor, transform: [{ translateY }] }]}>
 			<View style={styles.content}>
-				<View style={[styles.iconContainer, { backgroundColor: iconColor }]}>
-					<Icon size={24} color='white' />
+				<View style={[styles.iconContainer, { backgroundColor: iconBackgroundColor }]}>
+					<IconComponent size={24} color='white' />
 				</View>
 				<View style={styles.textContainer}>
-					<Text style={styles.title}>{title}</Text>
-					<Text style={styles.message}>{message}</Text>
+					<Text style={[styles.title, { color: titleColor }]}>{title}</Text>
+					<Text style={[styles.message, { color: messageColor }]}>{message}</Text>
 				</View>
-				<TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-					<X size={20} color='#6B7280' />
-				</TouchableOpacity>
 			</View>
 		</Animated.View>
 	);
@@ -74,17 +97,18 @@ const styles = StyleSheet.create({
 	container: {
 		position: 'absolute',
 		top: 60,
-		left: 20,
-		right: 20,
-		borderRadius: 12,
-		paddingVertical: 16,
-		paddingHorizontal: 16,
+		left: 16,
+		right: 16,
+		borderRadius: 16, // Esquinas más redondeadas
+		padding: 16,
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
+		shadowOffset: { width: 0, height: 4 }, // Sombra ajustada
 		shadowOpacity: 0.1,
-		shadowRadius: 8,
-		elevation: 5,
+		shadowRadius: 10,
+		elevation: 8,
 		zIndex: 1000,
+		borderWidth: 1,
+		borderColor: 'rgba(0, 0, 0, 0.05)',
 	},
 	content: {
 		flexDirection: 'row',
@@ -100,18 +124,13 @@ const styles = StyleSheet.create({
 	},
 	textContainer: {
 		flex: 1,
-		gap: 4,
+		gap: 2,
 	},
 	title: {
 		fontSize: 16,
-		fontWeight: '600',
-		color: '#1F2937',
+		fontWeight: '700', // Texto más grueso (bold)
 	},
 	message: {
 		fontSize: 14,
-		color: '#6B7280',
-	},
-	closeButton: {
-		padding: 4,
 	},
 });

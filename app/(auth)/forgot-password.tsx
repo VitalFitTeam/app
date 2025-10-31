@@ -1,6 +1,5 @@
 import { Logo } from '@/components/auth/Logo';
 import { CodeInput } from '@/components/CodeInput';
-import { CustomAlert } from '@/components/CustomAlert';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ProgressIndicator } from '@/components/ProgressIndicator';
 import { SecondaryButton } from '@/components/SecondaryButton';
@@ -9,6 +8,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
 import { Colors } from '@/constants/theme';
+import { useToast } from '@/hooks/useToast';
 import { ForgotPasswordSchema, type ForgotPasswordData } from '@/schemas/forgot-password';
 import api from '@/services/api';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,15 +17,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SlidersVertical } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import {
-	Alert,
-	KeyboardAvoidingView,
-	Platform,
-	ScrollView,
-	StyleSheet,
-	Text,
-	View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 interface ApiErrorResponse {
 	message?: string;
@@ -36,13 +28,7 @@ export default function ForgotPasswordScreen() {
 	const [email, setEmail] = useState<string>('');
 	const [token, setToken] = useState<string>('');
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [toastVisible, setToastVisible] = useState(false);
-	const [toastType, setToastType] = useState<'success' | 'error'>('success');
-	const [toastTitle, setToastTitle] = useState('');
-	const [toastMessage, setToastMessage] = useState('');
-	const [customAlertVisible, setCustomAlertVisible] = useState(false);
-	const [customAlertTitle, setCustomAlertTitle] = useState('');
-	const [customAlertMessage, setCustomAlertMessage] = useState('');
+	const { toastState, showToast, hideToast } = useToast();
 	const router = useRouter();
 	const params = useLocalSearchParams();
 
@@ -75,17 +61,18 @@ export default function ForgotPasswordScreen() {
 
 	const handleSendEmail = async (): Promise<void> => {
 		if (!email) {
-			Alert.alert('Error', 'Por favor, ingresa tu correo.');
+			showToast('error', 'Error', 'Por favor, ingresa tu correo.');
 			return;
 		}
 
 		setIsLoading(true);
 		try {
 			await api.post('/auth/password/forgot', { email });
-			setToastType('success');
-			setToastTitle('Éxito');
-			setToastMessage('Si el correo existe, se ha enviado un código de recuperación.');
-			setToastVisible(true);
+			showToast(
+				'success',
+				'Éxito',
+				'Si el correo existe, se ha enviado un código de recuperación.',
+			);
 			setStep(2);
 		} catch (error) {
 			const err = error as AxiosError<ApiErrorResponse>;
@@ -93,7 +80,7 @@ export default function ForgotPasswordScreen() {
 			const msg =
 				err.response?.data?.message ||
 				'Error al solicitar la recuperación. Intenta nuevamente.';
-			Alert.alert('Error', msg);
+			showToast('error', 'Error', msg);
 		} finally {
 			setIsLoading(false);
 		}
@@ -107,16 +94,17 @@ export default function ForgotPasswordScreen() {
 				password: data.password,
 				confirm_password: data.confirmPassword,
 			});
-			setCustomAlertTitle('¡Éxito!');
-			setCustomAlertMessage('Tu contraseña ha sido restablecida correctamente.');
-			setCustomAlertVisible(true);
+			showToast('success', '¡Éxito!', 'Tu contraseña ha sido restablecida correctamente.');
+			setTimeout(() => {
+				router.push('/(auth)/login');
+			}, 2000); // Espera 2 segundos antes de redirigir
 		} catch (error) {
 			const err = error as AxiosError<ApiErrorResponse>;
 			console.error('Error al restablecer contraseña:', err.message);
 			const msg =
 				err.response?.data?.message ||
 				'Error al restablecer la contraseña. Intenta nuevamente.';
-			Alert.alert('Error', msg);
+			showToast('error', 'Error', msg);
 		} finally {
 			setIsLoading(false);
 		}
@@ -241,20 +229,11 @@ export default function ForgotPasswordScreen() {
 				</ScrollView>
 			</KeyboardAvoidingView>
 			<ToastNotification
-				type={toastType}
-				title={toastTitle}
-				message={toastMessage}
-				visible={toastVisible}
-				onClose={() => setToastVisible(false)}
-			/>
-			<CustomAlert
-				visible={customAlertVisible}
-				title={customAlertTitle}
-				message={customAlertMessage}
-				onConfirm={() => {
-					setCustomAlertVisible(false);
-					router.push('/(auth)/login');
-				}}
+				visible={toastState.visible}
+				type={toastState.type}
+				title={toastState.title}
+				message={toastState.message}
+				onClose={hideToast}
 			/>
 		</ThemedView>
 	);

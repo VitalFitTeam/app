@@ -5,7 +5,6 @@ import { Link, useRouter } from 'expo-router';
 import { Eye, EyeOff, SlidersVertical } from 'lucide-react-native';
 import { useState } from 'react';
 import {
-	Alert,
 	Keyboard,
 	KeyboardAvoidingView,
 	Platform,
@@ -20,12 +19,15 @@ import {
 import { LogoSimple } from '@/components/auth/Logo';
 import { SocialButton } from '@/components/auth/SocialButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
+import { ToastNotification } from '@/components/ToastNotification';
+import { useToast } from '@/hooks/useToast';
 
 // Temas y API
 import { Colors, Fonts } from '@/constants/theme';
 import api from '@/services/api';
 
 export default function LoginScreen() {
+	const { toastState, showToast, hideToast } = useToast();
 	const router = useRouter();
 	const [isChecked, setChecked] = useState(false);
 	const [email, setEmail] = useState('');
@@ -36,13 +38,13 @@ export default function LoginScreen() {
 	//  Manejo de login con backend ---
 	const handleLogin = async () => {
 		if (!email || !password) {
-			Alert.alert('Error', 'Por favor, ingresa tu correo y contraseña.');
+			showToast('error', 'Error', 'Por favor, ingresa tu correo y contraseña.');
 			return;
 		}
 
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(email)) {
-			Alert.alert('Error', 'Por favor, ingresa un correo electrónico válido.');
+			showToast('error', 'Error', 'Por favor, ingresa un correo electrónico válido.');
 			return;
 		}
 
@@ -73,7 +75,7 @@ export default function LoginScreen() {
 				errorMessage = err.response?.data?.message || err.message;
 			}
 			console.error('Error en el login:', errorMessage);
-			Alert.alert('Error al iniciar sesión', errorMessage);
+			showToast('error', 'Error al iniciar sesión', errorMessage);
 		} finally {
 			setIsLoading(false);
 		}
@@ -92,6 +94,13 @@ export default function LoginScreen() {
 						paddingVertical: 16,
 					}}
 					className='bg-white'>
+					<ToastNotification
+						visible={toastState.visible}
+						type={toastState.type}
+						title={toastState.title}
+						message={toastState.message}
+						onClose={hideToast}
+					/>
 					<View className='w-full max-w-sm self-center'>
 						{/* Logo */}
 						<View className='items-center mb-2'>
