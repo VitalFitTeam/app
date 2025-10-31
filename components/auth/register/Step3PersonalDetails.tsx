@@ -7,7 +7,8 @@ import Checkbox from 'expo-checkbox';
 import { Calendar } from 'lucide-react-native';
 import { useState } from 'react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import PhoneInput from 'react-native-international-phone-number';
 import { PrimaryButton } from '../../PrimaryButton';
 import { StyledTextInput } from '../../StyledTextInput';
 
@@ -114,18 +115,33 @@ export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
 				}}
 			/>
 
+			{/* Campo de teléfono internacional */}
 			<Controller
 				control={control}
 				name='phone'
-				render={({ field: { onChange, onBlur, value } }) => (
-					<StyledTextInput
-						label='Teléfono'
-						onBlur={onBlur}
-						onChangeText={onChange}
-						value={value}
-						error={errors.phone?.message}
-						keyboardType='phone-pad'
-					/>
+				render={({ field: { onChange, value, ref } }) => (
+					<View style={{ width: '100%' }}>
+						<Text style={styles.label}>Teléfono</Text>
+						<PhoneInput
+							ref={ref}
+							value={value || ''}
+							onChangePhoneNumber={(phone) => onChange(phone)}
+							defaultCountry='VE'
+							placeholder='Número de teléfono'
+							phoneInputStyles={{
+								container: styles.phoneContainer,
+								flagContainer: styles.flagContainer,
+								flag: styles.flag,
+								caret: styles.caret,
+								divider: styles.divider,
+								callingCode: styles.callingCode,
+								input: styles.phoneInput,
+							}}
+						/>
+						{errors.phone && (
+							<Text style={styles.errorText}>{errors.phone.message}</Text>
+						)}
+					</View>
 				)}
 			/>
 
@@ -162,3 +178,46 @@ export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
 		</ScrollView>
 	);
 }
+
+const styles = StyleSheet.create({
+	label: {
+		fontSize: 14,
+		fontWeight: '500',
+		color: '#5C5E60',
+		marginBottom: 8,
+	},
+	phoneContainer: {
+		backgroundColor: '#F5F5F5',
+		borderRadius: 8,
+		borderWidth: 1,
+		borderColor: '#E0E0E0',
+		paddingHorizontal: 12,
+		height: 48,
+	},
+	flagContainer: {
+		backgroundColor: 'transparent',
+		justifyContent: 'center',
+	},
+	flag: {},
+	caret: {
+		color: '#5C5E60',
+		fontSize: 16,
+	},
+	divider: {
+		backgroundColor: '#E0E0E0',
+	},
+	callingCode: {
+		color: '#1F2937',
+		fontSize: 16,
+		fontWeight: '500',
+	},
+	phoneInput: {
+		color: '#1F2937',
+		fontSize: 16,
+	},
+	errorText: {
+		color: 'red',
+		fontSize: 12,
+		marginTop: 4,
+	},
+});
