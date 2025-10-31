@@ -11,9 +11,17 @@ import Constants from 'expo-constants';
 import { Image } from 'expo-image';
 import { Stack, useRouter } from 'expo-router';
 import { Calendar } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+	ActivityIndicator,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+} from 'react-native';
 import { ChevronLeftIcon, PencilSquareIcon } from 'react-native-heroicons/solid';
+import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
 
 const API_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL || process.env.EXPO_PUBLIC_API_URL;
 
@@ -28,6 +36,7 @@ interface User {
 
 export default function MyProfileScreen() {
 	const router = useRouter();
+	const phoneInputRef = useRef<IPhoneInputRef>(null);
 	const [isEditing, setIsEditing] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [userData, setUserData] = useState<User | null>(null);
@@ -249,13 +258,30 @@ export default function MyProfileScreen() {
 					)}
 					<View className='mb-4' />
 
-					<StyledTextInput
-						label='Teléfono'
-						value={phone}
-						onChangeText={setPhone}
-						editable={isEditing}
-						keyboardType='phone-pad'
-					/>
+					{/* Campo de teléfono internacional */}
+					<View>
+						<Text style={styles.label}>Teléfono</Text>
+						<PhoneInput
+							ref={phoneInputRef}
+							value={phone || ''}
+							onChangePhoneNumber={(phoneNumber) => setPhone(phoneNumber)}
+							defaultCountry='VE'
+							placeholder='Número de teléfono'
+							disabled={!isEditing}
+							phoneInputStyles={{
+								container: {
+									...styles.phoneContainer,
+									opacity: isEditing ? 1 : 0.6,
+								},
+								flagContainer: styles.flagContainer,
+								flag: styles.flag,
+								caret: styles.caret,
+								divider: styles.divider,
+								callingCode: styles.callingCode,
+								input: styles.phoneInput,
+							}}
+						/>
+					</View>
 				</View>
 
 				{/* Action Button */}
@@ -269,3 +295,41 @@ export default function MyProfileScreen() {
 		</ThemedView>
 	);
 }
+
+const styles = StyleSheet.create({
+	label: {
+		fontSize: 14,
+		fontWeight: '500',
+		color: '#5C5E60',
+		marginBottom: 8,
+	},
+	phoneContainer: {
+		backgroundColor: '#F5F5F5',
+		borderRadius: 8,
+		borderWidth: 1,
+		borderColor: '#E0E0E0',
+		paddingHorizontal: 12,
+		height: 48,
+	},
+	flagContainer: {
+		backgroundColor: 'transparent',
+		justifyContent: 'center',
+	},
+	flag: {},
+	caret: {
+		color: '#5C5E60',
+		fontSize: 16,
+	},
+	divider: {
+		backgroundColor: '#E0E0E0',
+	},
+	callingCode: {
+		color: '#1F2937',
+		fontSize: 16,
+		fontWeight: '500',
+	},
+	phoneInput: {
+		color: '#1F2937',
+		fontSize: 16,
+	},
+});
