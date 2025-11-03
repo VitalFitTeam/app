@@ -10,18 +10,14 @@ import { ToastNotification } from '@/components/ToastNotification';
 import { Colors } from '@/constants/theme';
 import { useToast } from '@/hooks/useToast';
 import { ForgotPasswordSchema, type ForgotPasswordData } from '@/schemas/forgot-password';
-import api from '@/services/api';
+import vitalFitApi from '@/services/vitalfitSdk';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosError } from 'axios';
+import { isAPIError } from '@vitalfit/sdk';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SlidersVertical } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
-
-interface ApiErrorResponse {
-	message?: string;
-}
 
 export default function ForgotPasswordScreen() {
 	const [step, setStep] = useState<number>(1);
@@ -67,20 +63,22 @@ export default function ForgotPasswordScreen() {
 
 		setIsLoading(true);
 		try {
-			await api.post('/auth/password/forgot', { email });
+			await vitalFitApi.auth.forgotPassword(email);
 			showToast(
 				'success',
 				'Éxito',
 				'Si el correo existe, se ha enviado un código de recuperación.',
 			);
 			setStep(2);
-		} catch (error) {
-			const err = error as AxiosError<ApiErrorResponse>;
-			console.error('Error al enviar correo:', err.message);
-			const msg =
-				err.response?.data?.message ||
-				'Error al solicitar la recuperación. Intenta nuevamente.';
-			showToast('error', 'Error', msg);
+		} catch (error: unknown) {
+			let errorMessage = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
+			if (isAPIError(error)) {
+				errorMessage = error.messages.join(', ');
+			} else if (error instanceof Error) {
+				errorMessage = error.message;
+			}
+			console.error('Error al enviar correo:', error);
+			showToast('error', 'Error', errorMessage);
 		} finally {
 			setIsLoading(false);
 		}
@@ -89,22 +87,20 @@ export default function ForgotPasswordScreen() {
 	const handleResetPassword = async (data: ForgotPasswordData): Promise<void> => {
 		setIsLoading(true);
 		try {
-			await api.post('/auth/password/reset', {
-				token,
-				password: data.password,
-				confirm_password: data.confirmPassword,
-			});
+			await vitalFitApi.auth.resetPassword(token, data.password, data.confirmPassword);
 			showToast('success', '¡Éxito!', 'Tu contraseña ha sido restablecida correctamente.');
 			setTimeout(() => {
 				router.push('/(auth)/login');
 			}, 2000); // Espera 2 segundos antes de redirigir
-		} catch (error) {
-			const err = error as AxiosError<ApiErrorResponse>;
-			console.error('Error al restablecer contraseña:', err.message);
-			const msg =
-				err.response?.data?.message ||
-				'Error al restablecer la contraseña. Intenta nuevamente.';
-			showToast('error', 'Error', msg);
+		} catch (error: unknown) {
+			let errorMessage = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
+			if (isAPIError(error)) {
+				errorMessage = error.messages.join(', ');
+			} else if (error instanceof Error) {
+				errorMessage = error.message;
+			}
+			console.error('Error al restablecer contraseña:', error);
+			showToast('error', 'Error', errorMessage);
 		} finally {
 			setIsLoading(false);
 		}

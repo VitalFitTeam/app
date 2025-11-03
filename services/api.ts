@@ -1,5 +1,4 @@
 // src/services/api.ts
-import axios from 'axios';
 import Constants from 'expo-constants';
 import { Alert } from 'react-native';
 
@@ -20,12 +19,3 @@ if (!API_URL) {
 } else {
 	console.log('✅ API_URL detectada:', API_URL);
 }
-
-const api = axios.create({
-	baseURL: API_URL,
-	headers: {
-		'Content-Type': 'application/json',
-	},
-});
-
-export default api;

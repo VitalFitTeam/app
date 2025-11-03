@@ -51,10 +51,12 @@ export const RegisterSchema = z
 			.regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/, 'El apellido solo puede contener letras.'),
 		documentId: z.string().min(1, 'El documento es requerido.'),
 		birthDate: z.string().min(1, 'La fecha de nacimiento es requerida.'),
-		phone: z.string().min(1, 'El teléfono es requerido.'),
+		phone: z.string().min(1, 'El teléfono es requerido.').optional().nullable(),
 		acceptTerms: z.boolean().refine((val) => val === true, {
 			message: 'Debes aceptar los términos y condiciones.',
 		}),
+		profile_picture_url: z.string().optional().nullable(),
+		role_name: z.string().optional().nullable(),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		message: 'Las contraseñas no coinciden.',
