@@ -4,10 +4,11 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
 import { Colors, Fonts } from '@/constants/theme';
+import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { isAPIError, User, UserUpdateRequest } from '@vitalfit/sdk';
 import { format } from 'date-fns';
-import Constants from 'expo-constants';
 import { Image } from 'expo-image';
 import { Stack, useRouter } from 'expo-router';
 import { Calendar } from 'lucide-react-native';
@@ -22,17 +23,6 @@ import {
 } from 'react-native';
 import { ChevronLeftIcon, PencilSquareIcon } from 'react-native-heroicons/solid';
 import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
-
-const API_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL || process.env.EXPO_PUBLIC_API_URL;
-
-interface User {
-	first_name: string;
-	last_name: string;
-	email: string;
-	identity_document: string;
-	birth_date: string;
-	phone: string;
-}
 
 export default function MyProfileScreen() {
 	const router = useRouter();
@@ -63,21 +53,25 @@ export default function MyProfileScreen() {
 		const fetchUser = async () => {
 			try {
 				const token = await AsyncStorage.getItem('token');
-				if (!token) return;
+				if (!token) {
+					console.error('❌ No se encontró token en AsyncStorage');
+					return;
+				}
 
-				const response = await fetch(`${API_URL.replace(/\/+$/, '')}/user/whoami`, {
-					headers: { Authorization: `Bearer ${token}` },
-				});
-				if (!response.ok) return;
-
-				const data = await response.json();
-				setUserData(data.user);
-				setFirstName(data.user.first_name || '');
-				setLastName(data.user.last_name || '');
-				setBirthDate(data.user.birth_date || '');
-				setPhone(data.user.phone || '');
-			} catch (error) {
-				console.error('Failed to fetch user data:', error);
+				const userDataResponse = await vitalFitApi.user.WhoAmI(token);
+				setUserData(userDataResponse.user);
+				setFirstName(userDataResponse.user.first_name || '');
+				setLastName(userDataResponse.user.last_name || '');
+				setBirthDate(userDataResponse.user.birth_date || '');
+				setPhone(userDataResponse.user.phone || '');
+			} catch (error: unknown) {
+				let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
+				if (isAPIError(error)) {
+					errorMessage = error.messages.join(', ');
+				} else if (error instanceof Error) {
+					errorMessage = error.message;
+				}
+				console.error('💥 Error al obtener datos del usuario:', errorMessage);
 			} finally {
 				setLoading(false);
 			}
@@ -88,30 +82,20 @@ export default function MyProfileScreen() {
 	const handleSaveChanges = async () => {
 		try {
 			const token = await AsyncStorage.getItem('token');
-			if (!token) return;
+			if (!token) {
+				console.error('❌ No se encontró token en AsyncStorage');
+				return;
+			}
 
-			const payload = {
+			const payload: UserUpdateRequest = {
 				first_name: firstName,
 				last_name: lastName,
 				birth_date: birthDate,
 				phone: phone,
 			};
 
-			const response = await fetch(`${API_URL.replace(/\/+$/, '')}/user/update`, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify(payload),
-			});
-
-			if (!response.ok) {
-				throw new Error('Error al actualizar el perfil');
-			}
-
-			const data = await response.json();
-			setUserData(data.user);
+			const updatedUserData = await vitalFitApi.user.update(payload, token);
+			setUserData(updatedUserData.user);
 			setIsEditing(false);
 
 			setToast({
@@ -120,13 +104,19 @@ export default function MyProfileScreen() {
 				title: '¡Perfil actualizado!',
 				message: 'Tus cambios se guardaron correctamente',
 			});
-		} catch (error) {
-			console.error('Error updating profile:', error);
+		} catch (error: unknown) {
+			let errorMessage = 'Ocurrió un error inesperado al actualizar el perfil.';
+			if (isAPIError(error)) {
+				errorMessage = error.messages.join(', ');
+			} else if (error instanceof Error) {
+				errorMessage = error.message;
+			}
+			console.error('💥 Error al actualizar el perfil:', errorMessage);
 			setToast({
 				visible: true,
 				type: 'error',
 				title: 'Error',
-				message: 'No se pudieron guardar los cambios',
+				message: errorMessage,
 			});
 		}
 	};

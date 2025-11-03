@@ -1,13 +1,12 @@
 import { ThemedText } from '@/components/themed-text';
+import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
+import { isAPIError } from '@vitalfit/sdk';
 import { Image } from 'expo-image';
 import { Link, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { ChevronRightIcon, Cog6ToothIcon } from 'react-native-heroicons/outline';
-
-const API_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL || process.env.EXPO_PUBLIC_API_URL;
 
 type ProfileMenuItemProps = {
 	title: string;
@@ -41,25 +40,19 @@ export default function ProfileScreen() {
 					return;
 				}
 
-				const response = await fetch(`${API_URL.replace(/\/+$/, '')}/user/whoami`, {
-					method: 'GET',
-					headers: {
-						Accept: 'application/json',
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${token}`,
-					},
-				});
-
-				if (!response.ok) {
-					console.error('❌ Error al obtener el usuario:', response.status);
-					return;
-				}
-
-				const data = await response.json();
-				const fullName = `${data?.user?.first_name || ''} ${data?.user?.last_name || ''}`;
+				const userData = await vitalFitApi.user.WhoAmI(token);
+				const fullName = `${userData?.user?.first_name || ''} ${
+					userData?.user?.last_name || ''
+				}`;
 				setUserName(fullName.trim().toUpperCase() || 'USUARIO');
-			} catch (error) {
-				console.error('💥 Error en la solicitud whoami:', error);
+			} catch (error: unknown) {
+				let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
+				if (isAPIError(error)) {
+					errorMessage = error.messages.join(', ');
+				} else if (error instanceof Error) {
+					errorMessage = error.message;
+				}
+				console.error('💥 Error en la solicitud whoami:', errorMessage);
 			} finally {
 				setLoading(false);
 			}

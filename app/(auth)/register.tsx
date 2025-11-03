@@ -10,10 +10,10 @@ import { ToastNotification } from '@/components/ToastNotification';
 import { Colors, Fonts } from '@/constants/theme';
 import { useToast } from '@/hooks/useToast';
 import { RegisterData, RegisterSchema, Step1Schema, Step2Schema } from '@/schemas/register';
-import api from '@/services/api';
+import vitalFitApi from '@/services/vitalfitSdk';
 import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AxiosError } from 'axios';
+import { isAPIError, SignUpRequest, UserGender } from '@vitalfit/sdk';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -57,20 +57,23 @@ export default function RegisterScreen() {
 		) as Pick<RegisterData, (typeof allowedKeys)[number]>;
 
 		try {
-			const payload = {
+			const payload: SignUpRequest = {
 				email: cleanedData.email,
 				password: cleanedData.password,
-				gender: cleanedData.gender,
+				gender:
+					cleanedData.gender === 'prefer-not-to-say'
+						? null
+						: (cleanedData.gender as UserGender), // Castear a UserGender ya que 'male' y 'female' coinciden
 				first_name: cleanedData.name,
 				last_name: cleanedData.lastName,
 				identity_document: cleanedData.documentId,
-				birth_date: `${cleanedData.birthDate}`,
+				birth_date: new Date(cleanedData.birthDate).toISOString().split('T')[0], // Convertir a Date y luego formatear
 				phone: cleanedData.phone,
-				profile_picture_url: '',
+				profile_picture_url: '', // El SDK espera esto, aunque esté vacío
 			};
 
 			// 🔹 Registro del usuario
-			await api.post('/auth/register', payload);
+			await vitalFitApi.auth.signUp(payload);
 
 			// 🔹 Guardamos las credenciales temporalmente para el login post-activación
 			await AsyncStorage.setItem('temp_email', cleanedData.email);
@@ -79,25 +82,22 @@ export default function RegisterScreen() {
 			console.log('✅ Registro exitoso, credenciales temporales guardadas.');
 
 			// Mostrar toast de éxito
-			showToast('success', 'Revisa tu correo', 'Codigo enviado correctamente');
+			showToast('success', 'Revisa tu correo', 'Código enviado correctamente');
 
 			// Redirigir después de 2 segundos
 			setTimeout(() => {
 				router.replace('/(auth)/confirm-email');
 			}, 2000);
-		} catch (err) {
-			const error = err as AxiosError<{ message?: string; error?: string }>;
-			console.error('❌ Error al registrar:', error);
-
-			if (error.response?.status === 409) {
-				showToast('error', 'Error al enviar el correo', 'Revisa el correo ingresado');
-			} else {
-				const message =
-					error.response?.data?.message ||
-					error.response?.data?.error ||
-					'Revisa el correo ingresado';
-				showToast('error', 'Error al enviar el correo', message);
+		} catch (error: unknown) {
+			let errorMessage =
+				'Ocurrió un error inesperado durante el registro. Inténtalo de nuevo.';
+			if (isAPIError(error)) {
+				errorMessage = error.messages.join(', ');
+			} else if (error instanceof Error) {
+				errorMessage = error.message;
 			}
+			console.error('❌ Error al registrar:', error);
+			showToast('error', 'Error al registrar', errorMessage);
 		}
 	};
 

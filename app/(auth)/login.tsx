@@ -24,8 +24,8 @@ import { useToast } from '@/hooks/useToast';
 
 // Temas y API
 import { Colors, Fonts } from '@/constants/theme';
-import api from '@/services/api';
-
+import vitalFitApi from '@/services/vitalfitSdk';
+import { isAPIError } from '@vitalfit/sdk';
 export default function LoginScreen() {
 	const { toastState, showToast, hideToast } = useToast();
 	const router = useRouter();
@@ -51,30 +51,28 @@ export default function LoginScreen() {
 		setIsLoading(true);
 
 		try {
-			const response = await api.post('/auth/login', { email, password });
-			console.log('Login exitoso:', response.data);
+			const response = await vitalFitApi.auth.login({ email, password });
+			console.log('Login exitoso:', response);
 
 			// Guarda el token JWT de la respuesta
-			const token = response.data?.access_token || response.data?.token;
+			const token = response.token;
 			if (token) {
 				await AsyncStorage.setItem('token', token);
 				console.log('Token guardado en AsyncStorage');
 			} else {
-				console.warn('No se recibió token en la respuesta del backend.');
+				console.warn('No se recibió token en la respuesta del SDK.');
 			}
 
 			// Redirigir al dashboard
 			router.replace('/(tabs)/dashboard');
 		} catch (error: unknown) {
-			let errorMessage = 'No se pudo conectar al servidor. Inténtalo de nuevo.';
-			if (typeof error === 'object' && error !== null && 'message' in error) {
-				const err = error as {
-					response?: { data?: { message?: string } };
-					message: string;
-				};
-				errorMessage = err.response?.data?.message || err.message;
+			let errorMessage = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
+			if (isAPIError(error)) {
+				errorMessage = error.messages.join(', ');
+			} else if (error instanceof Error) {
+				errorMessage = error.message;
 			}
-			console.error('Error en el login:', errorMessage);
+			console.error('Error en el login:', error);
 			showToast('error', 'Error al iniciar sesión', errorMessage);
 		} finally {
 			setIsLoading(false);

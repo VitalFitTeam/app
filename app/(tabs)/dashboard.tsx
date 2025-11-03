@@ -6,12 +6,11 @@ import { TodayRoutineCard } from '@/components/auth/dashboard/todayroutinecard';
 import { UserHeader } from '@/components/auth/dashboard/userheader';
 import { WeekCalendar } from '@/components/auth/dashboard/weekcalendar';
 import { ThemedView } from '@/components/themed-view';
+import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
+import { isAPIError } from '@vitalfit/sdk';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView } from 'react-native';
-
-const API_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL || process.env.EXPO_PUBLIC_API_URL;
 
 export default function DashboardScreen() {
 	const [firstName, setFirstName] = useState<string | null>(null);
@@ -31,27 +30,17 @@ export default function DashboardScreen() {
 
 				setUserToken(token); // 👈 Guardar token
 
-				const response = await fetch(`${API_URL.replace(/\/+$/, '')}/user/whoami`, {
-					method: 'GET',
-					headers: {
-						Accept: 'application/json',
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${token}`,
-					},
-				});
+				const userData = await vitalFitApi.user.WhoAmI(token);
 
-				const text = await response.text();
-
-				if (!response.ok) {
-					console.error('❌ Error al obtener el usuario:', response.status);
-					return;
+				setFirstName(userData?.user?.first_name || 'Usuario');
+			} catch (error: unknown) {
+				let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
+				if (isAPIError(error)) {
+					errorMessage = error.messages.join(', ');
+				} else if (error instanceof Error) {
+					errorMessage = error.message;
 				}
-
-				const data = JSON.parse(text);
-
-				setFirstName(data?.user?.first_name || 'Usuario');
-			} catch (error) {
-				console.error('💥 Error en la solicitud whoami:', error);
+				console.error('💥 Error en la solicitud whoami:', errorMessage);
 			} finally {
 				setLoading(false);
 			}

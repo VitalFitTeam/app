@@ -6,9 +6,9 @@ import { ThemedText } from '@/components/themed-text';
 import { ToastNotification } from '@/components/ToastNotification';
 import { Colors, Fonts } from '@/constants/theme';
 import { useToast } from '@/hooks/useToast';
-import api from '@/services/api';
+import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AxiosError } from 'axios';
+import { isAPIError } from '@vitalfit/sdk';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -37,13 +37,7 @@ export default function ConfirmEmailScreen() {
 		setIsLoading(true);
 
 		try {
-			const verifyResponse = await api.put('/auth/activate', { code: code.trim() });
-
-			if (verifyResponse.status !== 200 && verifyResponse.status !== 204) {
-				console.warn('⚠️ Estado inesperado al activar:', verifyResponse.status);
-				showToast('error', 'Error', 'Código inválido o expirado. Intenta nuevamente.');
-				return;
-			}
+			await vitalFitApi.auth.verifyEmail(code.trim());
 
 			showToast('success', '¡Éxito!', '¡Te has registrado exitosamente!');
 
@@ -61,12 +55,8 @@ export default function ConfirmEmailScreen() {
 			}
 
 			try {
-				const loginResponse = await api.post('/auth/login', { email, password });
-				const token =
-					loginResponse.data?.token ||
-					loginResponse.data?.access_token ||
-					loginResponse.data?.jwt ||
-					null;
+				const loginResponse = await vitalFitApi.auth.login({ email, password });
+				const token = loginResponse.token || null;
 
 				if (!token) {
 					console.error('❌ No se recibió token después del login automático');
@@ -83,27 +73,28 @@ export default function ConfirmEmailScreen() {
 				await AsyncStorage.multiRemove(['temp_email', 'temp_password']);
 
 				router.replace('/(tabs)/dashboard');
-			} catch (loginErr) {
+			} catch (loginErr: unknown) {
+				let errorMessage =
+					'Ocurrió un error inesperado en el login automático. Inténtalo de nuevo.';
+				if (isAPIError(loginErr)) {
+					errorMessage = loginErr.messages.join(', ');
+				} else if (loginErr instanceof Error) {
+					errorMessage = loginErr.message;
+				}
 				console.error('❌ Error en login automático:', loginErr);
-				showToast(
-					'error',
-					'Error',
-					'Error al iniciar sesión. Por favor, inicia sesión manualmente.',
-				);
+				showToast('error', 'Error', errorMessage);
 				setTimeout(() => router.replace('/(auth)/login'), 2000);
 			}
-		} catch (err) {
-			const error = err as AxiosError<{ message?: string; error?: string }>;
+		} catch (error: unknown) {
+			let errorMessage =
+				'Ocurrió un error inesperado al confirmar el correo. Inténtalo de nuevo.';
+			if (isAPIError(error)) {
+				errorMessage = error.messages.join(', ');
+			} else if (error instanceof Error) {
+				errorMessage = error.message;
+			}
 			console.error('❌ Error al confirmar o iniciar sesión:', error);
-
-			const backendMessage =
-				error.response?.data?.message ||
-				error.response?.data?.error ||
-				(error.response?.status === 404
-					? 'El endpoint /auth/activate no existe o fue movido.'
-					: 'Hubo un error inesperado.');
-
-			showToast('error', 'Error', backendMessage);
+			showToast('error', 'Error', errorMessage);
 		} finally {
 			setIsLoading(false);
 		}
