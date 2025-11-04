@@ -12,11 +12,16 @@ import { isAPIError } from '@vitalfit/sdk';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView } from 'react-native';
 
+// 👉 importa las versiones internas del dashboard
+import DashboardInstructor from '../dashboards/dashboard-instructor';
+import DashboardRecepcionist from '../dashboards/dashboard-recepcionist';
+
 export default function DashboardScreen() {
 	const [firstName, setFirstName] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
-	const [qrModalVisible, setQrModalVisible] = useState(false); // 👈 Estado del modal
-	const [userToken, setUserToken] = useState<string>(''); // 👈 Estado del token
+	const [qrModalVisible, setQrModalVisible] = useState(false);
+	const [userToken, setUserToken] = useState<string>('');
+	const [userRole, setUserRole] = useState<string>('');
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -24,13 +29,18 @@ export default function DashboardScreen() {
 				const token = await AsyncStorage.getItem('token');
 
 				if (!token) {
-					console.error('❌ No se encontró token en AsyncStorage');
+					console.error('No se encontró token en AsyncStorage');
 					return;
 				}
 
-				setUserToken(token); // 👈 Guardar token
+				setUserToken(token);
 
 				const userData = await vitalFitApi.user.WhoAmI(token);
+
+				// ⚙️ Temporal para probar:
+				// const roleName = userData?.user?.role?.name || '';
+				// setUserRole(roleName);
+				setUserRole('recepcionist'); // 👈 Cambia entre 'instructor', 'recepcionist' o 'client'
 
 				setFirstName(userData?.user?.first_name || 'Usuario');
 			} catch (error: unknown) {
@@ -40,7 +50,7 @@ export default function DashboardScreen() {
 				} else if (error instanceof Error) {
 					errorMessage = error.message;
 				}
-				console.error('💥 Error en la solicitud whoami:', errorMessage);
+				console.error('Error en la solicitud whoami:', errorMessage);
 			} finally {
 				setLoading(false);
 			}
@@ -57,6 +67,11 @@ export default function DashboardScreen() {
 		);
 	}
 
+	// 🧠 Render condicional
+	if (userRole === 'instructor') return <DashboardInstructor />;
+	if (userRole === 'recepcionist') return <DashboardRecepcionist />;
+
+	// 👇 Dashboard por defecto (clientes)
 	return (
 		<ThemedView className='flex-1 bg-white dark:bg-neutral-950 px-4 pt-10'>
 			<ScrollView showsVerticalScrollIndicator={false}>
@@ -67,11 +82,7 @@ export default function DashboardScreen() {
 				/>
 				<WeekCalendar />
 
-				{/* MembershipCard ahora abre el modal QR */}
-				<MembershipCard
-					daysRemaining={15}
-					onQRPress={() => setQrModalVisible(true)} // 👈 Abrir modal
-				/>
+				<MembershipCard daysRemaining={15} onQRPress={() => setQrModalVisible(true)} />
 
 				<ProgressCard weekProgress={0.8} calories={1200} completed='4/5' />
 				<ReservedClassesCard reserved={0} />
@@ -82,7 +93,6 @@ export default function DashboardScreen() {
 				/>
 			</ScrollView>
 
-			{/* Modal QR */}
 			<QRModal
 				visible={qrModalVisible}
 				onClose={() => setQrModalVisible(false)}
