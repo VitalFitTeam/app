@@ -15,7 +15,7 @@ type TabType = 'clientes' | 'clases' | 'mensajes';
 export default function DashboardInstructor() {
 	const [loading, setLoading] = useState(true);
 	const [firstName, setFirstName] = useState<string | null>(null);
-	const [activeTab, setActiveTab] = useState<TabType>('clientes'); // ✅ Estado para el tab activo
+	const [activeTab, setActiveTab] = useState<TabType>('clientes');
 
 	useEffect(() => {
 		const fetchUser = async () => {

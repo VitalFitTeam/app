@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
 	text: {
 		color: '#FFFFFF',
 		fontSize: 25,
-		lineHeight: BUTTON_H - PADDING_V * 2, // 30
+		lineHeight: BUTTON_H - PADDING_V * 2,
 		fontFamily: 'Montserrat_500Medium',
 		textAlign: 'center',
 		includeFontPadding: false,

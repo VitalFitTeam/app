@@ -1,7 +1,6 @@
 import { VitalFit } from '@vitalfit/sdk';
 import Constants from 'expo-constants';
 
-// Determinar si estamos en modo de desarrollo
 const isDevMode =
 	Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL === 'http://localhost:3000/v1' ||
 	Constants.manifest?.extra?.EXPO_PUBLIC_API_URL === 'http://localhost:3000/v1' ||

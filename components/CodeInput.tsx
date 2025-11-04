@@ -1,5 +1,3 @@
-// components/auth/CodeInput.tsx
-
 import { useRef, useState } from 'react';
 import { NativeSyntheticEvent, TextInput, TextInputKeyPressEventData, View } from 'react-native';
 
@@ -48,12 +46,12 @@ export function CodeInput({ onComplete, hasError }: Props) {
               w-12 h-14 border rounded-lg text-center text-2xl font-bold text-black dark:text-white
               ${hasError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
             `}
-						keyboardType='default' // 👈 CAMBIO: de 'number-pad' a 'default'
+						keyboardType='default'
 						maxLength={1}
 						value={code[index]}
 						onChangeText={(text) => handleTextChange(text, index)}
 						onKeyPress={(e) => handleKeyPress(e, index)}
-						autoCapitalize='characters' // Opcional: para mostrar letras en mayúsculas
+						autoCapitalize='characters'
 					/>
 				))}
 		</View>

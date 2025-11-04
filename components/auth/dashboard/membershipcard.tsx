@@ -5,7 +5,7 @@ import { QrCodeIcon } from 'react-native-heroicons/outline';
 
 interface Props {
 	daysRemaining: number;
-	onQRPress: () => void; // 👈 Nueva prop para abrir el modal
+	onQRPress: () => void;
 }
 
 export const MembershipCard: React.FC<Props> = ({ daysRemaining, onQRPress }) => {
@@ -19,24 +19,20 @@ export const MembershipCard: React.FC<Props> = ({ daysRemaining, onQRPress }) =>
 			start={{ x: 0, y: 0.1 }}
 			end={{ x: 1, y: 0.2 }}
 			style={[styles.card, { width: cardWidth }]}>
-			{/* Contenido principal - AHORA ES TOUCHABLE */}
 			<TouchableOpacity
 				style={styles.contentContainer}
 				onPress={onQRPress}
 				activeOpacity={0.8}>
-				{/* Icono QR */}
 				<View style={styles.iconContainer}>
 					<QrCodeIcon size={56} color='#FFFFFF' strokeWidth={0.5} />
 				</View>
 
-				{/* Texto derecho */}
 				<View style={styles.textContainer}>
 					<Text style={styles.title}>Acceso al Gimnasio</Text>
 					<Text style={styles.subtitle}>Escanea para ingresar</Text>
 				</View>
 			</TouchableOpacity>
 
-			{/* Texto inferior */}
 			<Text style={styles.footerText}>Membresía activa: {daysRemaining} días restantes</Text>
 		</LinearGradient>
 	);

@@ -3,26 +3,23 @@ import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { CalendarDaysIcon } from 'react-native-heroicons/mini';
 
 interface Props {
-	weekProgress: number; // valor entre 0 y 1
+	weekProgress: number;
 	calories: number;
-	completed: string; // ejemplo: "4/5"
+	completed: string;
 }
 
 export const ProgressCard: React.FC<Props> = ({ weekProgress, calories, completed }) => {
 	const { width } = Dimensions.get('window');
-	const cardWidth = Math.min(width - 32, 380); // responsive máx 380px
+	const cardWidth = Math.min(width - 32, 380);
 
 	return (
 		<View style={[styles.container, { width: cardWidth }]}>
-			{/* Encabezado */}
 			<View style={styles.header}>
 				<Text style={styles.title}>TU PROGRESO</Text>
 				<Text style={styles.link}>VER MÁS</Text>
 			</View>
 
-			{/* Cajas de progreso */}
 			<View style={styles.cardsContainer}>
-				{/* Card: Esta semana */}
 				<View style={styles.card}>
 					<View style={styles.cardHeader}>
 						<Text style={styles.cardTitle}>ESTA SEMANA</Text>
@@ -36,7 +33,6 @@ export const ProgressCard: React.FC<Props> = ({ weekProgress, calories, complete
 					</View>
 				</View>
 
-				{/* Card: Calorías */}
 				<View style={styles.card}>
 					<Text style={styles.cardTitle}>CALORÍAS ESTIMADAS</Text>
 					<Text style={styles.cardValue}>{calories}</Text>
@@ -86,12 +82,11 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 		padding: 12,
 		justifyContent: 'space-between',
-		// 🔥 sombra sutil como Figma
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.1,
 		shadowRadius: 3,
-		elevation: 1, // para Android
+		elevation: 1,
 	},
 	cardHeader: {
 		flexDirection: 'row',

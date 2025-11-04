@@ -83,7 +83,6 @@ export default function SettingsScreen() {
 		<View className='flex-1 bg-white dark:bg-neutral-900'>
 			<Stack.Screen options={{ headerShown: false }} />
 
-			{/* Header */}
 			<View className='flex-row items-center justify-center pt-14 pb-4 px-4 bg-white dark:bg-neutral-900 relative'>
 				<TouchableOpacity onPress={() => router.back()} className='absolute left-4 top-14'>
 					<ChevronLeftIcon size={28} color='#F27F2A' />
@@ -94,10 +93,8 @@ export default function SettingsScreen() {
 			</View>
 
 			<ScrollView className='bg-white dark:bg-neutral-900 px-4'>
-				{/* Menú de opciones */}
 				<View>
 					<SectionHeader title='Aplicación' />
-					{/* Contenedor 1: Solo Notificaciones Push */}
 					<View className='rounded-xl overflow-hidden mb-3'>
 						<SettingsToggleItem
 							title='Notificaciones Push'
@@ -107,7 +104,6 @@ export default function SettingsScreen() {
 					</View>
 
 					<SectionHeader title='Cuenta' />
-					{/* Contenedor 2: Opciones de cuenta */}
 					<View className='rounded-xl overflow-hidden'>
 						<SettingsMenuItem
 							title='Cambiar contraseña'
@@ -136,7 +132,6 @@ export default function SettingsScreen() {
 				</View>
 			</ScrollView>
 
-			{/* Modal de confirmación de cierre de sesión */}
 			<Modal
 				visible={showLogoutModal}
 				transparent={true}

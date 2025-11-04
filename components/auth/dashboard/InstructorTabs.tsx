@@ -16,7 +16,6 @@ export function InstructorTabs({ activeTab, onChange }: Props) {
 
 	return (
 		<View className='flex-row justify-between items-center bg-[#F8F9FB] dark:bg-neutral-900 rounded-2xl px-2 py-2 mt-6'>
-			{/* 🔹 Clientes */}
 			<TouchableOpacity
 				onPress={() => onChange('clientes')}
 				className={`flex-1 py-2 rounded-xl ${
@@ -27,7 +26,6 @@ export function InstructorTabs({ activeTab, onChange }: Props) {
 
 			<View className='w-[1px] h-[20px] bg-[#E5E5E5]' />
 
-			{/* 🔹 Clases */}
 			<TouchableOpacity
 				onPress={() => onChange('clases')}
 				className={`flex-1 py-2 rounded-xl ${
@@ -38,7 +36,6 @@ export function InstructorTabs({ activeTab, onChange }: Props) {
 
 			<View className='w-[1px] h-[20px] bg-[#E5E5E5]' />
 
-			{/* 🔹 Mensajes */}
 			<TouchableOpacity
 				onPress={() => onChange('mensajes')}
 				className={`flex-1 py-2 rounded-xl ${

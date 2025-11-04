@@ -25,7 +25,6 @@ export default function CancelMembershipScreen() {
 					<PrimaryButton
 						title='Cancelar membresía'
 						onPress={() => {
-							// Lógica para cancelar la membresía
 							console.log('Membresía cancelada');
 							router.back();
 						}}

@@ -6,7 +6,6 @@ import { ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { BellIcon } from 'react-native-heroicons/outline';
 import { ChevronLeftIcon } from 'react-native-heroicons/solid';
 
-// Mock Data for notification settings
 const mockSettings = [
 	{ id: '1', label: 'New offer available' },
 	{ id: '2', label: 'New offer available' },
@@ -16,7 +15,6 @@ const mockSettings = [
 	{ id: '6', label: 'New offer available' },
 ];
 
-// Setting Item Component
 const SettingItem = ({ label }: { label: string }) => {
 	const [isEnabled, setIsEnabled] = useState(false);
 	const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
