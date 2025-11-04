@@ -7,7 +7,6 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-
 	js.configs.recommended,
 
 	...tseslint.configs.recommended,
@@ -22,7 +21,7 @@ export default defineConfig([
 			globals: { ...globals.browser, ...globals.node },
 		},
 		plugins: {
-			'react-hooks': reactHooks, 
+			'react-hooks': reactHooks,
 		},
 		rules: {
 			'react/react-in-jsx-scope': 'off',
@@ -45,11 +44,9 @@ export default defineConfig([
 		},
 	},
 
-
 	{
 		ignores: ['node_modules', 'dist', 'build', 'android', 'ios', '.expo', '.prettierrc.js'],
 	},
-
 
 	prettier,
 ]);
