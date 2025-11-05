@@ -1,9 +1,7 @@
-// components/ToastNotification.tsx
 import { AlertCircle, CheckCircle, XCircle } from 'lucide-react-native';
 import { useCallback, useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 
-// Se ha añadido el tipo 'warning' para coincidir con el diseño
 interface Props {
 	type: 'success' | 'error' | 'warning';
 	title: string;
@@ -48,11 +46,10 @@ export function ToastNotification({
 
 	if (!visible) return null;
 
-	// Lógica para seleccionar colores e íconos según el tipo
 	let backgroundColor: string;
 	let iconBackgroundColor: string;
 	let IconComponent: React.ElementType;
-	const titleColor = '#111827'; // Un color de título más oscuro por defecto
+	const titleColor = '#111827';
 	let messageColor = '#6B7280';
 
 	switch (type) {
@@ -99,10 +96,10 @@ const styles = StyleSheet.create({
 		top: 60,
 		left: 16,
 		right: 16,
-		borderRadius: 16, // Esquinas más redondeadas
+		borderRadius: 16,
 		padding: 16,
 		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 4 }, // Sombra ajustada
+		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.1,
 		shadowRadius: 10,
 		elevation: 8,
@@ -128,7 +125,7 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 16,
-		fontWeight: '700', // Texto más grueso (bold)
+		fontWeight: '700',
 	},
 	message: {
 		fontSize: 14,

@@ -3,7 +3,6 @@ import { Image } from 'expo-image';
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
-// Define the type for class data passed to onPress
 type ClassData = {
 	time: string;
 	title: string;
@@ -18,7 +17,7 @@ type ClassCardProps = {
 	instructor: string;
 	branch: string;
 	imageUrl: string;
-	onPress: (classData: ClassData) => void; // Use the specific type
+	onPress: (classData: ClassData) => void;
 };
 
 export default function ClassCard({
@@ -33,7 +32,7 @@ export default function ClassCard({
 
 	return (
 		<TouchableOpacity
-			onPress={() => onPress(classData)} // Pass class data to onPress
+			onPress={() => onPress(classData)}
 			className='bg-white dark:bg-neutral-900 rounded-2xl p-4 mb-4 flex-row items-center'>
 			<View className='flex-1'>
 				<ThemedText className='text-sm text-neutral-500'>{time}</ThemedText>
@@ -42,7 +41,7 @@ export default function ClassCard({
 					{instructor} · {branch}
 				</ThemedText>
 				<TouchableOpacity
-					onPress={() => onPress(classData)} // Pass class data to onPress
+					onPress={() => onPress(classData)}
 					className='bg-neutral-100 dark:bg-neutral-800 rounded-full py-2 px-4 mt-4 self-start'>
 					<ThemedText className='font-semibold'>Ver Detalles</ThemedText>
 				</TouchableOpacity>

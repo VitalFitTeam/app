@@ -1,5 +1,12 @@
-// app/(auth)/login.tsx
+import { LogoSimple } from '@/components/auth/Logo';
+import { SocialButton } from '@/components/auth/SocialButton';
+import { PrimaryButton } from '@/components/PrimaryButton';
+import { ToastNotification } from '@/components/ToastNotification';
+import { Colors, Fonts } from '@/constants/theme';
+import { useToast } from '@/hooks/useToast';
+import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isAPIError } from '@vitalfit/sdk';
 import Checkbox from 'expo-checkbox';
 import { Link, useRouter } from 'expo-router';
 import { Eye, EyeOff, SlidersVertical } from 'lucide-react-native';
@@ -13,19 +20,7 @@ import {
 	TouchableOpacity,
 	TouchableWithoutFeedback,
 	View,
-} from 'react-native'; // <ScrollView> removed
-
-// Componentes personalizados
-import { LogoSimple } from '@/components/auth/Logo';
-import { SocialButton } from '@/components/auth/SocialButton';
-import { PrimaryButton } from '@/components/PrimaryButton';
-import { ToastNotification } from '@/components/ToastNotification';
-import { useToast } from '@/hooks/useToast';
-
-// Temas y API
-import { Colors, Fonts } from '@/constants/theme';
-import vitalFitApi from '@/services/vitalfitSdk';
-import { isAPIError } from '@vitalfit/sdk';
+} from 'react-native';
 export default function LoginScreen() {
 	const { toastState, showToast, hideToast } = useToast();
 	const router = useRouter();
@@ -35,7 +30,6 @@ export default function LoginScreen() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 
-	//  Manejo de login con backend ---
 	const handleLogin = async () => {
 		if (!email || !password) {
 			showToast('error', 'Error', 'Por favor, ingresa tu correo y contraseña.');
@@ -84,9 +78,9 @@ export default function LoginScreen() {
 			style={{ flex: 1 }}
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-				<View // Reemplazado ScrollView por View
+				<View
 					style={{
-						flex: 1, // Añadir flex: 1 para ocupar todo el espacio
+						flex: 1,
 						justifyContent: 'center',
 						paddingHorizontal: 32,
 						paddingVertical: 16,
@@ -100,26 +94,21 @@ export default function LoginScreen() {
 						onClose={hideToast}
 					/>
 					<View className='w-full max-w-sm self-center'>
-						{/* Logo */}
 						<View className='items-center mb-2'>
 							<LogoSimple size={250} />
 						</View>
 
-						{/* Título */}
 						<Text
 							className='text-4xl text-black mb-2 uppercase text-center'
 							style={{ fontFamily: Fonts.title }}>
 							Iniciar Sesión
 						</Text>
 
-						{/* Subtítulo */}
 						<Text className='text-gray-500 text-center mb-8 text-lg'>
 							Ingresa tus credenciales para iniciar sesión
 						</Text>
 
-						{/* Inputs */}
 						<View className='px-2 mt-6 gap-6'>
-							{/* Correo */}
 							<View className='mb-4'>
 								<Text className='text-black font-bold text-sm mb-1 ml-1'>
 									Correo electrónico
@@ -135,7 +124,6 @@ export default function LoginScreen() {
 								/>
 							</View>
 
-							{/* Contraseña */}
 							<View className='mb-4'>
 								<View className='flex-row items-center mb-1 ml-1'>
 									<SlidersVertical
@@ -167,7 +155,6 @@ export default function LoginScreen() {
 							</View>
 						</View>
 
-						{/* Checkbox y link */}
 						<View className='w-full flex-row justify-between items-center my-4'>
 							<View className='flex-row items-center'>
 								<Checkbox
@@ -195,7 +182,6 @@ export default function LoginScreen() {
 							</Link>
 						</View>
 
-						{/* Botones */}
 						<View className='gap-4 mb-4'>
 							<PrimaryButton
 								title={isLoading ? 'Iniciando...' : 'Iniciar sesión'}
@@ -205,7 +191,6 @@ export default function LoginScreen() {
 							<SocialButton title='Sign in with Google' iconName='google' />
 						</View>
 
-						{/* Registro (Margin ajustado) */}
 						<View className='mt-1 flex-row justify-center items-center'>
 							<Text className='text-gray-600'>¿No tienes cuenta aún? </Text>
 							<Link href='/(auth)/register' asChild>

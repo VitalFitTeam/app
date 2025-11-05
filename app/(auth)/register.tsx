@@ -1,5 +1,3 @@
-// RegisterScreen.tsx
-
 import { Logo } from '@/components/auth/Logo';
 import { Step1Gender } from '@/components/auth/register/Step1Gender';
 import { Step2Credentials } from '@/components/auth/register/Step2Credentials';
@@ -37,7 +35,7 @@ export default function RegisterScreen() {
 	});
 
 	const handleRegistration = async (data: RegisterData) => {
-		console.log('📤 Enviando datos:', data);
+		console.log('Enviando datos:', data);
 
 		const allowedKeys = [
 			'gender',
@@ -72,16 +70,15 @@ export default function RegisterScreen() {
 				profile_picture_url: '', // El SDK espera esto, aunque esté vacío
 			};
 
-			// 🔹 Registro del usuario
+			// Registro del usuario
 			await vitalFitApi.auth.signUp(payload);
 
-			// 🔹 Guardamos las credenciales temporalmente para el login post-activación
+			//Guardamos las credenciales temporalmente para el login post-activación
 			await AsyncStorage.setItem('temp_email', cleanedData.email);
 			await AsyncStorage.setItem('temp_password', cleanedData.password);
 
-			console.log('✅ Registro exitoso, credenciales temporales guardadas.');
+			console.log('Registro exitoso, credenciales temporales guardadas.');
 
-			// Mostrar toast de éxito
 			showToast('success', 'Revisa tu correo', 'Código enviado correctamente');
 
 			// Redirigir después de 2 segundos
@@ -96,7 +93,7 @@ export default function RegisterScreen() {
 			} else if (error instanceof Error) {
 				errorMessage = error.message;
 			}
-			console.error('❌ Error al registrar:', error);
+			console.error('Error al registrar:', error);
 			showToast('error', 'Error al registrar', errorMessage);
 		}
 	};
@@ -131,7 +128,6 @@ export default function RegisterScreen() {
 			style={styles.keyboardView}
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 			keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
-			{/* 🔹 ToastNotification FUERA del ScrollView */}
 			<ToastNotification
 				visible={toastState.visible}
 				type={toastState.type}

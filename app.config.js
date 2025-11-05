@@ -52,7 +52,6 @@ export default {
 			eas: {
 				projectId: '9082188e-00ad-4870-a784-a22d7a9af57a',
 			},
-			// 👇 Esta línea inyecta la variable del .env
 			EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL,
 		},
 		owner: 'mrwisz',

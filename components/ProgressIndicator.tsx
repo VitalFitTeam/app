@@ -1,4 +1,3 @@
-// components/auth/ProgressIndicator.tsx
 import { ThemedView } from '@/components/themed-view';
 import { Text, View } from 'react-native';
 

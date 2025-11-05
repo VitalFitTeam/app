@@ -1,4 +1,3 @@
-// app/index.tsx
 import { Montserrat_500Medium, Montserrat_700Bold, useFonts } from '@expo-google-fonts/montserrat';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -22,7 +21,6 @@ export default function HomeScreen() {
 		<View className='flex-1 bg-black'>
 			<StatusBar barStyle='light-content' backgroundColor='#000' />
 
-			{/* Carrusel a pantalla completa */}
 			<BackgroundCarousel
 				images={[
 					require('../assets/images/slide1.jpg'),
@@ -32,7 +30,6 @@ export default function HomeScreen() {
 				onIndexChange={setIndex}
 			/>
 
-			{/* Logo centrado */}
 			<View
 				className='absolute inset-0 items-center justify-center'
 				style={{ top: '-10%' }}
@@ -44,7 +41,6 @@ export default function HomeScreen() {
 				/>
 			</View>
 
-			{/* Degradado inferior + contenido */}
 			<LinearGradient
 				colors={['transparent', 'rgba(0,0,0,0.7)', 'black']}
 				style={{
@@ -56,7 +52,6 @@ export default function HomeScreen() {
 					paddingHorizontal: 24,
 					paddingTop: 48,
 				}}>
-				{/* Texto dinámico */}
 				<Text className='text-white text-[30px] font-montserrat-bold text-center leading-[36px] mb-6'>
 					{
 						[
@@ -67,7 +62,6 @@ export default function HomeScreen() {
 					}
 				</Text>
 
-				{/* Dots */}
 				<View className='flex-row justify-center mb-6'>
 					{[0, 1, 2].map((i) => (
 						<View
@@ -79,7 +73,6 @@ export default function HomeScreen() {
 					))}
 				</View>
 
-				{/* Botones alineados */}
 				<View
 					style={{
 						flexDirection: 'row',

@@ -52,7 +52,7 @@ export default function ProfileScreen() {
 				} else if (error instanceof Error) {
 					errorMessage = error.message;
 				}
-				console.error('💥 Error en la solicitud whoami:', errorMessage);
+				console.error('Error en la solicitud whoami:', errorMessage);
 			} finally {
 				setLoading(false);
 			}
@@ -71,7 +71,6 @@ export default function ProfileScreen() {
 
 	return (
 		<View className='flex-1 bg-white dark:bg-neutral-950'>
-			{/* Header con foto de perfil y nombre */}
 			<View className='items-center justify-center py-16 bg-white dark:bg-neutral-900'>
 				<View className='w-40 h-40 rounded-full mb-6 overflow-hidden bg-neutral-200 dark:bg-neutral-800'>
 					<Image
@@ -87,7 +86,6 @@ export default function ProfileScreen() {
 				</ThemedText>
 			</View>
 
-			{/* Menú de opciones */}
 			<View className='bg-white dark:bg-neutral-900'>
 				<Link href='/my-profile' asChild>
 					<ProfileMenuItem title='Mi perfil' />

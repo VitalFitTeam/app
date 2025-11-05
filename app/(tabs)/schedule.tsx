@@ -8,32 +8,30 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
 
-// Sample data for classes
 const classes = [
 	{
 		time: '12:00 PM',
 		title: 'Zumba',
 		instructor: 'Con Laura Torres',
 		branch: 'Sucursal Sur',
-		imageUrl: require('@/assets/images/yoga.png'), // Using yoga image as placeholder
+		imageUrl: require('@/assets/images/yoga.png'),
 	},
 	{
 		time: '11:00 AM',
 		title: 'Spinning',
 		instructor: 'Con Carlos Mendoza',
 		branch: 'Sucursal Norte',
-		imageUrl: require('@/assets/images/espini.png'), // Using spinning image as placeholder
+		imageUrl: require('@/assets/images/espini.png'),
 	},
 	{
 		time: '10:00 AM',
 		title: 'Yoga Flow',
 		instructor: 'Con Sofia Ramirez',
 		branch: 'Sucursal Centro',
-		imageUrl: require('@/assets/images/yoga.png'), // Using yoga image as placeholder
+		imageUrl: require('@/assets/images/yoga.png'),
 	},
 ];
 
-// Define the type for reservation data
 type Reservation = {
 	time: string;
 	title: string;
@@ -43,7 +41,6 @@ type Reservation = {
 	status: 'assisted' | 'absent' | 'cancelled';
 };
 
-// Sample data for reservations
 const reservations: Reservation[] = [
 	{
 		time: '10:00 AM',
@@ -71,7 +68,6 @@ const reservations: Reservation[] = [
 	},
 ];
 
-// Sample data for filters
 const days = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'];
 
 export default function HorariosScreen() {
@@ -91,7 +87,6 @@ export default function HorariosScreen() {
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<ThemedText className='text-3xl font-bold mb-6'>Horarios</ThemedText>
 
-				{/* Tabs */}
 				<View className='flex-row mb-6'>
 					<TouchableOpacity
 						onPress={() => setActiveTab('classes')}
@@ -127,7 +122,6 @@ export default function HorariosScreen() {
 					</TouchableOpacity>
 				</View>
 
-				{/* Filters */}
 				<View className='mb-6'>
 					<View className='flex-row flex-wrap mb-2'>
 						{days.map((day) => (
@@ -152,7 +146,6 @@ export default function HorariosScreen() {
 					</TouchableOpacity>
 				</View>
 
-				{/* Tabs content */}
 				{activeTab === 'classes' && (
 					<View>
 						{classes.map((classItem, index) => (

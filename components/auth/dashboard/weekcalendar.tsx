@@ -18,7 +18,6 @@ interface WeekCalendarProps {
 	initialDate?: string;
 }
 
-// Definimos la constante con el tipo correcto para que TypeScript no se queje
 const EMPTY_MARKED_DATES: { [date: string]: { marked?: boolean; dotColor?: string } } = {};
 
 export const WeekCalendar: React.FC<WeekCalendarProps> = ({
@@ -31,14 +30,12 @@ export const WeekCalendar: React.FC<WeekCalendarProps> = ({
 	);
 	const [weekDays, setWeekDays] = useState<DayData[]>([]);
 
-	// Generar días de la semana actual basado en la fecha de hoy
 	useEffect(() => {
 		const generateWeekDays = () => {
 			const today = new Date();
-			const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+			const currentDay = today.getDay();
 			const monday = new Date(today);
 
-			// Ajustar al lunes de la semana actual
 			const diff = currentDay === 0 ? -6 : 1 - currentDay;
 			monday.setDate(today.getDate() + diff);
 
@@ -70,7 +67,6 @@ export const WeekCalendar: React.FC<WeekCalendarProps> = ({
 	const handleDayPress = (day: DayData) => {
 		setSelectedDateString(day.dateString);
 
-		// Crear objeto DateData compatible con react-native-calendars
 		const dateData: DateData = {
 			dateString: day.dateString,
 			day: day.date,

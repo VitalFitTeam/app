@@ -59,7 +59,7 @@ export default function ConfirmEmailScreen() {
 				const token = loginResponse.token || null;
 
 				if (!token) {
-					console.error('❌ No se recibió token después del login automático');
+					console.error('No se recibió token después del login automático');
 					showToast(
 						'error',
 						'Error',
@@ -81,7 +81,7 @@ export default function ConfirmEmailScreen() {
 				} else if (loginErr instanceof Error) {
 					errorMessage = loginErr.message;
 				}
-				console.error('❌ Error en login automático:', loginErr);
+				console.error('Error en login automático:', loginErr);
 				showToast('error', 'Error', errorMessage);
 				setTimeout(() => router.replace('/(auth)/login'), 2000);
 			}
@@ -93,7 +93,7 @@ export default function ConfirmEmailScreen() {
 			} else if (error instanceof Error) {
 				errorMessage = error.message;
 			}
-			console.error('❌ Error al confirmar o iniciar sesión:', error);
+			console.error('Error al confirmar o iniciar sesión:', error);
 			showToast('error', 'Error', errorMessage);
 		} finally {
 			setIsLoading(false);
@@ -128,12 +128,11 @@ export default function ConfirmEmailScreen() {
 					message={toastState.message}
 					onClose={hideToast}
 				/>
-				{/* Logo */}
+
 				<View className='items-center mb-8'>
 					<Logo />
 				</View>
 
-				{/* Title */}
 				<View className='mb-16'>
 					<ThemedText
 						type='title'
@@ -159,12 +158,10 @@ export default function ConfirmEmailScreen() {
 					</ThemedText>
 				</View>
 
-				{/* Message */}
 				<Text className='text-gray-500 text-center mb-8 text-lg'>
 					Te hemos enviado un código a tu correo electrónico.
 				</Text>
 
-				{/* Code Input */}
 				<View className='w-full max-w-xs mb-8'>
 					<Text className='text-sm text-gray-500 mb-1 font-semibold'></Text>
 					<CodeInput
@@ -174,14 +171,12 @@ export default function ConfirmEmailScreen() {
 					/>
 				</View>
 
-				{/* Resend Code Link */}
 				<TouchableOpacity onPress={handleResendCode} className='mb-8'>
 					<Text className='text-blue-500 font-semibold'>
 						¿No recibiste el código? Reenviar
 					</Text>
 				</TouchableOpacity>
 
-				{/* Buttons */}
 				<View className='w-full gap-4'>
 					<PrimaryButton
 						title={isLoading ? 'Verificando...' : 'Continuar'}

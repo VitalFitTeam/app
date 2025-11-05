@@ -1,5 +1,3 @@
-// components/auth/SocialButton.tsx
-
 import { AntDesign } from '@expo/vector-icons';
 import { Text, TouchableOpacity, type TouchableOpacityProps } from 'react-native';
 

@@ -28,7 +28,6 @@ export const UserHeader: React.FC<Props> = ({
 
 	return (
 		<View className='mb-6 relative'>
-			{/* Cabecera */}
 			<View className='flex-row justify-between items-center'>
 				<View className='flex-row items-center'>
 					<Image
@@ -66,7 +65,6 @@ export const UserHeader: React.FC<Props> = ({
 					</View>
 				</View>
 
-				{/* Botón campana */}
 				<View className='relative'>
 					<TouchableOpacity
 						onPress={() => setShowNotifications(!showNotifications)}
@@ -81,7 +79,6 @@ export const UserHeader: React.FC<Props> = ({
 				</View>
 			</View>
 
-			{/* Panel flotante de notificaciones */}
 			{showNotifications && (
 				<View className='absolute right-0 top-16 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-2xl shadow-lg p-3 w-72 z-50'>
 					<Text className='text-base font-semibold mb-2'>Notificaciones</Text>

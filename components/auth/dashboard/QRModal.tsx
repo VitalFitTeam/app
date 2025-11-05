@@ -12,7 +12,6 @@ interface QRModalProps {
 export const QRModal: React.FC<QRModalProps> = ({ visible, onClose, token }) => {
 	return (
 		<Modal animationType='fade' transparent={true} visible={visible} onRequestClose={onClose}>
-			{/* Overlay con backdrop */}
 			<TouchableOpacity
 				style={{
 					flex: 1,
@@ -23,7 +22,6 @@ export const QRModal: React.FC<QRModalProps> = ({ visible, onClose, token }) => 
 				}}
 				activeOpacity={1}
 				onPress={onClose}>
-				{/* Modal Container */}
 				<TouchableOpacity
 					style={{
 						backgroundColor: 'white',
@@ -39,7 +37,6 @@ export const QRModal: React.FC<QRModalProps> = ({ visible, onClose, token }) => 
 					}}
 					activeOpacity={1}
 					onPress={(e) => e.stopPropagation()}>
-					{/* Close Button */}
 					<TouchableOpacity
 						onPress={onClose}
 						style={{
@@ -55,7 +52,6 @@ export const QRModal: React.FC<QRModalProps> = ({ visible, onClose, token }) => 
 						<XMarkIcon size={20} color='#666' />
 					</TouchableOpacity>
 
-					{/* Title */}
 					<Text
 						style={{
 							fontSize: 20,
@@ -69,7 +65,6 @@ export const QRModal: React.FC<QRModalProps> = ({ visible, onClose, token }) => 
 						Código QR de Acceso
 					</Text>
 
-					{/* QR Code Container */}
 					<View
 						style={{
 							backgroundColor: 'white',
@@ -97,7 +92,6 @@ export const QRModal: React.FC<QRModalProps> = ({ visible, onClose, token }) => 
 						/>
 					</View>
 
-					{/* Subtitle */}
 					<Text
 						style={{
 							fontSize: 14,

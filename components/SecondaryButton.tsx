@@ -1,4 +1,3 @@
-// components/auth/SecondaryButton.tsx
 import { Text, TouchableOpacity, type TouchableOpacityProps } from 'react-native';
 
 interface Props extends TouchableOpacityProps {

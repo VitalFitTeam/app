@@ -4,7 +4,6 @@ import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Datos de ejemplo para las membresías
 const membershipPlans = [
 	{
 		title: 'Básico',

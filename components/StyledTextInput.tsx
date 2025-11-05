@@ -1,5 +1,3 @@
-// components/auth/StyledTextInput.tsx
-
 import { Colors } from '@/constants/theme';
 import { Eye, EyeOff } from 'lucide-react-native'; // Importa los íconos
 import { forwardRef, useState } from 'react';
@@ -9,15 +7,14 @@ interface Props extends TextInputProps {
 	label?: string;
 	error?: string;
 	helperText?: string;
-	isPasswordInput?: boolean; // Nuevo prop para indicar si es un campo de contraseña
-	icon?: React.ReactNode; // Prop para el ícono
+	isPasswordInput?: boolean;
+	icon?: React.ReactNode;
 }
 
 export const StyledTextInput = forwardRef<TextInput, Props>(
 	({ label, error, helperText, isPasswordInput, icon, ...props }, ref) => {
 		const isError = Boolean(error);
-		const [isPasswordVisible, setIsPasswordVisible] = useState(false); // Estado para controlar la visibilidad de la contraseña
-
+		const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 		const togglePasswordVisibility = () => {
 			setIsPasswordVisible(!isPasswordVisible);
 		};
@@ -43,7 +40,7 @@ export const StyledTextInput = forwardRef<TextInput, Props>(
               ${isPasswordInput ? 'pr-10' : ''} // Añade padding a la derecha si es campo de contraseña
             `}
 						placeholderTextColor={Colors.light.icon}
-						secureTextEntry={isPasswordInput ? !isPasswordVisible : false} // Controla la seguridad del texto
+						secureTextEntry={isPasswordInput ? !isPasswordVisible : false}
 						{...props}
 					/>
 					{isPasswordInput && (
@@ -59,7 +56,6 @@ export const StyledTextInput = forwardRef<TextInput, Props>(
 						</TouchableOpacity>
 					)}
 				</View>
-				{/* 👇 LÍNEA CORREGIDA AQUÍ 👇 */}
 				{(helperText || error) && (
 					<Text className={`mt-1 text-xs ${isError ? 'text-red-500' : 'text-gray-500'}`}>
 						{isError ? error : helperText}

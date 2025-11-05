@@ -40,9 +40,7 @@ export function GenderSelector({ onSelect, selected }: Props) {
 					onPress={() => handlePress(option.id)}
 					className={`
             w-full flex-row items-center justify-between rounded-2xl p-4
-            ${
-				internalSelected === option.id ? 'bg-gray-800' : 'bg-white' // Puedes ajustar el color de fondo para no seleccionados si es necesario
-			}
+            ${internalSelected === option.id ? 'bg-gray-800' : 'bg-white'}
           `}>
 					<View className='flex-row items-center'>
 						<Text

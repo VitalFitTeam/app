@@ -10,22 +10,19 @@ interface Props {
 
 export const TodayRoutineCard: React.FC<Props> = ({ title, time, date }) => {
 	const { width } = Dimensions.get('window');
-	const cardWidth = Math.min(width - 32, 372); // según Figma
+	const cardWidth = Math.min(width - 32, 372);
 
 	return (
 		<View style={[styles.container, { width: cardWidth }]}>
-			{/* Header */}
 			<View style={styles.header}>
 				<Text style={styles.title}>Mi rutina de hoy</Text>
 				<Text style={styles.date}>{date}</Text>
 			</View>
 
-			{/* Imagen con overlay */}
 			<ImageBackground
 				source={require('@/assets/images/rutina.png')}
 				style={styles.image}
 				imageStyle={styles.imageRadius}>
-				{/* Overlay oscuro sutil */}
 				<LinearGradient
 					colors={['rgba(17,17,18,0.2)', 'rgba(17,17,18,0.6)']}
 					start={{ x: 0, y: 0.2 }}
@@ -33,7 +30,6 @@ export const TodayRoutineCard: React.FC<Props> = ({ title, time, date }) => {
 					style={styles.overlay}
 				/>
 
-				{/* Texto dentro de la imagen */}
 				<View style={styles.textContainer}>
 					<Text style={styles.imageTitle}>{title}</Text>
 					<Text style={styles.imageSubtitle}>{time}</Text>
