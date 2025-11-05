@@ -49,12 +49,11 @@ export default function ConfirmEmailScreen() {
 				return;
 			}
 
-			// 👇 PUT /auth/activate/{code} con password requerido
 			await vitalFitApi.client.put({
 				url: `/auth/activate/${code.trim()}`,
 				data: {
 					password: storedPassword,
-					confirm_password: storedPassword, // 👈 usa snake_case
+					confirm_password: storedPassword,
 				},
 			});
 
