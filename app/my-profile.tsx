@@ -7,7 +7,7 @@ import { Colors, Fonts } from '@/constants/theme';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { isAPIError, User, UserUpdateRequest } from '@vitalfit/sdk';
+import { isAPIError, User } from '@vitalfit/sdk';
 import { format } from 'date-fns';
 import { Image } from 'expo-image';
 import { Stack, useRouter } from 'expo-router';
@@ -87,6 +87,14 @@ export default function MyProfileScreen() {
 				return;
 			}
 
+			// 👇 Definimos el tipo local (sin depender del SDK)
+			type UserUpdateRequest = {
+				first_name?: string;
+				last_name?: string;
+				birth_date?: string;
+				phone?: string;
+			};
+
 			const payload: UserUpdateRequest = {
 				first_name: firstName,
 				last_name: lastName,
@@ -94,8 +102,16 @@ export default function MyProfileScreen() {
 				phone: phone,
 			};
 
-			const updatedUserData = await vitalFitApi.user.update(payload, token);
-			setUserData(updatedUserData.user);
+			/* eslint-disable @typescript-eslint/no-explicit-any */
+			const updatedUserData = (await vitalFitApi.client.put({
+				url: '/user/update',
+				jwt: token,
+				data: payload,
+			})) as any;
+			/* eslint-enable @typescript-eslint/no-explicit-any */
+
+			const newUser = updatedUserData?.user || updatedUserData?.data || updatedUserData;
+			setUserData(newUser);
 			setIsEditing(false);
 
 			setToast({
