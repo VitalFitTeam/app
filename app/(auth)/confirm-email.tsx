@@ -37,7 +37,27 @@ export default function ConfirmEmailScreen() {
 		setIsLoading(true);
 
 		try {
-			await vitalFitApi.auth.verifyEmail(code.trim());
+			const storedPassword = await AsyncStorage.getItem('temp_password');
+
+			if (!storedPassword) {
+				showToast(
+					'error',
+					'Error',
+					'No se encontró la contraseña temporal. Intenta iniciar sesión manualmente.',
+				);
+				setTimeout(() => router.replace('/(auth)/login'), 2000);
+				return;
+			}
+
+			await vitalFitApi.client.put({
+				url: `/auth/activate/${code.trim()}`,
+				data: {
+					password: storedPassword,
+					confirm_password: storedPassword,
+				},
+			});
+
+			showToast('success', '¡Éxito!', '¡Te has registrado exitosamente!');
 
 			showToast('success', '¡Éxito!', '¡Te has registrado exitosamente!');
 
@@ -88,6 +108,10 @@ export default function ConfirmEmailScreen() {
 		} catch (error: unknown) {
 			let errorMessage =
 				'Ocurrió un error inesperado al confirmar el correo. Inténtalo de nuevo.';
+			console.error(
+				'❌ Error al confirmar o iniciar sesión (detalle completo):',
+				JSON.stringify(error, null, 2),
+			);
 			if (isAPIError(error)) {
 				errorMessage = error.messages.join(', ');
 			} else if (error instanceof Error) {
