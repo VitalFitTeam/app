@@ -14,7 +14,7 @@ export default function ClassDetailsScreen() {
 		<ThemedView className='flex-1 bg-white dark:bg-neutral-950 p-4'>
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Image
-					source={{ uri: imageUrl as string }} // Ensure imageUrl is treated as a string URI
+					source={{ uri: imageUrl as string }}
 					style={styles.heroImage}
 					contentFit='cover'
 				/>
@@ -28,7 +28,6 @@ export default function ClassDetailsScreen() {
 					<ThemedText className='text-lg font-semibold mb-1'>
 						Hora: {time as string}
 					</ThemedText>
-					{/* Add other details like date, duration, description, location, equipment, difficulty */}
 				</View>
 
 				<View className='flex-row justify-between mb-6'>

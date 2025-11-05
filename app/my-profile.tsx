@@ -111,7 +111,7 @@ export default function MyProfileScreen() {
 			} else if (error instanceof Error) {
 				errorMessage = error.message;
 			}
-			console.error('💥 Error al actualizar el perfil:', errorMessage);
+			console.error('Error al actualizar el perfil:', errorMessage);
 			setToast({
 				visible: true,
 				type: 'error',
@@ -144,7 +144,6 @@ export default function MyProfileScreen() {
 				onClose={() => setToast({ ...toast, visible: false })}
 			/>
 
-			{/* Header */}
 			<View className='flex-row items-center justify-center pt-14 pb-4 px-4 bg-white dark:bg-neutral-900 relative'>
 				<TouchableOpacity onPress={() => router.back()} className='absolute left-4 top-14'>
 					<ChevronLeftIcon size={28} color='#F27F2A' />
@@ -155,7 +154,6 @@ export default function MyProfileScreen() {
 			</View>
 
 			<ScrollView className='flex-1 bg-white dark:bg-neutral-950'>
-				{/* Profile Image Section */}
 				<View className='items-center py-8 bg-white dark:bg-neutral-900'>
 					<View className='relative'>
 						<View className='w-32 h-32 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-800'>
@@ -181,7 +179,6 @@ export default function MyProfileScreen() {
 					</ThemedText>
 				</View>
 
-				{/* Form Section */}
 				<View className='px-6 py-4'>
 					<StyledTextInput
 						label='Nombre'
@@ -213,7 +210,6 @@ export default function MyProfileScreen() {
 					/>
 					<View className='mb-4' />
 
-					{/* Campo de fecha de nacimiento con calendario */}
 					<TouchableOpacity
 						onPress={() => isEditing && setShowPicker(true)}
 						style={{ position: 'relative' }}
@@ -248,7 +244,6 @@ export default function MyProfileScreen() {
 					)}
 					<View className='mb-4' />
 
-					{/* Campo de teléfono internacional */}
 					<View>
 						<Text style={styles.label}>Teléfono</Text>
 						<PhoneInput
@@ -274,7 +269,6 @@ export default function MyProfileScreen() {
 					</View>
 				</View>
 
-				{/* Action Button */}
 				<View className='px-6 mt-2 mb-10'>
 					<PrimaryButton
 						title={isEditing ? 'Guardar cambios' : 'Editar'}

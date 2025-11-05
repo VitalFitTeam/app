@@ -7,7 +7,7 @@ interface Props {
 
 export const ReservedClassesCard: React.FC<Props> = ({ reserved }) => {
 	const { width } = Dimensions.get('window');
-	const cardWidth = Math.min(width - 32, 382); // 🔥 mismo ancho que las demás secciones
+	const cardWidth = Math.min(width - 32, 382);
 
 	return (
 		<View style={[styles.card, { width: cardWidth }]}>
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 12,
 		height: 91,
-		// 🔥 sombra sutil como en el Figma
+
 		shadowColor: '#000000',
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.1,

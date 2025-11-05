@@ -1,5 +1,3 @@
-// app/(auth)/_layout.tsx
-
 import { Stack } from 'expo-router';
 
 export default function AuthLayout() {
@@ -9,8 +7,6 @@ export default function AuthLayout() {
 			<Stack.Screen name='register' options={{ headerShown: false }} />
 			<Stack.Screen name='forgot-password' options={{ headerShown: false }} />
 			<Stack.Screen name='confirm-email' options={{ headerShown: false }} />
-
-			{/* Puedes agregar más pantallas aquí a medida que las crees */}
 		</Stack>
 	);
 }

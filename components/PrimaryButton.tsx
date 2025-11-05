@@ -1,6 +1,3 @@
-//Botón principal (naranja)
-// components/auth/PrimaryButton.tsx
-
 import { Colors } from '@/constants/theme';
 import { Text, TouchableOpacity, type TouchableOpacityProps } from 'react-native';
 
@@ -12,7 +9,7 @@ export function PrimaryButton({ title, ...props }: Props) {
 	return (
 		<TouchableOpacity
 			className='h-12 w-full items-center justify-center rounded-md'
-			style={{ backgroundColor: Colors.light.tint }} // Usamos el color Naranja Vital del tema
+			style={{ backgroundColor: Colors.light.tint }}
 			{...props}>
 			<Text className='text-white text-base font-bold'>{title}</Text>
 		</TouchableOpacity>

@@ -1,8 +1,6 @@
-// components/themed-text.tsx
-
 import { StyleSheet, Text, type TextProps } from 'react-native';
 
-import { Fonts } from '@/constants/theme'; // Importa las fuentes
+import { Fonts } from '@/constants/theme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 export type ThemedTextProps = TextProps & {
@@ -20,7 +18,6 @@ export function ThemedText({
 }: ThemedTextProps) {
 	const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
-	// Determina la familia de fuente según el tipo
 	const fontFamily =
 		type === 'title'
 			? Fonts.title
@@ -31,7 +28,7 @@ export function ThemedText({
 	return (
 		<Text
 			style={[
-				{ color, fontFamily }, // Aplica el color y la fuente
+				{ color, fontFamily },
 				type === 'default' ? styles.default : undefined,
 				type === 'title' ? styles.title : undefined,
 				type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
@@ -54,7 +51,7 @@ const styles = StyleSheet.create({
 		lineHeight: 24,
 	},
 	title: {
-		fontSize: 42, // Ajusta el tamaño para Bebas Neue
+		fontSize: 42,
 		lineHeight: 42,
 	},
 	subtitle: {

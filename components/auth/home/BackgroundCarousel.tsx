@@ -49,7 +49,7 @@ export default function BackgroundCarousel({ images, onIndexChange, interval = 3
 	return (
 		<FlatList
 			ref={flatListRef}
-			style={{ flex: 1 }} // 👈 ocupa toda la pantalla
+			style={{ flex: 1 }}
 			data={images}
 			keyExtractor={(_, i) => String(i)}
 			horizontal
@@ -63,10 +63,10 @@ export default function BackgroundCarousel({ images, onIndexChange, interval = 3
 					<Image
 						source={item}
 						style={{
-							width: width * 1, // zoom in
-							height: height * 1, // zoom in
+							width: width * 1,
+							height: height * 1,
 							position: 'absolute',
-							top: '-5%', // 👈 centra el zoom
+							top: '-5%',
 						}}
 						resizeMode='cover'
 					/>

@@ -69,7 +69,6 @@ export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
 				)}
 			/>
 
-			{/* Campo con DateTimePicker para fecha de nacimiento */}
 			<Controller
 				control={control}
 				name='birthDate'
@@ -115,7 +114,6 @@ export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
 				}}
 			/>
 
-			{/* Campo de teléfono internacional */}
 			<Controller
 				control={control}
 				name='phone'

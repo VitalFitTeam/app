@@ -26,12 +26,7 @@ export function SignInButton({
 			disabled={disabled}
 			onPressIn={() => setPressed(true)}
 			onPressOut={() => setPressed(false)}
-			style={[
-				styles.base,
-				styles.outline,
-				containerStyle,
-				pressed && styles.pressed, // 🔑 aplica color si está presionado
-			]}>
+			style={[styles.base, styles.outline, containerStyle, pressed && styles.pressed]}>
 			<Text style={[styles.text, styles.textOutline, textStyle]}>{label}</Text>
 		</TouchableOpacity>
 	);
@@ -57,7 +52,7 @@ const styles = StyleSheet.create({
 		borderColor: '#D2D2D2',
 	},
 	pressed: {
-		backgroundColor: 'rgba(255,255,255,0.2)', // 🔑 cambia color al tocar
+		backgroundColor: 'rgba(255,255,255,0.2)',
 	},
 	text: {
 		color: '#FFFFFF',

@@ -11,27 +11,32 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView } from 'react-native';
+import DashboardInstructor from '../dashboards/dashboard-instructor';
+import DashboardRecepcionist from '../dashboards/dashboard-recepcionist';
 
 export default function DashboardScreen() {
 	const [firstName, setFirstName] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
-	const [qrModalVisible, setQrModalVisible] = useState(false); // 👈 Estado del modal
-	const [userToken, setUserToken] = useState<string>(''); // 👈 Estado del token
+	const [qrModalVisible, setQrModalVisible] = useState(false);
+	const [userToken, setUserToken] = useState<string>('');
+	const [userRole, setUserRole] = useState<string>('');
 
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
 				const token = await AsyncStorage.getItem('token');
-
 				if (!token) {
-					console.error('❌ No se encontró token en AsyncStorage');
+					console.error('No se encontró token en AsyncStorage');
 					return;
 				}
 
-				setUserToken(token); // 👈 Guardar token
+				setUserToken(token);
 
 				const userData = await vitalFitApi.user.WhoAmI(token);
 
+				const roleName = userData?.user?.role?.name?.toLowerCase() || '';
+
+				setUserRole(roleName);
 				setFirstName(userData?.user?.first_name || 'Usuario');
 			} catch (error: unknown) {
 				let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
@@ -40,7 +45,7 @@ export default function DashboardScreen() {
 				} else if (error instanceof Error) {
 					errorMessage = error.message;
 				}
-				console.error('💥 Error en la solicitud whoami:', errorMessage);
+				console.error('Error en la solicitud whoami:', errorMessage);
 			} finally {
 				setLoading(false);
 			}
@@ -57,37 +62,41 @@ export default function DashboardScreen() {
 		);
 	}
 
-	return (
-		<ThemedView className='flex-1 bg-white dark:bg-neutral-950 px-4 pt-10'>
-			<ScrollView showsVerticalScrollIndicator={false}>
-				<UserHeader
-					name={firstName ?? 'Usuario'}
-					message='Es hora de desafiar tus límites'
-					avatarUrl='https://randomuser.me/api/portraits/men/32.jpg'
-				/>
-				<WeekCalendar />
+	switch (userRole) {
+		case 'instructor':
+			return <DashboardInstructor />;
+		case 'recepcionist':
+		case 'receptionist':
+			return <DashboardRecepcionist />;
+		default:
+			return (
+				<ThemedView className='flex-1 bg-white dark:bg-neutral-950 px-4 pt-10'>
+					<ScrollView showsVerticalScrollIndicator={false}>
+						<UserHeader
+							name={firstName ?? 'Usuario'}
+							message='Es hora de desafiar tus límites'
+							avatarUrl='https://randomuser.me/api/portraits/men/32.jpg'
+						/>
+						<WeekCalendar />
+						<MembershipCard
+							daysRemaining={15}
+							onQRPress={() => setQrModalVisible(true)}
+						/>
+						<ProgressCard weekProgress={0.8} calories={1200} completed='4/5' />
+						<ReservedClassesCard reserved={0} />
+						<TodayRoutineCard
+							title='Day 05 - Warm Up'
+							time='07:00 - 08:00 AM'
+							date='Mon 26 Apr'
+						/>
+					</ScrollView>
 
-				{/* MembershipCard ahora abre el modal QR */}
-				<MembershipCard
-					daysRemaining={15}
-					onQRPress={() => setQrModalVisible(true)} // 👈 Abrir modal
-				/>
-
-				<ProgressCard weekProgress={0.8} calories={1200} completed='4/5' />
-				<ReservedClassesCard reserved={0} />
-				<TodayRoutineCard
-					title='Day 05 - Warm Up'
-					time='07:00 - 08:00 AM'
-					date='Mon 26 Apr'
-				/>
-			</ScrollView>
-
-			{/* Modal QR */}
-			<QRModal
-				visible={qrModalVisible}
-				onClose={() => setQrModalVisible(false)}
-				token={userToken}
-			/>
-		</ThemedView>
-	);
+					<QRModal
+						visible={qrModalVisible}
+						onClose={() => setQrModalVisible(false)}
+						token={userToken}
+					/>
+				</ThemedView>
+			);
+	}
 }
