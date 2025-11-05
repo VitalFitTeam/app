@@ -70,6 +70,7 @@ export default function RegisterScreen() {
 				birth_date: new Date(cleanedData.birthDate).toISOString().split('T')[0], // Convertir a Date y luego formatear
 				phone: cleanedData.phone,
 				profile_picture_url: '', // El SDK espera esto, aunque esté vacío
+				role_name: 'client',
 			};
 
 			// 🔹 Registro del usuario
