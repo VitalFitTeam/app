@@ -57,8 +57,16 @@ export default function LoginScreen() {
 				console.warn('No se recibió token en la respuesta del SDK.');
 			}
 
-			// Redirigir al dashboard
-			router.replace('/(tabs)/dashboard');
+			const whoamiResponse = await vitalFitApi.user.WhoAmI(token);
+			const role = whoamiResponse.user?.role?.name?.toLowerCase();
+
+			if (role === 'instructor') {
+				router.replace('/(instructor)/dashboard');
+			} else if (role === 'recepcionist' || role === 'receptionist') {
+				router.replace('/(recepcionist)/dashboard');
+			} else {
+				router.replace('/(tabs)/dashboard');
+			}
 		} catch (error: unknown) {
 			let errorMessage = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
 			if (isAPIError(error)) {
