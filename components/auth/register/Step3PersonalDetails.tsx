@@ -185,10 +185,10 @@ const styles = StyleSheet.create({
 		marginBottom: 8,
 	},
 	phoneContainer: {
-		backgroundColor: '#F5F5F5',
+		backgroundColor: '#FFFFFF',
 		borderRadius: 8,
 		borderWidth: 1,
-		borderColor: '#E0E0E0',
+		borderColor: '#E5E7EB',
 		paddingHorizontal: 12,
 		height: 48,
 	},
