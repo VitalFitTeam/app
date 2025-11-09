@@ -42,7 +42,7 @@ export default function RootLayout() {
 				<Stack.Screen
 					name='memberships'
 					options={{
-						title: 'Membresía',
+						title: '',
 						headerShown: true,
 						headerBackTitle: 'Volver',
 					}}
