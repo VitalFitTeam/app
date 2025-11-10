@@ -64,6 +64,9 @@ export default function ForgotPasswordScreen() {
 		setIsLoading(true);
 		try {
 			await vitalFitApi.auth.forgotPassword(email);
+			// If the email doesn't exist, the SDK might throw an error like "not found".
+			// We want to treat this silently as a success to avoid user enumeration and bad UX.
+			// If it's a different API error, we'll show it.
 			showToast(
 				'success',
 				'Éxito',
@@ -72,13 +75,24 @@ export default function ForgotPasswordScreen() {
 			setStep(2);
 		} catch (error: unknown) {
 			let errorMessage = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
-			if (isAPIError(error)) {
+			// Check if the error is an API error and if it's a "not found" error.
+			// The exact message might vary, but "not found" is common.
+			if (
+				isAPIError(error) &&
+				error.messages.some((msg) => msg.toLowerCase().includes('not found'))
+			) {
+				// Treat "not found" as a silent success for security and UX.
+				// The success toast is already shown above.
+				console.log('Correo electrónico no encontrado, procediendo silenciosamente.');
+			} else if (isAPIError(error)) {
 				errorMessage = error.messages.join(', ');
+				showToast('error', 'Error', errorMessage);
 			} else if (error instanceof Error) {
 				errorMessage = error.message;
+				showToast('error', 'Error', errorMessage);
+			} else {
+				showToast('error', 'Error', errorMessage);
 			}
-			console.error('Error al enviar correo:', error);
-			showToast('error', 'Error', errorMessage);
 		} finally {
 			setIsLoading(false);
 		}
