@@ -4,8 +4,18 @@ import ClassCard from '@/components/ClassCard';
 import Dropdown from '@/components/Dropdown';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useReservations } from '@/contexts/reservations';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
+// Heroicons (optional alternative)
+import {
+	BoltIcon,
+	FireIcon as FireIconH,
+	HeartIcon as HeartIconH,
+	SparklesIcon as SparklesIconH,
+} from 'react-native-heroicons/solid';
+// Lucide icons (default)
+import { Activity, Flame, Flower2, Heart } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 
@@ -54,7 +64,7 @@ type Reservation = {
 	title: string;
 	instructor: string;
 	branch: string;
-	imageUrl: string;
+	imageUrl: string | number;
 	status: 'assisted' | 'absent' | 'cancelled';
 	capacity: number;
 	occupied: number;
@@ -91,11 +101,22 @@ const reservations: Reservation[] = [
 		capacity: 25,
 		occupied: 25,
 	},
+	{
+		time: '07:00 AM',
+		title: 'Crossfit',
+		instructor: 'Con Laura Torres',
+		branch: 'Sucursal Sur',
+		imageUrl: require('@/assets/images/crossfit-w.jpg'),
+		status: 'assisted',
+		capacity: 25,
+		occupied: 25,
+	},
 ];
 
 export default function HorariosScreen() {
 	const router = useRouter();
 	const [activeTab, setActiveTab] = useState<'classes' | 'reservas' | 'explorar'>('classes'); // State to manage active tab
+	const { isReserved } = useReservations();
 
 	return (
 		<ThemedView className='flex-1 bg-white dark:bg-neutral-950 p-4 pt-12'>
@@ -172,6 +193,43 @@ export default function HorariosScreen() {
 					</View>
 				</View>
 
+				{/* Categorías */}
+				{(activeTab === 'classes' || activeTab === 'explorar') && (
+					<View className='mb-5'>
+						<ScrollView horizontal showsHorizontalScrollIndicator={false}>
+							{(() => {
+								const ICON_SET: 'lucide' | 'heroicons' = 'lucide'; // cambia a 'heroicons' si prefieres ese set
+								const items =
+									ICON_SET === 'lucide'
+										? [
+												{ label: 'Yoga', Icon: Flower2 },
+												{ label: 'HIIT', Icon: Activity },
+												{ label: 'Kick Boxing', Icon: Flame },
+												{ label: 'Pilates', Icon: Heart },
+											]
+										: [
+												{ label: 'Yoga', Icon: SparklesIconH },
+												{ label: 'HIIT', Icon: BoltIcon },
+												{ label: 'Kick Boxing', Icon: FireIconH },
+												{ label: 'Pilates', Icon: HeartIconH },
+											];
+								return items.map(({ label, Icon }) => (
+									<Pressable key={label} className='mr-4'>
+										<View className='items-center'>
+											<View className='w-16 h-16 rounded-xl bg-neutral-900 border border-neutral-700 items-center justify-center mb-2'>
+												<Icon color={'#f97316'} size={24} strokeWidth={2} />
+											</View>
+											<ThemedText className='text-[11px] text-neutral-300'>
+												{label}
+											</ThemedText>
+										</View>
+									</Pressable>
+								));
+							})()}
+						</ScrollView>
+					</View>
+				)}
+
 				{activeTab === 'classes' && (
 					<View>
 						{classes.map((classItem, index) => (
@@ -184,6 +242,7 @@ export default function HorariosScreen() {
 								imageUrl={classItem.imageUrl}
 								variant='overlay'
 								category={'categoría'}
+								reserved={isReserved(`${classItem.title}|${classItem.time}`)}
 								onPress={(classData) => {
 									router.push({
 										pathname: '/class-details',
@@ -212,6 +271,7 @@ export default function HorariosScreen() {
 								imageUrl={reservation.imageUrl}
 								variant='overlay'
 								category={'categoría'}
+								reserved={isReserved(`${reservation.title}|${reservation.time}`)}
 								onPress={(classData) => {
 									router.push({
 										pathname: '/class-details',
@@ -234,8 +294,29 @@ export default function HorariosScreen() {
 
 				{activeTab === 'explorar' && (
 					<View>
-						<ThemedText className='text-xl font-bold mb-4'>Explorar</ThemedText>
-						<ThemedText className='text-neutral-500'>Próximamente</ThemedText>
+						{classes.map((classItem, index) => (
+							<ClassCard
+								key={index}
+								time={classItem.time}
+								title={classItem.title}
+								instructor={classItem.instructor}
+								branch={classItem.branch}
+								imageUrl={classItem.imageUrl}
+								variant='overlay'
+								category={'categoría'}
+								reserved={isReserved(`${classItem.title}|${classItem.time}`)}
+								onPress={(classData) => {
+									router.push({
+										pathname: '/class-details',
+										params: {
+											...classData,
+											capacity: String(classItem.capacity),
+											occupied: String(classItem.occupied),
+										},
+									});
+								}}
+							/>
+						))}
 					</View>
 				)}
 			</ScrollView>

@@ -1,6 +1,7 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useReservations } from '@/contexts/reservations';
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useMemo } from 'react';
@@ -9,6 +10,7 @@ import { StarIcon } from 'react-native-heroicons/solid';
 
 export default function ClassDetailsScreen() {
 	const { time, title, instructor, imageUrl, capacity, occupied } = useLocalSearchParams();
+	const { isReserved, reserve } = useReservations();
 
 	const todayFormatted = useMemo(() => {
 		try {
@@ -57,6 +59,9 @@ export default function ClassDetailsScreen() {
 	const capNum = Number(capacity ?? 25);
 	const occNum = Number(occupied ?? 18);
 	const isFull = occNum >= capNum;
+
+	const id = useMemo(() => `${String(title || '')}|${String(time || '')}`, [title, time]);
+	const reserved = isReserved(id);
 
 	const timeRange = useMemo(() => {
 		const raw = String(time || '').trim();
@@ -133,10 +138,23 @@ export default function ClassDetailsScreen() {
 
 				<View className='mb-6'>
 					<PrimaryButton
-						title={isFull ? 'Clase llena' : 'Reservar'}
-						disabled={isFull}
-						style={{ backgroundColor: isFull ? '#6b7280' : undefined }}
-						onPress={() => {}}
+						title={isFull ? 'Clase llena' : reserved ? 'Reservado' : 'Reservar'}
+						disabled={isFull || reserved}
+						style={{ backgroundColor: isFull || reserved ? '#6b7280' : undefined }}
+						onPress={async () => {
+							if (isFull || reserved) return;
+							const img =
+								typeof heroSource === 'number'
+									? heroSource
+									: (imageUrl as string | number | undefined);
+							await reserve({
+								id,
+								title: String(title || ''),
+								time: String(time || ''),
+								instructor: String(instructor || ''),
+								imageUrl: img,
+							});
+						}}
 					/>
 				</View>
 

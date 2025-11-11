@@ -8,7 +8,7 @@ type ClassData = {
 	title: string;
 	instructor: string;
 	branch: string;
-	imageUrl: string;
+	imageUrl: string | number;
 };
 
 type ClassCardProps = {
@@ -16,10 +16,11 @@ type ClassCardProps = {
 	title: string;
 	instructor: string;
 	branch: string;
-	imageUrl: string;
+	imageUrl: string | number;
 	onPress: (classData: ClassData) => void;
 	variant?: 'default' | 'overlay';
 	category?: string;
+	reserved?: boolean;
 };
 
 export default function ClassCard({
@@ -31,6 +32,7 @@ export default function ClassCard({
 	onPress,
 	variant = 'default',
 	category,
+	reserved,
 }: ClassCardProps) {
 	const classData: ClassData = { time, title, instructor, branch, imageUrl };
 
@@ -74,6 +76,13 @@ export default function ClassCard({
 							</ThemedText>
 						</View>
 					</View>
+					{reserved ? (
+						<View className='absolute top-3 left-3 bg-orange-500 rounded-full px-2 py-1'>
+							<ThemedText className='text-white text-xs font-bold'>
+								Reservado
+							</ThemedText>
+						</View>
+					) : null}
 				</View>
 			</TouchableOpacity>
 		);
