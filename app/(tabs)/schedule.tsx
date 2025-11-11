@@ -16,6 +16,8 @@ const classes = [
 		instructor: 'Con Laura Torres',
 		branch: 'Sucursal Sur',
 		imageUrl: require('@/assets/images/zumba-w.jpg'),
+		capacity: 25,
+		occupied: 18,
 	},
 	{
 		time: '11:00 AM',
@@ -23,6 +25,8 @@ const classes = [
 		instructor: 'Con Carlos Mendoza',
 		branch: 'Sucursal Norte',
 		imageUrl: require('@/assets/images/spinning-w.jpg'),
+		capacity: 25,
+		occupied: 22,
 	},
 	{
 		time: '10:00 AM',
@@ -30,6 +34,18 @@ const classes = [
 		instructor: 'Con Sofia Ramirez',
 		branch: 'Sucursal Centro',
 		imageUrl: require('@/assets/images/yoga-w.jpg'),
+		capacity: 25,
+		occupied: 20,
+	},
+	// Full class example
+	{
+		time: '07:00 AM',
+		title: 'Crossfit',
+		instructor: 'Con Laura Torres',
+		branch: 'Sucursal Sur',
+		imageUrl: require('@/assets/images/crossfit-w.jpg'),
+		capacity: 25,
+		occupied: 25,
 	},
 ];
 
@@ -40,6 +56,8 @@ type Reservation = {
 	branch: string;
 	imageUrl: string;
 	status: 'assisted' | 'absent' | 'cancelled';
+	capacity: number;
+	occupied: number;
 };
 
 const reservations: Reservation[] = [
@@ -50,6 +68,8 @@ const reservations: Reservation[] = [
 		branch: 'Sucursal Centro',
 		imageUrl: require('@/assets/images/yoga-w.jpg'),
 		status: 'assisted',
+		capacity: 25,
+		occupied: 18,
 	},
 	{
 		time: '11:00 AM',
@@ -58,6 +78,8 @@ const reservations: Reservation[] = [
 		branch: 'Sucursal Norte',
 		imageUrl: require('@/assets/images/spinning-w.jpg'),
 		status: 'cancelled',
+		capacity: 25,
+		occupied: 22,
 	},
 	{
 		time: '12:00 PM',
@@ -66,6 +88,8 @@ const reservations: Reservation[] = [
 		branch: 'Sucursal Sur',
 		imageUrl: require('@/assets/images/zumba-w.jpg'),
 		status: 'absent',
+		capacity: 25,
+		occupied: 25,
 	},
 ];
 
@@ -163,7 +187,11 @@ export default function HorariosScreen() {
 								onPress={(classData) => {
 									router.push({
 										pathname: '/class-details',
-										params: classData,
+										params: {
+											...classData,
+											capacity: String(classItem.capacity),
+											occupied: String(classItem.occupied),
+										},
 									});
 								}}
 							/>
@@ -185,7 +213,14 @@ export default function HorariosScreen() {
 								variant='overlay'
 								category={'categoría'}
 								onPress={(classData) => {
-									router.push({ pathname: '/class-details', params: classData });
+									router.push({
+										pathname: '/class-details',
+										params: {
+											...classData,
+											capacity: String(reservation.capacity),
+											occupied: String(reservation.occupied),
+										},
+									});
 								}}
 							/>
 						))}
