@@ -1,6 +1,6 @@
+import { ReservationsProvider } from '@/contexts/reservations';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { ReservationsProvider } from '@/contexts/reservations';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
