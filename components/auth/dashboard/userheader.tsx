@@ -1,6 +1,6 @@
-import { Bell } from 'lucide-react-native';
+import { Award, Bell } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Notification {
 	id: string;
@@ -10,26 +10,34 @@ interface Notification {
 
 interface Props {
 	name: string;
-	message?: string;
 	avatarUrl?: string;
 	notifications?: Notification[];
+	onBadgesPress?: () => void;
 }
 
 export const UserHeader: React.FC<Props> = ({
 	name,
-	message = 'Es hora de desafiar tus límites',
 	avatarUrl,
 	notifications = [
 		{ id: '1', title: 'Tu clase comienza en 10 minutos', time: 'Hace 5 min' },
 		{ id: '2', title: 'Pago de membresía recibido', time: 'Hace 1 hora' },
 	],
+	onBadgesPress,
 }) => {
 	const [showNotifications, setShowNotifications] = useState(false);
 
 	return (
-		<View className='mb-6 relative'>
-			<View className='flex-row justify-between items-center'>
-				<View className='flex-row items-center'>
+		<View className='mb-6'>
+			<View style={styles.logoContainer}>
+				<Image
+					source={require('@/assets/images/Frame.png')}
+					style={styles.logo}
+					resizeMode='contain'
+				/>
+			</View>
+
+			<View className='flex-row justify-between items-center mt-6'>
+				<View className='flex-row items-center flex-1'>
 					<Image
 						source={
 							avatarUrl ? { uri: avatarUrl } : require('@/assets/images/usuario.png')
@@ -50,58 +58,95 @@ export const UserHeader: React.FC<Props> = ({
 								fontSize: 31,
 								color: '#000',
 							}}>
-							Bienvenido, {name}
-						</Text>
-
-						<Text
-							style={{
-								fontFamily: 'Montserrat_500Medium',
-								fontWeight: '500',
-								fontSize: 13,
-								color: '#6B7280',
-							}}>
-							{message}
+							Hola, {name}
 						</Text>
 					</View>
 				</View>
 
-				<View className='relative'>
-					<TouchableOpacity
-						onPress={() => setShowNotifications(!showNotifications)}
-						className='p-2 bg-gray-100 dark:bg-neutral-800 rounded-full'
-						activeOpacity={0.8}>
-						<Bell size={22} color='#333' />
+				<View className='flex-row items-center gap-3'>
+					<TouchableOpacity onPress={onBadgesPress} activeOpacity={0.7}>
+						<Award size={24} color='#333' strokeWidth={2} />
 					</TouchableOpacity>
 
-					{notifications.length > 0 && (
-						<View className='absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full' />
-					)}
+					<TouchableOpacity
+						onPress={() => setShowNotifications(!showNotifications)}
+						className='relative'
+						activeOpacity={0.7}>
+						<Bell size={24} color='#333' />
+						{notifications.length > 0 && (
+							<View className='absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full' />
+						)}
+					</TouchableOpacity>
 				</View>
 			</View>
 
 			{showNotifications && (
-				<View className='absolute right-0 top-16 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-2xl shadow-lg p-3 w-72 z-50'>
-					<Text className='text-base font-semibold mb-2'>Notificaciones</Text>
-					{notifications.length > 0 ? (
-						<FlatList
-							data={notifications}
-							keyExtractor={(item) => item.id}
-							renderItem={({ item }) => (
-								<View className='mb-2'>
-									<Text className='text-gray-800 dark:text-gray-200 font-medium text-sm'>
-										{item.title}
-									</Text>
-									<Text className='text-gray-400 text-xs'>{item.time}</Text>
-								</View>
-							)}
-						/>
-					) : (
-						<Text className='text-gray-400 text-sm'>
-							No tienes notificaciones nuevas
-						</Text>
-					)}
-				</View>
+				<TouchableOpacity
+					style={styles.notificationOverlay}
+					activeOpacity={1}
+					onPress={() => setShowNotifications(false)}>
+					<TouchableOpacity
+						activeOpacity={1}
+						onPress={(e) => e.stopPropagation()}
+						style={styles.notificationModal}>
+						<Text className='text-base font-semibold mb-2'>Notificaciones</Text>
+						{notifications.length > 0 ? (
+							<FlatList
+								data={notifications}
+								keyExtractor={(item) => item.id}
+								renderItem={({ item }) => (
+									<View className='mb-2'>
+										<Text className='text-gray-800 dark:text-gray-200 font-medium text-sm'>
+											{item.title}
+										</Text>
+										<Text className='text-gray-400 text-xs'>{item.time}</Text>
+									</View>
+								)}
+							/>
+						) : (
+							<Text className='text-gray-400 text-sm'>
+								No tienes notificaciones nuevas
+							</Text>
+						)}
+					</TouchableOpacity>
+				</TouchableOpacity>
 			)}
 		</View>
 	);
 };
+
+const styles = StyleSheet.create({
+	logoContainer: {
+		alignItems: 'center',
+		marginBottom: 8,
+	},
+	logo: {
+		width: 150,
+		height: 50,
+	},
+	notificationOverlay: {
+		position: 'absolute',
+		top: 0,
+		left: -16,
+		right: -16,
+		bottom: -100,
+		zIndex: 50,
+	},
+	notificationModal: {
+		position: 'absolute',
+		right: 16,
+		top: 110,
+		backgroundColor: 'white',
+		borderWidth: 1,
+		borderColor: '#E5E7EB',
+		borderRadius: 16,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.1,
+		shadowRadius: 12,
+		elevation: 5,
+		padding: 12,
+		width: 288,
+		zIndex: 51,
+	},
+});

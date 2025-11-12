@@ -1,90 +1,121 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+	Dimensions,
+	Image,
+	ImageSourcePropType,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+} from 'react-native';
+// Importación del ícono QR
 import { QrCodeIcon } from 'react-native-heroicons/outline';
 
 interface Props {
-	daysRemaining: number;
+	daysRemaining?: number;
 	onQRPress: () => void;
+	gymName?: string;
+	membershipStatus?: string;
+	gymImage?: ImageSourcePropType;
 }
 
-export const MembershipCard: React.FC<Props> = ({ daysRemaining, onQRPress }) => {
+export const MembershipCard: React.FC<Props> = ({
+	daysRemaining = 15,
+	onQRPress,
+	gymName = 'VitalFit Caracas',
+	membershipStatus = 'Membresía activa',
+	gymImage = require('@/assets/images/Mask group.png'),
+}) => {
 	const { width } = Dimensions.get('window');
-	const cardWidth = Math.min(width - 32, 380);
+	const cardWidth = Math.min(width - 32, 600);
 
 	return (
 		<LinearGradient
-			colors={['#8C4918', '#F27F2A']}
-			locations={[0, 0.7]}
-			start={{ x: 0, y: 0.1 }}
-			end={{ x: 1, y: 0.2 }}
+			// AJUSTADO: Marrón oscuro para los extremos y naranja brillante en el centro
+			colors={['#4F3521', '#F27F2A', '#4F3521']}
+			// AJUSTADO: El color naranja solo ocupa una pequeña porción del centro
+			locations={[0, 0.5, 1]}
+			// Mantenemos el degradado horizontal
+			start={{ x: 0, y: 0.5 }}
+			end={{ x: 1, y: 0.5 }}
 			style={[styles.card, { width: cardWidth }]}>
-			<TouchableOpacity
-				style={styles.contentContainer}
-				onPress={onQRPress}
-				activeOpacity={0.8}>
-				<View style={styles.iconContainer}>
-					<QrCodeIcon size={56} color='#FFFFFF' strokeWidth={0.5} />
-				</View>
+			<Text style={styles.welcomeText}>Bienvenido a {gymName}</Text>
 
-				<View style={styles.textContainer}>
-					<Text style={styles.title}>Acceso al Gimnasio</Text>
-					<Text style={styles.subtitle}>Escanea para ingresar</Text>
-				</View>
-			</TouchableOpacity>
+			<Text style={styles.membershipText}>
+				{membershipStatus}: {daysRemaining} días restantes
+			</Text>
 
-			<Text style={styles.footerText}>Membresía activa: {daysRemaining} días restantes</Text>
+			<View style={styles.bottomContainer}>
+				<Image source={gymImage} style={styles.gymImage} resizeMode='cover' />
+
+				<TouchableOpacity
+					onPress={onQRPress}
+					style={styles.checkInButton}
+					activeOpacity={0.8}>
+					<QrCodeIcon size={24} color='#FFFFFF' style={styles.qrIcon} />
+
+					<Text style={styles.checkInText}>Check in</Text>
+				</TouchableOpacity>
+			</View>
 		</LinearGradient>
 	);
 };
 
 const styles = StyleSheet.create({
 	card: {
-		borderRadius: 16,
-		borderWidth: 0.5,
-		borderColor: '#E8E8E8',
-		paddingHorizontal: 16,
-		paddingVertical: 14,
+		borderRadius: 24,
+		paddingHorizontal: 24,
+		paddingVertical: 16,
 		alignSelf: 'center',
-		justifyContent: 'space-between',
-		marginVertical: 10,
+		marginVertical: 16,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.2,
+		shadowRadius: 5,
+		elevation: 8,
 	},
-	contentContainer: {
+	welcomeText: {
+		fontFamily: 'Inter_700Bold',
+		fontSize: 20,
+		fontWeight: '700',
+		color: '#FFFFFF',
+		marginBottom: 0,
+	},
+	membershipText: {
+		fontFamily: 'Inter_400Regular',
+		fontSize: 15,
+		fontWeight: '400',
+		color: '#E0E0E0',
+		marginBottom: 10,
+		marginTop: 2,
+	},
+	bottomContainer: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		marginBottom: 10,
+		width: '100%',
 	},
-	iconContainer: {
-		width: 145,
+	gymImage: {
+		width: 120,
+		height: 80,
+		borderRadius: 12,
+	},
+	checkInButton: {
+		backgroundColor: 'rgba(30, 15, 5, 0.7)',
+		borderRadius: 30,
+		paddingHorizontal: 18,
+		paddingVertical: 10,
+		flexDirection: 'row',
 		alignItems: 'center',
-		marginLeft: -30,
-		justifyContent: 'center',
 	},
-	textContainer: {
-		width: 200,
-		justifyContent: 'center',
-		marginLeft: 60,
+	qrIcon: {
+		marginRight: 8,
 	},
-	title: {
+	checkInText: {
 		fontFamily: 'Inter_700Bold',
-		fontSize: 14,
-		fontWeight: '700',
-		color: '#FFFFFF',
-	},
-	subtitle: {
-		fontFamily: 'Inter_400Regular',
-		fontSize: 12,
-		fontWeight: '400',
-		color: '#FFFFFF',
-		letterSpacing: 0.5,
-		marginTop: 4,
-	},
-	footerText: {
-		fontFamily: 'Montserrat_500Medium',
 		fontSize: 16,
-		fontWeight: '500',
-		textAlign: 'center',
+		fontWeight: '600',
 		color: '#FFFFFF',
 	},
 });
