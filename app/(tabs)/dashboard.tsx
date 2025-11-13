@@ -1,6 +1,8 @@
 import ChallengesSection from '@/components/auth/dashboard/challengessection';
 import { MembershipCard } from '@/components/auth/dashboard/membershipcard';
-import { PromotionalBanners } from '@/components/auth/dashboard/promotionalbanners';
+import BirthdayOfferBanner from '@/components/auth/dashboard/BirthdayOfferBanner';
+import WeeklyChallengeBanner from '@/components/auth/dashboard/WeeklyChallengeBanner';
+import CrossFitBanner from '@/components/auth/dashboard/CrossFitBanner';
 import { QRModal } from '@/components/auth/dashboard/QRModal';
 import { UpcomingClassesCarousel } from '@/components/auth/dashboard/upcomingclasses';
 import { UpcomingRoutinesSection } from '@/components/auth/dashboard/upcomingroutines';
@@ -10,7 +12,7 @@ import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 
 export default function DashboardScreen() {
 	const [firstName, setFirstName] = useState<string | null>(null);
@@ -125,10 +127,21 @@ export default function DashboardScreen() {
 
 				<UpcomingRoutinesSection routines={mockRoutines} />
 
-				<PromotionalBanners
-					onOfferPress={() => console.log('Abrir vista de ofertas')}
-					onChallengePress={(challengeId) => console.log('Abrir challenge:', challengeId)}
-				/>
+				<View className='gap-3'>
+					<BirthdayOfferBanner onPress={() => console.log('Abrir vista de ofertas')} />
+
+					<WeeklyChallengeBanner
+						onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
+					/>
+
+					<BirthdayOfferBanner onPress={() => console.log('Abrir vista de ofertas')} />
+
+					<CrossFitBanner
+						imageSource={require('@/assets/images/crossfit.png')}
+						title='CrossFit'
+						onPress={() => console.log('Abrir challenge:', 'crossfit')}
+					/>
+				</View>
 			</ScrollView>
 
 			<QRModal
