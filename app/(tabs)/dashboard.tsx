@@ -111,7 +111,7 @@ export default function DashboardScreen() {
 				contentContainerStyle={{
 					paddingHorizontal: 16,
 					paddingTop: 40,
-					paddingBottom: 20,
+					paddingBottom: 120,
 				}}>
 				<UserHeader
 					name={firstName ?? 'Usuario'}

@@ -5,7 +5,9 @@
 		"paths": {
 			"@/*": ["./*"]
 		},
-		"types": ["jest"]
+		"types": ["jest"],
+		"skipLibCheck": true,
+		"noEmit": true
 	},
 	"include": [
 		"**/*.ts",
@@ -13,5 +15,6 @@
 		".expo/types/**/*.ts",
 		"expo-env.d.ts",
 		"nativewind-env.d.ts"
-	]
+	],
+	"exclude": ["node_modules"]
 }
