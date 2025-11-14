@@ -1,16 +1,18 @@
+import BirthdayOfferBanner from '@/components/auth/dashboard/BirthdayOfferBanner';
+import ChallengesSection from '@/components/auth/dashboard/challengessection';
+import CrossFitBanner from '@/components/auth/dashboard/CrossFitBanner';
 import { MembershipCard } from '@/components/auth/dashboard/membershipcard';
-import { ProgressCard } from '@/components/auth/dashboard/progresscard';
 import { QRModal } from '@/components/auth/dashboard/QRModal';
-import { ReservedClassesCard } from '@/components/auth/dashboard/reservedclasses';
-import { TodayRoutineCard } from '@/components/auth/dashboard/todayroutinecard';
+import { UpcomingClassesCarousel } from '@/components/auth/dashboard/upcomingclasses';
+import { UpcomingRoutinesSection } from '@/components/auth/dashboard/upcomingroutines';
 import { UserHeader } from '@/components/auth/dashboard/userheader';
-import { WeekCalendar } from '@/components/auth/dashboard/weekcalendar';
+import WeeklyChallengeBanner from '@/components/auth/dashboard/WeeklyChallengeBanner';
 import { ThemedView } from '@/components/themed-view';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 
 export default function DashboardScreen() {
 	const [firstName, setFirstName] = useState<string | null>(null);
@@ -47,6 +49,53 @@ export default function DashboardScreen() {
 		fetchUser();
 	}, []);
 
+	// Datos mock - reemplazar con llamadas a la API cuando estén disponibles
+	const mockChallenges = [
+		{ id: '1', title: 'Retos completados', current: 2, total: 5, iconType: 'trophy' as const },
+		{
+			id: '2',
+			title: 'Entrenamiento semanal',
+			current: 8,
+			total: 10,
+			iconType: 'dumbbell' as const,
+		},
+		{ id: '3', title: 'Progreso', current: 4, total: 5, iconType: 'target' as const },
+	];
+
+	const mockClasses = [
+		{
+			id: '1',
+			title: 'Hora',
+			time: '07:00 - 08:00 AM',
+			calories: '95 kcal',
+			image: require('@/assets/images/rutina.png'),
+		},
+		{
+			id: '2',
+			title: 'Burn',
+			time: '09:00 - 10:00 AM',
+			calories: '120 kcal',
+			image: require('@/assets/images/rutina.png'),
+		},
+		{
+			id: '3',
+			title: 'Hora',
+			time: '11:00 - 12:00 PM',
+			calories: '85 kcal',
+			image: require('@/assets/images/rutina.png'),
+		},
+	];
+
+	const mockRoutines = [
+		{
+			id: '1',
+			title: 'DÍA 01',
+			subtitle: 'Comienza a trotar',
+			duration: '10 km, 4 semanas',
+			image: require('@/assets/images/rutina.png'),
+		},
+	];
+
 	if (loading) {
 		return (
 			<ThemedView className='flex-1 justify-center items-center bg-white dark:bg-neutral-950'>
@@ -56,22 +105,43 @@ export default function DashboardScreen() {
 	}
 
 	return (
-		<ThemedView className='flex-1 bg-white dark:bg-neutral-950 px-4 pt-10'>
-			<ScrollView showsVerticalScrollIndicator={false}>
+		<ThemedView className='flex-1 bg-white dark:bg-neutral-950'>
+			<ScrollView
+				showsVerticalScrollIndicator={false}
+				contentContainerStyle={{
+					paddingHorizontal: 16,
+					paddingTop: 40,
+					paddingBottom: 120,
+				}}>
 				<UserHeader
 					name={firstName ?? 'Usuario'}
-					message='Es hora de desafiar tus límites'
 					avatarUrl='https://randomuser.me/api/portraits/men/32.jpg'
+					onBadgesPress={() => console.log('Abrir vista de medallas/insignias')}
 				/>
-				<WeekCalendar />
+
+				<ChallengesSection challenges={mockChallenges} />
+
 				<MembershipCard daysRemaining={15} onQRPress={() => setQrModalVisible(true)} />
-				<ProgressCard weekProgress={0.8} calories={1200} completed='4/5' />
-				<ReservedClassesCard reserved={0} />
-				<TodayRoutineCard
-					title='Day 05 - Warm Up'
-					time='07:00 - 08:00 AM'
-					date='Mon 26 Apr'
-				/>
+
+				<UpcomingClassesCarousel classes={mockClasses} />
+
+				<UpcomingRoutinesSection routines={mockRoutines} />
+
+				<View className='gap-3'>
+					<BirthdayOfferBanner onPress={() => console.log('Abrir vista de ofertas')} />
+
+					<WeeklyChallengeBanner
+						onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
+					/>
+
+					<BirthdayOfferBanner onPress={() => console.log('Abrir vista de ofertas')} />
+
+					<CrossFitBanner
+						imageSource={require('@/assets/images/crossfit.png')}
+						title='CrossFit'
+						onPress={() => console.log('Abrir challenge:', 'crossfit')}
+					/>
+				</View>
 			</ScrollView>
 
 			<QRModal
