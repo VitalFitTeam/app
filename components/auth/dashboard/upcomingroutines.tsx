@@ -20,15 +20,19 @@ interface Routine {
 
 interface Props {
 	routines: Routine[];
+	mode?: 'member' | 'guest';
+	onPrimaryActionPress?: (id: string) => void;
 }
 
-export const UpcomingRoutinesSection: React.FC<Props> = ({ routines }) => {
+export const UpcomingRoutinesSection: React.FC<Props> = ({ routines, mode = 'member', onPrimaryActionPress }) => {
 	const { width } = Dimensions.get('window');
 	const cardWidth = Math.min(width - 32, 600);
+	const sectionTitle = mode === 'member' ? 'Próximas rutinas' : 'Servicios';
+	const buttonLabel = mode === 'member' ? 'Comenzar' : 'Comprar';
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.sectionTitle}>Próximas rutinas</Text>
+			<Text style={styles.sectionTitle}>{sectionTitle}</Text>
 			{routines.map((routine) => (
 				<LinearGradient
 					key={routine.id}
@@ -49,8 +53,11 @@ export const UpcomingRoutinesSection: React.FC<Props> = ({ routines }) => {
 							<Text style={styles.duration}>{routine.duration}</Text>
 							<Text style={styles.title}>{routine.title}</Text>
 						</View>
-						<TouchableOpacity style={styles.button} activeOpacity={0.8}>
-							<Text style={styles.buttonText}>Comenzar</Text>
+						<TouchableOpacity
+							style={styles.button}
+							activeOpacity={0.8}
+							onPress={() => onPrimaryActionPress && onPrimaryActionPress(routine.id)}>
+							<Text style={styles.buttonText}>{buttonLabel}</Text>
 						</TouchableOpacity>
 					</View>
 				</LinearGradient>
