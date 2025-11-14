@@ -23,11 +23,11 @@ export default function TabLayout() {
 					position: 'absolute',
 					left: 16,
 					right: 16,
-					bottom: 0,
+					bottom: 36,
 					paddingHorizontal: 8,
 					overflow: 'hidden',
 					elevation: 0,
-					paddingBottom: 0,
+					paddingBottom: 4,
 					paddingTop: 0,
 				},
 				tabBarItemStyle: {

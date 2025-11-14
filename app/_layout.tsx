@@ -47,6 +47,8 @@ export default function RootLayout() {
 							title: '',
 							headerShown: true,
 							headerBackTitle: 'Volver',
+							headerStyle: { backgroundColor: '#000000' },
+							headerTintColor: '#ffffff',
 						}}
 					/>
 					<Stack.Screen
