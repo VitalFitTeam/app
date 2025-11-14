@@ -5,9 +5,10 @@ export type CrossFitBannerProps = {
 	imageSource: ImageSourcePropType;
 	title: string;
 	onPress?: () => void;
+	ctaLabel?: string;
 };
 
-export default function CrossFitBanner({ imageSource, title, onPress }: CrossFitBannerProps) {
+export default function CrossFitBanner({ imageSource, title, onPress, ctaLabel = 'Ver más' }: CrossFitBannerProps) {
 	return (
 		<View className='h-48 w-full rounded-2xl overflow-hidden'>
 			<Image
@@ -30,7 +31,7 @@ export default function CrossFitBanner({ imageSource, title, onPress }: CrossFit
 					className='bg-orange-500 rounded-lg px-5 py-2.5 self-start'
 					onPress={onPress}
 					activeOpacity={0.8}>
-					<Text className='text-white font-bold text-sm'>Ver más</Text>
+					<Text className='text-white font-bold text-sm'>{ctaLabel}</Text>
 				</TouchableOpacity>
 			</View>
 		</View>
