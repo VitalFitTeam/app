@@ -57,6 +57,20 @@ export default function RootLayout() {
 							headerBackTitle: 'Volver',
 						}}
 					/>
+					<Stack.Screen
+						name='routine/details'
+						options={{
+							headerShown: false,
+							title: '',
+						}}
+					/>
+					<Stack.Screen
+						name='routine/history'
+						options={{
+							headerShown: false,
+							title: '',
+						}}
+					/>
 				</Stack>
 				<StatusBar style='auto' />
 			</ThemeProvider>
