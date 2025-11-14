@@ -1,12 +1,12 @@
-import ChallengesSection from '@/components/auth/dashboard/challengessection';
-import { MembershipCard } from '@/components/auth/dashboard/membershipcard';
 import BirthdayOfferBanner from '@/components/auth/dashboard/BirthdayOfferBanner';
-import WeeklyChallengeBanner from '@/components/auth/dashboard/WeeklyChallengeBanner';
+import ChallengesSection from '@/components/auth/dashboard/challengessection';
 import CrossFitBanner from '@/components/auth/dashboard/CrossFitBanner';
+import { MembershipCard } from '@/components/auth/dashboard/membershipcard';
 import { QRModal } from '@/components/auth/dashboard/QRModal';
 import { UpcomingClassesCarousel } from '@/components/auth/dashboard/upcomingclasses';
 import { UpcomingRoutinesSection } from '@/components/auth/dashboard/upcomingroutines';
 import { UserHeader } from '@/components/auth/dashboard/userheader';
+import WeeklyChallengeBanner from '@/components/auth/dashboard/WeeklyChallengeBanner';
 import { ThemedView } from '@/components/themed-view';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
