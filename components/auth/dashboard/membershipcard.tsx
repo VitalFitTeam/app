@@ -13,22 +13,38 @@ import {
 import { QrCodeIcon } from 'react-native-heroicons/outline';
 
 interface Props {
+	hasMembership: boolean;
 	daysRemaining?: number;
-	onQRPress: () => void;
+	onQRPress?: () => void;
+	onGetMembershipPress?: () => void;
 	gymName?: string;
 	membershipStatus?: string;
 	gymImage?: ImageSourcePropType;
 }
 
 export const MembershipCard: React.FC<Props> = ({
+	hasMembership,
 	daysRemaining = 15,
 	onQRPress,
+	onGetMembershipPress,
 	gymName = 'VitalFit Caracas',
 	membershipStatus = 'Membresía activa',
 	gymImage = require('@/assets/images/Mask group.png'),
 }) => {
 	const { width } = Dimensions.get('window');
 	const cardWidth = Math.min(width - 32, 600);
+
+	const effectiveStatusText = hasMembership
+		? `${membershipStatus}: ${daysRemaining} días restantes`
+		: 'No tiene membresía activa';
+
+	const handlePress = () => {
+		if (hasMembership) {
+			if (onQRPress) onQRPress();
+			return;
+		}
+		if (onGetMembershipPress) onGetMembershipPress();
+	};
 
 	return (
 		<LinearGradient
@@ -40,22 +56,23 @@ export const MembershipCard: React.FC<Props> = ({
 			start={{ x: 0, y: 0.5 }}
 			end={{ x: 1, y: 0.5 }}
 			style={[styles.card, { width: cardWidth }]}>
-			<Text style={styles.welcomeText}>Bienvenido a {gymName}</Text>
+			<Text style={styles.welcomeText}>Bienvenido a {hasMembership ? gymName : 'VitalFit'}</Text>
 
-			<Text style={styles.membershipText}>
-				{membershipStatus}: {daysRemaining} días restantes
-			</Text>
+			<Text style={styles.membershipText}>{effectiveStatusText}</Text>
 
 			<View style={styles.bottomContainer}>
-				<Image source={gymImage} style={styles.gymImage} resizeMode='cover' />
+				{hasMembership && (
+					<Image source={gymImage} style={styles.gymImage} resizeMode='cover' />
+				)}
 
 				<TouchableOpacity
-					onPress={onQRPress}
+					onPress={handlePress}
 					style={styles.checkInButton}
 					activeOpacity={0.8}>
-					<QrCodeIcon size={24} color='#FFFFFF' style={styles.qrIcon} />
-
-					<Text style={styles.checkInText}>Check in</Text>
+					{hasMembership && (
+						<QrCodeIcon size={24} color='#FFFFFF' style={styles.qrIcon} />
+					)}
+					<Text style={styles.checkInText}>{hasMembership ? 'Check in' : 'Comprar'}</Text>
 				</TouchableOpacity>
 			</View>
 		</LinearGradient>

@@ -11,14 +11,19 @@ import { ThemedView } from '@/components/themed-view';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Text as RNText, ScrollView, View } from 'react-native';
 
 export default function DashboardScreen() {
+	const router = useRouter();
 	const [firstName, setFirstName] = useState<string | null>(null);
+	const [lastName, setLastName] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [qrModalVisible, setQrModalVisible] = useState(false);
 	const [userToken, setUserToken] = useState<string>('');
+	// TODO: reemplazar cuando exista endpoint real de membresía
+	const hasMembership = true;
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -33,6 +38,7 @@ export default function DashboardScreen() {
 
 				const userData = await vitalFitApi.user.WhoAmI(token);
 				setFirstName(userData?.user?.first_name || 'Usuario');
+				setLastName(userData?.user?.last_name || null);
 			} catch (error: unknown) {
 				let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
 				if (isAPIError(error)) {
@@ -104,6 +110,10 @@ export default function DashboardScreen() {
 		);
 	}
 
+	const displayName = lastName
+		? `${firstName ?? 'Usuario'} ${lastName}`
+		: firstName ?? 'Usuario';
+
 	return (
 		<ThemedView className='flex-1 bg-white dark:bg-neutral-950'>
 			<ScrollView
@@ -114,40 +124,82 @@ export default function DashboardScreen() {
 					paddingBottom: 120,
 				}}>
 				<UserHeader
-					name={firstName ?? 'Usuario'}
+					name={displayName}
 					avatarUrl='https://randomuser.me/api/portraits/men/32.jpg'
 					onBadgesPress={() => console.log('Abrir vista de medallas/insignias')}
 				/>
 
 				<ChallengesSection challenges={mockChallenges} />
 
-				<MembershipCard daysRemaining={15} onQRPress={() => setQrModalVisible(true)} />
+				<MembershipCard
+					hasMembership={hasMembership}
+					daysRemaining={15}
+					onQRPress={() => setQrModalVisible(true)}
+					onGetMembershipPress={() => router.push('/memberships')}
+				/>
 
-				<UpcomingClassesCarousel classes={mockClasses} />
+				{hasMembership && <UpcomingClassesCarousel classes={mockClasses} />}
 
-				<UpcomingRoutinesSection routines={mockRoutines} />
+				<UpcomingRoutinesSection
+					mode={hasMembership ? 'member' : 'guest'}
+					routines={mockRoutines}
+					onPrimaryActionPress={(id) =>
+						hasMembership
+							? router.push(`/routine/details?id=${id}`)
+							: router.push('/memberships')
+					}
+				/>
 
-				<View className='gap-3'>
-					<BirthdayOfferBanner onPress={() => console.log('Abrir vista de ofertas')} />
+				{/* Banners adicionales */}
+				{hasMembership ? (
+					<View className='gap-3'>
+						<BirthdayOfferBanner onPress={() => console.log('Abrir vista de ofertas')} />
 
-					<WeeklyChallengeBanner
-						onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
-					/>
+						<WeeklyChallengeBanner
+							onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
+						/>
 
-					<BirthdayOfferBanner onPress={() => console.log('Abrir vista de ofertas')} />
+						<BirthdayOfferBanner onPress={() => console.log('Abrir vista de ofertas')} />
 
-					<CrossFitBanner
-						imageSource={require('@/assets/images/crossfit.png')}
-						title='CrossFit'
-						onPress={() => console.log('Abrir challenge:', 'crossfit')}
-					/>
-				</View>
+						<CrossFitBanner
+							imageSource={require('@/assets/images/crossfit.png')}
+							title='CrossFit'
+							onPress={() => console.log('Abrir challenge:', 'crossfit')}
+						/>
+					</View>
+				) : (
+					<>
+						{/* Servicios ya viene de UpcomingRoutinesSection en modo guest */}
+						<BirthdayOfferBanner onPress={() => console.log('Abrir vista de ofertas')} />
+						<RNText style={{ color: '#111827', fontWeight: '700', fontSize: 18, marginTop: 16, marginBottom: 8 }}>
+							Paquetes
+						</RNText>
+						<View className='gap-3 mb-4'>
+							<CrossFitBanner
+								imageSource={require('@/assets/images/rutina.png')}
+								title='CrossFit - 4 sesiones'
+								onPress={() => router.push('/memberships')}
+							/>
+							<CrossFitBanner
+								imageSource={require('@/assets/images/rutin.png')}
+								title='CrossFit - 4 sesiones'
+								onPress={() => router.push('/memberships')}
+							/>
+						</View>
+						<View className='gap-3'>
+							<WeeklyChallengeBanner
+								onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
+							/>
+						</View>
+					</>
+				)}
 			</ScrollView>
 
 			<QRModal
 				visible={qrModalVisible}
 				onClose={() => setQrModalVisible(false)}
 				token={userToken}
+				userName={displayName}
 			/>
 		</ThemedView>
 	);
