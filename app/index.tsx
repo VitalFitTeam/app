@@ -2,10 +2,11 @@ import { Montserrat_500Medium, Montserrat_700Bold, useFonts } from '@expo-google
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, StatusBar, Text, View } from 'react-native';
+import { Image, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundCarousel, SignInButton, SignUpButton } from '../components/auth/home';
 
+import { Global } from 'iconsax-react-native';
 export default function HomeScreen() {
 	const [index, setIndex] = useState(0);
 	const [fontsLoaded] = useFonts({
@@ -72,7 +73,12 @@ export default function HomeScreen() {
 						/>
 					))}
 				</View>
-
+				<TouchableOpacity
+					className='flex-row items-center justify-center py-2 mb-4'
+					onPress={() => router.push('/language')}>
+					<Global color='white' size={16} variant='Outline' />
+					<Text className='text-white ml-2 text-sm font-montserrat-medium'>Idioma</Text>
+				</TouchableOpacity>
 				<View
 					style={{
 						flexDirection: 'row',

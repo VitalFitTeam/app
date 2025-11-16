@@ -33,6 +33,7 @@ export default function RootLayout() {
 					<Stack.Screen name='(tabs)' options={{ headerShown: false }} />
 					<Stack.Screen name='(instructor)' options={{ headerShown: false }} />
 					<Stack.Screen name='(recepcionist)' options={{ headerShown: false }} />
+					<Stack.Screen name='language' />
 					<Stack.Screen
 						name='cancel-membership'
 						options={{
