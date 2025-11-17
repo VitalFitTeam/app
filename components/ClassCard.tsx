@@ -40,7 +40,7 @@ export default function ClassCard({
 		return (
 			<TouchableOpacity
 				onPress={() => onPress(classData)}
-				className='rounded-2xl overflow-hidden mb-4'>
+				className='rounded-2xl overflow-hidden mb-4 bg-white'>
 				<View className='h-44 w-full rounded-2xl overflow-hidden'>
 					<Image
 						source={imageUrl}
@@ -48,7 +48,7 @@ export default function ClassCard({
 						contentFit='cover'
 						contentPosition='center'
 					/>
-					<View className='absolute inset-0 bg-black/35' />
+					<View className='absolute inset-0 bg-black/25' />
 					<View className='absolute inset-0 p-4 justify-between'>
 						<View className='flex-row justify-between items-start'>
 							<View>
