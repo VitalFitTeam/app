@@ -28,15 +28,38 @@ type MembershipCardProps = {
 			]}
 		>
 			<View className='flex-1 mr-4'>
-				<ThemedText className='text-base font-semibold text-white mb-1'>{title}</ThemedText>
+				<ThemedText
+					lightColor='#ffffff'
+					darkColor='#ffffff'
+					className='text-base font-semibold mb-1'
+				>
+					{title}
+				</ThemedText>
 				{features.length > 0 && (
-					<ThemedText className='text-xs text-neutral-200 mb-2' numberOfLines={2}>
+					<ThemedText
+						lightColor='#e5e7eb'
+						darkColor='#e5e7eb'
+						className='text-xs mb-2'
+						numberOfLines={2}
+					>
 						{features[0]}
 					</ThemedText>
 				)}
 				<View className='flex-row items-baseline'>
-					<ThemedText className='text-sm font-semibold text-white mr-1'>${price}</ThemedText>
-					<ThemedText className='text-xs font-semibold text-neutral-200'>/mes</ThemedText>
+					<ThemedText
+						lightColor='#ffffff'
+						darkColor='#ffffff'
+						className='text-sm font-semibold mr-1'
+					>
+						${price}
+					</ThemedText>
+					<ThemedText
+						lightColor='#e5e7eb'
+						darkColor='#e5e7eb'
+						className='text-xs font-semibold'
+					>
+						/mes
+					</ThemedText>
 				</View>
 			</View>
 			<View className='items-center justify-center'>

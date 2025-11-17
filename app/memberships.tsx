@@ -1,6 +1,7 @@
 import MembershipPlanCard from '@/components/auth/dashboard/MembershipPlanCard';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ImageBackground, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -33,6 +34,7 @@ const membershipPlans = [
 ];
 
 export default function MembershipsScreen() {
+	const router = useRouter();
 	const [selectedPlanId, setSelectedPlanId] = useState<string | null>(membershipPlans[0]?.id ?? null);
 	const selectedPlan = membershipPlans.find(plan => plan.id === selectedPlanId);
 
@@ -45,16 +47,27 @@ export default function MembershipsScreen() {
 					<ScrollView className='flex-1'>
 						<View className='flex-1'>
 							<View className='w-full h-72 justify-end'>
-								<View className='px-6 pb-6 pt-8 items-center'>
-									<ThemedText className='text-xs tracking-[0.25em] text-orange-400 mb-1 text-center'>
-										NUESTRAS
-									</ThemedText>
-									<ThemedText className='text-4xl font-extrabold text-orange-400 mb-2 text-center'>
-										Membresías
-									</ThemedText>
-									<ThemedText className='text-sm text-neutral-200 px-2 text-center'>
-										Elige el plan que mejor se adapte a tus necesidades y objetivos de fitness.
-									</ThemedText>
+								<View className='px-6 pb-6'>
+									<View className='items-center'>
+										<ThemedText
+											lightColor='#f97316'
+											darkColor='#f97316'
+											className='text-xs tracking-[0.25em] mb-1 text-center'>
+											NUESTRAS
+										</ThemedText>
+										<ThemedText
+											lightColor='#f97316'
+											darkColor='#f97316'
+											className='text-4xl font-extrabold mb-2 text-center'>
+											MEMBRESIAS
+										</ThemedText>
+										<ThemedText
+											lightColor='#e5e7eb'
+											darkColor='#e5e7eb'
+											className='text-sm px-2 text-center'>
+											Elige el plan que mejor se adapte a tus necesidades y objetivos de fitness.
+										</ThemedText>
+									</View>
 								</View>
 							</View>
 
@@ -75,7 +88,12 @@ export default function MembershipsScreen() {
 										title={selectedPlan ? `Adquirir ${selectedPlan.title}` : 'Adquirir'}
 										onPress={() => {
 											if (!selectedPlan) return;
-											console.log('Plan seleccionado para adquirir:', selectedPlan);
+											const href =
+												`/membership-checkout` +
+												`?id=${selectedPlan.id}` +
+												`&title=${encodeURIComponent(selectedPlan.title)}` +
+												`&price=${selectedPlan.price}`;
+											router.push(href as never);
 										}}
 									/>
 								</View>
