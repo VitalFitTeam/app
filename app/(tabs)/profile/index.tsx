@@ -3,7 +3,7 @@ import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import { Image } from 'expo-image';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { ChevronRightIcon, Cog6ToothIcon } from 'react-native-heroicons/outline';
@@ -18,11 +18,13 @@ type ProfileMenuItemProps = {
 const ProfileMenuItem = ({ title, onPress, isLogout = false, icon }: ProfileMenuItemProps) => (
 	<TouchableOpacity
 		onPress={onPress}
-		className='flex-row justify-between items-center py-4 px-6 bg-white dark:bg-neutral-900'>
+		className="flex-row justify-between items-center py-4 px-6 bg-white dark:bg-neutral-900"
+	>
 		<ThemedText className={`text-base font-semibold ${isLogout ? 'text-red-500' : ''}`}>
 			{title}
 		</ThemedText>
-		{icon || <ChevronRightIcon size={20} color='#9ca3af' />}
+
+		{icon || <ChevronRightIcon size={20} color="#9ca3af" />}
 	</TouchableOpacity>
 );
 
@@ -41,9 +43,11 @@ export default function ProfileScreen() {
 				}
 
 				const userData = await vitalFitApi.user.WhoAmI(token);
+
 				const fullName = `${userData?.user?.first_name || ''} ${
 					userData?.user?.last_name || ''
 				}`;
+
 				setUserName(fullName.trim().toUpperCase() || 'USUARIO');
 			} catch (error: unknown) {
 				let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
@@ -63,51 +67,64 @@ export default function ProfileScreen() {
 
 	if (loading) {
 		return (
-			<View className='flex-1 justify-center items-center bg-white dark:bg-neutral-950'>
-				<ActivityIndicator size='large' color='#F27F2A' />
+			<View className="flex-1 justify-center items-center bg-white dark:bg-neutral-950">
+				<ActivityIndicator size="large" color="#F27F2A" />
 			</View>
 		);
 	}
 
 	return (
-		<View className='flex-1 bg-white dark:bg-neutral-950'>
-			<View className='items-center justify-center py-16 bg-white dark:bg-neutral-900'>
-				<View className='w-40 h-40 rounded-full mb-6 overflow-hidden bg-neutral-200 dark:bg-neutral-800'>
+		<View className="flex-1 bg-white dark:bg-neutral-950">
+			{/* Header con avatar */}
+			<View className="items-center justify-center py-16 bg-white dark:bg-neutral-900">
+				<View className="w-40 h-40 rounded-full mb-6 overflow-hidden bg-neutral-200 dark:bg-neutral-800">
 					<Image
 						source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
 						style={{ width: '100%', height: '100%' }}
-						contentFit='cover'
+						contentFit="cover"
 					/>
 				</View>
+
 				<ThemedText
-					className='text-4xl font-bold tracking-wide'
-					style={{ fontFamily: 'Montserrat-ExtraBold' }}>
+					className="text-4xl font-bold tracking-wide"
+					style={{ fontFamily: 'Montserrat-ExtraBold' }}
+				>
 					{userName}
 				</ThemedText>
 			</View>
 
-			<View className='bg-white dark:bg-neutral-900'>
-				<Link href='/my-profile' asChild>
-					<ProfileMenuItem title='Mi perfil' />
-				</Link>
-				<Link href='/cancel-membership' asChild>
-					<ProfileMenuItem title='Membresía' />
-				</Link>
+			{/* Menú principal */}
+			<View className="bg-white dark:bg-neutral-900">
 				<ProfileMenuItem
-					title='Historial pago'
+					title="Mi perfil"
+					onPress={() => router.replace('/profile/my-profile')}
+				/>
+
+				<ProfileMenuItem
+					title="Membresía"
+					onPress={() => router.replace('/profile/cancel-membership')}
+				/>
+
+				<ProfileMenuItem
+					title="Historial pago"
 					onPress={() => console.log('Historial pago')}
 				/>
-				<ProfileMenuItem title='Fidelización' onPress={() => console.log('Fidelización')} />
+
 				<ProfileMenuItem
-					title='Notificación'
-					onPress={() => router.push('/notifications')}
+					title="Fidelización"
+					onPress={() => console.log('Fidelización')}
 				/>
-				<Link href='/settings' asChild>
-					<ProfileMenuItem
-						title='Configuración'
-						icon={<Cog6ToothIcon size={20} color='#9ca3af' />}
-					/>
-				</Link>
+
+				<ProfileMenuItem
+					title="Notificación"
+					onPress={() => router.replace('/profile/notifications')}
+				/>
+
+				<ProfileMenuItem
+					title="Configuración"
+					icon={<Cog6ToothIcon size={20} color="#9ca3af" />}
+					onPress={() => router.replace('/profile/settings')}
+				/>
 			</View>
 		</View>
 	);

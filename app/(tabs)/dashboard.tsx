@@ -11,9 +11,9 @@ import { ThemedView } from '@/components/themed-view';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Text as RNText, ScrollView, View } from 'react-native';
+import { ActivityIndicator, BackHandler, Text as RNText, ScrollView, View } from 'react-native';
 
 export default function DashboardScreen() {
 	const router = useRouter();
@@ -54,6 +54,23 @@ export default function DashboardScreen() {
 
 		fetchUser();
 	}, []);
+
+	useFocusEffect(
+		React.useCallback(() => {
+			const onBackPress = () => {
+				BackHandler.exitApp();
+				return true;
+			};
+
+			const subscription = BackHandler.addEventListener(
+				'hardwareBackPress',
+				onBackPress
+			);
+
+			return () => subscription.remove();
+		}, [])
+	);
+
 
 	// Datos mock - reemplazar con llamadas a la API cuando estén disponibles
 	const mockChallenges = [
