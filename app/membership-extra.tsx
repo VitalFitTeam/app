@@ -50,7 +50,7 @@ export default function MembershipExtraScreen() {
 
   return (
     <SafeAreaView className='flex-1 bg-black'>
-      <ScrollView className='flex-1 px-6 pt-4 pb-8'>
+      <ScrollView className='flex-1 px-6 pt-8 pb-32'>
         <View className='mb-6'>
           <ThemedText
             lightColor='#f97316'
@@ -244,7 +244,7 @@ export default function MembershipExtraScreen() {
           );
         })}
 
-        <View className='mt-6'>
+        <View className='mt-6 mb-16'>
           <PrimaryButton
             title='Continuar'
             onPress={() => {

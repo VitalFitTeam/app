@@ -36,7 +36,7 @@ export default function MembershipConfirmScreen() {
 
   return (
     <SafeAreaView className='flex-1 bg-black'>
-      <ScrollView className='flex-1 px-6 pt-4 pb-8'>
+      <ScrollView className='flex-1 px-6 pt-8 pb-32'>
         {/* Header y pasos */}
         <View className='mb-6'>
           <ThemedText
@@ -282,12 +282,14 @@ export default function MembershipConfirmScreen() {
           </View>
         </View>
 
-        <PrimaryButton
-          title='Ir al inicio'
-          onPress={() => {
-            router.push('/(tabs)/dashboard' as never);
-          }}
-        />
+        <View className='mb-16'>
+          <PrimaryButton
+            title='Ir al inicio'
+            onPress={() => {
+              router.push('/(tabs)/dashboard' as never);
+            }}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

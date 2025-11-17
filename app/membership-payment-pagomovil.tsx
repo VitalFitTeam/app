@@ -46,7 +46,7 @@ export default function MembershipPaymentPagoMovilScreen() {
 
   return (
     <SafeAreaView className='flex-1 bg-black'>
-      <ScrollView className='flex-1 px-6 pt-4 pb-8'>
+      <ScrollView className='flex-1 px-6 pt-8 pb-32'>
         {/* Header y pasos */}
         <View className='mb-6'>
           <ThemedText
@@ -333,22 +333,24 @@ export default function MembershipPaymentPagoMovilScreen() {
           </View>
         </View>
 
-        <PrimaryButton
-          title='Confirmar pago'
-          onPress={() => {
-            router.push({
-              pathname: '/membership-confirm',
-              params: {
-                id: params.id ?? '',
-                title: params.title ?? '',
-                price: params.price ?? '',
-                branch: params.branch ?? '',
-                method: 'pagomovil',
-                addonsJson: params.addonsJson ?? '',
-              },
-            } as never);
-          }}
-        />
+        <View className='mb-16'>
+          <PrimaryButton
+            title='Confirmar pago'
+            onPress={() => {
+              router.push({
+                pathname: '/membership-confirm',
+                params: {
+                  id: params.id ?? '',
+                  title: params.title ?? '',
+                  price: params.price ?? '',
+                  branch: params.branch ?? '',
+                  method: 'pagomovil',
+                  addonsJson: params.addonsJson ?? '',
+                },
+              } as never);
+            }}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

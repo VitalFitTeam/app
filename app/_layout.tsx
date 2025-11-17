@@ -43,40 +43,28 @@ export default function RootLayout() {
 						name='membership-confirm'
 						options={{
 							title: '',
-							headerShown: true,
-							headerBackTitle: '',
-							headerStyle: { backgroundColor: '#000000' },
-							headerTintColor: '#ffffff',
+							headerShown: false,
 						}}
 					/>
 					<Stack.Screen
 						name='membership-payment-transfer'
 						options={{
 							title: '',
-							headerShown: true,
-							headerBackTitle: '',
-							headerStyle: { backgroundColor: '#000000' },
-							headerTintColor: '#ffffff',
+							headerShown: false,
 						}}
 					/>
 					<Stack.Screen
 						name='membership-payment-pagomovil'
 						options={{
 							title: '',
-							headerShown: true,
-							headerBackTitle: '',
-							headerStyle: { backgroundColor: '#000000' },
-							headerTintColor: '#ffffff',
+							headerShown: false,
 						}}
 					/>
 					<Stack.Screen
 						name='membership-methods'
 						options={{
 							title: '',
-							headerShown: true,
-							headerBackTitle: '',
-							headerStyle: { backgroundColor: '#000000' },
-							headerTintColor: '#ffffff',
+							headerShown: false,
 						}}
 					/>
 					<Stack.Screen
@@ -93,30 +81,21 @@ export default function RootLayout() {
 						name='memberships'
 						options={{
 							title: '',
-							headerShown: true,
-							headerBackTitle: 'Volver',
-							headerStyle: { backgroundColor: '#000000' },
-							headerTintColor: '#ffffff',
+							headerShown: false,
 						}}
 					/>
 					<Stack.Screen
 						name='membership-checkout'
 						options={{
 							title: '',
-							headerShown: true,
-							headerBackTitle: '',
-							headerStyle: { backgroundColor: '#000000' },
-							headerTintColor: '#ffffff',
+							headerShown: false,
 						}}
 					/>
 					<Stack.Screen
 						name='membership-extra'
 						options={{
 							title: '',
-							headerShown: true,
-							headerBackTitle: '',
-							headerStyle: { backgroundColor: '#000000' },
-							headerTintColor: '#ffffff',
+							headerShown: false,
 						}}
 					/>
 					<Stack.Screen

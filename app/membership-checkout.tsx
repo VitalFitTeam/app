@@ -1,8 +1,9 @@
+import { MonthCalendar } from '@/components/auth/dashboard/monthcalendar';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { ScrollView, TextInput, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { CheckCircleIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -42,7 +43,7 @@ export default function MembershipCheckoutScreen() {
 
 	return (
 		<SafeAreaView className='flex-1 bg-black'>
-			<ScrollView className='flex-1 px-6 pt-4 pb-8'>
+			<ScrollView className='flex-1 px-6 pt-8 pb-32'>
 				<View className='mb-6'>
 					<ThemedText
 						lightColor='#f97316'
@@ -177,30 +178,31 @@ export default function MembershipCheckoutScreen() {
 						className='text-sm mb-2'>
 						Fecha de inicio
 					</ThemedText>
-					<View className='border border-neutral-700 rounded-md h-12 px-3 justify-center bg-neutral-900'>
-						<TextInput
-							value={startDate}
-							onChangeText={setStartDate}
-							placeholder='mm/dd/yyyy'
-							placeholderTextColor='#6B7280'
-							className='text-white text-sm'
+					<View>
+						<MonthCalendar
+							initialDate={startDate || undefined}
+							onDateSelect={(day) => {
+								setStartDate(day.dateString);
+							}}
 						/>
 					</View>
 				</View>
 
-				<PrimaryButton
-					title='Continuar'
-					onPress={() => {
-						router.push({
-							pathname: '/membership-extra',
-							params: {
-								id: params.id ?? '',
-								title: params.title ?? '',
-								price: params.price ?? '',
-							},
-						} as never);
-					}}
-				/>
+				<View className='mb-16'>
+					<PrimaryButton
+						title='Continuar'
+						onPress={() => {
+							router.push({
+								pathname: '/membership-extra',
+								params: {
+									id: params.id ?? '',
+									title: params.title ?? '',
+									price: params.price ?? '',
+								},
+							} as never);
+						}}
+					/>
+				</View>
 			</ScrollView>
 		</SafeAreaView>
 	);

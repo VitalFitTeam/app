@@ -153,13 +153,13 @@ export default function DashboardScreen() {
 				{/* Banners adicionales */}
 				{hasMembership ? (
 					<View className='gap-3'>
-						<BirthdayOfferBanner onPress={() => console.log('Abrir vista de ofertas')} />
+						<BirthdayOfferBanner onPress={() => router.push('/memberships')} />
 
 						<WeeklyChallengeBanner
 							onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
 						/>
 
-						<BirthdayOfferBanner onPress={() => console.log('Abrir vista de ofertas')} />
+						<BirthdayOfferBanner onPress={() => router.push('/memberships')} />
 
 						<CrossFitBanner
 							imageSource={require('@/assets/images/crossfit.png')}
@@ -170,7 +170,8 @@ export default function DashboardScreen() {
 				) : (
 					<>
 						{/* Servicios ya viene de UpcomingRoutinesSection en modo guest */}
-						<BirthdayOfferBanner onPress={() => console.log('Abrir vista de ofertas')} />
+						<BirthdayOfferBanner onPress={() => router.push('/memberships')} />
+
 						<RNText style={{ color: '#111827', fontWeight: '700', fontSize: 18, marginTop: 16, marginBottom: 8 }}>
 							Paquetes
 						</RNText>

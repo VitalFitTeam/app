@@ -55,7 +55,7 @@ export default function MembershipMethodsScreen() {
 
   return (
     <SafeAreaView className='flex-1 bg-black'>
-      <ScrollView className='flex-1 px-6 pt-4 pb-8'>
+      <ScrollView className='flex-1 px-6 pt-8 pb-32'>
         {/* Header y pasos */}
         <View className='mb-6'>
           <ThemedText
@@ -275,30 +275,32 @@ export default function MembershipMethodsScreen() {
           })}
         </View>
 
-        <PrimaryButton
-          title='Continuar'
-          onPress={() => {
-            const commonParams = {
-              id: params.id ?? '',
-              title: params.title ?? '',
-              price: params.price ?? '',
-              addonsJson: params.addonsJson ?? '',
-              branch: selectedBranch,
-              method: selectedMethod,
-            };
-            if (selectedMethod === 'pagomovil') {
-              router.push({
-                pathname: '/membership-payment-pagomovil',
-                params: commonParams,
-              } as never);
-            } else {
-              router.push({
-                pathname: '/membership-payment-transfer',
-                params: commonParams,
-              } as never);
-            }
-          }}
-        />
+        <View className='mt-6 mb-16'>
+          <PrimaryButton
+            title='Continuar'
+            onPress={() => {
+              const commonParams = {
+                id: params.id ?? '',
+                title: params.title ?? '',
+                price: params.price ?? '',
+                addonsJson: params.addonsJson ?? '',
+                branch: selectedBranch,
+                method: selectedMethod,
+              };
+              if (selectedMethod === 'pagomovil') {
+                router.push({
+                  pathname: '/membership-payment-pagomovil',
+                  params: commonParams,
+                } as never);
+              } else {
+                router.push({
+                  pathname: '/membership-payment-transfer',
+                  params: commonParams,
+                } as never);
+              }
+            }}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
