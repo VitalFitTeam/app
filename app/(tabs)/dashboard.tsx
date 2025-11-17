@@ -71,7 +71,6 @@ export default function DashboardScreen() {
 		}, [])
 	);
 
-
 	// Datos mock - reemplazar con llamadas a la API cuando estén disponibles
 	const mockChallenges = [
 		{ id: '1', title: 'Retos completados', current: 2, total: 5, iconType: 'trophy' as const },
