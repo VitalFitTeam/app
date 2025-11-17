@@ -61,7 +61,7 @@ export default function NotificationsScreen() {
 			<Stack.Screen options={{ headerShown: false }} />
 
 			<View className='flex-row items-center justify-between pt-14 pb-4 px-4 bg-white dark:bg-neutral-900'>
-				<TouchableOpacity onPress={() => router.back()} className='p-2'>
+				<TouchableOpacity onPress={() => router.replace('/(tabs)/profile')} className='p-2'>
 					<ChevronLeftIcon size={28} color='#F27F2A' />
 				</TouchableOpacity>
 				<ThemedText className='text-xl font-bold' style={{ fontFamily: Fonts.title }}>
