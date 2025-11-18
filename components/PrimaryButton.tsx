@@ -4,11 +4,11 @@ interface Props extends TouchableOpacityProps {
 	title: string;
 }
 
-export function PrimaryButton({ title, ...props }: Props) {
+export function PrimaryButton({ title, style, ...props }: Props) {
 	return (
 		<TouchableOpacity
-			className='h-14 w-full items-center justify-center rounded-md'
-			style={{ backgroundColor: '#f97316' }}
+			className='h-12 w-full items-center justify-center rounded-full'
+			style={[{ backgroundColor: '#f97316' }, style]}
 			{...props}>
 			<Text className='text-white text-base font-bold'>{title}</Text>
 		</TouchableOpacity>

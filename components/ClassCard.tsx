@@ -40,8 +40,8 @@ export default function ClassCard({
 		return (
 			<TouchableOpacity
 				onPress={() => onPress(classData)}
-				className='rounded-2xl overflow-hidden mb-4 bg-white'>
-				<View className='h-44 w-full rounded-2xl overflow-hidden'>
+				className='rounded-2xl overflow-hidden mb-4 bg-neutral-900'>
+				<View className='h-40 w-full rounded-2xl overflow-hidden'>
 					<Image
 						source={imageUrl}
 						style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
@@ -52,33 +52,51 @@ export default function ClassCard({
 					<View className='absolute inset-0 p-4 justify-between'>
 						<View className='flex-row justify-between items-start'>
 							<View>
-								<ThemedText className='text-white text-xl font-extrabold'>
+								<ThemedText
+									lightColor='#ffffff'
+									darkColor='#ffffff'
+									className='text-xl font-extrabold'>
 									{title}
 								</ThemedText>
-								<ThemedText className='text-white/90 mt-1 font-semibold'>
+								<ThemedText
+									lightColor='#e5e5e5'
+									darkColor='#e5e5e5'
+									className='mt-1 font-semibold'>
 									Today, {time}
 								</ThemedText>
-								<ThemedText className='text-white/80 text-xs mt-1'>
+								<ThemedText
+									lightColor='#d4d4d4'
+									darkColor='#d4d4d4'
+									className='text-xs mt-1'>
 									Disponibilidad
 								</ThemedText>
 							</View>
 							{!!(category || branch) && (
 								<View className='bg-white/20 rounded-full px-3 py-1'>
-									<ThemedText className='text-white text-xs font-semibold'>
+									<ThemedText
+										lightColor='#ffffff'
+										darkColor='#ffffff'
+										className='text-xs font-semibold'>
 										{category || 'categoría'}
 									</ThemedText>
 								</View>
 							)}
 						</View>
 						<View className='flex-row'>
-							<ThemedText className='text-white/80 text-xs'>
+							<ThemedText
+								lightColor='#e5e5e5'
+								darkColor='#e5e5e5'
+								className='text-xs'>
 								{instructor.replace(/^Con\s+/i, '')}
 							</ThemedText>
 						</View>
 					</View>
 					{reserved ? (
 						<View className='absolute top-3 left-3 bg-orange-500 rounded-full px-2 py-1'>
-							<ThemedText className='text-white text-xs font-bold'>
+							<ThemedText
+								lightColor='#ffffff'
+								darkColor='#ffffff'
+								className='text-xs font-bold'>
 								Reservado
 							</ThemedText>
 						</View>

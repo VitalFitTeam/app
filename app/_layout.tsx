@@ -103,7 +103,7 @@ export default function RootLayout() {
 						name='class-details'
 						options={{
 							title: 'Detalles de la Clase',
-							headerShown: true,
+							headerShown: false,
 							headerBackTitle: 'Volver',
 						}}
 					/>
