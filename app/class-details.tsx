@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/useToast';
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, ExclamationCircleIcon, StarIcon } from 'react-native-heroicons/solid';
 
 const styles = StyleSheet.create({
@@ -69,6 +69,7 @@ export default function ClassDetailsScreen() {
   const capNum = Number(capacity ?? 25);
   const occNumInitial = Number(occupied ?? 18);
   const [forceFull, setForceFull] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const isFullInitial = occNumInitial >= capNum;
   const effectiveFull = isFullInitial || forceFull;
   const occNum = effectiveFull ? capNum : occNumInitial;
@@ -268,7 +269,7 @@ export default function ClassDetailsScreen() {
                   return;
                 }
                 if (reserved) {
-                  await cancel(id);
+                  setShowCancelModal(true);
                   return;
                 }
                 const lowerTitle = String(title || '').toLowerCase();
@@ -294,6 +295,11 @@ export default function ClassDetailsScreen() {
                     imageUrl: img,
                   });
                   setForceFull(true);
+                  showToast(
+                    'success',
+                    'Clase reservada',
+                    'Su clase ha sido reservada correctamente'
+                  );
                   return;
                 }
                 await reserve({
@@ -323,6 +329,62 @@ export default function ClassDetailsScreen() {
           </ThemedText>
         </View>
       </ScrollView>
+
+      <Modal
+        visible={showCancelModal}
+        transparent
+        animationType='fade'
+        onRequestClose={() => setShowCancelModal(false)}>
+        <TouchableOpacity
+          activeOpacity={1}
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}
+          onPress={() => setShowCancelModal(false)}>
+          <View
+            style={{ backgroundColor: '#ffffff', borderRadius: 24, paddingVertical: 24, paddingHorizontal: 20, width: '100%', maxWidth: 360 }}>
+            <ThemedText
+              lightColor='#111827'
+              darkColor='#ffffff'
+              className='text-xl font-bold text-center mb-2'>
+              ¿Cancelar reserva?
+            </ThemedText>
+            <ThemedText
+              lightColor='#4b5563'
+              darkColor='#9ca3af'
+              className='text-sm text-center mb-6'>
+              Perderás tu cupo en esta clase. ¿Estás seguro?
+            </ThemedText>
+            <View className='gap-3'>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={async () => {
+                  await cancel(id);
+                  setShowCancelModal(false);
+                }}
+                className='py-3 rounded-2xl items-center'
+                style={{ backgroundColor: '#f97316' }}>
+                <ThemedText
+                  lightColor='#ffffff'
+                  darkColor='#ffffff'
+                  className='text-base font-bold'>
+                  Aceptar
+                </ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => setShowCancelModal(false)}
+                className='py-3 rounded-2xl items-center'
+                style={{ backgroundColor: '#e5e7eb' }}>
+                <ThemedText
+                  lightColor='#111827'
+                  darkColor='#ffffff'
+                  className='text-base font-bold'>
+                  Volver
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </ThemedView>
   );
 }
