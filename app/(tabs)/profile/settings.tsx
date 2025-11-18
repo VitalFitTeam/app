@@ -70,14 +70,18 @@ export default function SettingsScreen() {
 
 	const handleLogout = async () => {
 		try {
-			await AsyncStorage.removeItem('token');
-			await AsyncStorage.removeItem('userData');
+			await AsyncStorage.clear();
 			setShowLogoutModal(false);
 			router.replace('/(auth)/login');
+			setTimeout(() => {
+				router.dismissAll();
+			}, 50);
 		} catch (error) {
 			console.error('Error al cerrar sesión:', error);
 		}
 	};
+
+
 
 	return (
 		<View className='flex-1 bg-white dark:bg-neutral-900'>

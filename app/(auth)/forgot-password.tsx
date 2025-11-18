@@ -64,25 +64,47 @@ export default function ForgotPasswordScreen() {
     setIsLoading(true);
     try {
       await vitalFitApi.auth.forgotPassword(email);
-      showToast(
-        'success',
-        'Éxito',
-        'Si el correo existe, se ha enviado un código de recuperación.',
-      );
-      setStep(2);
     } catch (error: unknown) {
-      let errorMessage = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
+      // ⚠️ NO debemos revelar si el correo existe o no
       if (isAPIError(error)) {
-        errorMessage = error.messages.join(', ');
+        const msg = error.messages.join(', ').toLowerCase();
+
+        // ❗ Errores que NO deben bloquear el flujo
+        if (
+          msg.includes('not found') ||
+          msg.includes('no existe') ||
+          msg.includes('email') ||
+          msg.includes('usuario') ||
+          msg.includes('does not exist')
+        ) {
+          // Ignorar estos errores
+        } else {
+          // ❌ Este sí podría ser un error verdadero (500, red, etc.)
+          console.error('Error real al enviar correo:', error);
+          showToast('error', 'Error', 'Ocurrió un error inesperado. Inténtalo de nuevo.');
+          setIsLoading(false);
+          return;
+        }
       } else if (error instanceof Error) {
-        errorMessage = error.message;
+        // Errores no API (red caída, timeout...)
+        console.error('Error inesperado al enviar correo:', error);
+        showToast('error', 'Error', 'Ocurrió un error inesperado. Inténtalo de nuevo.');
+        setIsLoading(false);
+        return;
       }
-      console.error('Error al enviar correo:', error);
-      showToast('error', 'Error', errorMessage);
-    } finally {
-      setIsLoading(false);
     }
+
+    // Pase lo que pase, continúa
+    showToast(
+      'success',
+      'Éxito',
+      'Si el correo existe, se ha enviado un código de recuperación.'
+    );
+    setStep(2);
+
+    setIsLoading(false);
   };
+
 
   const handleValidateToken = async (code: string): Promise<void> => {
     setIsLoading(true);
