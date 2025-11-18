@@ -1,5 +1,5 @@
 import { ReservationsProvider } from '@/contexts/reservations';
-import { DarkTheme, ThemeProvider } from '@react-navigation/native';
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -24,7 +24,7 @@ export default function RootLayout() {
 
 	return (
 		<ReservationsProvider>
-			<ThemeProvider value={DarkTheme}>
+			<ThemeProvider value={DefaultTheme}>
 				<Stack>
 					<Stack.Screen name='index' options={{ headerShown: false }} />
 					<Stack.Screen name='(auth)' options={{ headerShown: false }} />

@@ -25,6 +25,7 @@ export const UserHeader: React.FC<Props> = ({
 	onBadgesPress,
 }) => {
 	const [showNotifications, setShowNotifications] = useState(false);
+	const firstName = name.split(' ')[0];
 
 	return (
 		<View className='mb-6'>
@@ -58,7 +59,7 @@ export const UserHeader: React.FC<Props> = ({
 								fontSize: 31,
 								color: '#000',
 							}}>
-							Hola, {name}
+							Hola, {firstName}
 						</Text>
 					</View>
 				</View>
