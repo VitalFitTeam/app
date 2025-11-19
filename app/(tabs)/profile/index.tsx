@@ -102,7 +102,7 @@ export default function ProfileScreen() {
 
 				<ProfileMenuItem
 					title="Membresía"
-					onPress={() => router.replace('/profile/cancel-membership')}
+					onPress={() => router.push('/membership-entry')}
 				/>
 
 				<ProfileMenuItem

@@ -1,8 +1,9 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { ScrollView, TextInput, View } from 'react-native';
+import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface PaymentParams {
@@ -43,6 +44,7 @@ export default function MembershipPaymentTransferScreen() {
   const [reference, setReference] = useState('');
   const [documentNumber, setDocumentNumber] = useState('');
   const [phone, setPhone] = useState('');
+  const phoneInputRef = useRef<IPhoneInputRef | null>(null);
 
   return (
     <SafeAreaView className='flex-1 bg-black'>
@@ -293,13 +295,34 @@ export default function MembershipPaymentTransferScreen() {
           >
             Teléfono
           </ThemedText>
-          <View className='border border-neutral-700 rounded-md h-12 px-3 justify-center bg-neutral-900'>
-            <TextInput
-              value={phone}
-              onChangeText={setPhone}
-              placeholder='Ingrese su número de teléfono'
-              placeholderTextColor='#6B7280'
-              className='text-white text-base'
+          <View className='border border-neutral-700 rounded-md bg-neutral-900 px-2 py-1 justify-center'>
+            <PhoneInput
+              ref={phoneInputRef}
+              value={phone || ''}
+              onChangePhoneNumber={(phoneNumber) => setPhone(phoneNumber)}
+              defaultCountry='VE'
+              placeholder='Número de teléfono'
+              phoneInputStyles={{
+                container: {
+                  backgroundColor: 'transparent',
+                  borderWidth: 0,
+                  height: 40,
+                },
+                flagContainer: {
+                  backgroundColor: 'transparent',
+                },
+                callingCode: {
+                  color: '#e5e7eb',
+                  fontSize: 14,
+                },
+                input: {
+                  color: '#ffffff',
+                  fontSize: 14,
+                },
+                divider: {
+                  backgroundColor: '#374151',
+                },
+              }}
             />
           </View>
         </View>

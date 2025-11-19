@@ -151,7 +151,7 @@ export default function DashboardScreen() {
 					hasMembership={hasMembership}
 					daysRemaining={15}
 					onQRPress={() => setQrModalVisible(true)}
-					onGetMembershipPress={() => router.push('/memberships')}
+					onGetMembershipPress={() => router.push('/membership-entry')}
 				/>
 
 				{hasMembership && <UpcomingClassesCarousel classes={mockClasses} />}
@@ -162,20 +162,20 @@ export default function DashboardScreen() {
 					onPrimaryActionPress={(id) =>
 						hasMembership
 							? router.push(`/routine/details?id=${id}`)
-							: router.push('/memberships')
+							: router.push('/membership-entry')
 					}
 				/>
 
 				{/* Banners adicionales */}
 				{hasMembership ? (
 					<View className='gap-3'>
-						<BirthdayOfferBanner onPress={() => router.push('/memberships')} />
+						<BirthdayOfferBanner onPress={() => router.push('/membership-entry')} />
 
 						<WeeklyChallengeBanner
 							onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
 						/>
 
-						<BirthdayOfferBanner onPress={() => router.push('/memberships')} />
+						<BirthdayOfferBanner onPress={() => router.push('/membership-entry')} />
 
 						<CrossFitBanner
 							imageSource={require('@/assets/images/crossfit.png')}
@@ -186,7 +186,7 @@ export default function DashboardScreen() {
 				) : (
 					<>
 						{/* Servicios ya viene de UpcomingRoutinesSection en modo guest */}
-						<BirthdayOfferBanner onPress={() => router.push('/memberships')} />
+						<BirthdayOfferBanner onPress={() => router.push('/membership-entry')} />
 
 						<RNText style={{ color: '#111827', fontWeight: '700', fontSize: 18, marginTop: 16, marginBottom: 8 }}>
 							Paquetes
@@ -195,12 +195,12 @@ export default function DashboardScreen() {
 							<CrossFitBanner
 								imageSource={require('@/assets/images/rutina.png')}
 								title='CrossFit - 4 sesiones'
-								onPress={() => router.push('/memberships')}
+								onPress={() => router.push('/membership-entry')}
 							/>
 							<CrossFitBanner
 								imageSource={require('@/assets/images/rutin.png')}
 								title='CrossFit - 4 sesiones'
-								onPress={() => router.push('/memberships')}
+								onPress={() => router.push('/membership-entry')}
 							/>
 						</View>
 						<View className='gap-3'>

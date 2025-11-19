@@ -12,14 +12,14 @@ import { Link, useRouter } from 'expo-router';
 import { Eye, EyeOff, SlidersVertical } from 'lucide-react-native';
 import { useState } from 'react';
 import {
-	Keyboard,
-	KeyboardAvoidingView,
-	Platform,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	TouchableWithoutFeedback,
-	View,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from 'react-native';
 export default function LoginScreen() {
 	const { toastState, showToast, hideToast } = useToast();
@@ -74,7 +74,8 @@ export default function LoginScreen() {
 			} else if (error instanceof Error) {
 				errorMessage = error.message;
 			}
-			console.error('Error en el login:', error);
+			console.error('Error en el login (detalle completo):', JSON.stringify(error, null, 2));
+			console.error('Error en el login (objeto bruto):', error);
 			showToast('error', 'Error al iniciar sesión', errorMessage);
 		} finally {
 			setIsLoading(false);

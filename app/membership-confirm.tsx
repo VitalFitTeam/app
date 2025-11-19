@@ -3,6 +3,7 @@ import { ThemedText } from '@/components/themed-text';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { ScrollView, View } from 'react-native';
+import { CheckCircleIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface ConfirmParams {
@@ -139,13 +140,7 @@ export default function MembershipConfirmScreen() {
         {/* Icono y mensaje de éxito */}
         <View className='items-center mb-6'>
           <View className='w-16 h-16 rounded-2xl bg-orange-500 items-center justify-center mb-3'>
-            <ThemedText
-              lightColor='#ffffff'
-              darkColor='#ffffff'
-              className='text-2xl'
-            >
-              ✔
-            </ThemedText>
+            <CheckCircleIcon size={40} color='#ffffff' />
           </View>
           <ThemedText
             lightColor='#ffffff'

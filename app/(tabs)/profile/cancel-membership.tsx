@@ -23,7 +23,7 @@ export default function CancelMembershipScreen() {
 				<View className='w-full'>
 					<SecondaryButton
 						title='Mantener membresía'
-						onPress={() => router.push('/memberships')}
+						onPress={() => router.push('/membership-entry')}
 					/>
 					<View className='h-4' />
 					<PrimaryButton

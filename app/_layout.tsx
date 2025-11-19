@@ -79,6 +79,13 @@ export default function RootLayout() {
 						}}
 					/>
 					<Stack.Screen
+						name='membership-entry'
+						options={{
+							title: '',
+							headerShown: false,
+						}}
+					/>
+					<Stack.Screen
 						name='memberships'
 						options={{
 							title: '',
@@ -103,7 +110,7 @@ export default function RootLayout() {
 						name='class-details'
 						options={{
 							title: 'Detalles de la Clase',
-							headerShown: true,
+							headerShown: false,
 							headerBackTitle: 'Volver',
 						}}
 					/>

@@ -10,20 +10,31 @@ export type RoutineChip = {
 
 export type RoutinesCarouselProps = {
   items: RoutineChip[];
-  onSelect?: (id: string) => void;
+  showTitle?: boolean;
+  titleText?: string;
+  titleColor?: string;
 };
 
-export default function RoutinesCarousel({ items }: RoutinesCarouselProps) {
+export default function RoutinesCarousel({
+  items,
+  showTitle = true,
+  titleText = 'Rutinas',
+  titleColor = '#111827',
+}: RoutinesCarouselProps) {
   return (
     <View style={{ marginBottom: 16 }}>
-      <Text style={{
-        fontFamily: 'BebasNeue-Regular',
-        fontSize: 28,
-        color: '#111827',
-        marginBottom: 8,
-      }}>
-        Rutinas
-      </Text>
+      {showTitle && (
+        <Text
+          style={{
+            fontFamily: 'BebasNeue-Regular',
+            fontSize: 28,
+            color: titleColor,
+            marginBottom: 8,
+          }}
+        >
+          {titleText}
+        </Text>
+      )}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 8 }}>
         {items.map((it) => (
           <LinearGradient
@@ -40,7 +51,8 @@ export default function RoutinesCarousel({ items }: RoutinesCarouselProps) {
               marginRight: 12,
               alignItems: 'center',
               justifyContent: 'center',
-            }}>
+            }}
+          >
             <View style={{ alignItems: 'center' }}>
               <Image source={it.image} style={{ width: 48, height: 48, tintColor: '#F27F2A', marginBottom: 10 }} resizeMode="contain" />
               <Text style={{ color: '#FFFFFF', fontWeight: '700', textAlign: 'center' }}>{it.label}</Text>
