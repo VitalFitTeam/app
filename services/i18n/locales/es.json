@@ -1,0 +1,136 @@
+{
+	"translation": {
+		"language": "Idioma",
+		"save": "Guardar",
+		"signIn": "Acceder",
+		"signUp": "Registrarse",
+		"slide1": "Desafía tus límites,\nconquista tus metas",
+		"slide2": "La disciplina es el\ncamino al éxito",
+		"slide3": "Sé constante,\nsé imparable",
+		"login": {
+			"title": "Iniciar Sesión",
+			"subtitle": "Ingresa tus credenciales para iniciar sesión",
+			"emailLabel": "Correo electrónico",
+			"emailPlaceholder": "Ingresa tu correo electrónico",
+			"passwordLabel": "Contraseña",
+			"passwordPlaceholder": "Ingresa tu contraseña",
+			"rememberMe": "Mantener sesión",
+			"forgotPassword": "¿Olvidaste tu contraseña? ",
+			"recover": "Recuperar",
+			"signInButton": "Iniciar sesión",
+			"signingInButton": "Iniciando...",
+			"googleSignIn": "Iniciar sesión con Google",
+			"noAccount": "¿No tienes cuenta aún? ",
+			"signUpLink": "Regístrate",
+			"toast": {
+				"errorTitle": "Error",
+				"loginErrorTitle": "Error al iniciar sesión",
+				"emptyFields": "Por favor, ingresa tu correo y contraseña.",
+				"invalidEmail": "Por favor, ingresa un correo electrónico válido.",
+				"unexpectedError": "Ocurrió un error inesperado. Inténtalo de nuevo."
+			}
+		},
+		"register": {
+        "step1Title": "¿CUÁL ES TU GÉNERO?",
+        "step2Title": "CREA TU CUENTA",
+        "step2Subtitle": "Ingresa tus credenciales para registrarte",
+        "step3Subtitle": "Completa tus datos para crear tu cuenta",
+        "alreadyHaveAccount": "¿Ya tienes una cuenta? ",
+        "signInLink": " Iniciar sesión",
+        "continueButton": "Continuar",
+        
+        "genderSelector": {
+            "female": "Mujer",
+            "male": "Hombre",
+            "preferNotToSay": "Prefiero no especificarlo"
+        },
+
+        "toast": {
+            "successTitle": "Revisa tu correo",
+            "successMessage": "Código enviado correctamente",
+            "errorTitle": "Error al registrar",
+            "unexpectedError": "Ocurrió un error inesperado. Inténtalo de nuevo."
+        }
+    },
+    "step2Credentials": {
+        "emailLabel": "Correo electrónico",
+        "passwordLabel": "Contraseña",
+        "confirmPasswordLabel": "Confirmar contraseña",
+        "continueButton": "Continuar",
+        "googleSignInButton": "Iniciar sesión con Google"
+    },
+    "step3PersonalDetails": {
+        "nameLabel": "Nombre",
+        "lastNameLabel": "Apellido",
+        "documentIdLabel": "Documento de identidad",
+        "birthDateLabel": "Fecha de nacimiento",
+        "phoneLabel": "Teléfono",
+        "phonePlaceholder": "Número de teléfono",
+        "acceptTerms": "Acepto los ",
+        "termsAndConditions": "términos y condiciones",
+        "createAccountButton": "Crear cuenta"
+    }
+  },
+	"forgotPassword": {
+      "titles": [
+        "RECUPERA TU CONTRASEÑA",
+        "VERIFICAR CÓDIGO",
+        "NUEVA CONTRASEÑA"
+      ],
+      "subtitles": {
+        "step1": "Ingresa el correo electrónico asociado a la cuenta para recuperar tu contraseña",
+        "step2": "Te hemos enviado un código a tu correo",
+        "step3": "Ingresa tu nueva contraseña"
+      },
+      "step1": {
+        "emailLabel": "Correo electrónico",
+        "emailPlaceholder": "tucorreo@email.com",
+        "sendCodeButton": "Enviar código",
+        "sendingCodeButton": "Enviando...",
+        "cancelButton": "Cancelar",
+        "toast": {
+          "errorTitle": "Error",
+          "successTitle": "Éxito",
+          "successMessage": "Si el correo existe, se ha enviado un código de recuperación."
+        }
+      },
+      "step2": {
+        "cancelButton": "Cancelar",
+        "toast": {
+          "errorTitle": "Error",
+          "errorMessage": "Ocurrió un error inesperado. Inténtalo de nuevo."
+        }
+      },
+      "step3": {
+        "passwordLabel": "Nueva contraseña",
+        "passwordPlaceholder": "Ingresa tu nueva contraseña",
+        "confirmPasswordLabel": "Confirmar contraseña",
+        "confirmPasswordPlaceholder": "Confirma tu nueva contraseña",
+        "saveButton": "Guardar",
+        "savingButton": "Guardando...",
+        "cancelButton": "Cancelar",
+        "toast": {
+          "successTitle": "¡Éxito!",
+          "successMessage": "Tu contraseña ha sido restablecida correctamente.",
+          "errorTitle": "Error",
+          "errorMessage": "Ocurrió un error inesperado. Inténtalo de nuevo."
+        }
+      }
+    },
+    "confirmEmail": {
+      "title": "VERIFICA TU CUENTA",
+      "subtitle": "Ingresa el código de verificación que enviamos a tu correo electrónico.",
+      "verifyButton": "Verificar cuenta",
+      "verifyingButton": "Verificando...",
+      "resendText": "¿No recibiste el código? ",
+      "resendLink": "Reenviar",
+      "toast": {
+        "successTitle": "Cuenta verificada",
+        "successMessage": "Bienvenido a VitalFit.",
+        "resendTitle": "Código enviado",
+        "resendMessage": "Revisa tu bandeja de entrada.",
+        "errorTitle": "Error",
+        "errorMessage": "Código inválido o error de conexión."
+      }
+    }
+}

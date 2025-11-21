@@ -17,9 +17,11 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SlidersVertical } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next'; // 1. Importamos el hook
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function ForgotPasswordScreen() {
+  const { t } = useTranslation(); // 2. Inicializamos traducción
   const [step, setStep] = useState<number>(1);
   const [email, setEmail] = useState<string>('');
   const [token, setToken] = useState<string>('');
@@ -48,16 +50,23 @@ export default function ForgotPasswordScreen() {
     }
   };
 
-  const titles = ['RECUPERA TU CONTRASEÑA', 'VERIFICAR CÓDIGO', 'NUEVA CONTRASEÑA'];
+  // 3. Mapeamos los títulos y subtítulos usando las claves del JSON
+  // Nota: i18next accede a arrays usando índices (0, 1, 2)
+  const titles = [
+    t('forgotPassword.titles.0'),
+    t('forgotPassword.titles.1'),
+    t('forgotPassword.titles.2'),
+  ];
+  
   const subtitles = [
-    'Ingresa el correo electrónico asociado a la cuenta para recuperar tu contraseña',
-    'Te hemos enviado un código a tu correo',
-    'Ingresa tu nueva contraseña',
+    t('forgotPassword.subtitles.step1'),
+    t('forgotPassword.subtitles.step2'),
+    t('forgotPassword.subtitles.step3'),
   ];
 
   const handleSendEmail = async (): Promise<void> => {
     if (!email) {
-      showToast('error', 'Error', 'Por favor, ingresa tu correo.');
+      showToast('error', t('forgotPassword.step1.toast.errorTitle'), t('login.toast.emptyFields'));
       return;
     }
 
@@ -65,11 +74,9 @@ export default function ForgotPasswordScreen() {
     try {
       await vitalFitApi.auth.forgotPassword(email);
     } catch (error: unknown) {
-      // ⚠️ NO debemos revelar si el correo existe o no
+      // Lógica de manejo de errores (se mantiene igual, solo traducimos el fallback)
       if (isAPIError(error)) {
         const msg = error.messages.join(', ').toLowerCase();
-
-        // ❗ Errores que NO deben bloquear el flujo
         if (
           msg.includes('not found') ||
           msg.includes('no existe') ||
@@ -77,34 +84,30 @@ export default function ForgotPasswordScreen() {
           msg.includes('usuario') ||
           msg.includes('does not exist')
         ) {
-          // Ignorar estos errores
+          // Ignorar
         } else {
-          // ❌ Este sí podría ser un error verdadero (500, red, etc.)
           console.error('Error real al enviar correo:', error);
-          showToast('error', 'Error', 'Ocurrió un error inesperado. Inténtalo de nuevo.');
+          showToast('error', t('forgotPassword.step1.toast.errorTitle'), t('login.toast.unexpectedError'));
           setIsLoading(false);
           return;
         }
       } else if (error instanceof Error) {
-        // Errores no API (red caída, timeout...)
         console.error('Error inesperado al enviar correo:', error);
-        showToast('error', 'Error', 'Ocurrió un error inesperado. Inténtalo de nuevo.');
+        showToast('error', t('forgotPassword.step1.toast.errorTitle'), t('login.toast.unexpectedError'));
         setIsLoading(false);
         return;
       }
     }
 
-    // Pase lo que pase, continúa
+    // Mensaje de éxito siempre se muestra por seguridad
     showToast(
       'success',
-      'Éxito',
-      'Si el correo existe, se ha enviado un código de recuperación.'
+      t('forgotPassword.step1.toast.successTitle'),
+      t('forgotPassword.step1.toast.successMessage')
     );
     setStep(2);
-
     setIsLoading(false);
   };
-
 
   const handleValidateToken = async (code: string): Promise<void> => {
     setIsLoading(true);
@@ -113,14 +116,14 @@ export default function ForgotPasswordScreen() {
       setToken(code);
       setStep(3);
     } catch (error: unknown) {
-      let errorMessage = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
+      let errorMessage = t('forgotPassword.step2.toast.errorMessage');
       if (isAPIError(error)) {
         errorMessage = error.messages.join(', ');
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
       console.error('Error al validar el código:', error);
-      showToast('error', 'Error', errorMessage);
+      showToast('error', t('forgotPassword.step2.toast.errorTitle'), errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -130,7 +133,7 @@ export default function ForgotPasswordScreen() {
     setIsLoading(true);
     try {
       if (!token) {
-        showToast('error', 'Error', 'Token de verificación no encontrado.');
+        showToast('error', t('forgotPassword.step3.toast.errorTitle'), 'Token not found');
         setIsLoading(false);
         return;
       }
@@ -144,23 +147,29 @@ export default function ForgotPasswordScreen() {
         },
       });
 
-      showToast('success', '¡Éxito!', 'Tu contraseña ha sido restablecida correctamente.');
+      showToast(
+        'success',
+        t('forgotPassword.step3.toast.successTitle'),
+        t('forgotPassword.step3.toast.successMessage')
+      );
+      
       setTimeout(() => {
         router.push('/(auth)/login');
       }, 2000);
     } catch (error: unknown) {
-      let errorMessage = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
+      let errorMessage = t('forgotPassword.step3.toast.errorMessage');
       if (isAPIError(error)) {
         errorMessage = error.messages.join(', ');
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
       console.error('Error al restablecer contraseña:', error);
-      showToast('error', 'Error', errorMessage);
+      showToast('error', t('forgotPassword.step3.toast.errorTitle'), errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <ThemedView style={styles.container}>
       <KeyboardAvoidingView
@@ -181,19 +190,19 @@ export default function ForgotPasswordScreen() {
             {step === 1 && (
               <>
                 <StyledTextInput
-                  label="Correo electrónico"
-                  placeholder="tucorreo@email.com"
+                  label={t('forgotPassword.step1.emailLabel')}
+                  placeholder={t('forgotPassword.step1.emailPlaceholder')}
                   keyboardType="email-address"
                   value={email}
                   onChangeText={setEmail}
                 />
                 <PrimaryButton
-                  title={isLoading ? 'Enviando...' : 'Enviar código'}
+                  title={isLoading ? t('forgotPassword.step1.sendingCodeButton') : t('forgotPassword.step1.sendCodeButton')}
                   onPress={handleSendEmail}
                   disabled={isLoading}
                 />
                 <SecondaryButton
-                  title="Cancelar"
+                  title={t('forgotPassword.step1.cancelButton')}
                   onPress={handleCancel}
                   style={{ marginTop: 12 }}
                 />
@@ -204,7 +213,7 @@ export default function ForgotPasswordScreen() {
               <>
                 <CodeInput onComplete={handleValidateToken} />
                 <SecondaryButton
-                  title="Cancelar"
+                  title={t('forgotPassword.step2.cancelButton')}
                   onPress={handleCancel}
                   style={{ marginTop: 12 }}
                 />
@@ -218,13 +227,14 @@ export default function ForgotPasswordScreen() {
                   name="password"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <StyledTextInput
-                      label="Nueva contraseña"
+                      label={t('forgotPassword.step3.passwordLabel')}
                       isPasswordInput
                       icon={<SlidersVertical size={16} color={Colors.light.icon} />}
                       value={value}
                       onBlur={onBlur}
                       onChangeText={onChange}
                       error={errors.password?.message}
+                      placeholder={t('forgotPassword.step3.passwordPlaceholder')}
                     />
                   )}
                 />
@@ -233,23 +243,24 @@ export default function ForgotPasswordScreen() {
                   name="confirmPassword"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <StyledTextInput
-                      label="Confirmar contraseña"
+                      label={t('forgotPassword.step3.confirmPasswordLabel')}
                       isPasswordInput
                       icon={<SlidersVertical size={16} color={Colors.light.icon} />}
                       value={value}
                       onBlur={onBlur}
                       onChangeText={onChange}
                       error={errors.confirmPassword?.message}
+                      placeholder={t('forgotPassword.step3.confirmPasswordPlaceholder')}
                     />
                   )}
                 />
                 <PrimaryButton
-                  title={isLoading ? 'Guardando...' : 'Guardar'}
+                  title={isLoading ? t('forgotPassword.step3.savingButton') : t('forgotPassword.step3.saveButton')}
                   onPress={handleSubmit(handleResetPassword)}
                   disabled={isLoading}
                 />
                 <SecondaryButton
-                  title="Cancelar"
+                  title={t('forgotPassword.step3.cancelButton')}
                   onPress={handleCancel}
                   style={{ marginTop: 12 }}
                 />

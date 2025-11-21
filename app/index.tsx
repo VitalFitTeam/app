@@ -1,12 +1,14 @@
+// app/index.tsx
 import { Montserrat_500Medium, Montserrat_700Bold, useFonts } from '@expo-google-fonts/montserrat';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
+import { Global } from 'iconsax-react-native';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next'; // 1. Importa el hook
 import { Image, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundCarousel, SignInButton, SignUpButton } from '../components/auth/home';
 
-import { Global } from 'iconsax-react-native';
 export default function HomeScreen() {
 	const [index, setIndex] = useState(0);
 	const [fontsLoaded] = useFonts({
@@ -15,6 +17,10 @@ export default function HomeScreen() {
 	});
 	const insets = useSafeAreaInsets();
 	const router = useRouter();
+	const { t } = useTranslation(); // 2. Obtén la función 't'
+
+	// 3. Define los textos de los slides usando 't'
+	const slideTexts = [t('slide1'), t('slide2'), t('slide3')];
 
 	if (!fontsLoaded) return null;
 
@@ -53,14 +59,9 @@ export default function HomeScreen() {
 					paddingHorizontal: 24,
 					paddingTop: 48,
 				}}>
+				{/* 4. Usa el array de textos traducidos */}
 				<Text className='text-white text-[30px] font-montserrat-bold text-center leading-[36px] mb-6'>
-					{
-						[
-							'Desafía tus límites,\nconquista tus metas',
-							'La disciplina es el\ncamino al éxito',
-							'Sé constante,\nsé imparable',
-						][index]
-					}
+					{slideTexts[index]}
 				</Text>
 
 				<View className='flex-row justify-center mb-6'>
@@ -73,12 +74,17 @@ export default function HomeScreen() {
 						/>
 					))}
 				</View>
-				<TouchableOpacity
-					className='flex-row items-center justify-center py-2 mb-4'
-					onPress={() => router.push('/language')}>
-					<Global color='white' size={16} variant='Outline' />
-					<Text className='text-white ml-2 text-sm font-montserrat-medium'>Idioma</Text>
-				</TouchableOpacity>
+
+				{/* 5. Usa 't' para el botón de idioma */}
+				<Link href='/language' asChild>
+					<TouchableOpacity className='flex-row items-center justify-center py-2 mb-4'>
+						<Global color='white' size={16} variant='Outline' />
+						<Text className='text-white ml-2 text-sm font-montserrat-medium'>
+							{t('language')}
+						</Text>
+					</TouchableOpacity>
+				</Link>
+
 				<View
 					style={{
 						flexDirection: 'row',
@@ -89,15 +95,16 @@ export default function HomeScreen() {
 						marginTop: 16,
 					}}>
 					<View style={{ flex: 1, marginRight: 8 }}>
+						{/* 6. Usa 't' para las etiquetas de los botones */}
 						<SignInButton
-							label='Acceder'
+							label={t('Login')}
 							onPress={() => router.push('/(auth)/login')}
 						/>
 					</View>
 
 					<View style={{ flex: 1, marginLeft: 8 }}>
 						<SignUpButton
-							label='Registrarse'
+							label={t('Register')}
 							onPress={() => router.push('/(auth)/register')}
 						/>
 					</View>
