@@ -1,7 +1,12 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
+import {
+    MembershipPagoMovilPaymentData,
+    MembershipPagoMovilPaymentSchema,
+} from '@/schemas/membership';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
+import { useForm } from 'react-hook-form';
 import { ScrollView, TextInput, View } from 'react-native';
 import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -41,10 +46,53 @@ export default function MembershipPaymentPagoMovilScreen() {
   const addonsTotal = selectedAddons.reduce((sum, addon) => sum + addon.price, 0);
   const totalPrice = basePrice + addonsTotal;
 
-  const [reference, setReference] = useState('');
-  const [documentNumber, setDocumentNumber] = useState('');
-  const [phone, setPhone] = useState('');
-  const phoneInputRef = useRef<IPhoneInputRef | null>(null);
+  const {
+    getValues,
+    setError,
+    setValue,
+    clearErrors,
+    formState: { errors },
+  } = useForm<MembershipPagoMovilPaymentData>({
+    defaultValues: {
+      id: params.id ?? '',
+      title: params.title ?? '',
+      price: params.price ?? '',
+      branch: params.branch ?? '',
+      addonsJson: params.addonsJson ?? '',
+      reference: '',
+      documentNumber: '',
+      phone: '',
+    },
+  });
+
+  const onConfirm = () => {
+    const result = MembershipPagoMovilPaymentSchema.safeParse(getValues());
+
+    if (!result.success) {
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as keyof MembershipPagoMovilPaymentData;
+        setError(field, {
+          type: 'manual',
+          message: issue.message,
+        });
+      });
+      return;
+    }
+
+    const data = result.data;
+
+    router.push({
+      pathname: '/membership-confirm',
+      params: {
+        id: data.id,
+        title: data.title,
+        price: data.price,
+        branch: data.branch,
+        method: 'pagomovil',
+        addonsJson: data.addonsJson ?? '',
+      },
+    } as never);
+  };
 
   return (
     <SafeAreaView className='flex-1 bg-black'>
@@ -261,10 +309,22 @@ export default function MembershipPaymentPagoMovilScreen() {
           >
             Referencia
           </ThemedText>
+          {errors.reference?.message && (
+            <ThemedText
+              lightColor='#ef4444'
+              darkColor='#ef4444'
+              className='text-xs mb-1'
+            >
+              {errors.reference.message}
+            </ThemedText>
+          )}
           <View className='border border-neutral-700 rounded-md h-12 px-3 justify-center bg-neutral-900 mb-5'>
             <TextInput
-              value={reference}
-              onChangeText={setReference}
+              value={getValues('reference')}
+              onChangeText={(text) => {
+                setValue('reference', text, { shouldValidate: true });
+                clearErrors('reference');
+              }}
               placeholder='Ingrese la referencia'
               placeholderTextColor='#6B7280'
               className='text-white text-base'
@@ -278,10 +338,22 @@ export default function MembershipPaymentPagoMovilScreen() {
           >
             Número de documento
           </ThemedText>
+          {errors.documentNumber?.message && (
+            <ThemedText
+              lightColor='#ef4444'
+              darkColor='#ef4444'
+              className='text-xs mb-1'
+            >
+              {errors.documentNumber.message}
+            </ThemedText>
+          )}
           <View className='border border-neutral-700 rounded-md h-12 px-3 justify-center bg-neutral-900 mb-5'>
             <TextInput
-              value={documentNumber}
-              onChangeText={setDocumentNumber}
+              value={getValues('documentNumber')}
+              onChangeText={(text) => {
+                setValue('documentNumber', text, { shouldValidate: true });
+                clearErrors('documentNumber');
+              }}
               placeholder='Ingrese su número de documento'
               placeholderTextColor='#6B7280'
               className='text-white text-base'
@@ -295,11 +367,23 @@ export default function MembershipPaymentPagoMovilScreen() {
           >
             Teléfono
           </ThemedText>
+          {errors.phone?.message && (
+            <ThemedText
+              lightColor='#ef4444'
+              darkColor='#ef4444'
+              className='text-xs mb-1'
+            >
+              {errors.phone.message}
+            </ThemedText>
+          )}
           <View className='border border-neutral-700 rounded-md bg-neutral-900 px-2 py-1 justify-center'>
             <PhoneInput
-              ref={phoneInputRef}
-              value={phone || ''}
-              onChangePhoneNumber={(phoneNumber) => setPhone(phoneNumber)}
+              ref={useRef<IPhoneInputRef | null>(null)}
+              value={getValues('phone') || ''}
+              onChangePhoneNumber={(phoneNumber) => {
+                setValue('phone', phoneNumber, { shouldValidate: true });
+                clearErrors('phone');
+              }}
               defaultCountry='VE'
               placeholder='Número de teléfono'
               phoneInputStyles={{
@@ -359,19 +443,7 @@ export default function MembershipPaymentPagoMovilScreen() {
         <View className='mb-16'>
           <PrimaryButton
             title='Confirmar pago'
-            onPress={() => {
-              router.push({
-                pathname: '/membership-confirm',
-                params: {
-                  id: params.id ?? '',
-                  title: params.title ?? '',
-                  price: params.price ?? '',
-                  branch: params.branch ?? '',
-                  method: 'pagomovil',
-                  addonsJson: params.addonsJson ?? '',
-                },
-              } as never);
-            }}
+            onPress={onConfirm}
           />
         </View>
       </ScrollView>

@@ -1,8 +1,10 @@
 import { MonthCalendar } from '@/components/auth/dashboard/monthcalendar';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
+import { MembershipCheckoutData, MembershipCheckoutSchema } from '@/schemas/membership';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
+import { useForm } from 'react-hook-form';
 import { ScrollView, View } from 'react-native';
 import { CheckCircleIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -32,7 +34,49 @@ const PLAN_BENEFITS: Record<string, string[]> = {
 export default function MembershipCheckoutScreen() {
 	const params = useLocalSearchParams<{ id?: string; title?: string; price?: string }>();
 	const router = useRouter();
-	const [startDate, setStartDate] = useState('');
+
+	const {
+		getValues,
+		setError,
+		setValue,
+		clearErrors,
+		formState: { errors },
+	} = useForm<MembershipCheckoutData>({
+		defaultValues: {
+			startDate: '',
+		},
+	});
+
+	const onContinue = () => {
+		const result = MembershipCheckoutSchema.safeParse(getValues());
+
+		if (!result.success) {
+			result.error.issues.forEach((issue) => {
+				const field = issue.path[0] as keyof MembershipCheckoutData;
+				setError(field, {
+					type: 'manual',
+					message: issue.message,
+				});
+			});
+			return;
+		}
+
+		const data = result.data;
+
+		if (!params.id || !params.title || !params.price) {
+			return;
+		}
+
+		router.push({
+			pathname: '/membership-extra',
+			params: {
+				id: params.id,
+				title: params.title,
+				price: params.price,
+				startDate: data.startDate,
+			},
+		} as never);
+	};
 
 	const benefits = useMemo(() => {
 		if (!params.id) return [];
@@ -178,11 +222,20 @@ export default function MembershipCheckoutScreen() {
 						className='text-sm mb-2'>
 						Fecha de inicio
 					</ThemedText>
+					{errors.startDate?.message && (
+						<ThemedText
+							lightColor='#ef4444'
+							darkColor='#ef4444'
+							className='text-xs mb-2'>
+							{errors.startDate.message}
+						</ThemedText>
+					)}
 					<View>
 						<MonthCalendar
-							initialDate={startDate || undefined}
+							initialDate={undefined}
 							onDateSelect={(day) => {
-								setStartDate(day.dateString);
+								setValue('startDate', day.dateString, { shouldValidate: true });
+								clearErrors('startDate');
 							}}
 						/>
 					</View>
@@ -191,16 +244,7 @@ export default function MembershipCheckoutScreen() {
 				<View className='mb-16'>
 					<PrimaryButton
 						title='Continuar'
-						onPress={() => {
-							router.push({
-								pathname: '/membership-extra',
-								params: {
-									id: params.id ?? '',
-									title: params.title ?? '',
-									price: params.price ?? '',
-								},
-							} as never);
-						}}
+						onPress={onContinue}
 					/>
 				</View>
 			</ScrollView>
