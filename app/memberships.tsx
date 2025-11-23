@@ -9,27 +9,36 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const membershipPlans = [
 	{
 		id: 'free-trial',
-		title: 'Free Trial',
+		title: 'FREE TRIAL',
 		price: '0',
-		features: ['7 días de prueba gratuita'],
+		features: ['7 días de acceso libres'],
+		period: '',
+		isFree: true,
+		badgeLabel: 'Gratis',
 	},
 	{
 		id: 'advanced',
-		title: 'Suscripción Avanzada',
+		title: 'SUSCRIPCIÓN AVANZADA',
 		price: '75',
 		features: ['Más beneficios para tu vida fitness'],
+		period: '/mes',
+		isFree: false,
 	},
 	{
 		id: 'athlete',
-		title: 'Paquete Atleta',
+		title: 'PAQUETE ATLETA',
 		price: '500',
 		features: ['La mejor relación calidad-precio'],
+		period: '/año',
+		isFree: false,
 	},
 	{
 		id: 'premium',
-		title: 'Suscripción Premium',
+		title: 'SUSCRIPCIÓN AVANZADA',
 		price: '105',
-		features: ['Máximos beneficios para tu vida fitness'],
+		features: ['Más beneficios para tu vida fitness'],
+		period: '/3 meses',
+		isFree: false,
 	},
 ];
 
@@ -39,7 +48,7 @@ export default function MembershipsScreen() {
 	const selectedPlan = membershipPlans.find(plan => plan.id === selectedPlanId);
 
 	return (
-		<SafeAreaView className='flex-1 bg-black'>
+		<SafeAreaView className='flex-1 bg-white'>
 			<ImageBackground
 				source={require('@/assets/images/chicafit.png')}
 				className='flex-1'>
@@ -52,19 +61,22 @@ export default function MembershipsScreen() {
 										<ThemedText
 											lightColor='#f97316'
 											darkColor='#f97316'
-											className='text-xs tracking-[0.25em] mb-1 text-center'>
+											className='text-lg tracking-[0.25em] mb-1 text-center'
+											style={{ fontFamily: 'BebasNeue-Regular' }}>
 											NUESTRAS
 										</ThemedText>
 										<ThemedText
 											lightColor='#f97316'
 											darkColor='#f97316'
-											className='text-4xl font-extrabold mb-2 text-center'>
-											MEMBRESIAS
+											className='text-6xl mb-3 text-center'
+											style={{ fontFamily: 'BebasNeue-Regular' }}>
+											MEMBRESÍAS
 										</ThemedText>
 										<ThemedText
-											lightColor='#e5e7eb'
+											lightColor='#ffffff'
 											darkColor='#e5e7eb'
-											className='text-sm px-2 text-center'>
+											className='text-sm px-2 text-center'
+											style={{ fontFamily: 'Montserrat_400Regular' }}>
 											Elige el plan que mejor se adapte a tus necesidades y objetivos de fitness.
 										</ThemedText>
 									</View>
@@ -78,6 +90,9 @@ export default function MembershipsScreen() {
 										title={plan.title}
 										price={plan.price}
 										features={plan.features}
+										period={plan.period}
+										isFree={plan.isFree}
+										badgeLabel={plan.badgeLabel}
 										isSelected={selectedPlanId === plan.id}
 										onPress={() => setSelectedPlanId(plan.id)}
 									/>
@@ -92,7 +107,8 @@ export default function MembershipsScreen() {
 												`/membership-checkout` +
 												`?id=${selectedPlan.id}` +
 												`&title=${encodeURIComponent(selectedPlan.title)}` +
-												`&price=${selectedPlan.price}`;
+												`&price=${selectedPlan.price}` +
+												`&period=${encodeURIComponent(selectedPlan.period ?? '')}`;
 											router.push(href as never);
 										}}
 									/>

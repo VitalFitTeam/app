@@ -1,12 +1,15 @@
-import { MonthCalendar } from '@/components/auth/dashboard/monthcalendar';
 import { PrimaryButton } from '@/components/PrimaryButton';
+import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedText } from '@/components/themed-text';
 import { MembershipCheckoutData, MembershipCheckoutSchema } from '@/schemas/membership';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
+import { Calendar } from 'lucide-react-native';
+import React, { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ScrollView, View } from 'react-native';
-import { CheckCircleIcon } from 'react-native-heroicons/solid';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { CheckCircleIcon, TrashIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const PLAN_BENEFITS: Record<string, string[]> = {
@@ -32,8 +35,9 @@ const PLAN_BENEFITS: Record<string, string[]> = {
 };
 
 export default function MembershipCheckoutScreen() {
-	const params = useLocalSearchParams<{ id?: string; title?: string; price?: string }>();
+	const params = useLocalSearchParams<{ id?: string; title?: string; price?: string; period?: string }>();
 	const router = useRouter();
+	const [showDatePicker, setShowDatePicker] = useState(false);
 
 	const {
 		getValues,
@@ -86,75 +90,82 @@ export default function MembershipCheckoutScreen() {
 	const currentStep: number = 1;
 
 	return (
-		<SafeAreaView className='flex-1 bg-black'>
+		<SafeAreaView className='flex-1 bg-white'>
 			<ScrollView className='flex-1 px-6 pt-8 pb-32'>
 				<View className='mb-6'>
 					<ThemedText
 						lightColor='#f97316'
 						darkColor='#f97316'
-						className='text-2xl font-extrabold mb-4 text-center'>
+						className='text-4xl mb-4 text-center'
+						style={{ fontFamily: 'BebasNeue-Regular' }}>
 						COMPRAR MEMBRESÍA
 					</ThemedText>
 					<View className='flex-row justify-between items-center mb-4'>
 						<View className='items-center flex-1'>
 							<View
-								className={`w-8 h-8 rounded-full items-center justify-center mb-1 ${
-									currentStep === 1 ? 'bg-orange-500' : 'bg-white'
+								className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
+									currentStep === 1 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
 								}`}> 
 								<ThemedText
-									lightColor={currentStep === 1 ? '#ffffff' : '#000000'}
-									darkColor={currentStep === 1 ? '#ffffff' : '#000000'}
-									className='text-xs font-semibold'
+									lightColor={currentStep === 1 ? '#ffffff' : '#111827'}
+									darkColor={currentStep === 1 ? '#ffffff' : '#111827'}
+									className='text-[10px] font-semibold'
+									style={{ fontFamily: 'Montserrat_500Medium' }}
 								>
 									1
 								</ThemedText>
 							</View>
 							<ThemedText
-								lightColor={currentStep === 1 ? '#f97316' : '#ffffff'}
-								darkColor={currentStep === 1 ? '#f97316' : '#ffffff'}
-								className='text-xs text-center'
+								lightColor={currentStep === 1 ? '#f97316' : '#111827'}
+								darkColor={currentStep === 1 ? '#f97316' : '#111827'}
+								className='text-[11px] text-center'
+								style={{ fontFamily: 'Montserrat_500Medium' }}
 							>
 								Opciones de producto
 							</ThemedText>
 						</View>
 						<View className='items-center flex-1'>
 							<View
-								className={`w-8 h-8 rounded-full items-center justify-center mb-1 ${
-									currentStep === 2 ? 'bg-orange-500' : 'bg-white'
+								className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
+									currentStep === 2 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
 								}`}> 
 								<ThemedText
-									lightColor={currentStep === 2 ? '#ffffff' : '#000000'}
-									darkColor={currentStep === 2 ? '#ffffff' : '#000000'}
-									className='text-xs font-semibold'
+									lightColor={currentStep === 2 ? '#ffffff' : '#111827'}
+									darkColor={currentStep === 2 ? '#ffffff' : '#111827'}
+									className='text-[10px] font-semibold'
+									style={{ fontFamily: 'Montserrat_500Medium' }}
 								>
 									2
 								</ThemedText>
 							</View>
 							<ThemedText
-								lightColor={currentStep === 2 ? '#f97316' : '#ffffff'}
-								darkColor={currentStep === 2 ? '#f97316' : '#ffffff'}
-								className='text-xs text-center'
+								lightColor={currentStep === 2 ? '#f97316' : '#111827'}
+								darkColor={currentStep === 2 ? '#f97316' : '#111827'}
+								className='text-[11px] text-center'
+								style={{ fontFamily: 'Montserrat_500Medium' }}
 							>
 								Métodos de pago
 							</ThemedText>
 						</View>
 						<View className='items-center flex-1'>
 							<View
-								className={`w-8 h-8 rounded-full items-center justify-center mb-1 ${
-									currentStep === 3 ? 'bg-orange-500' : 'bg-white'
+								className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
+									currentStep === 3 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
 								}`}> 
 								<ThemedText
-									lightColor={currentStep === 3 ? '#ffffff' : '#000000'}
-									darkColor={currentStep === 3 ? '#ffffff' : '#000000'}
-									className='text-xs font-semibold'
+									lightColor={currentStep === 3 ? '#ffffff' : '#111827'}
+									darkColor={currentStep === 3 ? '#ffffff' : '#111827'}
+									className='text-[10px] font-semibold'
+									style={{ fontFamily: 'Montserrat_500Medium' }}
 								>
 									3
 								</ThemedText>
 							</View>
 							<ThemedText
-								lightColor={currentStep === 3 ? '#f97316' : '#ffffff'}
-								darkColor={currentStep === 3 ? '#f97316' : '#ffffff'}
-								className='text-xs text-center'
+								lightColor={currentStep === 3 ? '#f97316' : '#111827'}
+								darkColor={currentStep === 3 ? '#f97316' : '#111827'}
+								className='text-[11px] text-center'
+								style={{ fontFamily: 'Montserrat_500Medium' }}
 							>
 								Confirmación de compra
 							</ThemedText>
@@ -163,53 +174,60 @@ export default function MembershipCheckoutScreen() {
 				</View>
 
 				<View className='mb-6'>
-					<ThemedText
-						lightColor='#f97316'
-						darkColor='#f97316'
-						className='text-xs tracking-[0.2em] mb-1'>
-						SUSCRIPCIÓN
-					</ThemedText>
-					<View className='flex-row items-baseline justify-between'>
+					<View className='flex-row items-center justify-between'>
 						<View className='flex-1 mr-2'>
 							<ThemedText
-								lightColor='#ffffff'
+								lightColor='#111827'
 								darkColor='#ffffff'
-								className='text-xl font-extrabold mb-1'>
-								{params.title ?? 'Plan seleccionado'}
-							</ThemedText>
+								className='text-xl mb-1'
+								style={{ fontFamily: 'Montserrat_400Regular' }}>
+									{params.title ?? 'Plan seleccionado'}
+								</ThemedText>
 							<ThemedText
-								lightColor='#d1d5db'
+								lightColor='#4b5563'
 								darkColor='#d1d5db'
-								className='text-xs'>
-								Más beneficios para tu vida fitness
-							</ThemedText>
+								className='text-xs'
+								style={{ fontFamily: 'Montserrat_400Regular' }}>
+									Más beneficios para tu vida fitness
+								</ThemedText>
 						</View>
-						<View className='items-end'>
-							<ThemedText
-								lightColor='#ffffff'
-								darkColor='#ffffff'
-								className='text-2xl font-extrabold'>
-								${params.price ?? '--'}
-							</ThemedText>
-							<ThemedText
-								lightColor='#d1d5db'
-								darkColor='#d1d5db'
-								className='text-xs mt-[-4]'>
-								/mes
-							</ThemedText>
+						<View className='flex-row items-center'>
+							<View className='items-end mr-3'>
+								<ThemedText
+									lightColor='#111827'
+									darkColor='#ffffff'
+									className='text-2xl'
+									style={{ fontFamily: 'Montserrat_700Bold' }}>
+									${params.price ?? '--'}
+								</ThemedText>
+								<ThemedText
+									lightColor='#4b5563'
+									darkColor='#d1d5db'
+									className='text-xs mt-[-4]'
+									style={{ fontFamily: 'Montserrat_500Medium' }}>
+									{params.period ?? ''}
+								</ThemedText>
+							</View>
+							<TouchableOpacity
+								activeOpacity={0.8}
+								onPress={() => router.back()}
+								className='p-1'>
+								<TrashIcon size={18} color='#111827' />
+							</TouchableOpacity>
 						</View>
 					</View>
 				</View>
-				
+
 				<View className='mb-6'>
-					{benefits.map(benefit => (
+					{benefits.map((benefit) => (
 						<View key={benefit} className='flex-row items-center mb-3'>
 							<CheckCircleIcon size={18} color='#F97316' />
 							<ThemedText
-								lightColor='#e5e7eb'
+								lightColor='#111827'
 								darkColor='#e5e7eb'
-								className='text-sm ml-2'>
-								{benefit}
+								className='text-sm ml-2'
+								style={{ fontFamily: 'Montserrat_400Regular' }}>
+									{benefit}
 							</ThemedText>
 						</View>
 					))}
@@ -217,27 +235,47 @@ export default function MembershipCheckoutScreen() {
 				
 				<View className='mb-8'>
 					<ThemedText
-						lightColor='#e5e7eb'
+						lightColor='#111827'
 						darkColor='#e5e7eb'
-						className='text-sm mb-2'>
+						className='text-sm mb-2'
+						style={{ fontFamily: 'Montserrat_500Medium' }}>
 						Fecha de inicio
 					</ThemedText>
 					{errors.startDate?.message && (
-						<ThemedText
-							lightColor='#ef4444'
-							darkColor='#ef4444'
-							className='text-xs mb-2'>
+						<Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>
 							{errors.startDate.message}
-						</ThemedText>
+						</Text>
 					)}
 					<View>
-						<MonthCalendar
-							initialDate={undefined}
-							onDateSelect={(day) => {
-								setValue('startDate', day.dateString, { shouldValidate: true });
-								clearErrors('startDate');
-							}}
-						/>
+						<TouchableOpacity
+							activeOpacity={0.8}
+							onPress={() => setShowDatePicker(true)}
+							style={{ position: 'relative' }}>
+							<StyledTextInput
+								label={undefined}
+								value={getValues('startDate') ? format(new Date(getValues('startDate')), 'yyyy-MM-dd') : ''}
+								editable={false}
+								pointerEvents='none'
+							/>
+							<View style={{ position: 'absolute', right: 12, bottom: 12 }}>
+								<Calendar size={20} color='#111827' />
+							</View>
+						</TouchableOpacity>
+						{showDatePicker && (
+							<DateTimePicker
+								value={getValues('startDate') ? new Date(getValues('startDate')) : new Date()}
+								mode='date'
+								display='default'
+								minimumDate={new Date()}
+								onChange={(_, selectedDate) => {
+									setShowDatePicker(false);
+									if (selectedDate) {
+										setValue('startDate', selectedDate.toISOString(), { shouldValidate: true });
+										clearErrors('startDate');
+									}
+								}}
+							/>
+						)}
 					</View>
 				</View>
 

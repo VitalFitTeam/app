@@ -54,7 +54,7 @@ export default function MembershipPaymentScreen() {
   const selectedBranch = BRANCH_OPTIONS[selectedBranchIndex] ?? BRANCH_OPTIONS[0];
 
   return (
-    <SafeAreaView className='flex-1 bg-black'>
+    <SafeAreaView className='flex-1 bg-white'>
       <ScrollView className='flex-1 px-6 pt-4 pb-8'>
         <View className='mb-6'>
           <ThemedText
