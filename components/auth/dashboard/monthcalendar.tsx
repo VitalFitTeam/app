@@ -27,15 +27,15 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
 				markedDates={markedDates}
 				onDayPress={(day) => onDateSelect?.(day)}
 				theme={{
-					backgroundColor: '#0a0a0a',
-					calendarBackground: '#0a0a0a',
-					textSectionTitleColor: '#9CA3AF',
-					monthTextColor: '#E5E7EB',
-					dayTextColor: '#E5E7EB',
-					todayTextColor: '#F27F2A',
-					textDisabledColor: '#4B5563',
-					arrowColor: '#E5E7EB',
-					selectedDayBackgroundColor: '#F27F2A',
+					backgroundColor: '#ffffff',
+					calendarBackground: '#ffffff',
+					textSectionTitleColor: '#6B7280',
+					monthTextColor: '#111827',
+					dayTextColor: '#111827',
+					todayTextColor: '#F97316',
+					textDisabledColor: '#D1D5DB',
+					arrowColor: '#111827',
+					selectedDayBackgroundColor: '#F97316',
 					selectedDayTextColor: '#FFFFFF',
 				}}
 				hideExtraDays={false}
@@ -47,9 +47,9 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
 
 const styles = StyleSheet.create({
 	wrapper: {
-		borderWidth: 0.75,
-		borderColor: '#1F1F1F',
-		borderRadius: 10,
+		borderWidth: 1,
+		borderColor: '#e5e7eb',
+		borderRadius: 12,
 		overflow: 'hidden',
 	},
 });

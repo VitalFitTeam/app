@@ -105,7 +105,7 @@ export default function ClassDetailsScreen() {
 
   return (
     <ThemedView
-      lightColor='#050816'
+      lightColor='#FFFFFF'
       darkColor='#050816'
       className='flex-1 p-4 pt-12'>
       <ToastNotification
@@ -119,17 +119,19 @@ export default function ClassDetailsScreen() {
         <Image source={heroSource} style={styles.heroImage} contentFit='cover' />
 
         <ThemedText
-          lightColor='#ffffff'
+          lightColor='#111827'
           darkColor='#ffffff'
-          className='text-3xl font-extrabold mt-4 mb-1'>
+          className='text-3xl font-extrabold mt-4 mb-1'
+          style={{ fontFamily: 'BebasNeue-Regular' }}>
           {String(title || 'Nombre de la clase').toUpperCase()}
         </ThemedText>
 
         <View className='mb-1'>
           <ThemedText
-            lightColor='#d4d4d4'
+            lightColor='#6b7280'
             darkColor='#d4d4d4'
-            className='text-sm'>
+            className='text-sm'
+            style={{ fontFamily: 'Montserrat_400Regular' }}>
             {todayFormatted}
           </ThemedText>
         </View>
@@ -154,9 +156,10 @@ export default function ClassDetailsScreen() {
 
         <View className='mb-1'>
           <ThemedText
-            lightColor={effectiveFull ? '#fca5a5' : '#e5e5e5'}
+            lightColor={effectiveFull ? '#b91c1c' : '#4b5563'}
             darkColor={effectiveFull ? '#fca5a5' : '#e5e5e5'}
-            className='text-sm'>
+            className='text-sm'
+            style={{ fontFamily: 'Montserrat_500Medium' }}>
             {occNum} / {capNum} cupos ocupados
           </ThemedText>
         </View>
@@ -186,9 +189,10 @@ export default function ClassDetailsScreen() {
         <View className='flex-row items-center mb-3'>
           <StarIcon size={16} color='#F59E0B' />
           <ThemedText
-            lightColor='#e5e5e5'
+            lightColor='#4b5563'
             darkColor='#e5e5e5'
-            className='ml-2 text-sm'>
+            className='ml-2 text-sm'
+            style={{ fontFamily: 'Montserrat_400Regular' }}>
             4.9 (231 reviews)
           </ThemedText>
         </View>
@@ -200,24 +204,27 @@ export default function ClassDetailsScreen() {
             contentFit='cover'
           />
           <ThemedText
-            lightColor='#e5e5e5'
+            lightColor='#4b5563'
             darkColor='#e5e5e5'
-            className='ml-2'>
+            className='ml-2'
+            style={{ fontFamily: 'Montserrat_500Medium' }}>
             {String(instructor || 'Nombre del Instructor')}
           </ThemedText>
         </View>
 
         <View className='mb-4'>
           <ThemedText
-            lightColor='#ffffff'
+            lightColor='#111827'
             darkColor='#ffffff'
-            className='mb-1'>
+            className='mb-1'
+            style={{ fontFamily: 'Montserrat_600SemiBold' }}>
             Descripción de la clase:
           </ThemedText>
           <ThemedText
-            lightColor='#ffffff'
+            lightColor='#4b5563'
             darkColor='#ffffff'
-            className='text-sm leading-relaxed'>
+            className='text-sm leading-relaxed'
+            style={{ fontFamily: 'Montserrat_400Regular' }}>
             {description}
           </ThemedText>
         </View>
@@ -226,32 +233,35 @@ export default function ClassDetailsScreen() {
           <ThemedText
             lightColor='#f97316'
             darkColor='#f97316'
-            className='font-semibold'>
+            className='font-semibold'
+            style={{ fontFamily: 'Montserrat_600SemiBold' }}>
             Nivel: intermedio
           </ThemedText>
         </View>
 
         <View className='mb-4 flex-row items-baseline'>
           <ThemedText
-            lightColor='#ffffff'
+            lightColor='#111827'
             darkColor='#ffffff'
-            className='font-semibold text-sm'>
+            className='font-semibold text-sm'
+            style={{ fontFamily: 'Montserrat_600SemiBold' }}>
             Ubicación / Sala:
           </ThemedText>
           <ThemedText
-            lightColor='#d4d4d4'
+            lightColor='#6b7280'
             darkColor='#d4d4d4'
-            className='text-sm ml-1'>
+            className='text-sm ml-1'
+            style={{ fontFamily: 'Montserrat_400Regular' }}>
             Sala B - Planta 2
           </ThemedText>
         </View>
 
         {isCrossfitCompleted ? (
           <View className='mb-6 items-center'>
-            <View className='flex-row items-center rounded-full px-4 py-2 bg-neutral-800'>
+            <View className='flex-row items-center rounded-full px-4 py-2 bg-emerald-50'>
               <CheckCircleIcon size={18} color='#22c55e' />
               <ThemedText
-                lightColor='#e5e5e5'
+                lightColor='#166534'
                 darkColor='#e5e5e5'
                 className='ml-2 text-xs font-semibold'>
                 Completado
@@ -278,7 +288,7 @@ export default function ClassDetailsScreen() {
                     ? heroSource
                     : (imageUrl as string | number | undefined);
                 if (lowerTitle === 'yoga flow') {
-                  setForceFull(true);
+                  // Solo mostramos el toast de validación, sin marcar la clase como llena
                   showToast(
                     'error',
                     'Clase llena',
