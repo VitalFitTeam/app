@@ -1,7 +1,12 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
+import {
+  MembershipTransferPaymentData,
+  MembershipTransferPaymentSchema,
+} from '@/schemas/membership';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { ScrollView, TextInput, View } from 'react-native';
 import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -45,6 +50,54 @@ export default function MembershipPaymentTransferScreen() {
   const [documentNumber, setDocumentNumber] = useState('');
   const [phone, setPhone] = useState('');
   const phoneInputRef = useRef<IPhoneInputRef | null>(null);
+
+  const {
+    getValues,
+    setError,
+    setValue,
+    clearErrors,
+    formState: { errors },
+  } = useForm<MembershipTransferPaymentData>({
+    defaultValues: {
+      id: params.id ?? '',
+      title: params.title ?? '',
+      price: params.price ?? '',
+      branch: params.branch ?? '',
+      addonsJson: params.addonsJson ?? '',
+      reference: '',
+      documentNumber: '',
+      phone: '',
+    },
+  });
+
+  const onConfirm = () => {
+    const result = MembershipTransferPaymentSchema.safeParse(getValues());
+
+    if (!result.success) {
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as keyof MembershipTransferPaymentData;
+        setError(field, {
+          type: 'manual',
+          message: issue.message,
+        });
+      });
+      return;
+    }
+
+    // Si todo es válido, navegamos a la confirmación
+    const data = result.data;
+
+    router.push({
+      pathname: '/membership-confirm',
+      params: {
+        id: data.id,
+        title: data.title,
+        price: data.price,
+        branch: data.branch,
+        method: 'transferencia',
+      },
+    } as never);
+  };
 
   return (
     <SafeAreaView className='flex-1 bg-black'>
@@ -261,10 +314,23 @@ export default function MembershipPaymentTransferScreen() {
           >
             Referencia
           </ThemedText>
+          {errors.reference?.message && (
+            <ThemedText
+              lightColor='#ef4444'
+              darkColor='#ef4444'
+              className='text-xs mb-1'
+            >
+              {errors.reference.message}
+            </ThemedText>
+          )}
           <View className='border border-neutral-700 rounded-md h-12 px-3 justify-center bg-neutral-900 mb-5'>
             <TextInput
               value={reference}
-              onChangeText={setReference}
+              onChangeText={(text) => {
+                setReference(text);
+                setValue('reference', text, { shouldValidate: true });
+                clearErrors('reference');
+              }}
               placeholder='Ingrese la referencia'
               placeholderTextColor='#6B7280'
               className='text-white text-base'
@@ -278,10 +344,23 @@ export default function MembershipPaymentTransferScreen() {
           >
             Número de documento
           </ThemedText>
+          {errors.documentNumber?.message && (
+            <ThemedText
+              lightColor='#ef4444'
+              darkColor='#ef4444'
+              className='text-xs mb-1'
+            >
+              {errors.documentNumber.message}
+            </ThemedText>
+          )}
           <View className='border border-neutral-700 rounded-md h-12 px-3 justify-center bg-neutral-900 mb-5'>
             <TextInput
               value={documentNumber}
-              onChangeText={setDocumentNumber}
+              onChangeText={(text) => {
+                setDocumentNumber(text);
+                setValue('documentNumber', text, { shouldValidate: true });
+                clearErrors('documentNumber');
+              }}
               placeholder='Ingrese su número de documento'
               placeholderTextColor='#6B7280'
               className='text-white text-base'
@@ -295,11 +374,24 @@ export default function MembershipPaymentTransferScreen() {
           >
             Teléfono
           </ThemedText>
+          {errors.phone?.message && (
+            <ThemedText
+              lightColor='#ef4444'
+              darkColor='#ef4444'
+              className='text-xs mb-1'
+            >
+              {errors.phone.message}
+            </ThemedText>
+          )}
           <View className='border border-neutral-700 rounded-md bg-neutral-900 px-2 py-1 justify-center'>
             <PhoneInput
               ref={phoneInputRef}
               value={phone || ''}
-              onChangePhoneNumber={(phoneNumber) => setPhone(phoneNumber)}
+              onChangePhoneNumber={(phoneNumber) => {
+                setPhone(phoneNumber);
+                setValue('phone', phoneNumber, { shouldValidate: true });
+                clearErrors('phone');
+              }}
               defaultCountry='VE'
               placeholder='Número de teléfono'
               phoneInputStyles={{
@@ -359,18 +451,7 @@ export default function MembershipPaymentTransferScreen() {
         <View className='mb-16'>
           <PrimaryButton
             title='Confirmar pago'
-            onPress={() => {
-              router.push({
-                pathname: '/membership-confirm',
-                params: {
-                  id: params.id ?? '',
-                  title: params.title ?? '',
-                  price: params.price ?? '',
-                  branch: params.branch ?? '',
-                  method: 'transferencia',
-                },
-              } as never);
-            }}
+            onPress={onConfirm}
           />
         </View>
       </ScrollView>
