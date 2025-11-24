@@ -3,6 +3,7 @@ import { ThemedText } from '@/components/themed-text';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { BuildingLibraryIcon, PhoneIcon } from 'react-native-heroicons/outline';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface MethodsParams {
@@ -50,73 +51,95 @@ export default function MembershipMethodsScreen() {
   }, [params.addonsJson]);
 
   const [selectedBranchIndex, setSelectedBranchIndex] = useState<number>(0);
+  const [showBranchOptions, setShowBranchOptions] = useState(false);
   const selectedBranch = BRANCH_OPTIONS[selectedBranchIndex] ?? BRANCH_OPTIONS[0];
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethodId>('pagomovil');
 
+  const currentStep: number = 2;
+
   return (
-    <SafeAreaView className='flex-1 bg-black'>
+    <SafeAreaView className='flex-1 bg-white'>
       <ScrollView className='flex-1 px-6 pt-8 pb-32'>
         {/* Header y pasos */}
         <View className='mb-6'>
           <ThemedText
             lightColor='#f97316'
             darkColor='#f97316'
-            className='text-2xl font-extrabold mb-4 text-center'
+            className='text-4xl mb-4 text-center'
+            style={{ fontFamily: 'BebasNeue-Regular' }}
           >
             COMPRAR MEMBRESÍA
           </ThemedText>
 
           <View className='flex-row justify-between items-center mb-4'>
             <View className='items-center flex-1'>
-              <View className='w-8 h-8 rounded-full items-center justify-center mb-1 bg-white'>
+              <View
+                className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
+                  currentStep === 1 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
+                }`}
+              >
                 <ThemedText
-                  lightColor='#000000'
-                  darkColor='#000000'
-                  className='text-xs font-semibold'
+                  lightColor={currentStep === 1 ? '#ffffff' : '#111827'}
+                  darkColor={currentStep === 1 ? '#ffffff' : '#111827'}
+                  className='text-[10px] font-semibold'
+                  style={{ fontFamily: 'Montserrat_500Medium' }}
                 >
                   1
                 </ThemedText>
               </View>
               <ThemedText
-                lightColor='#ffffff'
-                darkColor='#ffffff'
-                className='text-xs text-center'
+                lightColor={currentStep === 1 ? '#f97316' : '#111827'}
+                darkColor={currentStep === 1 ? '#f97316' : '#111827'}
+                className='text-[11px] text-center'
+                style={{ fontFamily: 'Montserrat_500Medium' }}
               >
                 Opciones de producto
               </ThemedText>
             </View>
             <View className='items-center flex-1'>
-              <View className='w-8 h-8 rounded-full items-center justify-center mb-1 bg-orange-500'>
+              <View
+                className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
+                  currentStep === 2 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
+                }`}
+              >
                 <ThemedText
-                  lightColor='#ffffff'
-                  darkColor='#ffffff'
-                  className='text-xs font-semibold'
+                  lightColor={currentStep === 2 ? '#ffffff' : '#111827'}
+                  darkColor={currentStep === 2 ? '#ffffff' : '#111827'}
+                  className='text-[10px] font-semibold'
+                  style={{ fontFamily: 'Montserrat_500Medium' }}
                 >
                   2
                 </ThemedText>
               </View>
               <ThemedText
-                lightColor='#f97316'
-                darkColor='#f97316'
-                className='text-xs text-center'
+                lightColor={currentStep === 2 ? '#f97316' : '#111827'}
+                darkColor={currentStep === 2 ? '#f97316' : '#111827'}
+                className='text-[11px] text-center'
+                style={{ fontFamily: 'Montserrat_500Medium' }}
               >
                 Métodos de pago
               </ThemedText>
             </View>
             <View className='items-center flex-1'>
-              <View className='w-8 h-8 rounded-full items-center justify-center mb-1 bg-white'>
+              <View
+                className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
+                  currentStep === 3 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
+                }`}
+              >
                 <ThemedText
-                  lightColor='#000000'
-                  darkColor='#000000'
-                  className='text-xs font-semibold'
+                  lightColor={currentStep === 3 ? '#ffffff' : '#111827'}
+                  darkColor={currentStep === 3 ? '#ffffff' : '#111827'}
+                  className='text-[10px] font-semibold'
+                  style={{ fontFamily: 'Montserrat_500Medium' }}
                 >
                   3
                 </ThemedText>
               </View>
               <ThemedText
-                lightColor='#ffffff'
-                darkColor='#ffffff'
-                className='text-xs text-center'
+                lightColor={currentStep === 3 ? '#f97316' : '#111827'}
+                darkColor={currentStep === 3 ? '#f97316' : '#111827'}
+                className='text-[11px] text-center'
+                style={{ fontFamily: 'Montserrat_500Medium' }}
               >
                 Confirmación de compra
               </ThemedText>
@@ -126,20 +149,22 @@ export default function MembershipMethodsScreen() {
 
         {/* Complementos seleccionados (solo resumen texto) */}
         {selectedAddons.length > 0 && (
-          <View className='mb-4 border border-orange-500/60 rounded-2xl px-4 py-3 bg-black/90'>
+          <View className='mb-4 border border-orange-500/60 rounded-2xl px-4 py-3 bg-white'>
             <ThemedText
               lightColor='#f97316'
               darkColor='#f97316'
               className='text-xs tracking-[0.2em] mb-2'
+              style={{ fontFamily: 'Montserrat_600SemiBold' }}
             >
               COMPLEMENTOS AGREGADOS
             </ThemedText>
             {selectedAddons.map(addon => (
               <ThemedText
                 key={addon.id}
-                lightColor='#e5e7eb'
+                lightColor='#111827'
                 darkColor='#e5e7eb'
                 className='text-xs mb-1'
+                style={{ fontFamily: 'Montserrat_400Regular' }}
               >
                 • {addon.title}
               </ThemedText>
@@ -148,43 +173,40 @@ export default function MembershipMethodsScreen() {
         )}
 
         {/* Plan principal */}
-        <View className='mb-4 border border-orange-500/80 rounded-2xl px-4 py-3 bg-black/90'>
-          <ThemedText
-            lightColor='#f97316'
-            darkColor='#f97316'
-            className='text-xs tracking-[0.2em] mb-1'
-          >
-            SUSCRIPCIÓN
-          </ThemedText>
-          <View className='flex-row items-baseline justify-between'>
+        <View className='mb-4 border border-orange-500/80 rounded-2xl px-4 py-3 bg-white'>
+          <View className='flex-row items-center justify-between'>
             <View className='flex-1 mr-2'>
               <ThemedText
-                lightColor='#ffffff'
+                lightColor='#111827'
                 darkColor='#ffffff'
-                className='text-xl font-extrabold mb-1'
+                className='text-xl mb-1'
+                style={{ fontFamily: 'Montserrat_400Regular' }}
               >
                 {params.title ?? 'Plan seleccionado'}
               </ThemedText>
               <ThemedText
-                lightColor='#d1d5db'
+                lightColor='#4b5563'
                 darkColor='#d1d5db'
                 className='text-xs'
+                style={{ fontFamily: 'Montserrat_400Regular' }}
               >
                 Más beneficios para tu vida fitness
               </ThemedText>
             </View>
             <View className='items-end'>
               <ThemedText
-                lightColor='#ffffff'
+                lightColor='#111827'
                 darkColor='#ffffff'
-                className='text-2xl font-extrabold'
+                className='text-2xl'
+                style={{ fontFamily: 'Montserrat_700Bold' }}
               >
                 ${params.price ?? '--'}
               </ThemedText>
               <ThemedText
-                lightColor='#d1d5db'
+                lightColor='#4b5563'
                 darkColor='#d1d5db'
                 className='text-xs mt-[-4]'
+                style={{ fontFamily: 'Montserrat_500Medium' }}
               >
                 /mes
               </ThemedText>
@@ -195,36 +217,62 @@ export default function MembershipMethodsScreen() {
         {/* Selección de sucursal */}
         <View className='mt-2 mb-6'>
           <ThemedText
-            lightColor='#e5e7eb'
-            darkColor='#e5e7eb'
-            className='text-sm mb-2'
+            lightColor='#f97316'
+            darkColor='#f97316'
+            className='text-xs tracking-[0.2em] mb-3'
+            style={{ fontFamily: 'Montserrat_600SemiBold' }}
           >
-            Seleccionar sucursal
+            SELECCIONE LA SUCURSAL
           </ThemedText>
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => {
-              setSelectedBranchIndex((prev) => (prev + 1) % BRANCH_OPTIONS.length);
-            }}
-            className='border border-neutral-700 rounded-md h-12 px-3 justify-center bg-neutral-900'
+            onPress={() => setShowBranchOptions((prev) => !prev)}
+            className='border border-orange-500 rounded-md h-12 px-3 justify-center bg-white'
           >
             <View className='flex-row items-center justify-between'>
               <ThemedText
-                lightColor='#e5e7eb'
+                lightColor='#111827'
                 darkColor='#e5e7eb'
                 className='text-sm'
+                style={{ fontFamily: 'Montserrat_400Regular' }}
               >
                 {selectedBranch}
               </ThemedText>
               <ThemedText
-                lightColor='#e5e7eb'
+                lightColor='#4b5563'
                 darkColor='#e5e7eb'
                 className='text-lg'
               >
-                ▾
+                {showBranchOptions ? '▴' : '▾'}
               </ThemedText>
             </View>
           </TouchableOpacity>
+          {showBranchOptions && (
+            <View className='mt-2 border border-neutral-200 rounded-md bg-white overflow-hidden'>
+              {BRANCH_OPTIONS.map((branch, index) => (
+                <TouchableOpacity
+                  key={branch}
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    setSelectedBranchIndex(index);
+                    setShowBranchOptions(false);
+                  }}
+                  className={`px-3 py-2 ${
+                    index === selectedBranchIndex ? 'bg-orange-50' : 'bg-white'
+                  }`}
+                >
+                  <ThemedText
+                    lightColor='#111827'
+                    darkColor='#e5e7eb'
+                    className='text-sm'
+                    style={{ fontFamily: 'Montserrat_400Regular' }}
+                  >
+                    {branch}
+                  </ThemedText>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Selección de método de pago */}
@@ -233,6 +281,7 @@ export default function MembershipMethodsScreen() {
             lightColor='#f97316'
             darkColor='#f97316'
             className='text-xs tracking-[0.2em] mb-3'
+            style={{ fontFamily: 'Montserrat_600SemiBold' }}
           >
             SELECCIONE EL MÉTODO DE PAGO
           </ThemedText>
@@ -244,8 +293,8 @@ export default function MembershipMethodsScreen() {
                 key={method.id}
                 activeOpacity={0.9}
                 onPress={() => setSelectedMethod(method.id)}
-                className={`mb-3 rounded-2xl border px-4 py-3 flex-row items-center justify-between bg-black/90 ${
-                  isActive ? 'border-orange-500' : 'border-neutral-600'
+                className={`mb-3 rounded-2xl border px-4 py-3 flex-row items-center justify-between bg-white ${
+                  isActive ? 'border-orange-500' : 'border-neutral-300'
                 }`}
               >
                 <View className='flex-row items-center'>
@@ -255,21 +304,21 @@ export default function MembershipMethodsScreen() {
                     }`}
                   />
                   <ThemedText
-                    lightColor='#e5e7eb'
+                    lightColor='#111827'
                     darkColor='#e5e7eb'
-                    className='text-sm font-semibold'
+                    className='text-sm'
+                    style={{ fontFamily: 'Montserrat_500Medium' }}
                   >
                     {method.label}
                   </ThemedText>
                 </View>
-                {/* Icono simple placeholder */}
-                <ThemedText
-                  lightColor='#f97316'
-                  darkColor='#f97316'
-                  className='text-lg'
-                >
-                  {method.id === 'pagomovil' ? '📱' : '🏦'}
-                </ThemedText>
+                <View className='flex-row items-center'>
+                  {method.id === 'pagomovil' ? (
+                    <PhoneIcon size={20} color={isActive ? '#F97316' : '#6B7280'} />
+                  ) : (
+                    <BuildingLibraryIcon size={20} color={isActive ? '#F97316' : '#6B7280'} />
+                  )}
+                </View>
               </TouchableOpacity>
             );
           })}

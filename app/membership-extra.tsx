@@ -3,6 +3,7 @@ import { ThemedText } from '@/components/themed-text';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { PlusIcon } from 'react-native-heroicons/outline';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Addon = {
@@ -48,69 +49,90 @@ export default function MembershipExtraScreen() {
     [selectedAddonIds],
   );
 
+  const currentStep: number = 2;
+
   return (
-    <SafeAreaView className='flex-1 bg-black'>
+    <SafeAreaView className='flex-1 bg-white'>
       <ScrollView className='flex-1 px-6 pt-8 pb-32'>
         <View className='mb-6'>
           <ThemedText
             lightColor='#f97316'
             darkColor='#f97316'
-            className='text-2xl font-extrabold text-orange-400 mb-4 text-center'
+            className='text-4xl mb-4 text-center'
+            style={{ fontFamily: 'BebasNeue-Regular' }}
           >
             COMPRAR MEMBRESÍA
           </ThemedText>
 
           <View className='flex-row justify-between items-center mb-4'>
             <View className='items-center flex-1'>
-              <View className='w-8 h-8 rounded-full items-center justify-center mb-1 bg-orange-500'>
+              <View
+                className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
+                  currentStep === 1 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
+                }`}
+              >
                 <ThemedText
-                  lightColor='#ffffff'
-                  darkColor='#ffffff'
-                  className='text-xs font-semibold text-white'
+                  lightColor={currentStep === 1 ? '#ffffff' : '#111827'}
+                  darkColor={currentStep === 1 ? '#ffffff' : '#111827'}
+                  className='text-[10px] font-semibold'
+                  style={{ fontFamily: 'Montserrat_500Medium' }}
                 >
                   1
                 </ThemedText>
               </View>
               <ThemedText
-                lightColor='#f97316'
-                darkColor='#f97316'
-                className='text-xs text-center text-orange-400'
+                lightColor={currentStep === 1 ? '#f97316' : '#111827'}
+                darkColor={currentStep === 1 ? '#f97316' : '#111827'}
+                className='text-[11px] text-center'
+                style={{ fontFamily: 'Montserrat_500Medium' }}
               >
                 Opciones de producto
               </ThemedText>
             </View>
             <View className='items-center flex-1'>
-              <View className='w-8 h-8 rounded-full items-center justify-center mb-1 bg-white'>
+              <View
+                className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
+                  currentStep === 2 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
+                }`}
+              >
                 <ThemedText
-                  lightColor='#000000'
-                  darkColor='#000000'
-                  className='text-xs font-semibold text-black'
+                  lightColor={currentStep === 2 ? '#ffffff' : '#111827'}
+                  darkColor={currentStep === 2 ? '#ffffff' : '#111827'}
+                  className='text-[10px] font-semibold'
+                  style={{ fontFamily: 'Montserrat_500Medium' }}
                 >
                   2
                 </ThemedText>
               </View>
               <ThemedText
-                lightColor='#ffffff'
-                darkColor='#ffffff'
-                className='text-xs text-white text-center'
+                lightColor={currentStep === 2 ? '#f97316' : '#111827'}
+                darkColor={currentStep === 2 ? '#f97316' : '#111827'}
+                className='text-[11px] text-center'
+                style={{ fontFamily: 'Montserrat_500Medium' }}
               >
                 Métodos de pago
               </ThemedText>
             </View>
             <View className='items-center flex-1'>
-              <View className='w-8 h-8 rounded-full items-center justify-center mb-1 bg-white'>
+              <View
+                className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
+                  currentStep === 3 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
+                }`}
+              >
                 <ThemedText
-                  lightColor='#000000'
-                  darkColor='#000000'
-                  className='text-xs font-semibold text-black'
+                  lightColor={currentStep === 3 ? '#ffffff' : '#111827'}
+                  darkColor={currentStep === 3 ? '#ffffff' : '#111827'}
+                  className='text-[10px] font-semibold'
+                  style={{ fontFamily: 'Montserrat_500Medium' }}
                 >
                   3
                 </ThemedText>
               </View>
               <ThemedText
-                lightColor='#ffffff'
-                darkColor='#ffffff'
-                className='text-xs text-white text-center'
+                lightColor={currentStep === 3 ? '#f97316' : '#111827'}
+                darkColor={currentStep === 3 ? '#f97316' : '#111827'}
+                className='text-[11px] text-center'
+                style={{ fontFamily: 'Montserrat_500Medium' }}
               >
                 Confirmación de compra
               </ThemedText>
@@ -119,43 +141,40 @@ export default function MembershipExtraScreen() {
         </View>
 
         {/* Plan principal */}
-        <View className='mb-6 border border-orange-500/80 rounded-2xl px-4 py-3 bg-black/90'>
-          <ThemedText
-            lightColor='#f97316'
-            darkColor='#f97316'
-            className='text-xs tracking-[0.2em] text-orange-400 mb-1'
-          >
-            SUSCRIPCIÓN
-          </ThemedText>
-          <View className='flex-row items-baseline justify-between'>
+        <View className='mb-6 border border-orange-500/80 rounded-2xl px-4 py-3 bg-white'>
+          <View className='flex-row items-center justify-between'>
             <View className='flex-1 mr-2'>
               <ThemedText
-                lightColor='#ffffff'
+                lightColor='#111827'
                 darkColor='#ffffff'
-                className='text-xl font-extrabold text-white mb-1'
+                className='text-xl mb-1'
+                style={{ fontFamily: 'Montserrat_400Regular' }}
               >
                 {params.title ?? 'Plan seleccionado'}
               </ThemedText>
               <ThemedText
-                lightColor='#d1d5db'
+                lightColor='#4b5563'
                 darkColor='#d1d5db'
-                className='text-xs text-neutral-300'
+                className='text-xs'
+                style={{ fontFamily: 'Montserrat_400Regular' }}
               >
                 Más beneficios para tu vida fitness
               </ThemedText>
             </View>
             <View className='items-end'>
               <ThemedText
-                lightColor='#ffffff'
+                lightColor='#111827'
                 darkColor='#ffffff'
-                className='text-2xl font-extrabold text-white'
+                className='text-2xl'
+                style={{ fontFamily: 'Montserrat_700Bold' }}
               >
                 ${params.price ?? '--'}
               </ThemedText>
               <ThemedText
-                lightColor='#d1d5db'
+                lightColor='#4b5563'
                 darkColor='#d1d5db'
-                className='text-xs text-neutral-300 mt-[-4]'
+                className='text-xs mt-[-4]'
+                style={{ fontFamily: 'Montserrat_500Medium' }}
               >
                 /mes
               </ThemedText>
@@ -168,19 +187,20 @@ export default function MembershipExtraScreen() {
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={() => setAddonsExpanded((prev) => !prev)}
-            className='w-full flex-row items-center justify-between border border-neutral-600 rounded-md px-4 py-3 bg-black'
+            className='w-full flex-row items-center justify-between border border-neutral-300 rounded-md px-4 py-3 bg-white'
           >
             <ThemedText
-              lightColor='#e5e7eb'
+              lightColor='#111827'
               darkColor='#e5e7eb'
-              className='text-sm text-neutral-100'
+              className='text-sm'
+              style={{ fontFamily: 'Montserrat_400Regular' }}
             >
               Complementa tu plan (Opcional)
             </ThemedText>
             <ThemedText
-              lightColor='#e5e7eb'
+              lightColor='#4b5563'
               darkColor='#e5e7eb'
-              className='text-lg text-neutral-100'
+              className='text-lg'
             >
               {addonsExpanded ? '▴' : '▾'}
             </ThemedText>
@@ -193,27 +213,30 @@ export default function MembershipExtraScreen() {
           return (
             <View
               key={addon.id}
-              className='border border-orange-500/70 rounded-2xl px-4 py-3 mb-3 bg-black/90'
+              className='border border-orange-500/70 rounded-2xl px-4 py-3 mb-3 bg-white'
             >
               <ThemedText
                 lightColor='#f97316'
                 darkColor='#f97316'
-                className='text-xs font-semibold text-orange-400 mb-1 uppercase'
+                className='text-xs mb-1 uppercase'
+                style={{ fontFamily: 'Montserrat_600SemiBold' }}
               >
                 {addon.title}
               </ThemedText>
               <ThemedText
-                lightColor='#e5e7eb'
+                lightColor='#111827'
                 darkColor='#e5e7eb'
-                className='text-xs text-neutral-200 mb-1'
+                className='text-xs mb-1'
+                style={{ fontFamily: 'Montserrat_400Regular' }}
               >
                 {addon.description}
               </ThemedText>
               {addon.sessionsIncluded ? (
                 <ThemedText
-                  lightColor='#9ca3af'
+                  lightColor='#6b7280'
                   darkColor='#9ca3af'
-                  className='text-[11px] text-neutral-400 mb-2'
+                  className='text-[11px] mb-2'
+                  style={{ fontFamily: 'Montserrat_400Regular' }}
                 >
                   {addon.sessionsIncluded} sesiones incluidas
                 </ThemedText>
@@ -221,24 +244,34 @@ export default function MembershipExtraScreen() {
 
               <View className='flex-row items-center justify-between mt-1'>
                 <ThemedText
-                  lightColor='#ffffff'
+                  lightColor='#111827'
                   darkColor='#ffffff'
-                  className='text-xl font-extrabold text-white'
+                  className='text-xl'
+                  style={{ fontFamily: 'Montserrat_700Bold' }}
                 >
-                  ${addon.price.toFixed(2)}
+                  ${addon.price.toFixed(2).replace('.', ',')}
                 </ThemedText>
-                <View className='w-32'>
-                  <PrimaryButton
-                    title={isSelected ? 'Agregado' : 'Agregar'}
-                    onPress={() => {
-                      setSelectedAddonIds((prev) =>
-                        prev.includes(addon.id)
-                          ? prev.filter((id) => id !== addon.id)
-                          : [...prev, addon.id],
-                      );
-                    }}
-                  />
-                </View>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => {
+                    setSelectedAddonIds((prev) =>
+                      prev.includes(addon.id)
+                        ? prev.filter((id) => id !== addon.id)
+                        : [...prev, addon.id],
+                    );
+                  }}
+                  className='flex-row items-center justify-center px-5 h-11 rounded-xl bg-orange-500'
+                >
+                  <PlusIcon size={18} color='#ffffff' />
+                  <ThemedText
+                    lightColor='#ffffff'
+                    darkColor='#ffffff'
+                    className='text-sm ml-2'
+                    style={{ fontFamily: 'Montserrat_500Medium' }}
+                  >
+                    {isSelected ? 'Agregado' : 'Agregar'}
+                  </ThemedText>
+                </TouchableOpacity>
               </View>
             </View>
           );

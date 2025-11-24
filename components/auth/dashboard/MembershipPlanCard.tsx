@@ -7,14 +7,20 @@ type MembershipCardProps = {
 	title: string;
 	price: string;
 	features: string[];
+	period?: string; 
+	isFree?: boolean; 
+	badgeLabel?: string; 
 	isSelected?: boolean;
 	onPress?: () => void;
 };
 
-	export default function MembershipCard({
+export default function MembershipCard({
 	title,
 	price,
 	features,
+	period = '/mes',
+	isFree = false,
+	badgeLabel,
 	isSelected = false,
 	onPress,
 }: MembershipCardProps) {
@@ -28,45 +34,95 @@ type MembershipCardProps = {
 			]}
 		>
 			<View className='flex-1 mr-4'>
-				<ThemedText
-					lightColor='#ffffff'
-					darkColor='#ffffff'
-					className='text-base font-semibold mb-1'
-				>
-					{title}
-				</ThemedText>
+				<View className='flex-row items-center justify-between mb-1'>
+					<ThemedText
+						lightColor={isSelected ? '#ffffff' : '#f97316'}
+						darkColor={isSelected ? '#ffffff' : '#f97316'}
+						className='text-base'
+						style={{ fontFamily: 'BebasNeue-Regular' }}
+					>
+						{title}
+					</ThemedText>
+					{/* Badge sólo se muestra en la columna derecha junto al check */}
+				</View>
 				{features.length > 0 && (
 					<ThemedText
 						lightColor='#e5e7eb'
 						darkColor='#e5e7eb'
 						className='text-xs mb-2'
+						style={{ fontFamily: 'Montserrat_400Regular' }}
 						numberOfLines={2}
 					>
 						{features[0]}
 					</ThemedText>
 				)}
-				<View className='flex-row items-baseline'>
-					<ThemedText
-						lightColor='#ffffff'
-						darkColor='#ffffff'
-						className='text-sm font-semibold mr-1'
-					>
-						${price}
-					</ThemedText>
-					<ThemedText
-						lightColor='#e5e7eb'
-						darkColor='#e5e7eb'
-						className='text-xs font-semibold'
-					>
-						/mes
-					</ThemedText>
-				</View>
+				{/* Sin precio en esta columna; va en la columna derecha junto al indicador */}
 			</View>
-			<View className='items-center justify-center'>
-				<CheckCircleIcon
-					size={28}
-					color={isSelected ? '#F97316' : '#E5E7EB'}
-				/>
+			<View className='items-end justify-center'>
+				{/* Precio o badge alineado con el círculo */}
+				{isFree ? (
+					badgeLabel ? (
+						<View className='flex-row items-center mb-1'>
+							<View className='px-3 py-1 rounded-full bg-orange-500 mr-2'>
+								<ThemedText
+									lightColor='#ffffff'
+									darkColor='#ffffff'
+									className='text-[10px]'
+									style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+										{badgeLabel}
+									</ThemedText>
+								</View>
+							{/* Círculo / check */}
+							<View
+								style={{
+									width: 22,
+									height: 22,
+									borderRadius: 999,
+									borderWidth: isSelected ? 0 : 2,
+									borderColor: '#E5E7EB',
+									alignItems: 'center',
+									justifyContent: 'center',
+								}}>
+								{isSelected && (
+									<CheckCircleIcon size={22} color='#F97316' />
+								)}
+							</View>
+						</View>
+					) : null
+				) : (
+					<View className='flex-row items-center mb-1'>
+						<View className='flex-row items-baseline mr-2'>
+							<ThemedText
+								lightColor='#ffffff'
+								darkColor='#ffffff'
+								className='text-sm mr-1'
+								style={{ fontFamily: 'Montserrat_700Bold' }}>
+									${price}
+								</ThemedText>
+							<ThemedText
+								lightColor='#e5e7eb'
+								darkColor='#e5e7eb'
+								className='text-xs'
+								style={{ fontFamily: 'Montserrat_500Medium' }}>
+									{period}
+								</ThemedText>
+						</View>
+						<View
+							style={{
+								width: 22,
+								height: 22,
+								borderRadius: 999,
+								borderWidth: isSelected ? 0 : 2,
+								borderColor: '#E5E7EB',
+								alignItems: 'center',
+								justifyContent: 'center',
+							}}>
+							{isSelected && (
+								<CheckCircleIcon size={22} color='#F97316' />
+							)}
+						</View>
+					</View>
+				)}
 			</View>
 		</TouchableOpacity>
 	);
@@ -84,16 +140,16 @@ const styles = StyleSheet.create({
 		marginBottom: 16,
 	},
 	cardDefault: {
-		backgroundColor: '#171717',
-		borderColor: '#404040',
+		backgroundColor: 'transparent',
+		borderColor: '#f97316',
 	},
 	cardSelected: {
-		backgroundColor: '#171717',
+		backgroundColor: 'transparent',
 		borderColor: '#f97316',
-		shadowColor: '#f97316',
-		shadowOpacity: 0.3,
-		shadowRadius: 8,
-		shadowOffset: { width: 0, height: 4 },
-		elevation: 4,
+		shadowColor: 'transparent',
+		shadowOpacity: 0,
+		shadowRadius: 0,
+		shadowOffset: { width: 0, height: 0 },
+		elevation: 0,
 	},
 });

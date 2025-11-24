@@ -50,45 +50,51 @@ export default function ClassCard({
 					/>
 					<View className='absolute inset-0 bg-black/25' />
 					<View className='absolute inset-0 p-4 justify-between'>
-						<View className='flex-row justify-between items-start'>
-							<View>
-								<ThemedText
-									lightColor='#ffffff'
-									darkColor='#ffffff'
-									className='text-xl font-extrabold'>
-									{title}
-								</ThemedText>
-								<ThemedText
-									lightColor='#e5e5e5'
-									darkColor='#e5e5e5'
-									className='mt-1 font-semibold'>
-									Today, {time}
-								</ThemedText>
-								<ThemedText
-									lightColor='#d4d4d4'
-									darkColor='#d4d4d4'
-									className='text-xs mt-1'>
-									Disponibilidad
-								</ThemedText>
-							</View>
+						{/* Parte superior: título, hora y etiqueta pequeña */}
+						<View>
+							<ThemedText
+								lightColor='#ffffff'
+								darkColor='#ffffff'
+								style={{ fontFamily: 'BebasNeue-Regular', fontSize: 24 }}
+							>
+								{title}
+							</ThemedText>
+							<ThemedText
+								lightColor='#E0E0E0'
+								darkColor='#E0E0E0'
+								style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14, marginTop: 2 }}
+							>
+								Hoy, {time}
+							</ThemedText>
+							<ThemedText
+								lightColor='#E5E7EB'
+								darkColor='#E5E7EB'
+								style={{ fontFamily: 'Montserrat_400Regular', fontSize: 11, marginTop: 4 }}
+							>
+								Disponibilidad
+							</ThemedText>
+						</View>
+						{/* Parte inferior: instructor a la izquierda y categoría abajo a la derecha */}
+						<View className='flex-row items-center justify-between mt-2'>
+							<ThemedText
+								lightColor='#E5E7EB'
+								darkColor='#E5E7EB'
+								style={{ fontFamily: 'Montserrat_400Regular', fontSize: 12 }}
+							>
+								{instructor.replace(/^Con\s+/i, '')}
+							</ThemedText>
 							{!!(category || branch) && (
-								<View className='bg-white/20 rounded-full px-3 py-1'>
+								<View className='px-3 py-1 rounded-full'
+									style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}>
 									<ThemedText
 										lightColor='#ffffff'
 										darkColor='#ffffff'
-										className='text-xs font-semibold'>
+										style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 11 }}
+									>
 										{category || 'categoría'}
 									</ThemedText>
 								</View>
 							)}
-						</View>
-						<View className='flex-row'>
-							<ThemedText
-								lightColor='#e5e5e5'
-								darkColor='#e5e5e5'
-								className='text-xs'>
-								{instructor.replace(/^Con\s+/i, '')}
-							</ThemedText>
 						</View>
 					</View>
 					{reserved ? (

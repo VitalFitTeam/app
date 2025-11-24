@@ -123,14 +123,14 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		borderWidth: 0.75,
-		borderColor: '#1F1F1F',
-		borderRadius: 10,
+		borderWidth: 1,
+		borderColor: '#e5e7eb',
+		borderRadius: 12,
 		padding: 16,
 		width: screenWidth - 32,
 		alignSelf: 'center',
 		height: 94,
-		backgroundColor: '#0a0a0a',
+		backgroundColor: '#ffffff',
 	},
 	dayButton: {
 		alignItems: 'center',
@@ -143,25 +143,25 @@ const styles = StyleSheet.create({
 		backgroundColor: 'transparent',
 	},
 	selectedDay: {
-		backgroundColor: '#F27F2A',
+		backgroundColor: '#F97316',
 	},
 	dayLabel: {
 		fontFamily: 'Montserrat_500Medium',
 		fontSize: 13,
 		fontWeight: '500',
-		color: '#A3A3A3',
+		color: '#6b7280',
 	},
 	dateNumber: {
 		fontFamily: 'Montserrat_600SemiBold',
 		fontSize: 15,
 		fontWeight: '600',
-		color: '#E5E7EB',
+		color: '#111827',
 	},
 	selectedText: {
 		color: '#FFFFFF',
 	},
 	todayText: {
-		color: '#F27F2A',
+		color: '#F97316',
 	},
 	eventDot: {
 		position: 'absolute',
@@ -169,6 +169,6 @@ const styles = StyleSheet.create({
 		width: 4,
 		height: 4,
 		borderRadius: 2,
-		backgroundColor: '#F27F2A',
+		backgroundColor: '#F97316',
 	},
 });
