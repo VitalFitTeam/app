@@ -28,7 +28,7 @@ export const UserHeader: React.FC<Props> = ({
 	const firstName = name.split(' ')[0];
 
 	return (
-		<View className='mb-6'>
+		<View className='mt-2 mb-6'>
 			<View style={styles.logoContainer}>
 				<Image
 					source={require('@/assets/images/Frame.png')}
@@ -75,7 +75,7 @@ export const UserHeader: React.FC<Props> = ({
 						activeOpacity={0.7}>
 						<Bell size={24} color='#333' />
 						{notifications.length > 0 && (
-							<View className='absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full' />
+							<View className='absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full' />
 						)}
 					</TouchableOpacity>
 				</View>

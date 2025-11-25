@@ -2,19 +2,10 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import {
-	CalendarIcon,
-	ChatBubbleLeftRightIcon,
-	ClipboardDocumentListIcon,
-	HomeIcon,
-	UserGroupIcon,
-	UserIcon,
-} from 'react-native-heroicons/solid';
+import { View } from 'react-native';
+import { CalendarIcon, ChatBubbleLeftRightIcon, HomeIcon, UserIcon, UsersIcon } from 'react-native-heroicons/solid';
 
 export default function InstructorLayout() {
-	const colorScheme = useColorScheme();
-
 	return (
 		<Tabs
 			screenOptions={{
@@ -23,37 +14,95 @@ export default function InstructorLayout() {
 				headerShown: false,
 				tabBarButton: HapticTab,
 				tabBarStyle: {
-					backgroundColor: colorScheme === 'dark' ? '#000' : '#fff',
+					backgroundColor: '#1f2937',
 					borderTopWidth: 0,
+					borderRadius: 0,
+					marginHorizontal: 0,
+					height: 60,
+					position: 'absolute',
+					left: 0,
+					right: 0,
+					bottom: 0,
+					paddingHorizontal: 8,
+					overflow: 'hidden',
+					elevation: 0,
+					paddingBottom: 6,
+					paddingTop: 0,
 				},
+				tabBarItemStyle: {
+					justifyContent: 'center',
+					alignItems: 'center',
+					height: 60,
+					paddingVertical: 0,
+					paddingTop: 0,
+					paddingBottom: 0,
+					margin: 0,
+				},
+				tabBarIconStyle: {
+					marginTop: 0,
+					marginBottom: 0,
+				},
+				tabBarShowLabel: false,
+				// aunque no mostramos labels, se usa para accesibilidad
+				tabBarLabel: () => null,
 			}}>
 			<Tabs.Screen
 				name='dashboard'
 				options={{
 					title: 'Inicio',
-					tabBarIcon: ({ color }) => <HomeIcon color={color} size={28} />,
+					tabBarIcon: ({ focused }) => (
+						<View
+							style={{
+								backgroundColor: focused ? '#f97316' : 'transparent',
+								borderRadius: 12,
+								width: 44,
+								height: 44,
+								alignItems: 'center',
+								justifyContent: 'center',
+								marginTop: 16,
+							}}>
+							<HomeIcon color={focused ? '#fff' : '#a1a1aa'} size={24} />
+						</View>
+					),
 				}}
 			/>
 			<Tabs.Screen
 				name='classes'
 				options={{
 					title: 'Clases',
-					tabBarIcon: ({ color }) => <CalendarIcon color={color} size={28} />,
+					tabBarIcon: ({ focused }) => (
+						<View
+							style={{
+								backgroundColor: focused ? '#f97316' : 'transparent',
+								borderRadius: 12,
+								width: 44,
+								height: 44,
+								alignItems: 'center',
+								justifyContent: 'center',
+								marginTop: 16,
+							}}>
+							<CalendarIcon color={focused ? '#fff' : '#a1a1aa'} size={24} />
+						</View>
+					),
 				}}
 			/>
 			<Tabs.Screen
 				name='clients'
 				options={{
 					title: 'Clientes',
-					tabBarIcon: ({ color }) => <UserGroupIcon color={color} size={28} />,
-				}}
-			/>
-			<Tabs.Screen
-				name='routines'
-				options={{
-					title: 'Rutinas',
-					tabBarIcon: ({ color }) => (
-						<ClipboardDocumentListIcon color={color} size={28} />
+					tabBarIcon: ({ focused }) => (
+						<View
+							style={{
+								backgroundColor: focused ? '#f97316' : 'transparent',
+								borderRadius: 12,
+								width: 44,
+								height: 44,
+								alignItems: 'center',
+								justifyContent: 'center',
+								marginTop: 16,
+							}}>
+							<UsersIcon color={focused ? '#fff' : '#a1a1aa'} size={24} />
+						</View>
 					),
 				}}
 			/>
@@ -61,14 +110,43 @@ export default function InstructorLayout() {
 				name='chat'
 				options={{
 					title: 'Chat',
-					tabBarIcon: ({ color }) => <ChatBubbleLeftRightIcon color={color} size={28} />,
+					tabBarIcon: ({ focused }) => (
+						<View
+							style={{
+								backgroundColor: focused ? '#f97316' : 'transparent',
+								borderRadius: 12,
+								width: 44,
+								height: 44,
+								alignItems: 'center',
+								justifyContent: 'center',
+								marginTop: 16,
+							}}>
+							<ChatBubbleLeftRightIcon
+								color={focused ? '#fff' : '#a1a1aa'}
+								size={24}
+							/>
+						</View>
+					),
 				}}
 			/>
 			<Tabs.Screen
 				name='profile'
 				options={{
 					title: 'Perfil',
-					tabBarIcon: ({ color }) => <UserIcon color={color} size={28} />,
+					tabBarIcon: ({ focused }) => (
+						<View
+							style={{
+								backgroundColor: focused ? '#f97316' : 'transparent',
+								borderRadius: 12,
+								width: 44,
+								height: 44,
+								alignItems: 'center',
+								justifyContent: 'center',
+								marginTop: 16,
+							}}>
+							<UserIcon color={focused ? '#fff' : '#a1a1aa'} size={24} />
+						</View>
+					),
 				}}
 			/>
 		</Tabs>

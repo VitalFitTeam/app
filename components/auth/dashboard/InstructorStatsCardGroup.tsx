@@ -1,58 +1,53 @@
-import { Flag2, Profile2User } from 'iconsax-react-native';
+import { Dumbbell } from 'lucide-react-native';
 import React from 'react';
 import { Text, View } from 'react-native';
-import { CalendarDaysIcon, CheckCircleIcon } from 'react-native-heroicons/mini';
+import { CheckCircleIcon, UsersIcon } from 'react-native-heroicons/outline';
 
-export function InstructorStatsCardGroup() {
+type InstructorStats = {
+	activeClients: number;
+	classesToday: number;
+	attendanceRate: number; // porcentaje 0-100
+};
+
+type Props = {
+	stats?: InstructorStats;
+};
+
+export function InstructorStatsCardGroup({ stats }: Props) {
+	const data: InstructorStats =
+		stats ?? ({ activeClients: 24, classesToday: 2, attendanceRate: 89 } as InstructorStats);
+
+	const cards = [
+		{
+			label: 'Clientes Activos',
+			value: `${data.activeClients}`,
+			icon: <UsersIcon size={16} color='#f97316' />,
+		},
+		{
+			label: 'Clases Hoy',
+			value: `${data.classesToday}`,
+			icon: <Dumbbell size={16} color='#f97316' strokeWidth={1.8} />,
+		},
+		{
+			label: 'Tasa Asistencia',
+			value: `${data.attendanceRate}%`,
+			icon: <CheckCircleIcon size={16} color='#f97316' />,
+		},
+	];
+
 	return (
-		<View className='flex flex-wrap flex-row justify-between px-2 mt-4'>
-			<View className='w-[48%] bg-white dark:bg-neutral-900 rounded-2xl p-4 mb-4 shadow-sm border border-neutral-200 dark:border-neutral-800'>
-				<View className='flex-row items-center justify-center mb-1'>
-					<CheckCircleIcon width={20} height={20} color='#22C55E' />
-					<Text className='ml-1 text-[16px] font-medium text-neutral-900 dark:text-white text-center'>
-						Check-ins Mensual
+		<View className='flex-row justify-between mt-6 px-2'>
+			{cards.map((card) => (
+				<View
+					key={card.label}
+					className='w-[30%] bg-white rounded-2xl px-2 py-3 border border-[#f97316] shadow-sm'>
+					<View className='items-center mb-1'>{card.icon}</View>
+					<Text className='text-center text-[18px] font-semibold text-[#111827]'>
+						{card.value}
 					</Text>
+					<Text className='mt-1 text-center text-[10px] text-[#4b5563]'>{card.label}</Text>
 				</View>
-				<Text className='text-center text-[24px] font-semibold text-neutral-900 dark:text-white mt-1'>
-					234
-				</Text>
-			</View>
-
-			<View className='w-[48%] bg-white dark:bg-neutral-900 rounded-2xl p-4 mb-4 shadow-sm border border-neutral-200 dark:border-neutral-800'>
-				<View className='flex-row items-center justify-center mb-1'>
-					<CalendarDaysIcon width={19.2} height={19.2} color='#F17B23' />
-					<Text className='ml-1 text-[16px] font-medium text-neutral-900 dark:text-white text-center'>
-						Clases Esta Semana
-					</Text>
-				</View>
-				<Text className='text-center text-[24px] font-semibold text-neutral-900 dark:text-white mt-1'>
-					23
-				</Text>
-			</View>
-
-			<View className='w-[48%] bg-white dark:bg-neutral-900 rounded-2xl p-4 mb-4 shadow-sm border border-neutral-200 dark:border-neutral-800'>
-				<View className='flex-row items-center justify-center mb-1'>
-					<Profile2User size={24} color='#9747FF' variant='Bold' />
-					<Text className='ml-1 text-[16px] font-medium text-neutral-900 dark:text-white text-center'>
-						Mensajes Nuevos
-					</Text>
-				</View>
-				<Text className='text-center text-[24px] font-semibold text-neutral-900 dark:text-white mt-1'>
-					234
-				</Text>
-			</View>
-
-			<View className='w-[48%] bg-white dark:bg-neutral-900 rounded-2xl p-4 mb-4 shadow-sm border border-neutral-200 dark:border-neutral-800'>
-				<View className='flex-row items-center justify-center mb-1'>
-					<Flag2 size={24} color='#E1491B' variant='Bold' />
-					<Text className='ml-1 text-[16px] font-medium text-neutral-900 dark:text-white text-center'>
-						Rutinas Asignadas
-					</Text>
-				</View>
-				<Text className='text-center text-[24px] font-semibold text-neutral-900 dark:text-white mt-1'>
-					+12%
-				</Text>
-			</View>
+			))}
 		</View>
 	);
 }
