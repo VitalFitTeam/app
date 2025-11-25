@@ -7,8 +7,9 @@ import { ThemedView } from '@/components/themed-view';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, BackHandler, ScrollView, Text, View } from 'react-native';
 import { CalendarDaysIcon, ClockIcon } from 'react-native-heroicons/mini';
 import { ChatBubbleLeftRightIcon, ChevronRightIcon, UserIcon } from 'react-native-heroicons/outline';
 
@@ -45,6 +46,19 @@ export default function DashboardInstructor() {
 
 		fetchUser();
 	}, []);
+
+	useFocusEffect(
+		useCallback(() => {
+			const onBackPress = () => {
+				BackHandler.exitApp();
+				return true;
+			};
+
+			const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+			return () => subscription.remove();
+		}, []),
+	);
 
 	if (loading) {
 		return (
