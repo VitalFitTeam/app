@@ -3,7 +3,7 @@ import React from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { View } from 'react-native';
-import { CalendarIcon, ChatBubbleLeftRightIcon, HomeIcon, UserIcon, UsersIcon } from 'react-native-heroicons/solid';
+import { CalendarIcon, HomeIcon, UserIcon, UsersIcon } from 'react-native-heroicons/solid';
 
 export default function InstructorLayout() {
 	return (
@@ -102,29 +102,6 @@ export default function InstructorLayout() {
 								marginTop: 16,
 							}}>
 							<UsersIcon color={focused ? '#fff' : '#a1a1aa'} size={24} />
-						</View>
-					),
-				}}
-			/>
-			<Tabs.Screen
-				name='chat'
-				options={{
-					title: 'Chat',
-					tabBarIcon: ({ focused }) => (
-						<View
-							style={{
-								backgroundColor: focused ? '#f97316' : 'transparent',
-								borderRadius: 12,
-								width: 44,
-								height: 44,
-								alignItems: 'center',
-								justifyContent: 'center',
-								marginTop: 16,
-							}}>
-							<ChatBubbleLeftRightIcon
-								color={focused ? '#fff' : '#a1a1aa'}
-								size={24}
-							/>
 						</View>
 					),
 				}}

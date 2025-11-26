@@ -138,6 +138,20 @@ export default function RootLayout() {
                             title: '',
                         }}
                     />
+                    <Stack.Screen
+                        name='instructor-assign-routine'
+                        options={{
+                            headerShown: false,
+                            title: '',
+                        }}
+                    />
+                    <Stack.Screen
+                        name='instructor-client-progress'
+                        options={{
+                            headerShown: false,
+                            title: '',
+                        }}
+                    />
                 </Stack>
                 <StatusBar style='auto' />
             </ThemeProvider>
