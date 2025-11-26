@@ -34,6 +34,34 @@ export default function RootLayout() {
                     <Stack.Screen name='index' options={{ headerShown: false }} />
                     <Stack.Screen name='(auth)' options={{ headerShown: false }} />
                     <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+                    <Stack.Screen
+                        name='instructor-security'
+                        options={{
+                            headerShown: false,
+                            title: '',
+                        }}
+                    />
+                    <Stack.Screen
+                        name='instructor-change-password'
+                        options={{
+                            headerShown: false,
+                            title: '',
+                        }}
+                    />
+                    <Stack.Screen
+                        name='instructor-notifications'
+                        options={{
+                            headerShown: false,
+                            title: '',
+                        }}
+                    />
+                    <Stack.Screen
+                        name='instructor-notifications-settings'
+                        options={{
+                            headerShown: false,
+                            title: '',
+                        }}
+                    />
                     <Stack.Screen name='(instructor)' options={{ headerShown: false }} />
                     <Stack.Screen name='(recepcionist)' options={{ headerShown: false }} />
                     
@@ -133,6 +161,27 @@ export default function RootLayout() {
                     />
                     <Stack.Screen
                         name='routine/history'
+                        options={{
+                            headerShown: false,
+                            title: '',
+                        }}
+                    />
+                    <Stack.Screen
+                        name='instructor-assign-routine'
+                        options={{
+                            headerShown: false,
+                            title: '',
+                        }}
+                    />
+                    <Stack.Screen
+                        name='instructor-client-progress'
+                        options={{
+                            headerShown: false,
+                            title: '',
+                        }}
+                    />
+                    <Stack.Screen
+                        name='instructor-profile-personal'
                         options={{
                             headerShown: false,
                             title: '',

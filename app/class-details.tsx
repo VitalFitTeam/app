@@ -1,14 +1,16 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { ToastNotification } from '@/components/ToastNotification';
 import { useReservations } from '@/contexts/reservations';
 import { useToast } from '@/hooks/useToast';
+import vitalFitApi from '@/services/vitalfitSdk';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
-import { useLocalSearchParams } from 'expo-router';
-import React, { useMemo, useState } from 'react';
-import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { CheckCircleIcon, ExclamationCircleIcon, StarIcon } from 'react-native-heroicons/solid';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassIcon, ClockIcon as OutlineClockIcon, UsersIcon, XMarkIcon } from 'react-native-heroicons/outline';
+import { CheckCircleIcon, CheckIcon, ExclamationCircleIcon, StarIcon, UserIcon } from 'react-native-heroicons/solid';
 
 const styles = StyleSheet.create({
   heroImage: {
@@ -19,7 +21,8 @@ const styles = StyleSheet.create({
 });
 
 export default function ClassDetailsScreen() {
-  const { time, title, instructor, imageUrl, capacity, occupied } = useLocalSearchParams();
+  const router = useRouter();
+  const { time, title, instructor, imageUrl, capacity, occupied, mode } = useLocalSearchParams();
   const { isReserved, reserve, cancel } = useReservations();
 
   const todayFormatted = useMemo(() => {
@@ -76,17 +79,16 @@ export default function ClassDetailsScreen() {
 
   const id = useMemo(() => `${String(title || '')}|${String(time || '')}`, [title, time]);
   const reserved = isReserved(id);
-  const { toastState, showToast, hideToast } = useToast();
+  const { showToast } = useToast();
   const isCrossfitCompleted =
     String(title || '').toLowerCase() === 'crossfit' && effectiveFull;
 
   const timeRange = useMemo(() => {
     const raw = String(time || '').trim();
     if (!raw) return '07:00 - 08:00 AM';
-    if (raw.includes('-')) return raw; // already a range
-    // parse 12h like '07:00 AM'
+    if (raw.includes('-')) return raw;
     const m = raw.match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
-    if (!m) return raw; // unknown format, show raw
+    if (!m) return raw;
     const [, hh, mm, ap] = m;
     let hour = parseInt(hh, 10) % 12;
     if (ap.toUpperCase() === 'PM') hour += 12;
@@ -103,19 +105,443 @@ export default function ClassDetailsScreen() {
     return `${fmt(start)} - ${fmt(end)}`;
   }, [time]);
 
+  const isInstructorMode = String(mode || '').toLowerCase() === 'instructor';
+
+  const [instructorFirstName, setInstructorFirstName] = useState<string | null>(null);
+  const [instructorLastName, setInstructorLastName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isInstructorMode) return;
+
+    const fetchInstructor = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) return;
+
+        const userData = await vitalFitApi.user.WhoAmI(token);
+        setInstructorFirstName(userData?.user?.first_name || null);
+        setInstructorLastName(userData?.user?.last_name || null);
+      } catch {
+        console.error('Error fetching instructor data');
+      }
+    };
+
+    fetchInstructor();
+  }, [isInstructorMode]);
+
+  const [activeTab, setActiveTab] = useState<'clientes' | 'pasar-lista'>('clientes');
+  const [attendance, setAttendance] = useState<Record<string, 'present' | 'late' | 'absent'>>({});
+  const [search, setSearch] = useState('');
+  const [classNotes, setClassNotes] = useState('');
+
+  const filteredClients = useMemo(
+    () => {
+      const instructorClients = [
+        { id: '1', name: 'Juan Perez', level: 'Nivel 5', program: 'Fuerza Máxima - Semana 2' },
+        { id: '2', name: 'María López', level: 'Nivel 3', program: 'Resistencia Funcional - Semana 1' },
+        { id: '3', name: 'Carlos Pérez', level: 'Nivel 4', program: 'Hipertrofia - Semana 4' },
+        { id: '4', name: 'Ana García', level: 'Nivel 2', program: 'Inicio Funcional - Semana 3' },
+      ];
+
+      return instructorClients.filter((c) =>
+        c.name.toLowerCase().includes(search.toLowerCase().trim()),
+      );
+    },
+    [search],
+  );
+
+  if (isInstructorMode) {
+    return (
+      <ThemedView
+        lightColor='#FFFFFF'
+        darkColor='#050816'
+        className='flex-1 p-4 pt-12'>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-4 flex-row items-center justify-center'>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => router.back()}
+              className='absolute left-4'>
+              <ChevronLeftIcon width={20} height={20} color='#f97316' />
+            </TouchableOpacity>
+            <ThemedText
+              lightColor='#111827'
+              className='text-base font-semibold'
+              style={{ fontFamily: 'System', fontSize: 16, fontWeight: '600' }}>
+              Detalles clase
+            </ThemedText>
+          </View>
+          <Image source={heroSource} style={styles.heroImage} contentFit='cover' />
+
+          <ThemedText
+            lightColor='#111827'
+            darkColor='#ffffff'
+            className='text-3xl font-extrabold mt-4 mb-1'
+            style={{ fontFamily: 'BebasNeue-Regular' }}>
+            {String(title || 'Nombre de la clase').toUpperCase()}
+          </ThemedText>
+
+          <View className='mb-1'>
+            <ThemedText
+              lightColor='#6b7280'
+              darkColor='#d4d4d4'
+              className='text-sm'
+              style={{ fontFamily: 'Montserrat_400Regular' }}>
+              {todayFormatted}
+            </ThemedText>
+          </View>
+
+          <View className='mb-1'>
+            <ThemedText
+              lightColor='#4b5563'
+              darkColor='#e5e5e5'
+              className='text-sm'
+              style={{ fontFamily: 'Montserrat_500Medium' }}>
+              18 / 25 cupos ocupados
+            </ThemedText>
+          </View>
+
+          <View className='mb-3'>
+            <ThemedText
+              lightColor='#f97316'
+              darkColor='#f97316'
+              className='font-bold'>
+              07:00 - 08:00 AM
+            </ThemedText>
+          </View>
+
+          <View className='flex-row items-center mb-3'>
+            <StarIcon size={16} color='#F59E0B' />
+            <ThemedText
+              lightColor='#4b5563'
+              darkColor='#e5e5e5'
+              className='ml-2 text-sm'
+              style={{ fontFamily: 'Montserrat_400Regular' }}>
+              4.9 (231 reviews)
+            </ThemedText>
+          </View>
+
+          <View className='flex-row items-center mb-4'>
+            <Image
+              source={{ uri: 'https://randomuser.me/api/portraits/men/31.jpg' }}
+              style={{ width: 28, height: 28, borderRadius: 9999 }}
+              contentFit='cover'
+            />
+            <ThemedText
+              lightColor='#4b5563'
+              darkColor='#e5e5e5'
+              className='ml-2'
+              style={{ fontFamily: 'Montserrat_500Medium' }}>
+              {instructorFirstName || instructorLastName
+                ? `${instructorFirstName ?? ''} ${instructorLastName ?? ''}`.trim()
+                : String(instructor || 'Nombre del Instructor')}
+            </ThemedText>
+          </View>
+
+          <View className='mb-2'>
+            <ThemedText
+              lightColor='#f97316'
+              darkColor='#f97316'
+              className='font-semibold'
+              style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+              Nivel: intermedio
+            </ThemedText>
+          </View>
+
+          <View className='mb-4'>
+            <ThemedText
+              lightColor='#111827'
+              darkColor='#ffffff'
+              className='mb-1'
+              style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+              Descripción de la clase:
+            </ThemedText>
+            <ThemedText
+              lightColor='#4b5563'
+              darkColor='#ffffff'
+              className='text-sm leading-relaxed'
+              style={{ fontFamily: 'Montserrat_400Regular' }}>
+              Este entrenamiento de fuerza se enfoca en el desarrollo muscular y la resistencia. Incluye ejercicios con pesas,
+              bandas de resistencia y peso corporal. Ideal para todos los niveles.
+            </ThemedText>
+          </View>
+
+          <View className='flex-row bg-[#F3F4F6] rounded-2xl p-1 mb-3'>
+            <TouchableOpacity
+              className={`flex-1 py-2 rounded-xl items-center ${
+                activeTab === 'clientes' ? 'bg-white' : 'bg-transparent'
+              }`}
+              activeOpacity={0.7}
+              onPress={() => setActiveTab('clientes')}>
+              <Text
+                className={`font-semibold ${
+                  activeTab === 'clientes' ? 'text-[#111827]' : 'text-[#6b7280]'
+                }`}>
+                Clientes
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`flex-1 py-2 rounded-xl items-center ${
+                activeTab === 'pasar-lista' ? 'bg-white' : 'bg-transparent'
+              }`}
+              activeOpacity={0.7}
+              onPress={() => setActiveTab('pasar-lista')}>
+              <Text
+                className={`font-semibold ${
+                  activeTab === 'pasar-lista' ? 'text-[#111827]' : 'text-[#6b7280]'
+                }`}>
+                Pasar lista
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View className='mb-3'>
+            <View className='border border-[#e5e7eb] rounded-2xl px-3 py-2 bg-white flex-row items-center'>
+              <MagnifyingGlassIcon width={18} height={18} color='#f97316' />
+              <TextInput
+                placeholder='Nombre del cliente'
+                placeholderTextColor='#9ca3af'
+                value={search}
+                onChangeText={setSearch}
+                style={{ fontSize: 14, color: '#111827', marginLeft: 8, flex: 1 }}
+              />
+            </View>
+          </View>
+
+          <View className='mb-6'>
+            {activeTab === 'clientes' ? (
+              <View className='rounded-2xl bg-white px-4 py-3 border border-[#e5e7eb] shadow-sm'>
+                <View className='flex-row items-center mb-3'>
+                  <UsersIcon size={18} color='#f97316' />
+                  <Text className='ml-2 text-[14px] font-medium text-[#111827]'>
+                    Lista de clientes inscritos
+                  </Text>
+                </View>
+
+                {filteredClients.map((client) => (
+                  <TouchableOpacity
+                    key={client.id}
+                    className='flex-row items-center justify-between bg-[#F8F9FB] rounded-2xl px-4 py-4 mb-3'
+                    activeOpacity={0.8}>
+                    <View className='flex-row items-center flex-1'>
+                      <View className='w-10 h-10 rounded-xl bg-[#FED7AA] justify-center items-center mr-3'>
+                        <UserIcon size={22} color='#f97316' />
+                      </View>
+                      <View className='flex-1'>
+                        <Text className='text-[14px] font-bold text-[#1F2024]'>
+                          {client.name}
+                        </Text>
+                        <Text className='text-[12px] text-[#71727A]'>
+                          {client.level}
+                        </Text>
+                      </View>
+                    </View>
+                    <ChevronRightIcon size={12} color='#71727A' />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            ) : (
+              <View className='rounded-2xl bg-white px-4 py-4 border border-[#e5e7eb] shadow-sm'>
+                <View className='flex-row items-center mb-4'>
+                  <UsersIcon size={18} color='#f97316' />
+                  <Text className='ml-2 text-[14px] font-medium text-[#111827]'>
+                    Clientes inscritos
+                  </Text>
+                </View>
+
+                {filteredClients.map((client) => {
+                  const status = attendance[client.id];
+                  return (
+                    <View
+                      key={client.id}
+                      className='bg-[#F8F9FB] rounded-2xl px-4 py-4 mb-4'>
+                      <View className='flex-row items-center mb-2'>
+                        <View className='w-12 h-12 rounded-full bg-[#FED7AA] justify-center items-center mr-3'>
+                          <UserIcon size={26} color='#f97316' />
+                        </View>
+                        <View className='flex-1'>
+                          <Text className='text-[16px] font-bold text-[#1F2024]'>
+                            {client.name}
+                          </Text>
+                          <Text className='text-[12px] text-[#71727A] mb-1'>
+                            {client.level}
+                          </Text>
+                        </View>
+                      </View>
+
+                      <View className='mb-4'>
+                        <ThemedText
+                          lightColor='#111827'
+                          darkColor='#e5e5e5'
+                          className='text-[15px] font-semibold'
+                          style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+                          {client.program}
+                        </ThemedText>
+                      </View>
+
+                      <View className='flex-row gap-2'>
+                        <TouchableOpacity
+                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${
+                            status === 'present'
+                              ? 'bg-[#f97316]'
+                              : 'bg-white border border-[#f97316]'
+                          }`}
+                          activeOpacity={0.8}
+                          onPress={() =>
+                            setAttendance((prev) => ({ ...prev, [client.id]: 'present' }))
+                          }>
+                          <CheckIcon size={16} color={status === 'present' ? '#ffffff' : '#f97316'} strokeWidth={3} />
+                          <Text
+                            className={`ml-2 text-[13px] ${
+                              status === 'present' ? 'text-white' : 'text-[#f97316]'
+                            }`}
+                            style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+                            Presente
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${
+                            status === 'late'
+                              ? 'bg-[#D1D5DB]'
+                              : 'bg-white border border-[#D1D5DB]'
+                          }`}
+                          activeOpacity={0.8}
+                          onPress={() =>
+                            setAttendance((prev) => ({ ...prev, [client.id]: 'late' }))
+                          }>
+                          <OutlineClockIcon size={16} color={status === 'late' ? '#374151' : '#9ca3af'} strokeWidth={2.5} />
+                          <Text
+                            className={`ml-2 text-[13px] ${
+                              status === 'late' ? 'text-[#374151]' : 'text-[#9ca3af]'
+                            }`}
+                            style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+                            Tarde
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 bg-white border ${
+                            status === 'absent' ? 'border-[#374151]' : 'border-[#e5e7eb]'
+                          }`}
+                          activeOpacity={0.8}
+                          onPress={() =>
+                            setAttendance((prev) => ({ ...prev, [client.id]: 'absent' }))
+                          }>
+                          <XMarkIcon size={16} color='#374151' strokeWidth={2.5} />
+                          <Text
+                            className='ml-2 text-[13px] text-[#374151]'
+                            style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+                            Ausente
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  );
+                })}
+
+                {/* Separador naranja y notas internas de la clase */}
+                <View className='h-[1px] bg-[#f97316] w-full mb-4 mt-1' />
+
+                <View className='mt-1'>
+                  <ThemedText
+                    lightColor='#111827'
+                    darkColor='#ffffff'
+                    className='mb-2'
+                    style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+                    Notas internas de la clase
+                  </ThemedText>
+
+                  <View className='mb-3'>
+                    <TextInput
+                      multiline
+                      numberOfLines={4}
+                      placeholder='Añade notas sobre esta clase...'
+                      placeholderTextColor='#9ca3af'
+                      value={classNotes}
+                      onChangeText={setClassNotes}
+                      style={{
+                        borderWidth: 1,
+                        borderColor: '#d1d5db',
+                        borderRadius: 16,
+                        paddingHorizontal: 12,
+                        paddingVertical: 12,
+                        minHeight: 120,
+                        textAlignVertical: 'top',
+                        fontSize: 13,
+                        color: '#111827',
+                      }}
+                    />
+                  </View>
+
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    className='w-full py-3 rounded-2xl mb-3 items-center justify-center'
+                    style={{ backgroundColor: '#4b5563', borderWidth: 1, borderColor: '#e5e7eb' }}
+                    onPress={() =>
+                      showToast(
+                        'success',
+                        'Notas guardadas',
+                        'Las notas internas se han guardado correctamente.'
+                      )
+                    }>
+                    <ThemedText
+                      lightColor='#f9fafb'
+                      darkColor='#f9fafb'
+                      className='text-sm'
+                      style={{ fontFamily: 'Montserrat_500Medium' }}>
+                      Guardar notas
+                    </ThemedText>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    className='w-full py-3 rounded-2xl items-center justify-center'
+                    style={{ backgroundColor: '#f97316' }}
+                    onPress={() =>
+                      showToast(
+                        'success',
+                        'Asistencia guardada',
+                        'La asistencia de la clase se ha guardado correctamente.'
+                      )
+                    }>
+                    <ThemedText
+                      lightColor='#ffffff'
+                      darkColor='#ffffff'
+                      className='text-sm font-semibold'
+                      style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+                      Guardar asistencia
+                    </ThemedText>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </ThemedView>
+    );
+  }
+
   return (
     <ThemedView
       lightColor='#FFFFFF'
       darkColor='#050816'
       className='flex-1 p-4 pt-12'>
-      <ToastNotification
-        type={toastState.type}
-        title={toastState.title}
-        message={toastState.message}
-        visible={toastState.visible}
-        onClose={hideToast}
-      />
       <ScrollView showsVerticalScrollIndicator={false}>
+        <View className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-4 flex-row items-center justify-center'>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => router.back()}
+            className='absolute left-4'>
+            <ChevronLeftIcon width={20} height={20} color='#f97316' />
+          </TouchableOpacity>
+          <ThemedText
+            lightColor='#111827'
+            className='text-base font-semibold'
+            style={{ fontFamily: 'System', fontSize: 16, fontWeight: '600' }}>
+            Detalles clase
+          </ThemedText>
+        </View>
         <Image source={heroSource} style={styles.heroImage} contentFit='cover' />
 
         <ThemedText
@@ -275,9 +701,7 @@ export default function ClassDetailsScreen() {
               disabled={effectiveFull}
               style={{ backgroundColor: effectiveFull ? '#6b7280' : reserved ? '#ef4444' : '#f97316' }}
               onPress={async () => {
-                if (effectiveFull) {
-                  return;
-                }
+                if (effectiveFull) return;
                 if (reserved) {
                   setShowCancelModal(true);
                   return;
@@ -288,7 +712,6 @@ export default function ClassDetailsScreen() {
                     ? heroSource
                     : (imageUrl as string | number | undefined);
                 if (lowerTitle === 'yoga flow') {
-                  // Solo mostramos el toast de validación, sin marcar la clase como llena
                   showToast(
                     'error',
                     'Clase llena',
