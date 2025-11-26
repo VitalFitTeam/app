@@ -1,0 +1,167 @@
+import { ThemedView } from '@/components/themed-view';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ChevronLeftIcon } from 'react-native-heroicons/solid';
+
+const mockNotifications = [
+  {
+    id: '1',
+    title: 'Recordatorio de clase',
+    body: 'Tienes una clase de Functional Strength hoy a las 6:00 pm.',
+    dateLabel: 'Sep 9, 2024',
+  },
+  {
+    id: '2',
+    title: 'Nuevo progreso de cliente',
+    body: 'Tu cliente Juan Pérez actualizó su progreso de rutina.',
+    dateLabel: 'Sep 9, 2024',
+  },
+  {
+    id: '3',
+    title: 'Recordatorio de clase',
+    body: 'Tienes una clase de HIIT programada para mañana.',
+    dateLabel: 'Sep 8, 2024',
+  },
+];
+
+export default function InstructorNotificationsScreen() {
+  const router = useRouter();
+
+  const handleOpenSettings = () => {
+    router.push('/instructor-notifications-settings');
+  };
+
+  return (
+    <ThemedView className='flex-1 bg-white pt-10'>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
+        {/* Franja superior */}
+        <View
+          className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'
+          style={{ position: 'relative' }}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => router.back()}
+            style={{ position: 'absolute', left: 12, top: 8, bottom: 8, justifyContent: 'center' }}>
+            <ChevronLeftIcon width={20} height={20} color='#f97316' />
+          </TouchableOpacity>
+
+          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Notificaciones</Text>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={handleOpenSettings}
+            style={{ position: 'absolute', right: 12, top: 8, bottom: 8, justifyContent: 'center' }}>
+            <Text style={{ color: '#f97316', fontSize: 13, fontWeight: '600' }}>Configurar</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Sección "Hoy" */}
+        <Text style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 8 }}>Hoy</Text>
+        {mockNotifications.slice(0, 2).map((n) => (
+          <View
+            key={n.id}
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: 16,
+              paddingVertical: 10,
+              paddingHorizontal: 12,
+              marginBottom: 8,
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              shadowColor: '#000',
+              shadowOpacity: 0.06,
+              shadowRadius: 6,
+              shadowOffset: { width: 0, height: 2 },
+              elevation: 1,
+            }}>
+            <View
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: '#BBF7D0',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 10,
+              }}>
+              <Text style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>Gym</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text
+                style={{
+                  color: '#111827',
+                  fontSize: 13,
+                  fontWeight: '600',
+                  marginBottom: 2,
+                }}
+                numberOfLines={1}>
+                {n.title}
+              </Text>
+              <Text
+                style={{ color: '#4b5563', fontSize: 12, marginBottom: 4 }}
+                numberOfLines={2}>
+                {n.body}
+              </Text>
+              <Text style={{ color: '#9ca3af', fontSize: 11 }}>{n.dateLabel}</Text>
+            </View>
+          </View>
+        ))}
+
+        {/* Sección "Ayer" */}
+        <Text style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 16 }}>Ayer</Text>
+        {mockNotifications.slice(2).map((n) => (
+          <View
+            key={n.id}
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: 16,
+              paddingVertical: 10,
+              paddingHorizontal: 12,
+              marginBottom: 8,
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              shadowColor: '#000',
+              shadowOpacity: 0.06,
+              shadowRadius: 6,
+              shadowOffset: { width: 0, height: 2 },
+              elevation: 1,
+            }}>
+            <View
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: '#BBF7D0',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 10,
+              }}>
+              <Text style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>Gym</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text
+                style={{
+                  color: '#111827',
+                  fontSize: 13,
+                  fontWeight: '600',
+                  marginBottom: 2,
+                }}
+                numberOfLines={1}>
+                {n.title}
+              </Text>
+              <Text
+                style={{ color: '#4b5563', fontSize: 12, marginBottom: 4 }}
+                numberOfLines={2}>
+                {n.body}
+              </Text>
+              <Text style={{ color: '#9ca3af', fontSize: 11 }}>{n.dateLabel}</Text>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    </ThemedView>
+  );
+}
