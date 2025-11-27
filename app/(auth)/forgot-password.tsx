@@ -17,11 +17,11 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SlidersVertical } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next'; // 1. Importamos el hook
+import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function ForgotPasswordScreen() {
-  const { t } = useTranslation(); // 2. Inicializamos traducción
+  const { t } = useTranslation(); 
   const [step, setStep] = useState<number>(1);
   const [email, setEmail] = useState<string>('');
   const [token, setToken] = useState<string>('');
@@ -50,19 +50,8 @@ export default function ForgotPasswordScreen() {
     }
   };
 
-  // 3. Mapeamos los títulos y subtítulos usando las claves del JSON
-  // Nota: i18next accede a arrays usando índices (0, 1, 2)
-  const titles = [
-    t('forgotPassword.titles.0'),
-    t('forgotPassword.titles.1'),
-    t('forgotPassword.titles.2'),
-  ];
-  
-  const subtitles = [
-    t('forgotPassword.subtitles.step1'),
-    t('forgotPassword.subtitles.step2'),
-    t('forgotPassword.subtitles.step3'),
-  ];
+  // NOTA: Hemos eliminado los arrays 'titles' y 'subtitles' de aquí.
+  // Ahora se llaman directamente en el JSX usando la variable 'step'.
 
   const handleSendEmail = async (): Promise<void> => {
     if (!email) {
@@ -74,7 +63,6 @@ export default function ForgotPasswordScreen() {
     try {
       await vitalFitApi.auth.forgotPassword(email);
     } catch (error: unknown) {
-      // Lógica de manejo de errores (se mantiene igual, solo traducimos el fallback)
       if (isAPIError(error)) {
         const msg = error.messages.join(', ').toLowerCase();
         if (
@@ -99,7 +87,6 @@ export default function ForgotPasswordScreen() {
       }
     }
 
-    // Mensaje de éxito siempre se muestra por seguridad
     showToast(
       'success',
       t('forgotPassword.step1.toast.successTitle'),
@@ -180,10 +167,16 @@ export default function ForgotPasswordScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView}>
           <View style={styles.formContainer}>
             <Logo />
+            
+            {/* --- CORRECCIÓN AQUÍ --- */}
+            {/* Usamos claves dinámicas que coinciden con tu JSON: step1, step2, step3 */}
             <ThemedText type="title" lightColor={Colors.light.tint} style={styles.title}>
-              {titles[step - 1]}
+              {t(`forgotPassword.titles.step${step}`)}
             </ThemedText>
-            <Text className="text-gray-500 text-center mb-8 text-lg">{subtitles[step - 1]}</Text>
+            <Text className="text-gray-500 text-center mb-8 text-lg">
+              {t(`forgotPassword.subtitles.step${step}`)}
+            </Text>
+            {/* ----------------------- */}
 
             <ProgressIndicator currentStep={step} />
 

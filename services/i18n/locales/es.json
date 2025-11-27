@@ -1,82 +1,95 @@
 {
-	"translation": {
-		"language": "Idioma",
-		"save": "Guardar",
-		"signIn": "Acceder",
-		"signUp": "Registrarse",
-		"slide1": "Desafía tus límites,\nconquista tus metas",
-		"slide2": "La disciplina es el\ncamino al éxito",
-		"slide3": "Sé constante,\nsé imparable",
-		"login": {
-			"title": "Iniciar Sesión",
-			"subtitle": "Ingresa tus credenciales para iniciar sesión",
-			"emailLabel": "Correo electrónico",
-			"emailPlaceholder": "Ingresa tu correo electrónico",
-			"passwordLabel": "Contraseña",
-			"passwordPlaceholder": "Ingresa tu contraseña",
-			"rememberMe": "Mantener sesión",
-			"forgotPassword": "¿Olvidaste tu contraseña? ",
-			"recover": "Recuperar",
-			"signInButton": "Iniciar sesión",
-			"signingInButton": "Iniciando...",
-			"googleSignIn": "Iniciar sesión con Google",
-			"noAccount": "¿No tienes cuenta aún? ",
-			"signUpLink": "Regístrate",
-			"toast": {
-				"errorTitle": "Error",
-				"loginErrorTitle": "Error al iniciar sesión",
-				"emptyFields": "Por favor, ingresa tu correo y contraseña.",
-				"invalidEmail": "Por favor, ingresa un correo electrónico válido.",
-				"unexpectedError": "Ocurrió un error inesperado. Inténtalo de nuevo."
-			}
-		},
-		"register": {
-        "step1Title": "¿CUÁL ES TU GÉNERO?",
-        "step2Title": "CREA TU CUENTA",
-        "step2Subtitle": "Ingresa tus credenciales para registrarte",
-        "step3Subtitle": "Completa tus datos para crear tu cuenta",
-        "alreadyHaveAccount": "¿Ya tienes una cuenta? ",
-        "signInLink": " Iniciar sesión",
-        "continueButton": "Continuar",
-        
-        "genderSelector": {
-            "female": "Mujer",
-            "male": "Hombre",
-            "preferNotToSay": "Prefiero no especificarlo"
-        },
-
-        "toast": {
-            "successTitle": "Revisa tu correo",
-            "successMessage": "Código enviado correctamente",
-            "errorTitle": "Error al registrar",
-            "unexpectedError": "Ocurrió un error inesperado. Inténtalo de nuevo."
-        }
+  "translation": {
+    "language": "Idioma",
+    "save": "Guardar",
+    "signIn": "Acceder",
+    "signUp": "Registrarse",
+    "slide1": "Desafía tus límites,\nconquista tus metas",
+    "slide2": "La disciplina es el\ncamino al éxito",
+    "slide3": "Sé constante,\nsé imparable",
+    "nav": {
+      "dashboard": "Inicio",
+      "schedule": "Horarios",
+      "training": "Entrenamiento",
+      "community": "Comunidad",
+      "profile": "Perfil",
+      "back": "Volver",
+      "membership": "Membresía",
+      "classDetails": "Detalles de la Clase"
+    },
+    "login": {
+      "title": "Iniciar Sesión",
+      "subtitle": "Ingresa tus credenciales para iniciar sesión",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "Ingresa tu correo electrónico",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "rememberMe": "Mantener sesión",
+      "forgotPassword": "¿Olvidaste tu contraseña? ",
+      "recover": "Recuperar",
+      "signInButton": "Iniciar sesión",
+      "signingInButton": "Iniciando...",
+      "googleSignIn": "Iniciar sesión con Google",
+      "noAccount": "¿No tienes cuenta aún? ",
+      "signUpLink": "Regístrate",
+      "toast": {
+        "errorTitle": "Error",
+        "loginErrorTitle": "Error al iniciar sesión",
+        "emptyFields": "Por favor, ingresa tu correo y contraseña.",
+        "invalidEmail": "Por favor, ingresa un correo electrónico válido.",
+        "unexpectedError": "Ocurrió un error inesperado. Inténtalo de nuevo."
+      }
+    },
+    "register": {
+      "step1Title": "¿CUÁL ES TU GÉNERO?",
+      "step2Title": "CREA TU CUENTA",
+      "step2Subtitle": "Ingresa tus credenciales para registrarte",
+      "step3Subtitle": "Completa tus datos para crear tu cuenta",
+      "alreadyHaveAccount": "¿Ya tienes una cuenta? ",
+      "signInLink": " Iniciar sesión",
+      "continueButton": "Continuar",
+      "genderSelector": {
+        "female": "Mujer",
+        "male": "Hombre",
+        "preferNotToSay": "Prefiero no especificarlo"
+      },
+      "toast": {
+        "successTitle": "Revisa tu correo",
+        "successMessage": "Código enviado correctamente",
+        "errorTitle": "Error al registrar",
+        "unexpectedError": "Ocurrió un error inesperado. Inténtalo de nuevo."
+      }
     },
     "step2Credentials": {
-        "emailLabel": "Correo electrónico",
-        "passwordLabel": "Contraseña",
-        "confirmPasswordLabel": "Confirmar contraseña",
-        "continueButton": "Continuar",
-        "googleSignInButton": "Iniciar sesión con Google"
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "Ingresa tu correo electrónico",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Confirma tu contraseña",
+      "continueButton": "Continuar",
+      "googleSignInButton": "Iniciar sesión con Google"
     },
     "step3PersonalDetails": {
-        "nameLabel": "Nombre",
-        "lastNameLabel": "Apellido",
-        "documentIdLabel": "Documento de identidad",
-        "birthDateLabel": "Fecha de nacimiento",
-        "phoneLabel": "Teléfono",
-        "phonePlaceholder": "Número de teléfono",
-        "acceptTerms": "Acepto los ",
-        "termsAndConditions": "términos y condiciones",
-        "createAccountButton": "Crear cuenta"
-    }
-  },
-	"forgotPassword": {
-      "titles": [
-        "RECUPERA TU CONTRASEÑA",
-        "VERIFICAR CÓDIGO",
-        "NUEVA CONTRASEÑA"
-      ],
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Ingresa tu nombre",
+      "lastNameLabel": "Apellido",
+      "lastNamePlaceholder": "Ingresa tu apellido",
+      "documentIdLabel": "Documento de identidad",
+      "documentIdPlaceholder": "Ingresa tu documento de identidad",
+      "birthDateLabel": "Fecha de nacimiento",
+      "phoneLabel": "Teléfono",
+      "phonePlaceholder": "Número de teléfono",
+      "acceptTerms": "Acepto los ",
+      "termsAndConditions": "términos y condiciones",
+      "createAccountButton": "Crear cuenta"
+    },
+    "forgotPassword": {
+      "titles": {
+        "step1": "RECUPERA TU CONTRASEÑA",
+        "step2": "VERIFICAR CÓDIGO",
+        "step3": "NUEVA CONTRASEÑA"
+      },
       "subtitles": {
         "step1": "Ingresa el correo electrónico asociado a la cuenta para recuperar tu contraseña",
         "step2": "Te hemos enviado un código a tu correo",
@@ -115,6 +128,13 @@
           "errorTitle": "Error",
           "errorMessage": "Ocurrió un error inesperado. Inténtalo de nuevo."
         }
+      },
+      "notifications": {
+        "success": "¡Éxito!",
+        "error": "Error",
+        "checkEmail": "Verifica tu correo electrónico",
+        "invalidCode": "Código inválido",
+        "passwordChanged": "Contraseña cambiada exitosamente"
       }
     },
     "confirmEmail": {
@@ -132,5 +152,44 @@
         "errorTitle": "Error",
         "errorMessage": "Código inválido o error de conexión."
       }
+    },
+    "dashboard": {
+      "defaultUser": "Usuario",
+      "challenges": {
+        "completed": "Retos completados",
+        "weekly": "Entrenamiento semanal",
+        "progress": "Progreso"
+      },
+      "mock": {
+        "classTitle": "Hora",
+        "routineDay": "DÍA 01",
+        "routineSubtitle": "Comienza a trotar",
+        "routineDuration": "10 km, 4 semanas"
+      },
+      "sections": {
+        "packages": "Paquetes"
+      },
+      "banners": {
+        "crossfit4": "CrossFit - 4 sesiones"
+      }
+    },
+    "schedule": {
+      "calendar": "CALENDARIO",
+      "tabs": {
+        "classes": "Clases",
+        "reservations": "Reservas",
+        "explore": "Explorar"
+      },
+      "upcomingClasses": "Próximas clases",
+      "filter": "Filtrar",
+      "myReservations": "Mis reservas",
+      "noReservations": "Aún no tienes reservas.",
+      "categories": {
+        "yoga": "Yoga",
+        "hiit": "HIIT",
+        "kickBoxing": "Kick Boxing",
+        "pilates": "Pilates"
+      }
     }
+  }
 }

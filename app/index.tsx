@@ -97,14 +97,14 @@ export default function HomeScreen() {
 					<View style={{ flex: 1, marginRight: 8 }}>
 						{/* 6. Usa 't' para las etiquetas de los botones */}
 						<SignInButton
-							label={t('Login')}
+							label={t('signIn')}
 							onPress={() => router.push('/(auth)/login')}
 						/>
 					</View>
 
 					<View style={{ flex: 1, marginLeft: 8 }}>
 						<SignUpButton
-							label={t('Register')}
+							label={t('signUp')}
 							onPress={() => router.push('/(auth)/register')}
 						/>
 					</View>

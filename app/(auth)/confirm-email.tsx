@@ -11,29 +11,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next'; // 1. Importar hook
+import { useTranslation } from 'react-i18next';
 import {
-	KeyboardAvoidingView,
-	Platform,
-	ScrollView,
-	Text,
-	TouchableOpacity,
-	View,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ConfirmEmailScreen() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { t } = useTranslation(); // 2. Inicializar hook
+    const { t } = useTranslation();
     const [code, setCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { toastState, showToast, hideToast } = useToast();
 
     const handleConfirmCode = async () => {
         if (!code.trim()) {
-            // "Por favor, ingresa el código..."
-            showToast('error', t('confirmEmail.toast.errorTitle'), 'Por favor, ingresa el código.');
+            // CORREGIDO: Uso de traducción
+            showToast('error', t('confirmEmail.toast.errorTitle'), t('confirmEmail.toast.emptyCode'));
             return;
         }
 
@@ -46,7 +46,7 @@ export default function ConfirmEmailScreen() {
                 showToast(
                     'error',
                     t('confirmEmail.toast.errorTitle'),
-                    'No se encontró la contraseña temporal.'
+                    t('confirmEmail.toast.missingCreds') // CORREGIDO
                 );
                 setTimeout(() => router.replace('/(auth)/login'), 2000);
                 return;
@@ -60,19 +60,17 @@ export default function ConfirmEmailScreen() {
                 },
             });
 
-            // ¡Éxito! Cuenta verificada
             showToast(
                 'success',
                 t('confirmEmail.toast.successTitle'),
                 t('confirmEmail.toast.successMessage')
             );
 
-            // Login automático después de verificar
+            // Login automático
             const email = await AsyncStorage.getItem('temp_email');
             const password = await AsyncStorage.getItem('temp_password');
 
             if (!email || !password) {
-                // Si faltan credenciales, redirigir al login
                 setTimeout(() => router.replace('/(auth)/login'), 2000);
                 return;
             }
@@ -93,7 +91,6 @@ export default function ConfirmEmailScreen() {
                 router.replace('/(tabs)/dashboard');
             } catch (loginErr: unknown) {
                 console.error('Error en login automático:', loginErr);
-                // Si falla el login automático, mandamos al usuario al login manual
                 setTimeout(() => router.replace('/(auth)/login'), 2000);
             }
         } catch (error: unknown) {
@@ -103,7 +100,8 @@ export default function ConfirmEmailScreen() {
             } else if (error instanceof Error) {
                 errorMessage = error.message;
             }
-            console.error('Error al confirmar o iniciar sesión:', error);
+            console.error('Error al confirmar:', error);
+            // CORREGIDO: Usamos la clave de error de confirmEmail, no de forgotPassword
             showToast('error', t('confirmEmail.toast.errorTitle'), errorMessage);
         } finally {
             setIsLoading(false);
@@ -111,7 +109,6 @@ export default function ConfirmEmailScreen() {
     };
 
     const handleResendCode = () => {
-        // Aquí deberías llamar a la API de reenvío si la tienes
         showToast(
             'success',
             t('confirmEmail.toast.resendTitle'),
@@ -145,7 +142,6 @@ export default function ConfirmEmailScreen() {
                 </View>
 
                 <View className='mb-16'>
-                    {/* Título dividido en dos líneas para mantener tu estilo */}
                     <ThemedText
                         type='title'
                         lightColor={Colors.light.tint}
@@ -164,7 +160,6 @@ export default function ConfirmEmailScreen() {
                 </Text>
 
                 <View className='w-full max-w-xs mb-8'>
-                    <Text className='text-sm text-gray-500 mb-1 font-semibold'></Text>
                     <CodeInput
                         onComplete={(inputCode: string) => {
                             setCode(inputCode);
@@ -185,8 +180,9 @@ export default function ConfirmEmailScreen() {
                         onPress={handleConfirmCode}
                         disabled={isLoading}
                     />
+                    {/* Reutilizamos el botón cancelar genérico o el de forgotPassword si prefieres */}
                     <SecondaryButton 
-                        title={t('forgotPassword.step1.cancelButton')} // Reutilizamos "Cancelar"
+                        title={t('forgotPassword.step1.cancelButton')} 
                         onPress={() => router.back()} 
                     />
                 </View>
