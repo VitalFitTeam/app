@@ -3,9 +3,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next'; // <--- 1. Importamos el hook
 
 import { HapticTab } from '@/components/haptic-tab';
-import { Dumbbell } from 'lucide-react-native';
 import { View } from 'react-native';
-import { CalendarIcon, HomeIcon, UserIcon, UsersIcon } from 'react-native-heroicons/solid';
+import { CalendarIcon, HomeIcon, UserIcon, QrCodeIcon } from 'react-native-heroicons/solid';
 
 export default function TabLayout() {
     // 2. Obtenemos la función para traducir
@@ -53,7 +52,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name='dashboard'
                 options={{
-                    title: t('nav.dashboard'), // <--- Traducción: Inicio / Home
+                    title: t('nav.dashboard'), // Inicio / Home
                     tabBarIcon: ({ focused }) => (
                         <View
                             style={{
@@ -71,9 +70,29 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
+                name='qr'
+                options={{
+                    title: 'QR',
+                    tabBarIcon: ({ focused }) => (
+                        <View
+                            style={{
+                                backgroundColor: focused ? '#f97316' : 'transparent',
+                                borderRadius: 12,
+                                width: 44,
+                                height: 44,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginTop: 16,
+                            }}>
+                            <QrCodeIcon color={focused ? '#fff' : '#a1a1aa'} size={24} />
+                        </View>
+                    ),
+                }}
+            />
+            <Tabs.Screen
                 name='schedule'
                 options={{
-                    title: t('nav.schedule'), // <--- Traducción: Horarios / Schedule
+                    title: t('nav.schedule'), // Horarios / Schedule
                     tabBarIcon: ({ focused }) => (
                         <View
                             style={{
@@ -91,53 +110,9 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name='training'
-                options={{
-                    title: t('nav.training'), // <--- Traducción: Entrenamiento / Training
-                    tabBarIcon: ({ focused }) => (
-                        <View
-                            style={{
-                                backgroundColor: focused ? '#f97316' : 'transparent',
-                                borderRadius: 12,
-                                width: 44,
-                                height: 44,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginTop: 16,
-                            }}>
-                            <Dumbbell
-                                color={focused ? '#fff' : '#a1a1aa'}
-                                size={24}
-                                strokeWidth={1.5}
-                            />
-                        </View>
-                    ),
-                }}
-            />
-            <Tabs.Screen
-                name='community'
-                options={{
-                    title: t('nav.community'), // <--- Traducción: Comunidad / Community
-                    tabBarIcon: ({ focused }) => (
-                        <View
-                            style={{
-                                backgroundColor: focused ? '#f97316' : 'transparent',
-                                borderRadius: 12,
-                                width: 44,
-                                height: 44,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginTop: 16,
-                            }}>
-                            <UsersIcon color={focused ? '#fff' : '#a1a1aa'} size={24} />
-                        </View>
-                    ),
-                }}
-            />
-            <Tabs.Screen
                 name='profile'
                 options={{
-                    title: t('nav.profile'), // <--- Traducción: Perfil / Profile
+                    title: t('nav.profile'), // Perfil / Profile
                     tabBarIcon: ({ focused }) => (
                         <View
                             style={{
