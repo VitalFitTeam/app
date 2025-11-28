@@ -12,15 +12,15 @@ export default function RecepcionistNavBar() {
         tabBarButton: HapticTab,
         tabBarStyle: {
           backgroundColor: '#fff',
-          borderTopWidth: 0,
+          borderTopWidth: 1,
+          borderTopColor: '#e5e7eb',
           height: 60,
-          paddingBottom: 6,
+          paddingBottom: 28,
           paddingTop: 0,
-          elevation: 10,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
         },
         tabBarItemStyle: {
           paddingVertical: 0,
@@ -28,11 +28,8 @@ export default function RecepcionistNavBar() {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          marginBottom: 4,
+          marginBottom: 2,
         },
-        contentStyle: {
-          paddingBottom: 70, // Espacio para que no se tape el contenido con el navbar
-        }
       }}>
       <Tabs.Screen
         name='dashboard'
@@ -57,6 +54,18 @@ export default function RecepcionistNavBar() {
       />
       <Tabs.Screen
         name='class-details'
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name='personal-info'
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name='security'
         options={{
           href: null,
         }}
