@@ -71,6 +71,18 @@ export default function RecepcionistNavBar() {
         }}
       />
       <Tabs.Screen
+        name='enroll-client'
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name='notifications'
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
         name='profile'
         options={{
           title: 'Perfil',

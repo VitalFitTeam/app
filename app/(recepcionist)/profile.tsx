@@ -39,7 +39,7 @@ export default function ProfileScreen() {
         {/* About me */}
         <View style={styles.section}> 
           <ThemedText style={styles.sectionTitle}>Sobre mí</ThemedText>
-          <ThemedText style={styles.sectionBody}>
+          <ThemedText style={[styles.sectionBody, { fontFamily: 'BebasNeue-Regular' }]}>
             Recepcionista dedicada con experiencia en gestión de horarios, atención al cliente
             y coordinación de clases. Enfocada en brindar una experiencia fluida y organizada
             a todos los miembros del gimnasio.
@@ -89,6 +89,13 @@ export default function ProfileScreen() {
                   router.push('/(recepcionist)/personal-info');
                 } else if (item === 'Seguridad') {
                   router.push('/(recepcionist)/security');
+                } else if (item === 'Idioma') {
+                  router.push('/language');
+                } else if (item === 'Notificaciones') {
+                  router.push('/(recepcionist)/notifications');
+                } else if (item === 'Ayuda y soporte') {
+                  // Por ahora mostramos una alerta ya que no existe la pantalla
+                  alert('Función de ayuda y soporte en desarrollo');
                 }
               }}
             >

@@ -88,7 +88,7 @@ export default function ClassDetailsScreen() {
   const date = params.date || '2025-07-15';
   const time = params.time || '07:00 - 08:00 AM';
   const capacity = Number(params.capacity || 25);
-  const enrolled = Number(params.enrolled || 18);
+  const enrolled = Number(params.enrolled || 45);
   const status = params.status || 'available';
   const instructorName = params.instructor || 'Nombre del Instructor';
 
@@ -154,6 +154,7 @@ export default function ClassDetailsScreen() {
             </ThemedText>
           </View>
 
+          {/* Lista de clientes implementado inline */}
           <View style={styles.searchWrapper}>
             <TextInput
               placeholder='Nombre del cliente'
@@ -194,7 +195,23 @@ export default function ClassDetailsScreen() {
               <ThemedText style={styles.fullButtonText}>Clase Llena</ThemedText>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8}>
+            <TouchableOpacity 
+              style={styles.primaryButton} 
+              activeOpacity={0.8}
+              onPress={() => {
+                const queryParams = new URLSearchParams({
+                  id: params.id || '',
+                  name: name,
+                  date: date,
+                  time: time,
+                  capacity: capacity.toString(),
+                  enrolled: enrolled.toString(),
+                  status: status,
+                  instructor: instructorName
+                });
+                router.push(`/(recepcionist)/enroll-client?${queryParams.toString()}`);
+              }}
+            >
               <ThemedText style={styles.primaryButtonText}>Inscribir Cliente</ThemedText>
             </TouchableOpacity>
           )}
@@ -377,7 +394,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F97316',
     paddingVertical: 12,
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 48,
   },
   primaryButtonText: {
     fontSize: 14,
