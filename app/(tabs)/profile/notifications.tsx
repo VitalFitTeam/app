@@ -1,88 +1,167 @@
-import { ThemedText } from '@/components/themed-text';
-import { Fonts } from '@/constants/theme';
-import { Stack, useRouter } from 'expo-router';
+import { ThemedView } from '@/components/themed-view';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { BellIcon, Cog6ToothIcon } from 'react-native-heroicons/outline';
 import { ChevronLeftIcon } from 'react-native-heroicons/solid';
 
 const mockNotifications = [
-	{
-		id: '1',
-		title: 'New offer available',
-		description: 'Get 20% off your next purchase! Offer ends in 3 days.',
-	},
-	{
-		id: '2',
-		title: 'New offer available',
-		description: 'Get 20% off your next purchase! Offer ends in 3 days.',
-	},
-	{
-		id: '3',
-		title: 'New offer available',
-		description: 'Get 20% off your next purchase! Offer ends in 3 days.',
-	},
-	{
-		id: '4',
-		title: 'New offer available',
-		description: 'Get 20% off your next purchase! Offer ends in 3 days.',
-	},
-	{
-		id: '5',
-		title: 'New offer available',
-		description: 'Get 20% off your next purchase! Offer ends in 3 days.',
-	},
-	{
-		id: '6',
-		title: 'New offer available',
-		description: 'Get 20% off your next purchase! Offer ends in 3 days.',
-	},
+  {
+    id: '1',
+    title: 'Recordatorio de clase',
+    body: 'Tienes una clase de Functional Strength hoy a las 6:00 pm.',
+    dateLabel: 'Sep 9, 2024',
+  },
+  {
+    id: '2',
+    title: 'Nuevo mensaje',
+    body: 'Tienes nuevas recomendaciones en tu plan de entrenamiento.',
+    dateLabel: 'Sep 9, 2024',
+  },
+  {
+    id: '3',
+    title: 'Actualización de membresía',
+    body: 'Tu membresía Premium se ha renovado correctamente.',
+    dateLabel: 'Sep 8, 2024',
+  },
 ];
 
-const NotificationItem = ({ title, description }: { title: string; description: string }) => (
-	<View className='flex-row items-start p-4 bg-white dark:bg-neutral-900'>
-		<View className='w-12 h-12 rounded-lg bg-neutral-200 dark:bg-neutral-800 items-center justify-center mr-3'>
-			<BellIcon size={24} color='#f97316' />
-		</View>
-		<View className='flex-1'>
-			<Text style={{ fontSize: 14, fontWeight: '600', color: '#000000', marginBottom: 4 }}>
-				{title}
-			</Text>
-			<Text style={{ fontSize: 12, color: '#9ca3af', lineHeight: 18 }}>{description}</Text>
-		</View>
-	</View>
-);
-
 export default function NotificationsScreen() {
-	const router = useRouter();
+  const router = useRouter();
 
-	return (
-		<View className='flex-1 bg-white dark:bg-neutral-900'>
-			<Stack.Screen options={{ headerShown: false }} />
+  const handleOpenSettings = () => {
+    router.push('/profile/notifications-settings');
+  };
 
-			<View className='flex-row items-center justify-between pt-14 pb-4 px-4 bg-white dark:bg-neutral-900'>
-				<TouchableOpacity onPress={() => router.replace('/(tabs)/profile')} className='p-2'>
-					<ChevronLeftIcon size={28} color='#F27F2A' />
-				</TouchableOpacity>
-				<ThemedText className='text-xl font-bold' style={{ fontFamily: Fonts.title }}>
-					Notificaciones
-				</ThemedText>
-				<TouchableOpacity
-					onPress={() => router.push('/notification-settings')}
-					className='p-2'>
-					<Cog6ToothIcon size={28} color='#000' />
-				</TouchableOpacity>
-			</View>
+  return (
+    <ThemedView className='flex-1 bg-white pt-10'>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
+        {/* Franja superior */}
+        <View
+          className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'
+          style={{ position: 'relative' }}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => router.back()}
+            style={{ position: 'absolute', left: 12, top: 8, bottom: 8, justifyContent: 'center' }}>
+            <ChevronLeftIcon width={20} height={20} color='#f97316' />
+          </TouchableOpacity>
 
-			<ScrollView>
-				{mockNotifications.map((item) => (
-					<NotificationItem
-						key={item.id}
-						title={item.title}
-						description={item.description}
-					/>
-				))}
-			</ScrollView>
-		</View>
-	);
+          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Notificaciones</Text>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={handleOpenSettings}
+            style={{ position: 'absolute', right: 12, top: 8, bottom: 8, justifyContent: 'center' }}>
+            <Text style={{ color: '#f97316', fontSize: 13, fontWeight: '600' }}>Configurar</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Sección "Hoy" */}
+        <Text style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 8 }}>Hoy</Text>
+        {mockNotifications.slice(0, 2).map((n) => (
+          <View
+            key={n.id}
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: 16,
+              paddingVertical: 10,
+              paddingHorizontal: 12,
+              marginBottom: 8,
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              shadowColor: '#000',
+              shadowOpacity: 0.06,
+              shadowRadius: 6,
+              shadowOffset: { width: 0, height: 2 },
+              elevation: 1,
+            }}>
+            <View
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: '#BBF7D0',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 10,
+              }}>
+              <Text style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>Gym</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text
+                style={{
+                  color: '#111827',
+                  fontSize: 13,
+                  fontWeight: '600',
+                  marginBottom: 2,
+                }}
+                numberOfLines={1}>
+                {n.title}
+              </Text>
+              <Text
+                style={{ color: '#4b5563', fontSize: 12, marginBottom: 4 }}
+                numberOfLines={2}>
+                {n.body}
+              </Text>
+              <Text style={{ color: '#9ca3af', fontSize: 11 }}>{n.dateLabel}</Text>
+            </View>
+          </View>
+        ))}
+
+        {/* Sección "Ayer" */}
+        <Text style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 16 }}>Ayer</Text>
+        {mockNotifications.slice(2).map((n) => (
+          <View
+            key={n.id}
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: 16,
+              paddingVertical: 10,
+              paddingHorizontal: 12,
+              marginBottom: 8,
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              shadowColor: '#000',
+              shadowOpacity: 0.06,
+              shadowRadius: 6,
+              shadowOffset: { width: 0, height: 2 },
+              elevation: 1,
+            }}>
+            <View
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: '#BBF7D0',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 10,
+              }}>
+              <Text style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>Gym</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text
+                style={{
+                  color: '#111827',
+                  fontSize: 13,
+                  fontWeight: '600',
+                  marginBottom: 2,
+                }}
+                numberOfLines={1}>
+                {n.title}
+              </Text>
+              <Text
+                style={{ color: '#4b5563', fontSize: 12, marginBottom: 4 }}
+                numberOfLines={2}>
+                {n.body}
+              </Text>
+              <Text style={{ color: '#9ca3af', fontSize: 11 }}>{n.dateLabel}</Text>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    </ThemedView>
+  );
 }

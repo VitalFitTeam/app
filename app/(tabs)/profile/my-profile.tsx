@@ -1,52 +1,26 @@
-import { PrimaryButton } from '@/components/PrimaryButton';
-import { StyledTextInput } from '@/components/StyledTextInput';
-import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { ToastNotification } from '@/components/ToastNotification';
-import { Colors, Fonts } from '@/constants/theme';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { isAPIError, User } from '@vitalfit/sdk';
-import { format } from 'date-fns';
+import { isAPIError } from '@vitalfit/sdk';
 import { Image } from 'expo-image';
-import { Stack, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Calendar } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import {
-	ActivityIndicator,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
-} from 'react-native';
-import { ChevronLeftIcon, PencilSquareIcon } from 'react-native-heroicons/solid';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ChevronLeftIcon, PencilSquareIcon, PhoneIcon, UserCircleIcon } from 'react-native-heroicons/solid';
 import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
 
 export default function MyProfileScreen() {
 	const router = useRouter();
-	const phoneInputRef = useRef<IPhoneInputRef>(null);
-	const [isEditing, setIsEditing] = useState(false);
 	const [loading, setLoading] = useState(true);
-	const [userData, setUserData] = useState<User | null>(null);
-	const [showPicker, setShowPicker] = useState(false);
-	const [toast, setToast] = useState<{
-		visible: boolean;
-		type: 'success' | 'error';
-		title: string;
-		message: string;
-	}>({
-		visible: false,
-		type: 'success',
-		title: '',
-		message: '',
-	});
+	const [isEditing, setIsEditing] = useState(false);
+	const phoneInputRef = useRef<IPhoneInputRef>(null);
 
-	// Estados para los campos editables
 	const [firstName, setFirstName] = useState('');
 	const [lastName, setLastName] = useState('');
-	const [birthDate, setBirthDate] = useState('');
+	const [documentId, setDocumentId] = useState('');
+	const [birthDate, setBirthDate] = useState('mm/dd/yy');
+	const [email, setEmail] = useState('');
 	const [phone, setPhone] = useState('');
 
 	useEffect(() => {
@@ -54,16 +28,16 @@ export default function MyProfileScreen() {
 			try {
 				const token = await AsyncStorage.getItem('token');
 				if (!token) {
-					console.error('❌ No se encontró token en AsyncStorage');
+					console.error('No se encontró token en AsyncStorage');
+					setLoading(false);
 					return;
 				}
 
-				const userDataResponse = await vitalFitApi.user.WhoAmI(token);
-				setUserData(userDataResponse.user);
-				setFirstName(userDataResponse.user.first_name || '');
-				setLastName(userDataResponse.user.last_name || '');
-				setBirthDate(userDataResponse.user.birth_date || '');
-				setPhone(userDataResponse.user.phone || '');
+				const userData = await vitalFitApi.user.WhoAmI(token);
+				setFirstName(userData?.user?.first_name || '');
+				setLastName(userData?.user?.last_name || '');
+				setEmail(userData?.user?.email || '');
+				setPhone(userData?.user?.phone || '');
 			} catch (error: unknown) {
 				let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
 				if (isAPIError(error)) {
@@ -71,208 +45,243 @@ export default function MyProfileScreen() {
 				} else if (error instanceof Error) {
 					errorMessage = error.message;
 				}
-				console.error('💥 Error al obtener datos del usuario:', errorMessage);
+				console.error('Error en WhoAmI (Perfil personal cliente):', errorMessage);
 			} finally {
 				setLoading(false);
 			}
 		};
+
 		fetchUser();
 	}, []);
 
-	const handleSaveChanges = async () => {
-		try {
-			const token = await AsyncStorage.getItem('token');
-			if (!token) {
-				console.error('❌ No se encontró token en AsyncStorage');
-				return;
-			}
-
-			// 👇 Definimos el tipo local (sin depender del SDK)
-			type UserUpdateRequest = {
-				first_name?: string;
-				last_name?: string;
-				birth_date?: string;
-				phone?: string;
-			};
-
-			const payload: UserUpdateRequest = {
-				first_name: firstName,
-				last_name: lastName,
-				birth_date: birthDate,
-				phone: phone,
-			};
-
-			/* eslint-disable @typescript-eslint/no-explicit-any */
-			const updatedUserData = (await vitalFitApi.client.put({
-				url: '/user/update',
-				jwt: token,
-				data: payload,
-			})) as any;
-			/* eslint-enable @typescript-eslint/no-explicit-any */
-
-			const newUser = updatedUserData?.user || updatedUserData?.data || updatedUserData;
-			setUserData(newUser);
+	const handleToggleEdit = () => {
+		if (isEditing) {
+			// Aquí luego se podrían persistir los cambios
 			setIsEditing(false);
-
-			setToast({
-				visible: true,
-				type: 'success',
-				title: '¡Perfil actualizado!',
-				message: 'Tus cambios se guardaron correctamente',
-			});
-		} catch (error: unknown) {
-			let errorMessage = 'Ocurrió un error inesperado al actualizar el perfil.';
-			if (isAPIError(error)) {
-				errorMessage = error.messages.join(', ');
-			} else if (error instanceof Error) {
-				errorMessage = error.message;
-			}
-			console.error('Error al actualizar el perfil:', errorMessage);
-			setToast({
-				visible: true,
-				type: 'error',
-				title: 'Error',
-				message: errorMessage,
-			});
+		} else {
+			setIsEditing(true);
 		}
 	};
 
 	if (loading) {
 		return (
-			<ThemedView className='flex-1 justify-center items-center'>
+			<ThemedView className='flex-1 justify-center items-center bg-white'>
 				<ActivityIndicator size='large' color='#F27F2A' />
 			</ThemedView>
 		);
 	}
 
-	const fullName = `${userData?.first_name || ''} ${userData?.last_name || ''}`.toUpperCase();
-	const date = birthDate ? new Date(birthDate) : new Date();
+	const displayName =
+		lastName && firstName ? `${firstName} ${lastName}` : firstName || lastName || 'Cliente';
 
 	return (
-		<ThemedView className='flex-1 bg-white dark:bg-neutral-950'>
-			<Stack.Screen options={{ headerShown: false }} />
+		<ThemedView className='flex-1 bg-white pt-10'>
+			<ScrollView
+				showsVerticalScrollIndicator={false}
+				contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
+				{/* Franja gris superior con flecha */}
+				<View
+					className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'
+					style={{ position: 'relative' }}>
+					<TouchableOpacity
+						activeOpacity={0.7}
+						onPress={() => router.back()}
+						style={{ position: 'absolute', left: 12, top: 8, bottom: 8, justifyContent: 'center' }}>
+						<ChevronLeftIcon width={20} height={20} color='#f97316' />
+					</TouchableOpacity>
 
-			<ToastNotification
-				type={toast.type}
-				title={toast.title}
-				message={toast.message}
-				visible={toast.visible}
-				onClose={() => setToast({ ...toast, visible: false })}
-			/>
+					<Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Perfil</Text>
+				</View>
 
-			<View className='flex-row items-center justify-center pt-14 pb-4 px-4 bg-white dark:bg-neutral-900 relative'>
-				<TouchableOpacity onPress={() => router.replace('/(tabs)/profile')} className='absolute left-4 top-14'>
-					<ChevronLeftIcon size={28} color='#F27F2A' />
-				</TouchableOpacity>
-				<ThemedText className='text-xl font-bold' style={{ fontFamily: Fonts.title }}>
-					Mi perfil
-				</ThemedText>
-			</View>
-
-			<ScrollView className='flex-1 bg-white dark:bg-neutral-950'>
-				<View className='items-center py-8 bg-white dark:bg-neutral-900'>
-					<View className='relative'>
-						<View className='w-32 h-32 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-800'>
+				{/* Avatar + nombre centrados */}
+				<View className='mb-4 items-center'>
+					<View style={{ position: 'relative', marginBottom: 12 }}>
+						<View className='w-24 h-24 rounded-full overflow-hidden bg-[#FED7AA] items-center justify-center'>
 							<Image
 								source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
 								style={{ width: '100%', height: '100%' }}
-								contentFit='cover'
 							/>
 						</View>
 						{isEditing && (
-							<TouchableOpacity className='absolute bottom-0 right-0 bg-orange-500 w-10 h-10 rounded-full items-center justify-center'>
-								<PencilSquareIcon size={20} color='white' />
-							</TouchableOpacity>
+							<View
+								style={{
+									position: 'absolute',
+									right: 0,
+									bottom: 0,
+									width: 28,
+									height: 28,
+									borderRadius: 14,
+									backgroundColor: '#f97316',
+									alignItems: 'center',
+									justifyContent: 'center',
+									borderWidth: 2,
+									borderColor: '#FFFFFF',
+								}}>
+								<PencilSquareIcon width={16} height={16} color='#FFFFFF' />
+							</View>
 						)}
 					</View>
-					<ThemedText
-						className='text-xl font-bold mt-4'
-						style={{ fontFamily: Fonts.title }}>
-						{fullName}
-					</ThemedText>
-					<ThemedText className='text-sm text-neutral-500 dark:text-neutral-400 mt-1'>
-						Cuenta personal
-					</ThemedText>
+					<Text style={{ color: '#111827', fontSize: 20, fontWeight: '600' }}>{displayName}</Text>
+					<View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+						<Text style={{ color: '#6b7280', fontSize: 13, marginRight: 4 }}>Nivel 24</Text>
+						<Image
+							source={require('@/assets/images/medal2.png')}
+							style={{ width: 14, height: 14 }}
+							contentFit='contain'
+						/>
+					</View>
+					<Text style={{ color: '#f97316', fontSize: 13, marginTop: 2 }}>Premium</Text>
 				</View>
 
-				<View className='px-6 py-4'>
-					<StyledTextInput
-						label='Nombre'
+				{/* Botón Editar / Guardar cambios */}
+				<TouchableOpacity
+					activeOpacity={0.85}
+					className='w-full rounded-2xl py-3 mb-5 items-center justify-center'
+					style={{ backgroundColor: isEditing ? '#4b5563' : '#f97316' }}
+					onPress={handleToggleEdit}>
+					<Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>
+						{isEditing ? 'Guardar cambios' : 'Editar'}
+					</Text>
+				</TouchableOpacity>
+
+				{/* Sección Información personal */}
+				<View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
+					<View className='flex-row items-center mb-3'>
+						<UserCircleIcon width={18} height={18} color='#111827' />
+						<Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>
+							Información Personal
+						</Text>
+					</View>
+
+					{/* Nombre */}
+					<Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Nombre</Text>
+					<TextInput
+						editable={isEditing}
 						value={firstName}
 						onChangeText={setFirstName}
-						editable={isEditing}
+						placeholder='Nombre'
+						placeholderTextColor='#9CA3AF'
+						style={{
+							backgroundColor: isEditing ? '#FFFFFF' : '#E5E7EB',
+							borderRadius: 10,
+							paddingHorizontal: 10,
+							paddingVertical: 8,
+							fontSize: 13,
+							color: '#111827',
+							marginBottom: 10,
+						}}
 					/>
-					<View className='mb-4' />
 
-					<StyledTextInput
-						label='Apellido'
+					{/* Apellido */}
+					<Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Apellido</Text>
+					<TextInput
+						editable={isEditing}
 						value={lastName}
 						onChangeText={setLastName}
+						placeholder='Apellido'
+						placeholderTextColor='#9CA3AF'
+						style={{
+							backgroundColor: isEditing ? '#FFFFFF' : '#E5E7EB',
+							borderRadius: 10,
+							paddingHorizontal: 10,
+							paddingVertical: 8,
+							fontSize: 13,
+							color: '#111827',
+							marginBottom: 10,
+						}}
+					/>
+
+					{/* Documento de identidad */}
+					<Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Documento de identidad</Text>
+					<TextInput
 						editable={isEditing}
+						value={documentId}
+						onChangeText={setDocumentId}
+						placeholder='Documento de identidad'
+						placeholderTextColor='#9CA3AF'
+						keyboardType='numeric'
+						style={{
+							backgroundColor: isEditing ? '#FFFFFF' : '#E5E7EB',
+							borderRadius: 10,
+							paddingHorizontal: 10,
+							paddingVertical: 8,
+							fontSize: 13,
+							color: '#111827',
+							marginBottom: 10,
+						}}
 					/>
-					<View className='mb-4' />
 
-					<StyledTextInput
-						label='Correo electrónico'
-						value={userData?.email || ''}
-						editable={false}
-					/>
-					<View className='mb-4' />
-
-					<StyledTextInput
-						label='Documento de identidad'
-						value={userData?.identity_document || ''}
-						editable={false}
-					/>
-					<View className='mb-4' />
-
-					<TouchableOpacity
-						onPress={() => isEditing && setShowPicker(true)}
-						style={{ position: 'relative' }}
-						disabled={!isEditing}>
-						<StyledTextInput
-							label='Fecha de nacimiento'
-							value={birthDate ? format(date, 'yyyy-MM-dd') : ''}
-							editable={false}
-							pointerEvents='none'
+					{/* Fecha de nacimiento */}
+					<Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Fecha de nacimiento</Text>
+					<View style={{ position: 'relative' }}>
+						<TextInput
+							editable={isEditing}
+							value={birthDate}
+							onChangeText={setBirthDate}
+							placeholder='mm/dd/yy'
+							placeholderTextColor='#9CA3AF'
+							style={{
+								backgroundColor: isEditing ? '#FFFFFF' : '#E5E7EB',
+								borderRadius: 10,
+								paddingHorizontal: 10,
+								paddingVertical: 8,
+								fontSize: 13,
+								color: '#111827',
+								paddingRight: 32,
+							}}
 						/>
 						<View
 							style={{
 								position: 'absolute',
-								right: 12,
-								bottom: 12,
+								right: 10,
+								top: 10,
 							}}>
-							<Calendar size={20} color={Colors.light.icon} />
+							<Calendar size={18} color='#9CA3AF' />
 						</View>
-					</TouchableOpacity>
-					{showPicker && (
-						<DateTimePicker
-							value={date}
-							mode='date'
-							display='default'
-							onChange={(event, selectedDate) => {
-								setShowPicker(false);
-								if (selectedDate) {
-									setBirthDate(selectedDate.toISOString());
-								}
-							}}
-						/>
-					)}
-					<View className='mb-4' />
+					</View>
+				</View>
 
-					<View>
-						<Text style={styles.label}>Teléfono</Text>
+				{/* Sección Información de contacto */}
+				<View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
+					<View className='flex-row items-center mb-3'>
+						<PhoneIcon width={18} height={18} color='#111827' />
+						<Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>
+							Información de contacto
+						</Text>
+					</View>
+
+					{/* Correo electrónico */}
+					<Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Correo electrónico</Text>
+					<TextInput
+						editable={false}
+						value={email}
+						placeholder='Correo electrónico'
+						placeholderTextColor='#9CA3AF'
+						keyboardType='email-address'
+						style={{
+							backgroundColor: '#E5E7EB',
+							borderRadius: 10,
+							paddingHorizontal: 10,
+							paddingVertical: 8,
+							fontSize: 13,
+							color: '#111827',
+							marginBottom: 10,
+						}}
+					/>
+
+					{/* Teléfono */}
+					<Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Teléfono</Text>
+					{isEditing ? (
 						<PhoneInput
 							ref={phoneInputRef}
 							value={phone || ''}
-							onChangePhoneNumber={(phoneNumber) => setPhone(phoneNumber)}
+							onChangePhoneNumber={setPhone}
 							defaultCountry='VE'
 							placeholder='Número de teléfono'
-							disabled={!isEditing}
 							phoneInputStyles={{
 								container: {
 									...styles.phoneContainer,
-									opacity: isEditing ? 1 : 0.6,
+									opacity: 1,
 								},
 								flagContainer: styles.flagContainer,
 								flag: styles.flag,
@@ -282,14 +291,23 @@ export default function MyProfileScreen() {
 								input: styles.phoneInput,
 							}}
 						/>
-					</View>
-				</View>
-
-				<View className='px-6 mt-2 mb-10'>
-					<PrimaryButton
-						title={isEditing ? 'Guardar cambios' : 'Editar'}
-						onPress={() => (isEditing ? handleSaveChanges() : setIsEditing(true))}
-					/>
+					) : (
+						<TextInput
+							editable={false}
+							value={phone}
+							placeholder='Teléfono'
+							placeholderTextColor='#9CA3AF'
+							keyboardType='phone-pad'
+							style={{
+								backgroundColor: '#E5E7EB',
+								borderRadius: 10,
+								paddingHorizontal: 10,
+								paddingVertical: 8,
+								fontSize: 13,
+								color: '#111827',
+							}}
+						/>
+					)}
 				</View>
 			</ScrollView>
 		</ThemedView>
@@ -297,19 +315,13 @@ export default function MyProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-	label: {
-		fontSize: 14,
-		fontWeight: '500',
-		color: '#5C5E60',
-		marginBottom: 8,
-	},
 	phoneContainer: {
 		backgroundColor: '#F5F5F5',
-		borderRadius: 8,
+		borderRadius: 10,
 		borderWidth: 1,
-		borderColor: '#E0E0E0',
-		paddingHorizontal: 12,
-		height: 48,
+		borderColor: '#E5E7EB',
+		paddingHorizontal: 10,
+		height: 44,
 	},
 	flagContainer: {
 		backgroundColor: 'transparent',
@@ -317,19 +329,19 @@ const styles = StyleSheet.create({
 	},
 	flag: {},
 	caret: {
-		color: '#5C5E60',
+		color: '#6b7280',
 		fontSize: 16,
 	},
 	divider: {
-		backgroundColor: '#E0E0E0',
+		backgroundColor: '#E5E7EB',
 	},
 	callingCode: {
-		color: '#1F2937',
-		fontSize: 16,
+		color: '#111827',
+		fontSize: 14,
 		fontWeight: '500',
 	},
 	phoneInput: {
-		color: '#1F2937',
-		fontSize: 16,
+		color: '#111827',
+		fontSize: 14,
 	},
 });
