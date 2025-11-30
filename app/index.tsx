@@ -60,15 +60,15 @@ export default function HomeScreen() {
 					paddingTop: 48,
 				}}>
 				{/* 4. Usa el array de textos traducidos */}
-				<Text className='text-white text-[30px] font-montserrat-bold text-center leading-[36px] mb-6'>
+				<Text className='mb-6 text-center font-montserrat-bold text-[30px] leading-[36px] text-white'>
 					{slideTexts[index]}
 				</Text>
 
-				<View className='flex-row justify-center mb-6'>
+				<View className='mb-6 flex-row justify-center'>
 					{[0, 1, 2].map((i) => (
 						<View
 							key={i}
-							className={`h-1.5 mx-2 rounded-full ${
+							className={`mx-2 h-1.5 rounded-full ${
 								i === index ? 'w-5 bg-white' : 'w-1.5 bg-white/40'
 							}`}
 						/>
@@ -77,9 +77,9 @@ export default function HomeScreen() {
 
 				{/* 5. Usa 't' para el botón de idioma */}
 				<Link href='/language' asChild>
-					<TouchableOpacity className='flex-row items-center justify-center py-2 mb-4'>
+					<TouchableOpacity className='mb-4 flex-row items-center justify-center py-2'>
 						<Global color='white' size={16} variant='Outline' />
-						<Text className='text-white ml-2 text-sm font-montserrat-medium'>
+						<Text className='ml-2 font-montserrat-medium text-sm text-white'>
 							{t('language')}
 						</Text>
 					</TouchableOpacity>
@@ -97,14 +97,14 @@ export default function HomeScreen() {
 					<View style={{ flex: 1, marginRight: 8 }}>
 						{/* 6. Usa 't' para las etiquetas de los botones */}
 						<SignInButton
-							label={t('Login')}
+							label={t('signIn')}
 							onPress={() => router.push('/(auth)/login')}
 						/>
 					</View>
 
 					<View style={{ flex: 1, marginLeft: 8 }}>
 						<SignUpButton
-							label={t('Register')}
+							label={t('signUp')}
 							onPress={() => router.push('/(auth)/register')}
 						/>
 					</View>
