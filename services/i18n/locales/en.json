@@ -1,36 +1,46 @@
 {
-	"translation": {
-		"language": "Language",
-		"save": "Save",
-		"signIn": "Sign In",
-		"signUp": "Sign Up",
-		"slide1": "Challenge your limits,\nconquer your goals",
-		"slide2": "Discipline is the\npath to success",
-		"slide3": "Be constant,\nbe unstoppable",
-		"login": {
-			"title": "Sign In",
-			"subtitle": "Enter your credentials to sign in",
-			"emailLabel": "Email",
-			"emailPlaceholder": "Enter your email",
-			"passwordLabel": "Password",
-			"passwordPlaceholder": "Enter your password",
-			"rememberMe": "Keep me signed in",
-			"forgotPassword": "Forgot your password? ",
-			"recover": "Recover",
-			"signInButton": "Sign In",
-			"signingInButton": "Signing in...",
-			"googleSignIn": "Sign in with Google",
-			"noAccount": "Don't have an account yet? ",
-			"signUpLink": "Sign Up",
-			"toast": {
-				"errorTitle": "Error",
-				"loginErrorTitle": "Login Error",
-				"emptyFields": "Please enter your email and password.",
-				"invalidEmail": "Please enter a valid email address.",
-				"unexpectedError": "An unexpected error occurred. Please try again."
-			}
-		},
-		"register": {
+  "translation": {
+    "language": "Language",
+    "save": "Save",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "slide1": "Challenge your limits,\nconquer your goals",
+    "slide2": "Discipline is the\npath to success",
+    "slide3": "Be constant,\nbe unstoppable",
+    "nav": {
+      "dashboard": "Home",
+      "schedule": "Schedule",
+      "training": "Training",
+      "community": "Community",
+      "profile": "Profile",
+      "back": "Back",
+      "membership": "Membership",
+      "classDetails": "Class Details"
+    },
+    "login": {
+      "title": "Sign In",
+      "subtitle": "Enter your credentials to sign in",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "rememberMe": "Keep me signed in",
+      "forgotPassword": "Forgot your password? ",
+      "recover": "Recover",
+      "signInButton": "Sign In",
+      "signingInButton": "Signing in...",
+      "googleSignIn": "Sign in with Google",
+      "noAccount": "Don't have an account yet? ",
+      "signUpLink": "Sign Up",
+      "toast": {
+        "errorTitle": "Error",
+        "loginErrorTitle": "Login Error",
+        "emptyFields": "Please enter your email and password.",
+        "invalidEmail": "Please enter a valid email address.",
+        "unexpectedError": "An unexpected error occurred. Please try again."
+      }
+    },
+    "register": {
       "step1Title": "WHAT'S YOUR GENDER?",
       "step2Title": "CREATE YOUR ACCOUNT",
       "step2Subtitle": "Enter your credentials to register",
@@ -50,7 +60,6 @@
         "unexpectedError": "An unexpected error occurred. Please try again."
       }
     },
-
     "step2Credentials": {
       "emailLabel": "Email",
       "emailPlaceholder": "Enter your email",
@@ -61,7 +70,6 @@
       "continueButton": "Continue",
       "googleSignInButton": "Sign in with Google"
     },
-
     "step3PersonalDetails": {
       "nameLabel": "Name",
       "namePlaceholder": "Enter your name",
@@ -75,14 +83,13 @@
       "acceptTerms": "I accept the ",
       "termsAndConditions": "terms and conditions",
       "createAccountButton": "Create Account"
-    }
     },
-	"forgotPassword": {
-      "titles": [
-        "RECOVER YOUR PASSWORD",
-        "VERIFY CODE",
-        "NEW PASSWORD"
-      ],
+    "forgotPassword": {
+      "titles": {
+        "step1": "RECOVER YOUR PASSWORD",
+        "step2": "VERIFY CODE",
+        "step3": "NEW PASSWORD"
+      },
       "subtitles": {
         "step1": "Enter the email associated with the account to recover your password",
         "step2": "We have sent a code to your email",
@@ -121,6 +128,13 @@
           "errorTitle": "Error",
           "errorMessage": "An unexpected error occurred. Please try again."
         }
+      },
+      "notifications": {
+        "success": "Success!",
+        "error": "Error",
+        "checkEmail": "Check your email",
+        "invalidCode": "Invalid code",
+        "passwordChanged": "Password changed successfully"
       }
     },
     "confirmEmail": {
@@ -138,5 +152,44 @@
         "errorTitle": "Error",
         "errorMessage": "Invalid code or connection error."
       }
+    },
+    "dashboard": {
+      "defaultUser": "User",
+      "challenges": {
+        "completed": "Completed Challenges",
+        "weekly": "Weekly Training",
+        "progress": "Progress"
+      },
+      "mock": {
+        "classTitle": "Class",
+        "routineDay": "DAY 01",
+        "routineSubtitle": "Start jogging",
+        "routineDuration": "10 km, 4 weeks"
+      },
+      "sections": {
+        "packages": "Packages"
+      },
+      "banners": {
+        "crossfit4": "CrossFit - 4 sessions"
+      }
+    },
+    "schedule": {
+      "calendar": "CALENDAR",
+      "tabs": {
+        "classes": "Classes",
+        "reservations": "Bookings",
+        "explore": "Explore"
+      },
+      "upcomingClasses": "Upcoming Classes",
+      "filter": "Filter",
+      "myReservations": "My Reservations",
+      "noReservations": "No reservations yet.",
+      "categories": {
+        "yoga": "Yoga",
+        "hiit": "HIIT",
+        "kickBoxing": "Kick Boxing",
+        "pilates": "Pilates"
+      }
     }
+  }
 }
