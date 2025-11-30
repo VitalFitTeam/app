@@ -3,21 +3,38 @@ import { ThemedView } from '@/components/themed-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ChevronRightIcon, QrCodeIcon } from 'react-native-heroicons/outline';
 
 export default function ProfileScreen() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    try {
-      // Eliminar el token de AsyncStorage
-      await AsyncStorage.removeItem('token');
-      // Navegar al login
-      router.push('/(auth)/login');
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-    }
+    Alert.alert(
+      'Cerrar sesión',
+      '¿Estás seguro de que deseas cerrar sesión?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Cerrar sesión',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // Eliminar el token de AsyncStorage
+              await AsyncStorage.removeItem('token');
+              // Limpiar toda la pila de navegación y ir al login
+              router.dismissAll();
+              router.replace('/(auth)/login');
+            } catch (error) {
+              console.error('Error al cerrar sesión:', error);
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (

@@ -2,9 +2,9 @@ import { MonthCalendar } from '@/components/auth/dashboard/monthcalendar';
 import { WeekCalendar } from '@/components/auth/dashboard/weekcalendar';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import { BackHandler, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { CalendarDaysIcon, FunnelIcon } from 'react-native-heroicons/outline';
 
 type ViewMode = 'week' | 'month';
@@ -92,6 +92,18 @@ export default function ScheduleScreen() {
   const [viewMode, setViewMode] = useState<ViewMode>('week');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [filteredDate, setFilteredDate] = useState('');
+
+  // Manejar el botón de atrás para ir al inicio
+  useFocusEffect(
+    useCallback(() => {
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+        router.replace('/(recepcionist)/dashboard');
+        return true;
+      });
+
+      return () => backHandler.remove();
+    }, [router])
+  );
 
   const handleDateSelect = (date: { timestamp: number } | Date) => {
   

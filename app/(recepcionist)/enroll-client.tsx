@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/themed-view';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { BackHandler, Image, Modal, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { ArrowLeftIcon, CheckCircleIcon } from 'react-native-heroicons/solid';
+import { CheckCircleIcon } from 'react-native-heroicons/solid';
 
 export default function EnrollClientScreen() {
   const router = useRouter();
@@ -24,10 +24,21 @@ export default function EnrollClientScreen() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleBackPress = useCallback(() => {
-    router.back();
+    const queryParams = new URLSearchParams({
+      id: params.id || '',
+      name: params.name || '',
+      date: params.date || '',
+      time: params.time || '',
+      capacity: params.capacity || '',
+      enrolled: params.enrolled || '',
+      status: params.status || '',
+      instructor: params.instructor || ''
+    });
+    router.replace(`/(recepcionist)/class-details?${queryParams.toString()}`);
     return true;
-  }, [router]);
+  }, [router, params]);
 
+  
   const handleEnroll = () => {
     if (!clientId.trim() || !clientName.trim()) {
       alert('Por favor completa todos los campos');
@@ -40,7 +51,17 @@ export default function EnrollClientScreen() {
 
   const handleSuccessClose = () => {
     setShowSuccessModal(false);
-    router.back();
+    const queryParams = new URLSearchParams({
+      id: params.id || '',
+      name: params.name || '',
+      date: params.date || '',
+      time: params.time || '',
+      capacity: params.capacity || '',
+      enrolled: params.enrolled || '',
+      status: params.status || '',
+      instructor: params.instructor || ''
+    });
+    router.replace(`/(recepcionist)/class-details?${queryParams.toString()}`);
   };
 
   React.useEffect(() => {
@@ -48,6 +69,7 @@ export default function EnrollClientScreen() {
     return () => subscription.remove();
   }, [handleBackPress]);
 
+  
   return (
     <ThemedView style={styles.container}>
       {/* Header con logo */}
@@ -59,11 +81,7 @@ export default function EnrollClientScreen() {
         />
       </View>
 
-      {/* Botón de regresar */}
-      <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
-        <ArrowLeftIcon size={24} color="#1F2937" />
-      </TouchableOpacity>
-
+      
       {/* Contenido principal */}
       <View style={styles.content}>
         <ThemedText style={styles.title}>Inscribir Cliente</ThemedText>
@@ -164,23 +182,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 50,
   },
-  backButton: {
-    position: 'absolute',
-    top: 70,
-    left: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  content: {
+    content: {
     flex: 1,
     paddingHorizontal: 20,
   },

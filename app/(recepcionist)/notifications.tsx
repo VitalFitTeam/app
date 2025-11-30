@@ -1,8 +1,8 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Stack, useRouter } from 'expo-router';
-import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback } from 'react';
+import { BackHandler, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BellIcon, Cog6ToothIcon } from 'react-native-heroicons/outline';
 import { ChevronLeftIcon } from 'react-native-heroicons/solid';
 
@@ -49,13 +49,23 @@ const NotificationItem = ({ title, description }: { title: string; description: 
 export default function RecepcionistNotificationsScreen() {
   const router = useRouter();
 
+  const handleBackPress = useCallback(() => {
+    router.replace('/(recepcionist)/profile');
+    return true;
+  }, [router]);
+
+  React.useEffect(() => {
+    const subscription = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+    return () => subscription.remove();
+  }, [handleBackPress]);
+
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.replace('/(recepcionist)/profile')} style={styles.backButton}>
           <ChevronLeftIcon size={28} color='#F97316' />
         </TouchableOpacity>
         <ThemedText style={styles.headerTitle}>Notificaciones</ThemedText>

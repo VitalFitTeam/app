@@ -1,13 +1,14 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Alert, BackHandler, Image, Modal, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { EyeIcon, EyeSlashIcon } from 'react-native-heroicons/outline';
 
 export default function SecurityScreen() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -16,6 +17,27 @@ export default function SecurityScreen() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleBackPress = useCallback(() => {
+    if (isEditing) {
+      // Si está en modo edición, cancelar la edición
+      setIsEditing(false);
+      // Restaurar valores originales
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      return true;
+    } else {
+      // Si no está editando, ir al perfil
+      router.replace('/(recepcionist)/profile');
+      return true;
+    }
+  }, [router, isEditing]);
+
+  React.useEffect(() => {
+    const subscription = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+    return () => subscription.remove();
+  }, [handleBackPress]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -47,7 +69,11 @@ export default function SecurityScreen() {
     
     setIsEditing(false);
     // Aquí guardarías los datos
-    router.push('/(recepcionist)/profile');
+    setShowSuccessModal(true);
+  };
+
+  const handleSuccessClose = () => {
+    setShowSuccessModal(false);
   };
 
   const handleCancel = () => {
@@ -175,6 +201,29 @@ export default function SecurityScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Modal de éxito */}
+      <Modal
+        transparent={true}
+        visible={showSuccessModal}
+        animationType="fade"
+        onRequestClose={handleSuccessClose}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ThemedText style={styles.modalTitle}>¡Éxito!</ThemedText>
+            <ThemedText style={styles.modalMessage}>
+              Los cambios fueron guardados exitosamente
+            </ThemedText>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={handleSuccessClose}
+            >
+              <ThemedText style={styles.modalButtonText}>Aceptar</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ThemedView>
   );
 }
@@ -298,5 +347,50 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 12,
     padding: 4,
+  },
+  // Estilos del modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    width: '80%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#10B981',
+    marginBottom: 12,
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#374151',
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  modalButton: {
+    backgroundColor: '#F97316',
+    borderRadius: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    minWidth: 120,
+  },
+  modalButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });

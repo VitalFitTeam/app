@@ -2,12 +2,13 @@ import type { Client } from '@/components/recepcionista/ClientList';
 import ClientList from '@/components/recepcionista/ClientList';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useRef, useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, BackHandler, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, MagnifyingGlassIcon, QrCodeIcon } from 'react-native-heroicons/outline';
 
 export default function CheckInScreen() {
+  const router = useRouter();
   const [isScanning, setIsScanning] = useState(false);
   const [showAllClients, setShowAllClients] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -30,8 +31,15 @@ export default function CheckInScreen() {
       setTimeout(() => {
         scrollViewRef.current?.scrollTo({ y: 0, animated: true });
       }, 100);
-      return () => {};
-    }, [])
+
+      // Manejar el botón de atrás para ir al inicio
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+        router.replace('/(recepcionist)/dashboard');
+        return true;
+      });
+
+      return () => backHandler.remove();
+    }, [router])
   );
 
   const handleScanQR = () => {

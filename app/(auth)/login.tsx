@@ -13,14 +13,14 @@ import { Eye, EyeOff, SlidersVertical } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next'; // 1. Importar el hook
 import {
-	Keyboard,
-	KeyboardAvoidingView,
-	Platform,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	TouchableWithoutFeedback,
-	View,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from 'react-native';
 
 export default function LoginScreen() {
@@ -95,7 +95,7 @@ export default function LoginScreen() {
                         flex: 1,
                         justifyContent: 'center',
                         paddingHorizontal: 32,
-                        paddingVertical: 16,
+                        paddingVertical: 48,
                     }}
                     className='bg-white'>
                     <ToastNotification
@@ -212,7 +212,7 @@ export default function LoginScreen() {
                             />
                         </View>
 
-                        <View className='mt-1 flex-row justify-center items-center'>
+                        <View className='mt-1 flex-row justify-center items-center mb-12'>
                             <Text className='text-gray-600'>
                                 {t('login.noAccount')}
                             </Text>

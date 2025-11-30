@@ -1,7 +1,7 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useCallback, useEffect } from 'react';
 import { BackHandler, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { CalendarDaysIcon, UserIcon } from 'react-native-heroicons/outline';
 
@@ -83,6 +83,18 @@ export default function ClassDetailsScreen() {
     status?: string;
     instructor?: string;
   }>();
+
+  // Manejar el botón de atrás para ir a horarios
+  useFocusEffect(
+    useCallback(() => {
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+        router.replace('/(recepcionist)/schedule');
+        return true;
+      });
+
+      return () => backHandler.remove();
+    }, [router])
+  );
 
   const name = params.name || 'NOMBRE DE LA CLASE';
   const date = params.date || '2025-07-15';

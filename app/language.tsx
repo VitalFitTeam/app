@@ -31,8 +31,7 @@ export default function LanguageScreen() {
 
   const handleSuccessClose = () => {
     setShowSuccessModal(false);
-    // Redirigir al perfil del recepcionista
-    router.replace('/(recepcionist)/profile');
+    router.replace('/(recepcionist)/profile'); // Navegar al perfil
   };
 
   return (
@@ -140,6 +139,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     padding: 16,
     marginTop: 'auto',
+    marginBottom: 30, // Agregar espacio inferior para evitar choque con botones del teléfono
   },
   modalOverlay: {
     flex: 1,
