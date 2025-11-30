@@ -44,10 +44,12 @@ export default function DashboardRecepcionist() {
 
 	return (
 		<ThemedView className='flex-1 bg-white dark:bg-neutral-950 px-4 pt-10'>
-			<ScrollView showsVerticalScrollIndicator={false}>
+			<ScrollView 
+				showsVerticalScrollIndicator={false}
+				contentContainerStyle={{ paddingBottom: 100 }}
+			>
 				<UserHeader
 					name={firstName ?? 'Recepcionista'}
-					message='Bienvenido a VITALFIT'
 					avatarUrl='https://randomuser.me/api/portraits/women/44.jpg'
 				/>
 
