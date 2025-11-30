@@ -8,11 +8,12 @@ import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView } from 'react-native';
+import { ActivityIndicator, BackHandler, ScrollView } from 'react-native';
 
 export default function DashboardRecepcionist() {
 	const [loading, setLoading] = useState(true);
 	const [firstName, setFirstName] = useState<string | null>(null);
+	const [backPressCount, setBackPressCount] = useState(0);
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -33,6 +34,31 @@ export default function DashboardRecepcionist() {
 
 		fetchUser();
 	}, []);
+
+	// Manejar doble presión atrás para salir de la app (persistente)
+	useEffect(() => {
+		const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+			if (backPressCount === 0) {
+				// Primera presión: mostrar mensaje y aumentar contador
+				setBackPressCount(1);
+				
+				// Resetear el contador después de 2 segundos
+				setTimeout(() => {
+					setBackPressCount(0);
+				}, 2000);
+				
+				return true; // Prevenir comportamiento por defecto
+			} else if (backPressCount === 1) {
+				// Segunda presión: salir de la app
+				BackHandler.exitApp();
+				return true;
+			}
+			
+			return true;
+		});
+
+		return () => backHandler.remove();
+	}, [backPressCount]);
 
 	if (loading) {
 		return (

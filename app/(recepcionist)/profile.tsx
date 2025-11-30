@@ -1,13 +1,25 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
-import React from 'react';
-import { Alert, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback } from 'react';
+import { Alert, BackHandler, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ChevronRightIcon, QrCodeIcon } from 'react-native-heroicons/outline';
 
 export default function ProfileScreen() {
   const router = useRouter();
+
+  // Manejar el botón de atrás para ir al dashboard
+  useFocusEffect(
+    useCallback(() => {
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+        router.replace('/(recepcionist)/dashboard');
+        return true;
+      });
+
+      return () => backHandler.remove();
+    }, [router])
+  );
 
   const handleLogout = async () => {
     Alert.alert(

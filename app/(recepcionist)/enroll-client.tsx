@@ -1,6 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { BackHandler, Image, Modal, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon } from 'react-native-heroicons/solid';
@@ -64,10 +64,12 @@ export default function EnrollClientScreen() {
     router.replace(`/(recepcionist)/class-details?${queryParams.toString()}`);
   };
 
-  React.useEffect(() => {
-    const subscription = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
-    return () => subscription.remove();
-  }, [handleBackPress]);
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+      return () => subscription.remove();
+    }, [handleBackPress])
+  );
 
   
   return (

@@ -1,7 +1,7 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { BackHandler, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { CalendarDaysIcon, UserIcon } from 'react-native-heroicons/outline';
 
@@ -115,16 +115,6 @@ export default function ClassDetailsScreen() {
   }));
 
   const isFull = status === 'full' || enrolled >= capacity;
-
-  useEffect(() => {
-    const handler = () => {
-      router.replace('/(recepcionist)/schedule');
-      return true;
-    };
-
-    const subscription = BackHandler.addEventListener('hardwareBackPress', handler);
-    return () => subscription.remove();
-  }, [router]);
 
   return (
     <ThemedView style={styles.container}>
