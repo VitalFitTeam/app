@@ -3,7 +3,7 @@ import { Stack, useRouter } from 'expo-router';
 import { Check } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next'; // 1. Importamos el hook de traducción
-import { Modal, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 // Opciones de idioma disponibles
 const LANGUAGES = [
@@ -19,19 +19,13 @@ export default function LanguageScreen() {
 
   // 3. El estado inicial es el idioma que está activo actualmente
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleSaveLanguage = () => {
     // 4. Cambiamos el idioma globalmente
     i18n.changeLanguage(selectedLanguage);
-    
-    // Mostrar modal de éxito
-    setShowSuccessModal(true);
-  };
 
-  const handleSuccessClose = () => {
-    setShowSuccessModal(false);
-    router.replace('/(recepcionist)/profile'); // Navegar al perfil
+    // 5. Redirigimos al inicio (replace evita que puedan volver atrás con el idioma viejo)
+    router.replace('/');
   };
 
   return (
@@ -71,39 +65,6 @@ export default function LanguageScreen() {
           <PrimaryButton title={t('save')} onPress={handleSaveLanguage} />
         </View>
       </View>
-
-      {/* Modal de éxito */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={showSuccessModal}
-        onRequestClose={handleSuccessClose}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={handleSuccessClose}
-        >
-          <View style={styles.successModal}>
-            <View style={styles.successIcon}>
-              <Check color="#10B981" size={60} />
-            </View>
-            
-            <Text style={styles.successTitle}>¡Éxito!</Text>
-            <Text style={styles.successMessage}>
-              Cambiado exitosamente
-            </Text>
-            
-            <TouchableOpacity
-              style={styles.successButton}
-              onPress={handleSuccessClose}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.successButtonText}>Aceptar</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
     </SafeAreaView>
   );
 }
@@ -139,55 +100,5 @@ const styles = StyleSheet.create({
   buttonContainer: {
     padding: 16,
     marginTop: 'auto',
-    marginBottom: 30, // Agregar espacio inferior para evitar choque con botones del teléfono
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  successModal: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 32,
-    alignItems: 'center',
-    width: '100%',
-    maxWidth: 320,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  successIcon: {
-    marginBottom: 20,
-  },
-  successTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#10B981',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  successMessage: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#111827',
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  successButton: {
-    backgroundColor: '#10B981',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    alignItems: 'center',
-  },
-  successButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
   },
 });
