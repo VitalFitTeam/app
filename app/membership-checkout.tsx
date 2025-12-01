@@ -2,13 +2,15 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedText } from '@/components/themed-text';
 import { MembershipCheckoutData, MembershipCheckoutSchema } from '@/schemas/membership';
+import vitalFitApi from '@/services/vitalfitSdk';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Calendar } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, TrashIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -35,9 +37,15 @@ const PLAN_BENEFITS: Record<string, string[]> = {
 };
 
 export default function MembershipCheckoutScreen() {
-	const params = useLocalSearchParams<{ id?: string; title?: string; price?: string; period?: string }>();
+	const params = useLocalSearchParams<{
+		id?: string;
+		title?: string;
+		price?: string;
+		period?: string;
+	}>();
 	const router = useRouter();
 	const [showDatePicker, setShowDatePicker] = useState(false);
+	const [loading, setLoading] = useState(false);
 
 	const {
 		getValues,
@@ -51,7 +59,8 @@ export default function MembershipCheckoutScreen() {
 		},
 	});
 
-	const onContinue = () => {
+	const onContinue = async () => {
+		// 1. Validaciones del formulario local
 		const result = MembershipCheckoutSchema.safeParse(getValues());
 
 		if (!result.success) {
@@ -68,18 +77,95 @@ export default function MembershipCheckoutScreen() {
 		const data = result.data;
 
 		if (!params.id || !params.title || !params.price) {
+			Alert.alert('Error', 'Faltan datos del plan seleccionado.');
 			return;
 		}
 
-		router.push({
-			pathname: '/membership-extra',
-			params: {
-				id: params.id,
-				title: params.title,
-				price: params.price,
-				startDate: data.startDate,
-			},
-		} as never);
+		setLoading(true);
+		try {
+			const token = await AsyncStorage.getItem('token');
+			if (!token) {
+				Alert.alert('Error', 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+				return;
+			}
+
+			// 2. Obtener datos necesarios (Usuario y Sucursal)
+			// Usamos getBranchMap (Público) para evitar errores de permisos
+			const [userResponse, branchesResponse] = await Promise.all([
+				vitalFitApi.user.WhoAmI(token),
+				vitalFitApi.public.getBranchMap(token),
+			]);
+
+			// CORRECCIÓN 1: user_id (Según types/user.ts)
+			const userId = userResponse.user?.user_id;
+
+			// CORRECCIÓN 2: Manejo seguro del ID de sucursal
+			const firstBranch = branchesResponse.data?.[0];
+
+			// Usamos 'as any' para evitar el error de TypeScript si la definición local no está actualizada.
+			// Buscamos 'branch_id' (estándar del SDK) o 'id' como respaldo.
+			const branchObj = firstBranch as any;
+			const branchId = branchObj?.branch_id || branchObj?.id || branchObj?.branch_map_id;
+
+			if (!userId) {
+				throw new Error('No se pudo identificar al usuario.');
+			}
+			if (!branchId) {
+				throw new Error('No se encontró una sucursal disponible para asignar la factura.');
+			}
+
+			// 3. Crear la factura (Invoice)
+			const invoiceResponse = await vitalFitApi.billing.createInvoice(
+				{
+					branch_id: branchId,
+					user_id: userId,
+					items: [
+						{
+							item_id: params.id,
+							item_type: 'membership',
+							quantity: 1,
+						},
+					],
+				},
+				token,
+			);
+
+			// Obtener el ID de la factura de la respuesta de forma segura
+			const responseData = invoiceResponse as any;
+			const invoiceId = responseData.invoice_id || responseData.id || responseData.data?.id;
+
+			if (!invoiceId) {
+				console.error('Respuesta Invoice:', invoiceResponse);
+				throw new Error('El servidor no devolvió el ID de la factura.');
+			}
+
+			// 4. Navegar al siguiente paso
+			router.push({
+				pathname: '/membership-extra', // Ajusta si vas directo al pago
+				params: {
+					id: params.id,
+					title: params.title,
+					price: params.price,
+					startDate: data.startDate,
+					invoiceId: invoiceId, // ID crucial para el pago
+					branchId: branchId,
+				},
+			} as never);
+		} catch (error) {
+			console.error('Error en checkout:', error);
+			const msg = error instanceof Error ? error.message : 'Inténtalo de nuevo.';
+
+			const apiError = error as any;
+			const apiMsg = apiError?.messages ? apiError.messages.join('\n') : msg;
+
+			if (msg.includes('forbidden') || msg.includes('403')) {
+				Alert.alert('Permiso denegado', 'No tienes permisos para realizar esta compra.');
+			} else {
+				Alert.alert('No se pudo crear la orden', apiMsg);
+			}
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const benefits = useMemo(() => {
@@ -91,82 +177,82 @@ export default function MembershipCheckoutScreen() {
 
 	return (
 		<SafeAreaView className='flex-1 bg-white'>
-			<ScrollView className='flex-1 px-6 pt-8 pb-32'>
+			<ScrollView className='flex-1 px-6 pb-32 pt-8'>
 				<View className='mb-6'>
 					<ThemedText
 						lightColor='#f97316'
 						darkColor='#f97316'
-						className='text-4xl mb-4 text-center'
+						className='mb-4 text-center text-4xl'
 						style={{ fontFamily: 'BebasNeue-Regular' }}>
 						COMPRAR MEMBRESÍA
 					</ThemedText>
-					<View className='flex-row justify-between items-center mb-4'>
-						<View className='items-center flex-1'>
+					<View className='mb-4 flex-row items-center justify-between'>
+						<View className='flex-1 items-center'>
 							<View
-								className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
-									currentStep === 1 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
-								}`}> 
+								className={`mb-1 h-8 w-8 items-center justify-center rounded-full border ${
+									currentStep === 1
+										? 'border-orange-500 bg-orange-500'
+										: 'border-neutral-400 bg-white'
+								}`}>
 								<ThemedText
 									lightColor={currentStep === 1 ? '#ffffff' : '#111827'}
 									darkColor={currentStep === 1 ? '#ffffff' : '#111827'}
 									className='text-[10px] font-semibold'
-									style={{ fontFamily: 'Montserrat_500Medium' }}
-								>
+									style={{ fontFamily: 'Montserrat_500Medium' }}>
 									1
 								</ThemedText>
 							</View>
 							<ThemedText
 								lightColor={currentStep === 1 ? '#f97316' : '#111827'}
 								darkColor={currentStep === 1 ? '#f97316' : '#111827'}
-								className='text-[11px] text-center'
-								style={{ fontFamily: 'Montserrat_500Medium' }}
-							>
+								className='text-center text-[11px]'
+								style={{ fontFamily: 'Montserrat_500Medium' }}>
 								Opciones de producto
 							</ThemedText>
 						</View>
-						<View className='items-center flex-1'>
+						<View className='flex-1 items-center'>
 							<View
-								className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
-									currentStep === 2 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
-								}`}> 
+								className={`mb-1 h-8 w-8 items-center justify-center rounded-full border ${
+									currentStep === 2
+										? 'border-orange-500 bg-orange-500'
+										: 'border-neutral-400 bg-white'
+								}`}>
 								<ThemedText
 									lightColor={currentStep === 2 ? '#ffffff' : '#111827'}
 									darkColor={currentStep === 2 ? '#ffffff' : '#111827'}
 									className='text-[10px] font-semibold'
-									style={{ fontFamily: 'Montserrat_500Medium' }}
-								>
+									style={{ fontFamily: 'Montserrat_500Medium' }}>
 									2
 								</ThemedText>
 							</View>
 							<ThemedText
 								lightColor={currentStep === 2 ? '#f97316' : '#111827'}
 								darkColor={currentStep === 2 ? '#f97316' : '#111827'}
-								className='text-[11px] text-center'
-								style={{ fontFamily: 'Montserrat_500Medium' }}
-							>
+								className='text-center text-[11px]'
+								style={{ fontFamily: 'Montserrat_500Medium' }}>
 								Métodos de pago
 							</ThemedText>
 						</View>
-						<View className='items-center flex-1'>
+						<View className='flex-1 items-center'>
 							<View
-								className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
-									currentStep === 3 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
-								}`}> 
+								className={`mb-1 h-8 w-8 items-center justify-center rounded-full border ${
+									currentStep === 3
+										? 'border-orange-500 bg-orange-500'
+										: 'border-neutral-400 bg-white'
+								}`}>
 								<ThemedText
 									lightColor={currentStep === 3 ? '#ffffff' : '#111827'}
 									darkColor={currentStep === 3 ? '#ffffff' : '#111827'}
 									className='text-[10px] font-semibold'
-									style={{ fontFamily: 'Montserrat_500Medium' }}
-								>
+									style={{ fontFamily: 'Montserrat_500Medium' }}>
 									3
 								</ThemedText>
 							</View>
 							<ThemedText
 								lightColor={currentStep === 3 ? '#f97316' : '#111827'}
 								darkColor={currentStep === 3 ? '#f97316' : '#111827'}
-								className='text-[11px] text-center'
-								style={{ fontFamily: 'Montserrat_500Medium' }}
-							>
+								className='text-center text-[11px]'
+								style={{ fontFamily: 'Montserrat_500Medium' }}>
 								Confirmación de compra
 							</ThemedText>
 						</View>
@@ -175,24 +261,24 @@ export default function MembershipCheckoutScreen() {
 
 				<View className='mb-6'>
 					<View className='flex-row items-center justify-between'>
-						<View className='flex-1 mr-2'>
+						<View className='mr-2 flex-1'>
 							<ThemedText
 								lightColor='#111827'
 								darkColor='#ffffff'
-								className='text-xl mb-1'
+								className='mb-1 text-xl'
 								style={{ fontFamily: 'Montserrat_400Regular' }}>
-									{params.title ?? 'Plan seleccionado'}
-								</ThemedText>
+								{params.title ?? 'Plan seleccionado'}
+							</ThemedText>
 							<ThemedText
 								lightColor='#4b5563'
 								darkColor='#d1d5db'
 								className='text-xs'
 								style={{ fontFamily: 'Montserrat_400Regular' }}>
-									Más beneficios para tu vida fitness
-								</ThemedText>
+								Más beneficios para tu vida fitness
+							</ThemedText>
 						</View>
 						<View className='flex-row items-center'>
-							<View className='items-end mr-3'>
+							<View className='mr-3 items-end'>
 								<ThemedText
 									lightColor='#111827'
 									darkColor='#ffffff'
@@ -203,7 +289,7 @@ export default function MembershipCheckoutScreen() {
 								<ThemedText
 									lightColor='#4b5563'
 									darkColor='#d1d5db'
-									className='text-xs mt-[-4]'
+									className='mt-[-4] text-xs'
 									style={{ fontFamily: 'Montserrat_500Medium' }}>
 									{params.period ?? ''}
 								</ThemedText>
@@ -220,24 +306,24 @@ export default function MembershipCheckoutScreen() {
 
 				<View className='mb-6'>
 					{benefits.map((benefit) => (
-						<View key={benefit} className='flex-row items-center mb-3'>
+						<View key={benefit} className='mb-3 flex-row items-center'>
 							<CheckCircleIcon size={18} color='#F97316' />
 							<ThemedText
 								lightColor='#111827'
 								darkColor='#e5e7eb'
-								className='text-sm ml-2'
+								className='ml-2 text-sm'
 								style={{ fontFamily: 'Montserrat_400Regular' }}>
-									{benefit}
+								{benefit}
 							</ThemedText>
 						</View>
 					))}
 				</View>
-				
+
 				<View className='mb-8'>
 					<ThemedText
 						lightColor='#111827'
 						darkColor='#e5e7eb'
-						className='text-sm mb-2'
+						className='mb-2 text-sm'
 						style={{ fontFamily: 'Montserrat_500Medium' }}>
 						Fecha de inicio
 					</ThemedText>
@@ -253,7 +339,11 @@ export default function MembershipCheckoutScreen() {
 							style={{ position: 'relative' }}>
 							<StyledTextInput
 								label={undefined}
-								value={getValues('startDate') ? format(new Date(getValues('startDate')), 'yyyy-MM-dd') : ''}
+								value={
+									getValues('startDate')
+										? format(new Date(getValues('startDate')), 'yyyy-MM-dd')
+										: ''
+								}
 								editable={false}
 								pointerEvents='none'
 							/>
@@ -263,14 +353,20 @@ export default function MembershipCheckoutScreen() {
 						</TouchableOpacity>
 						{showDatePicker && (
 							<DateTimePicker
-								value={getValues('startDate') ? new Date(getValues('startDate')) : new Date()}
+								value={
+									getValues('startDate')
+										? new Date(getValues('startDate'))
+										: new Date()
+								}
 								mode='date'
 								display='default'
 								minimumDate={new Date()}
 								onChange={(_, selectedDate) => {
 									setShowDatePicker(false);
 									if (selectedDate) {
-										setValue('startDate', selectedDate.toISOString(), { shouldValidate: true });
+										setValue('startDate', selectedDate.toISOString(), {
+											shouldValidate: true,
+										});
 										clearErrors('startDate');
 									}
 								}}
@@ -280,10 +376,11 @@ export default function MembershipCheckoutScreen() {
 				</View>
 
 				<View className='mb-16'>
-					<PrimaryButton
-						title='Continuar'
-						onPress={onContinue}
-					/>
+					{loading ? (
+						<ActivityIndicator size='large' color='#f97316' />
+					) : (
+						<PrimaryButton title='Continuar' onPress={onContinue} />
+					)}
 				</View>
 			</ScrollView>
 		</SafeAreaView>
