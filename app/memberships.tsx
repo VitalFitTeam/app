@@ -1,3 +1,4 @@
+ 
 import MembershipPlanCard from '@/components/auth/dashboard/MembershipPlanCard';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
@@ -8,7 +9,6 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ImageBackground, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Definimos la interfaz localmente o importamos del SDK si está disponible
 interface PublicMembershipResponse {
 	membership_type_id: string;
 	name: string;
@@ -33,25 +33,19 @@ export default function MembershipsScreen() {
 		const fetchMemberships = async () => {
 			try {
 				const token = await AsyncStorage.getItem('token');
-
-				// Si el SDK requiere token obligatoriamente para este endpoint, manejamos el caso
-				// Nota: Asumimos que el usuario ya inició sesión o que el backend acepta string vacío para públicos
 				const jwt = token || '';
 
 				const response = await vitalFitApi.membership.publicGetMemberships(
 					jwt,
-					{ page: 1, limit: 100, sort: 'asc' }, // Paginación
-					'USD', // Moneda por defecto (ajustar según necesidad)
+					{ page: 1, limit: 100, sort: 'asc' as const },
+					'USD',
 				);
 
-				// El SDK retorna una estructura paginada, accedemos a los items
-				// Nota: Ajusta 'items' si la propiedad en PaginatedTotal tiene otro nombre (ej. 'data')
-				// @ts-ignore: Asumiendo estructura de respuesta del SDK
-				const fetchedPlans = response.items || response.data || [];
+				// CORRECCIÓN: Eliminado @ts-ignore innecesario
+				const fetchedPlans = response.data || [];
 
 				setPlans(fetchedPlans);
 
-				// Seleccionar el primer plan por defecto si hay planes
 				if (fetchedPlans.length > 0) {
 					setSelectedPlanId(fetchedPlans[0].membership_type_id);
 				}
@@ -111,12 +105,9 @@ export default function MembershipsScreen() {
 										{plans.map((plan) => (
 											<MembershipPlanCard
 												key={plan.membership_type_id}
-												// Mapeo de datos del API a Props del componente
 												title={plan.name}
 												price={plan.price.toString()}
-												// Convertimos la descripción única en un array para 'features'
 												features={[plan.description]}
-												// Construimos el string del periodo
 												period={`/${plan.duration_days} días`}
 												isFree={plan.price === 0}
 												badgeLabel={plan.price === 0 ? 'Gratis' : undefined}
@@ -138,8 +129,6 @@ export default function MembershipsScreen() {
 												}
 												onPress={() => {
 													if (!selectedPlan) return;
-
-													// Construcción de la URL con los datos del plan seleccionado
 													const href =
 														`/membership-checkout` +
 														`?id=${selectedPlan.membership_type_id}` +

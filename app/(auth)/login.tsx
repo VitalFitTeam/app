@@ -1,232 +1,391 @@
-import { LogoSimple } from '@/components/auth/Logo';
-import { SocialButton } from '@/components/auth/SocialButton';
 import { PrimaryButton } from '@/components/PrimaryButton';
-import { ToastNotification } from '@/components/ToastNotification';
-import { Colors, Fonts } from '@/constants/theme';
-import { useToast } from '@/hooks/useToast';
+import { StyledTextInput } from '@/components/StyledTextInput';
+import { ThemedText } from '@/components/themed-text';
+import { MembershipCheckoutData, MembershipCheckoutSchema } from '@/schemas/membership';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isAPIError } from '@vitalfit/sdk';
-import Checkbox from 'expo-checkbox';
-import { Link, useRouter } from 'expo-router';
-import { Eye, EyeOff, SlidersVertical } from 'lucide-react-native';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next'; // 1. Importar el hook
-import {
-	Keyboard,
-	KeyboardAvoidingView,
-	Platform,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	TouchableWithoutFeedback,
-	View,
-} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Calendar } from 'lucide-react-native';
+import React, { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { CheckCircleIcon, TrashIcon } from 'react-native-heroicons/solid';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function LoginScreen() {
-    const { toastState, showToast, hideToast } = useToast();
-    const router = useRouter();
-    const { t } = useTranslation(); // 2. Inicializar traducción
-    
-    const [isChecked, setChecked] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
+const PLAN_BENEFITS: Record<string, string[]> = {
+	'free-trial': ['Acceso limitado al gimnasio', '7 días de acceso libre'],
+	advanced: [
+		'Acceso ilimitado al gimnasio',
+		'7 sesiones con consultor fitness',
+		'Seguimiento nutricional',
+		'5 suplementos gratis',
+		'Credencial de gimnasio',
+		'Entrenador personal',
+	],
+	athlete: [
+		'Acceso total al gimnasio',
+		'Plan de entrenamiento personalizado',
+		'Seguimiento de progreso mensual',
+	],
+	premium: [
+		'Todos los beneficios del plan Avanzado',
+		'Sesiones ilimitadas con consultor fitness',
+		'Plan nutricional avanzado',
+	],
+};
 
-    const handleLogin = async () => {
-        if (!email || !password) {
-            // Traducción de errores
-            showToast('error', t('login.toast.errorTitle'), t('login.toast.emptyFields'));
-            return;
-        }
+export default function MembershipCheckoutScreen() {
+	const params = useLocalSearchParams<{
+		id?: string;
+		title?: string;
+		price?: string;
+		period?: string;
+	}>();
+	const router = useRouter();
+	const [showDatePicker, setShowDatePicker] = useState(false);
+	const [loading, setLoading] = useState(false);
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            showToast('error', t('login.toast.errorTitle'), t('login.toast.invalidEmail'));
-            return;
-        }
+	const {
+		getValues,
+		setError,
+		setValue,
+		clearErrors,
+		formState: { errors },
+	} = useForm<MembershipCheckoutData>({
+		defaultValues: {
+			startDate: '',
+		},
+	});
 
-        setIsLoading(true);
+	const onContinue = async () => {
+		// 1. Validaciones del formulario local
+		const result = MembershipCheckoutSchema.safeParse(getValues());
 
-        try {
-            const response = await vitalFitApi.auth.login({ email, password });
-            console.log('Login exitoso:', response);
+		if (!result.success) {
+			result.error.issues.forEach((issue) => {
+				const field = issue.path[0] as keyof MembershipCheckoutData;
+				setError(field, {
+					type: 'manual',
+					message: issue.message,
+				});
+			});
+			return;
+		}
 
-            const token = response.token;
-            if (token) {
-                await AsyncStorage.setItem('token', token);
-                console.log('Token guardado en AsyncStorage');
-            } else {
-                console.warn('No se recibió token en la respuesta del SDK.');
-            }
+		const data = result.data;
 
-            const whoamiResponse = await vitalFitApi.user.WhoAmI(token);
-            const role = whoamiResponse.user?.role?.name?.toLowerCase();
+		if (!params.id || !params.title || !params.price) {
+			Alert.alert('Error', 'Faltan datos del plan seleccionado.');
+			return;
+		}
 
-            if (role === 'instructor') {
-                router.replace('/(instructor)/dashboard');
-            } else if (role === 'recepcionist' || role === 'receptionist') {
-                router.replace('/(recepcionist)/dashboard');
-            } else {
-                router.replace('/(tabs)/dashboard');
-            }
-        } catch (error: unknown) {
-            let errorMessage = t('login.toast.unexpectedError'); // Mensaje por defecto traducido
-            if (isAPIError(error)) {
-                errorMessage = error.messages.join(', ');
-            } else if (error instanceof Error) {
-                errorMessage = error.message;
-            }
-            console.error('Error en el login (detalle completo):', JSON.stringify(error, null, 2));
-            showToast('error', t('login.toast.loginErrorTitle'), errorMessage);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+		setLoading(true);
+		try {
+			const token = await AsyncStorage.getItem('token');
+			if (!token) {
+				Alert.alert('Error', 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+				return;
+			}
 
-    return (
-        <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View
-                    style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        paddingHorizontal: 32,
-                        paddingVertical: 16,
-                    }}
-                    className='bg-white'>
-                    <ToastNotification
-                        visible={toastState.visible}
-                        type={toastState.type}
-                        title={toastState.title}
-                        message={toastState.message}
-                        onClose={hideToast}
-                    />
-                    <View className='w-full max-w-sm self-center'>
-                        <View className='items-center mb-2'>
-                            <LogoSimple size={250} />
-                        </View>
+			// 2. Obtener datos necesarios (Usuario y Sucursal)
+			// Usamos getBranchMap (Público) para evitar errores de permisos
+			const [userResponse, branchesResponse] = await Promise.all([
+				vitalFitApi.user.WhoAmI(token),
+				vitalFitApi.public.getBranchMap(token),
+			]);
 
-                        {/* Título */}
-                        <Text
-                            className='text-4xl text-black mb-2 uppercase text-center'
-                            style={{ fontFamily: Fonts.title }}>
-                            {t('login.title')}
-                        </Text>
+			// CORRECCIÓN 1: user_id (Según types/user.ts)
+			const userId = userResponse.user?.user_id;
 
-                        {/* Subtítulo */}
-                        <Text className='text-gray-500 text-center mb-8 text-lg'>
-                            {t('login.subtitle')}
-                        </Text>
+			// CORRECCIÓN 2: Manejo seguro del ID de sucursal
+			const firstBranch = branchesResponse.data?.[0];
 
-                        <View className='px-2 mt-6 gap-6'>
-                            <View className='mb-4'>
-                                <Text className='text-black font-bold text-sm mb-1 ml-1'>
-                                    {t('login.emailLabel')}
-                                </Text>
-                                <TextInput
-                                    placeholder={t('login.emailPlaceholder')}
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    keyboardType='email-address'
-                                    autoCapitalize='none'
-                                    style={{ height: 48 }}
-                                    className='border border-gray-300 rounded-md px-4'
-                                />
-                            </View>
+			// Usamos 'as any' para evitar el error de TypeScript si la definición local no está actualizada.
+			// Buscamos 'branch_id' (estándar del SDK) o 'id' como respaldo.
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const branchObj = firstBranch as any;
+			const branchId = branchObj?.branch_id || branchObj?.id || branchObj?.branch_map_id;
 
-                            <View className='mb-4'>
-                                <View className='flex-row items-center mb-1 ml-1'>
-                                    <SlidersVertical
-                                        size={16}
-                                        color={Colors.light.text}
-                                        className='mr-2'
-                                    />
-                                    <Text className='text-black font-bold text-sm'>
-                                        {t('login.passwordLabel')}
-                                    </Text>
-                                </View>
-                                <View
-                                    style={{ height: 48 }}
-                                    className='flex-row items-center border border-gray-300 rounded-md px-4'>
-                                    <TextInput
-                                        placeholder={t('login.passwordPlaceholder')}
-                                        secureTextEntry={!showPassword}
-                                        value={password}
-                                        onChangeText={setPassword}
-                                        className='flex-1'
-                                    />
-                                    <TouchableOpacity
-                                        onPress={() => setShowPassword(!showPassword)}>
-                                        {showPassword ? (
-                                            <EyeOff size={20} color={Colors.light.icon} />
-                                        ) : (
-                                            <Eye size={20} color={Colors.light.icon} />
-                                        )}
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
+			if (!userId) {
+				throw new Error('No se pudo identificar al usuario.');
+			}
+			if (!branchId) {
+				throw new Error('No se encontró una sucursal disponible para asignar la factura.');
+			}
 
-                        <View className='w-full flex-row justify-between items-center my-4'>
-                            <View className='flex-row items-center'>
-                                <Checkbox
-                                    value={isChecked}
-                                    onValueChange={setChecked}
-                                    color={isChecked ? Colors.light.tint : undefined}
-                                    style={{
-                                        transform: [{ scale: 0.7 }],
-                                        borderRadius: 5,
-                                    }}
-                                />
-                                <Text className='ml-2 text-gray-600 text-xs'>
-                                    {t('login.rememberMe')}
-                                </Text>
-                            </View>
-                            <Link href='/(auth)/forgot-password' asChild>
-                                <TouchableOpacity>
-                                    <View className='flex-row items-center'>
-                                        <Text className='text-xs text-gray-600'>
-                                            {t('login.forgotPassword')}
-                                        </Text>
-                                        <Text className='text-[#F27F2A] font-semibold text-xs'>
-                                            {t('login.recover')}
-                                        </Text>
-                                    </View>
-                                </TouchableOpacity>
-                            </Link>
-                        </View>
+			// 3. Crear la factura (Invoice)
+			const invoiceResponse = await vitalFitApi.billing.createInvoice(
+				{
+					branch_id: branchId,
+					user_id: userId,
+					items: [
+						{
+							item_id: params.id, // ID del plan de membresía
+							item_type: 'membership',
+							quantity: 1,
+						},
+					],
+				},
+				token,
+			);
 
-                        <View className='gap-4 mb-4'>
-                            <PrimaryButton
-                                title={isLoading ? t('login.signingInButton') : t('login.signInButton')}
-                                onPress={handleLogin}
-                                disabled={isLoading}
-                            />
-                            <SocialButton 
-                                title={t('login.googleSignIn')} 
-                                iconName='google' 
-                            />
-                        </View>
+			// Obtener el ID de la factura de la respuesta de forma segura
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const responseData = invoiceResponse as any;
+			const invoiceId = responseData.invoice_id || responseData.id || responseData.data?.id;
 
-                        <View className='mt-1 flex-row justify-center items-center'>
-                            <Text className='text-gray-600'>
-                                {t('login.noAccount')}
-                            </Text>
-                            <Link href='/(auth)/register' asChild>
-                                <TouchableOpacity>
-                                    <Text className='font-semibold text-[#F27F2A]'>
-                                        {t('login.signUpLink')}
-                                    </Text>
-                                </TouchableOpacity>
-                            </Link>
-                        </View>
-                    </View>
-                </View>
-            </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-    );
+			if (!invoiceId) {
+				console.error('Respuesta Invoice:', invoiceResponse);
+				throw new Error('El servidor no devolvió el ID de la factura.');
+			}
+
+			// 4. Navegar al siguiente paso
+			router.push({
+				pathname: '/membership-extra', // O '/membership-payment-pagomovil' si no usas extras
+				params: {
+					id: params.id,
+					title: params.title,
+					price: params.price,
+					startDate: data.startDate,
+					invoiceId: invoiceId, // <--- ID crucial para el pago
+					branchId: branchId,
+				},
+			} as never);
+		} catch (error) {
+			console.error('Error en checkout:', error);
+			const msg = error instanceof Error ? error.message : 'Inténtalo de nuevo.';
+
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const apiError = error as any;
+			const apiMsg = apiError?.messages ? apiError.messages.join('\n') : msg;
+
+			if (msg.includes('forbidden') || msg.includes('403')) {
+				Alert.alert('Permiso denegado', 'No tienes permisos para realizar esta compra.');
+			} else {
+				Alert.alert('No se pudo crear la orden', apiMsg);
+			}
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const benefits = useMemo(() => {
+		if (!params.id) return [];
+		return PLAN_BENEFITS[params.id] ?? [];
+	}, [params.id]);
+
+	const currentStep: number = 1;
+
+	return (
+		<SafeAreaView className='flex-1 bg-white'>
+			<ScrollView className='flex-1 px-6 pb-32 pt-8'>
+				<View className='mb-6'>
+					<ThemedText
+						lightColor='#f97316'
+						darkColor='#f97316'
+						className='mb-4 text-center text-4xl'
+						style={{ fontFamily: 'BebasNeue-Regular' }}>
+						COMPRAR MEMBRESÍA
+					</ThemedText>
+					<View className='mb-4 flex-row items-center justify-between'>
+						<View className='flex-1 items-center'>
+							<View
+								className={`mb-1 h-8 w-8 items-center justify-center rounded-full border ${
+									currentStep === 1
+										? 'border-orange-500 bg-orange-500'
+										: 'border-neutral-400 bg-white'
+								}`}>
+								<ThemedText
+									lightColor={currentStep === 1 ? '#ffffff' : '#111827'}
+									darkColor={currentStep === 1 ? '#ffffff' : '#111827'}
+									className='text-[10px] font-semibold'
+									style={{ fontFamily: 'Montserrat_500Medium' }}>
+									1
+								</ThemedText>
+							</View>
+							<ThemedText
+								lightColor={currentStep === 1 ? '#f97316' : '#111827'}
+								darkColor={currentStep === 1 ? '#f97316' : '#111827'}
+								className='text-center text-[11px]'
+								style={{ fontFamily: 'Montserrat_500Medium' }}>
+								Opciones de producto
+							</ThemedText>
+						</View>
+						<View className='flex-1 items-center'>
+							<View
+								className={`mb-1 h-8 w-8 items-center justify-center rounded-full border ${
+									currentStep === 2
+										? 'border-orange-500 bg-orange-500'
+										: 'border-neutral-400 bg-white'
+								}`}>
+								<ThemedText
+									lightColor={currentStep === 2 ? '#ffffff' : '#111827'}
+									darkColor={currentStep === 2 ? '#ffffff' : '#111827'}
+									className='text-[10px] font-semibold'
+									style={{ fontFamily: 'Montserrat_500Medium' }}>
+									2
+								</ThemedText>
+							</View>
+							<ThemedText
+								lightColor={currentStep === 2 ? '#f97316' : '#111827'}
+								darkColor={currentStep === 2 ? '#f97316' : '#111827'}
+								className='text-center text-[11px]'
+								style={{ fontFamily: 'Montserrat_500Medium' }}>
+								Métodos de pago
+							</ThemedText>
+						</View>
+						<View className='flex-1 items-center'>
+							<View
+								className={`mb-1 h-8 w-8 items-center justify-center rounded-full border ${
+									currentStep === 3
+										? 'border-orange-500 bg-orange-500'
+										: 'border-neutral-400 bg-white'
+								}`}>
+								<ThemedText
+									lightColor={currentStep === 3 ? '#ffffff' : '#111827'}
+									darkColor={currentStep === 3 ? '#ffffff' : '#111827'}
+									className='text-[10px] font-semibold'
+									style={{ fontFamily: 'Montserrat_500Medium' }}>
+									3
+								</ThemedText>
+							</View>
+							<ThemedText
+								lightColor={currentStep === 3 ? '#f97316' : '#111827'}
+								darkColor={currentStep === 3 ? '#f97316' : '#111827'}
+								className='text-center text-[11px]'
+								style={{ fontFamily: 'Montserrat_500Medium' }}>
+								Confirmación de compra
+							</ThemedText>
+						</View>
+					</View>
+				</View>
+
+				<View className='mb-6'>
+					<View className='flex-row items-center justify-between'>
+						<View className='mr-2 flex-1'>
+							<ThemedText
+								lightColor='#111827'
+								darkColor='#ffffff'
+								className='mb-1 text-xl'
+								style={{ fontFamily: 'Montserrat_400Regular' }}>
+								{params.title ?? 'Plan seleccionado'}
+							</ThemedText>
+							<ThemedText
+								lightColor='#4b5563'
+								darkColor='#d1d5db'
+								className='text-xs'
+								style={{ fontFamily: 'Montserrat_400Regular' }}>
+								Más beneficios para tu vida fitness
+							</ThemedText>
+						</View>
+						<View className='flex-row items-center'>
+							<View className='mr-3 items-end'>
+								<ThemedText
+									lightColor='#111827'
+									darkColor='#ffffff'
+									className='text-2xl'
+									style={{ fontFamily: 'Montserrat_700Bold' }}>
+									${params.price ?? '--'}
+								</ThemedText>
+								<ThemedText
+									lightColor='#4b5563'
+									darkColor='#d1d5db'
+									className='mt-[-4] text-xs'
+									style={{ fontFamily: 'Montserrat_500Medium' }}>
+									{params.period ?? ''}
+								</ThemedText>
+							</View>
+							<TouchableOpacity
+								activeOpacity={0.8}
+								onPress={() => router.back()}
+								className='p-1'>
+								<TrashIcon size={18} color='#111827' />
+							</TouchableOpacity>
+						</View>
+					</View>
+				</View>
+
+				<View className='mb-6'>
+					{benefits.map((benefit) => (
+						<View key={benefit} className='mb-3 flex-row items-center'>
+							<CheckCircleIcon size={18} color='#F97316' />
+							<ThemedText
+								lightColor='#111827'
+								darkColor='#e5e7eb'
+								className='ml-2 text-sm'
+								style={{ fontFamily: 'Montserrat_400Regular' }}>
+								{benefit}
+							</ThemedText>
+						</View>
+					))}
+				</View>
+
+				<View className='mb-8'>
+					<ThemedText
+						lightColor='#111827'
+						darkColor='#e5e7eb'
+						className='mb-2 text-sm'
+						style={{ fontFamily: 'Montserrat_500Medium' }}>
+						Fecha de inicio
+					</ThemedText>
+					{errors.startDate?.message && (
+						<Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>
+							{errors.startDate.message}
+						</Text>
+					)}
+					<View>
+						<TouchableOpacity
+							activeOpacity={0.8}
+							onPress={() => setShowDatePicker(true)}
+							style={{ position: 'relative' }}>
+							<StyledTextInput
+								label={undefined}
+								value={
+									getValues('startDate')
+										? format(new Date(getValues('startDate')), 'yyyy-MM-dd')
+										: ''
+								}
+								editable={false}
+								pointerEvents='none'
+							/>
+							<View style={{ position: 'absolute', right: 12, bottom: 12 }}>
+								<Calendar size={20} color='#111827' />
+							</View>
+						</TouchableOpacity>
+						{showDatePicker && (
+							<DateTimePicker
+								value={
+									getValues('startDate')
+										? new Date(getValues('startDate'))
+										: new Date()
+								}
+								mode='date'
+								display='default'
+								minimumDate={new Date()}
+								onChange={(_, selectedDate) => {
+									setShowDatePicker(false);
+									if (selectedDate) {
+										setValue('startDate', selectedDate.toISOString(), {
+											shouldValidate: true,
+										});
+										clearErrors('startDate');
+									}
+								}}
+							/>
+						)}
+					</View>
+				</View>
+
+				<View className='mb-16'>
+					{loading ? (
+						<ActivityIndicator size='large' color='#f97316' />
+					) : (
+						<PrimaryButton title='Continuar' onPress={onContinue} />
+					)}
+				</View>
+			</ScrollView>
+		</SafeAreaView>
+	);
 }

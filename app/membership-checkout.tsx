@@ -1,3 +1,4 @@
+ 
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedText } from '@/components/themed-text';
@@ -13,6 +14,25 @@ import { useForm } from 'react-hook-form';
 import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, TrashIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+// --- Interfaces para evitar 'any' y cumplir con ESLint ---
+interface BranchLike {
+	branch_id?: string;
+	id?: string;
+	branch_map_id?: string;
+}
+
+interface InvoiceResponseLike {
+	invoice_id?: string;
+	id?: string;
+	data?: { id?: string };
+}
+
+interface ApiErrorLike {
+	messages?: string[];
+	message?: string;
+}
+// ---------------------------------------------------------
 
 const PLAN_BENEFITS: Record<string, string[]> = {
 	'free-trial': ['Acceso limitado al gimnasio', '7 días de acceso libre'],
@@ -60,7 +80,6 @@ export default function MembershipCheckoutScreen() {
 	});
 
 	const onContinue = async () => {
-		// 1. Validaciones del formulario local
 		const result = MembershipCheckoutSchema.safeParse(getValues());
 
 		if (!result.success) {
@@ -89,22 +108,16 @@ export default function MembershipCheckoutScreen() {
 				return;
 			}
 
-			// 2. Obtener datos necesarios (Usuario y Sucursal)
-			// Usamos getBranchMap (Público) para evitar errores de permisos
 			const [userResponse, branchesResponse] = await Promise.all([
 				vitalFitApi.user.WhoAmI(token),
 				vitalFitApi.public.getBranchMap(token),
 			]);
 
-			// CORRECCIÓN 1: user_id (Según types/user.ts)
 			const userId = userResponse.user?.user_id;
-
-			// CORRECCIÓN 2: Manejo seguro del ID de sucursal
 			const firstBranch = branchesResponse.data?.[0];
 
-			// Usamos 'as any' para evitar el error de TypeScript si la definición local no está actualizada.
-			// Buscamos 'branch_id' (estándar del SDK) o 'id' como respaldo.
-			const branchObj = firstBranch as any;
+			// CORRECCIÓN: Uso de interfaz BranchLike en lugar de any
+			const branchObj = firstBranch as unknown as BranchLike;
 			const branchId = branchObj?.branch_id || branchObj?.id || branchObj?.branch_map_id;
 
 			if (!userId) {
@@ -114,7 +127,6 @@ export default function MembershipCheckoutScreen() {
 				throw new Error('No se encontró una sucursal disponible para asignar la factura.');
 			}
 
-			// 3. Crear la factura (Invoice)
 			const invoiceResponse = await vitalFitApi.billing.createInvoice(
 				{
 					branch_id: branchId,
@@ -130,8 +142,8 @@ export default function MembershipCheckoutScreen() {
 				token,
 			);
 
-			// Obtener el ID de la factura de la respuesta de forma segura
-			const responseData = invoiceResponse as any;
+			// CORRECCIÓN: Uso de interfaz InvoiceResponseLike en lugar de any
+			const responseData = invoiceResponse as unknown as InvoiceResponseLike;
 			const invoiceId = responseData.invoice_id || responseData.id || responseData.data?.id;
 
 			if (!invoiceId) {
@@ -139,15 +151,14 @@ export default function MembershipCheckoutScreen() {
 				throw new Error('El servidor no devolvió el ID de la factura.');
 			}
 
-			// 4. Navegar al siguiente paso
 			router.push({
-				pathname: '/membership-extra', // Ajusta si vas directo al pago
+				pathname: '/membership-extra',
 				params: {
 					id: params.id,
 					title: params.title,
 					price: params.price,
 					startDate: data.startDate,
-					invoiceId: invoiceId, // ID crucial para el pago
+					invoiceId: invoiceId,
 					branchId: branchId,
 				},
 			} as never);
@@ -155,7 +166,8 @@ export default function MembershipCheckoutScreen() {
 			console.error('Error en checkout:', error);
 			const msg = error instanceof Error ? error.message : 'Inténtalo de nuevo.';
 
-			const apiError = error as any;
+			// CORRECCIÓN: Uso de interfaz ApiErrorLike en lugar de any
+			const apiError = error as ApiErrorLike;
 			const apiMsg = apiError?.messages ? apiError.messages.join('\n') : msg;
 
 			if (msg.includes('forbidden') || msg.includes('403')) {
