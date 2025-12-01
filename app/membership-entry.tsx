@@ -97,7 +97,7 @@ export default function MembershipEntryScreen() {
 								activeOpacity={0.9}
 								onPress={() => {
 									router.push({
-										pathname: '/membership-extra',
+										pathname: '/services',
 										params: {
 											id: 'free-trial',
 											title: 'Free Trial',
