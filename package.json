@@ -26,6 +26,7 @@
     "axios": "^1.12.2",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
     "expo": "~54.0.25",
     "expo-checkbox": "~5.0.7",
     "expo-clipboard": "~8.0.7",
