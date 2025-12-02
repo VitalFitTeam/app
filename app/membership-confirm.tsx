@@ -1,14 +1,22 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
 import vitalFitApi from '@/services/vitalfitSdk';
-// Importamos la constante de monedas directamente del SDK
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { mainCurrencies } from '@vitalfit/sdk';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, TouchableOpacity, View } from 'react-native';
 import { CurrencyDollarIcon, MapPinIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+// --- Constantes y Tipos ---
+
+const mainCurrencies = [
+  { code: 'USD', name: 'Dólar Estadounidense', symbol: '$' },
+  { code: 'EUR', name: 'Euro', symbol: '€' },
+  { code: 'VES', name: 'Bolívar Soberano', symbol: 'Bs.' },
+  { code: 'COP', name: 'Peso Colombiano', symbol: '$' },
+  { code: 'BRL', name: 'Real Brasileño', symbol: 'R$' },
+];
 
 interface BranchItem {
   branch_id: string;
@@ -53,8 +61,7 @@ export default function MembershipConfirmScreen() {
         const token = await AsyncStorage.getItem('token');
         const response = await vitalFitApi.public.getBranchMap(token || '');
         
-         
-        
+       
         const data = response.data || response || [];
         setBranches(data as BranchItem[]);
 
@@ -81,12 +88,12 @@ export default function MembershipConfirmScreen() {
       setLoadingRate(true);
       try {
         const token = await AsyncStorage.getItem('token');
-        
         const response = await vitalFitApi.client.get({
             url: `/billing/rates/${selectedCurrency}`,
             jwt: token || undefined
-        }) as RateResponse | number; 
+        }) as RateResponse | number; // Casteo manual
         
+        // Manejo seguro del tipo de respuesta
         let rate = 1;
         if (typeof response === 'number') {
             rate = response;
@@ -99,12 +106,14 @@ export default function MembershipConfirmScreen() {
         if (rate) {
             setExchangeRate(rate);
         } else {
+            console.warn("Formato de tasa desconocido", response);
             setExchangeRate(1);
         }
       } catch (error) {
-        // CORRECCIÓN: Usamos la variable 'error' en el log para evitar el warning de unused-vars
-        console.log(`No se pudo obtener tasa para ${selectedCurrency}, usando referencia 1:1. Detalles:`, error);
-        setExchangeRate(1); 
+        console.error("Error obteniendo tasa:", error);
+        Alert.alert("Aviso", `No se pudo obtener la tasa para ${selectedCurrency}. Se usará referencia USD.`);
+        setExchangeRate(1);
+        setSelectedCurrency('USD');
       } finally {
         setLoadingRate(false);
       }
@@ -126,6 +135,7 @@ export default function MembershipConfirmScreen() {
   const grandTotalUSD = mainPriceUSD + packagesTotalUSD;
   const grandTotalConverted = grandTotalUSD * exchangeRate;
 
+  // Variable usada en el render
   const selectedBranchName = branches.find(b => b.branch_id === selectedBranchId)?.name || 'Seleccionar';
 
   const handleConfirmOrder = async () => {
@@ -167,7 +177,7 @@ export default function MembershipConfirmScreen() {
 
       if (!invoiceId) throw new Error('No se recibió ID de factura');
 
-      router.replace({
+      router.push({
         pathname: '/membership-payment',
         params: {
           invoiceId: invoiceId,

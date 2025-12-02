@@ -14,12 +14,24 @@ import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } fr
 import { CheckCircleIcon, TrashIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Interfaces locales para manejar respuestas del SDK
+// --- Interfaces para evitar 'any' y cumplir con ESLint ---
 interface BranchLike {
   branch_id?: string;
   id?: string;
   branch_map_id?: string;
 }
+
+interface InvoiceResponseLike {
+  invoice_id?: string;
+  id?: string;
+  data?: { id?: string };
+}
+
+interface ApiErrorLike {
+  messages?: string[];
+  message?: string;
+}
+// ---------------------------------------------------------
 
 const PLAN_BENEFITS: Record<string, string[]> = {
   'free-trial': ['Acceso limitado al gimnasio', '7 días de acceso libre'],
@@ -49,7 +61,7 @@ export default function MembershipCheckoutScreen() {
     title?: string;
     price?: string;
     period?: string;
-    type?: string;
+	type?: string;
   }>();
   const router = useRouter();
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -68,7 +80,6 @@ export default function MembershipCheckoutScreen() {
   });
 
   const onContinue = async () => {
-    // 1. Validar el formulario (Fecha de inicio)
     const result = MembershipCheckoutSchema.safeParse(getValues());
 
     if (!result.success) {
@@ -81,6 +92,8 @@ export default function MembershipCheckoutScreen() {
       });
       return;
     }
+
+    const data = result.data;
 
     if (!params.id || !params.title || !params.price) {
       Alert.alert('Error', 'Faltan datos del plan seleccionado.');
@@ -95,7 +108,6 @@ export default function MembershipCheckoutScreen() {
         return;
       }
 
-      // 2. Obtener datos necesarios (Usuario y Sucursal)
       const [userResponse, branchesResponse] = await Promise.all([
         vitalFitApi.user.WhoAmI(token),
         vitalFitApi.public.getBranchMap(token),
@@ -104,7 +116,7 @@ export default function MembershipCheckoutScreen() {
       const userId = userResponse.user?.user_id;
       const firstBranch = branchesResponse.data?.[0];
 
-      // Normalizar objeto de sucursal
+      // CORRECCIÓN: Uso de interfaz BranchLike en lugar de any
       const branchObj = firstBranch as unknown as BranchLike;
       const branchId = branchObj?.branch_id || branchObj?.id || branchObj?.branch_map_id;
 
@@ -115,28 +127,54 @@ export default function MembershipCheckoutScreen() {
         throw new Error('No se encontró una sucursal disponible para asignar la factura.');
       }
 
-      // 3. CAMBIO IMPORTANTE: NO CREAMOS LA FACTURA AQUÍ.
-      // Pasamos los datos a la pantalla de Extras para crearla allá junto con los paquetes.
+      const invoiceResponse = await vitalFitApi.billing.createInvoice(
+        {
+          branch_id: branchId,
+          user_id: userId,
+          items: [
+            {
+              item_id: params.id,
+              item_type: 'membership',
+              quantity: 1,
+            },
+          ],
+        },
+        token,
+      );
+
+      // CORRECCIÓN: Uso de interfaz InvoiceResponseLike en lugar de any
+      const responseData = invoiceResponse as unknown as InvoiceResponseLike;
+      const invoiceId = responseData.invoice_id || responseData.id || responseData.data?.id;
+
+      if (!invoiceId) {
+        console.error('Respuesta Invoice:', invoiceResponse);
+        throw new Error('El servidor no devolvió el ID de la factura.');
+      }
+
       router.push({
         pathname: '/membership-extra',
         params: {
-          // Datos del ítem principal (Membresía o Servicio)
-          mainItemId: params.id,
-          mainItemTitle: params.title,
-          mainItemPrice: params.price,
-          mainItemType: params.type || 'membership', // Default a 'membership'
-          startDate: result.data.startDate,
-          
-          // Datos de contexto para crear la factura luego
-          userId: userId,
+          id: params.id,
+          title: params.title,
+          price: params.price,
+          startDate: data.startDate,
+          invoiceId: invoiceId,
           branchId: branchId,
         },
       } as never);
-
     } catch (error) {
       console.error('Error en checkout:', error);
       const msg = error instanceof Error ? error.message : 'Inténtalo de nuevo.';
-      Alert.alert('No se pudo continuar', msg);
+
+      // CORRECCIÓN: Uso de interfaz ApiErrorLike en lugar de any
+      const apiError = error as ApiErrorLike;
+      const apiMsg = apiError?.messages ? apiError.messages.join('\n') : msg;
+
+      if (msg.includes('forbidden') || msg.includes('403')) {
+        Alert.alert('Permiso denegado', 'No tienes permisos para realizar esta compra.');
+      } else {
+        Alert.alert('No se pudo crear la orden', apiMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -160,8 +198,6 @@ export default function MembershipCheckoutScreen() {
             style={{ fontFamily: 'BebasNeue-Regular' }}>
             COMPRAR MEMBRESÍA
           </ThemedText>
-          
-          {/* Indicador de Pasos Visuales */}
           <View className='flex-row justify-between items-center mb-4'>
             <View className='items-center flex-1'>
               <View
@@ -183,7 +219,7 @@ export default function MembershipCheckoutScreen() {
                 darkColor={currentStep === 1 ? '#f97316' : '#111827'}
                 className='text-[11px] text-center'
                 style={{ fontFamily: 'Montserrat_500Medium' }}>
-                Opciones
+                Opciones de producto
               </ThemedText>
             </View>
             <View className='items-center flex-1'>
@@ -206,7 +242,7 @@ export default function MembershipCheckoutScreen() {
                 darkColor={currentStep === 2 ? '#f97316' : '#111827'}
                 className='text-[11px] text-center'
                 style={{ fontFamily: 'Montserrat_500Medium' }}>
-                Extras
+                Métodos de pago
               </ThemedText>
             </View>
             <View className='items-center flex-1'>
@@ -229,13 +265,12 @@ export default function MembershipCheckoutScreen() {
                 darkColor={currentStep === 3 ? '#f97316' : '#111827'}
                 className='text-[11px] text-center'
                 style={{ fontFamily: 'Montserrat_500Medium' }}>
-                Confirmación
+                Confirmación de compra
               </ThemedText>
             </View>
           </View>
         </View>
 
-        {/* Resumen del Plan Seleccionado */}
         <View className='mb-6'>
           <View className='flex-row items-center justify-between'>
             <View className='flex-1 mr-2'>
@@ -281,7 +316,6 @@ export default function MembershipCheckoutScreen() {
           </View>
         </View>
 
-        {/* Lista de Beneficios */}
         <View className='mb-6'>
           {benefits.map((benefit) => (
             <View key={benefit} className='flex-row items-center mb-3'>
@@ -297,7 +331,6 @@ export default function MembershipCheckoutScreen() {
           ))}
         </View>
 
-        {/* Selector de Fecha */}
         <View className='mb-8'>
           <ThemedText
             lightColor='#111827'
