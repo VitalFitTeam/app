@@ -13,14 +13,14 @@ import { Eye, EyeOff, SlidersVertical } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next'; // 1. Importar el hook
 import {
-	Keyboard,
-	KeyboardAvoidingView,
-	Platform,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	TouchableWithoutFeedback,
-	View,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from 'react-native';
 
 export default function LoginScreen() {
