@@ -1,7 +1,5 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
-import { ToastNotification } from '@/components/ToastNotification';
-import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -36,9 +34,6 @@ export default function MembershipPaymentScreen() {
   const [methods, setMethods] = useState<BranchPaymentMethod[]>([]);
   const [selectedMethodId, setSelectedMethodId] = useState<string | null>(null);
 
-  // Hook de notificaciones
-  const { toastState, showToast, hideToast } = useToast();
-
   useEffect(() => {
     const loadPaymentMethods = async () => {
       try {
@@ -57,12 +52,12 @@ export default function MembershipPaymentScreen() {
          
         const responseData = response.data || response || [];
         
-         
+        // CORRECCIÓN: Evitamos el 'any' en el filter usando cast directo
         const activeMethods = (responseData as BranchPaymentMethod[]).filter(m => m.is_active === true);
         setMethods(activeMethods);
 
       } catch (error) {
-        console.error('Error cargando métodos:', error);
+        console.error('Error cargando métodos:', error); // CORRECCIÓN: Se usa la variable error
         Alert.alert('Aviso', 'No se pudieron cargar los métodos de pago.');
       } finally {
         setLoadingMethods(false);
@@ -74,7 +69,7 @@ export default function MembershipPaymentScreen() {
 
   const handlePay = async () => {
     if (!selectedMethodId) {
-      showToast('warning', 'Atención', 'Por favor selecciona un método de pago.');
+      Alert.alert('Atención', 'Por favor selecciona un método de pago.');
       return;
     }
 
@@ -90,7 +85,6 @@ export default function MembershipPaymentScreen() {
         methodName: methodName,
     };
 
-    // Lógica de enrutamiento
     if (nameLower.includes('pago movil') || nameLower.includes('pago móvil')) {
         router.push({ pathname: '/membership-payment-pagomovil', params: nextParams } as never);
     } 
@@ -98,7 +92,6 @@ export default function MembershipPaymentScreen() {
         router.push({ pathname: '/membership-payment-transfer', params: nextParams } as never);
     } 
     else {
-        // Procesar pago directo (Efectivo, Punto de venta, etc.)
         processDirectPayment(selectedMethodId);
     }
   };
@@ -107,7 +100,6 @@ export default function MembershipPaymentScreen() {
       setLoading(true);
       try {
         const token = await AsyncStorage.getItem('token');
-        
         await vitalFitApi.billing.AddPaymentToInvoice({
             invoice_id: params.invoiceId,
             payment_method_id: methodId,
@@ -117,15 +109,12 @@ export default function MembershipPaymentScreen() {
             receipt_url: 'Pago reportado en sitio' 
         }, token || '');
 
-        showToast('success', 'Orden Creada', 'Por favor dirígete a recepción para completar el pago.');
-
-        setTimeout(() => {
-            router.replace('/(tabs)/dashboard');
-        }, 2500);
-
+        Alert.alert('¡Orden Creada!', 'Por favor dirígete a recepción para completar tu pago.', [
+            { text: 'Entendido', onPress: () => router.replace('/(tabs)/dashboard') }
+        ]);
       } catch (error) {
-          console.error('Error procesando pago directo:', error);
-          showToast('error', 'Error', 'No se pudo registrar la intención de pago.');
+          console.error('Error procesando pago directo:', error); // CORRECCIÓN: Se usa la variable error
+          Alert.alert('Error', 'No se pudo registrar la intención de pago.');
       } finally {
           setLoading(false);
       }
@@ -142,15 +131,6 @@ export default function MembershipPaymentScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      {/* Componente Toast para notificaciones */}
-      <ToastNotification
-        visible={toastState.visible}
-        type={toastState.type}
-        title={toastState.title}
-        message={toastState.message}
-        onClose={hideToast}
-      />
-
       <ScrollView className="flex-1 px-6 pt-8 pb-10">
         <View className="items-center mb-8">
             <ThemedText className="text-3xl font-bold text-center mb-2" style={{ fontFamily: 'BebasNeue-Regular' }}>
