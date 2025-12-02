@@ -1,268 +1,219 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
-import { useLocalSearchParams } from 'expo-router';
-import React, { useMemo, useState } from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import vitalFitApi from '@/services/vitalfitSdk';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView, TouchableOpacity, View } from 'react-native';
+import { BanknotesIcon, BuildingLibraryIcon, CreditCardIcon, DevicePhoneMobileIcon } from 'react-native-heroicons/outline';
+import { CheckCircleIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Tipos de datos que recibimos desde membership-extra
-interface PaymentParams {
-  id?: string;
-  title?: string;
-  price?: string;
-  addonsJson?: string; // JSON string con los complementos seleccionados
-  branch?: string;
-  method?: string;
+interface BranchPaymentMethod {
+  method_id: string;
+  branch_id: string;
+  name: string;
+  type: string;
+  is_active: boolean;
+  description?: string;
 }
-
-interface SelectedAddon {
-  id: string;
-  title: string;
-  price: number;
-  sessionsIncluded?: number;
-}
-
-const BRANCH_OPTIONS = [
-  'VitalFit Centro',
-  'VitalFit Este',
-  'VitalFit Oeste',
-  'VitalFit Norte',
-];
 
 export default function MembershipPaymentScreen() {
-  const rawParams = useLocalSearchParams();
-  const params = rawParams as PaymentParams;
+  const router = useRouter();
+  
+  const params = useLocalSearchParams<{
+    invoiceId: string;
+    totalAmount: string;
+    currency: string;
+    title?: string;
+    branchId: string; 
+  }>();
 
-  const selectedAddons: SelectedAddon[] = useMemo(() => {
-    if (!params.addonsJson) return [];
-    try {
-      const parsed = JSON.parse(params.addonsJson as string);
-      if (Array.isArray(parsed)) return parsed as SelectedAddon[];
-      return [];
-    } catch {
-      return [];
+  const [loadingMethods, setLoadingMethods] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [methods, setMethods] = useState<BranchPaymentMethod[]>([]);
+  const [selectedMethodId, setSelectedMethodId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadPaymentMethods = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) return;
+
+        if (!params.branchId) {
+            Alert.alert("Error", "No se identificó la sucursal.");
+            return;
+        }
+
+        const response = await vitalFitApi.paymentMethod.getBranchPaymentMethods(params.branchId, token);
+        
+         
+        
+         
+        const responseData = response.data || response || [];
+        
+        // CORRECCIÓN: Evitamos el 'any' en el filter usando cast directo
+        const activeMethods = (responseData as BranchPaymentMethod[]).filter(m => m.is_active === true);
+        setMethods(activeMethods);
+
+      } catch (error) {
+        console.error('Error cargando métodos:', error); // CORRECCIÓN: Se usa la variable error
+        Alert.alert('Aviso', 'No se pudieron cargar los métodos de pago.');
+      } finally {
+        setLoadingMethods(false);
+      }
+    };
+
+    loadPaymentMethods();
+  }, [params.branchId]);
+
+  const handlePay = async () => {
+    if (!selectedMethodId) {
+      Alert.alert('Atención', 'Por favor selecciona un método de pago.');
+      return;
     }
-  }, [params.addonsJson]);
 
-  const initialBranchIndex = Math.max(
-    0,
-    BRANCH_OPTIONS.findIndex(option => option === params.branch) ?? 0,
-  );
-  const [selectedBranchIndex, setSelectedBranchIndex] = useState<number>(
-    initialBranchIndex,
-  );
-  const selectedBranch = BRANCH_OPTIONS[selectedBranchIndex] ?? BRANCH_OPTIONS[0];
+    const selectedMethod = methods.find(m => m.method_id === selectedMethodId);
+    const methodName = selectedMethod?.name || '';
+    const nameLower = methodName.toLowerCase();
+
+    const nextParams = {
+        invoiceId: params.invoiceId,
+        totalAmount: params.totalAmount,
+        currency: params.currency || 'USD',
+        methodId: selectedMethodId,
+        methodName: methodName,
+    };
+
+    if (nameLower.includes('pago movil') || nameLower.includes('pago móvil')) {
+        router.push({ pathname: '/membership-payment-pagomovil', params: nextParams } as never);
+    } 
+    else if (nameLower.includes('zelle') || nameLower.includes('transfer') || selectedMethod?.type === 'Transfer') {
+        router.push({ pathname: '/membership-payment-transfer', params: nextParams } as never);
+    } 
+    else {
+        processDirectPayment(selectedMethodId);
+    }
+  };
+
+  const processDirectPayment = async (methodId: string) => {
+      setLoading(true);
+      try {
+        const token = await AsyncStorage.getItem('token');
+        await vitalFitApi.billing.AddPaymentToInvoice({
+            invoice_id: params.invoiceId,
+            payment_method_id: methodId,
+            amount_paid: Number(params.totalAmount),
+            currency_paid: params.currency || 'USD',
+            transaction_id: `SITIO-${Date.now()}`,
+            receipt_url: 'Pago reportado en sitio' 
+        }, token || '');
+
+        Alert.alert('¡Orden Creada!', 'Por favor dirígete a recepción para completar tu pago.', [
+            { text: 'Entendido', onPress: () => router.replace('/(tabs)/dashboard') }
+        ]);
+      } catch (error) {
+          console.error('Error procesando pago directo:', error); // CORRECCIÓN: Se usa la variable error
+          Alert.alert('Error', 'No se pudo registrar la intención de pago.');
+      } finally {
+          setLoading(false);
+      }
+  }
+
+  const renderMethodIcon = (methodName: string) => {
+    const name = (methodName || '').toLowerCase();
+    if (name.includes('pago movil')) return <DevicePhoneMobileIcon size={24} color="#f97316" />;
+    if (name.includes('zelle')) return <View className="w-6 h-6 border border-orange-500 rounded-full items-center justify-center"><ThemedText className="text-[10px] text-orange-500 font-bold">$</ThemedText></View>;
+    if (name.includes('transfer')) return <BuildingLibraryIcon size={24} color="#f97316" />;
+    if (name.includes('efectivo') || name.includes('cash')) return <BanknotesIcon size={24} color="#f97316" />;
+    return <CreditCardIcon size={24} color="#f97316" />;
+  };
 
   return (
-    <SafeAreaView className='flex-1 bg-white'>
-      <ScrollView className='flex-1 px-6 pt-4 pb-8'>
-        <View className='mb-6'>
-          <ThemedText
-            lightColor='#f97316'
-            darkColor='#f97316'
-            className='text-2xl font-extrabold mb-4 text-center'
-          >
-            COMPRAR MEMBRESÍA
-          </ThemedText>
-
-          <View className='flex-row justify-between items-center mb-4'>
-            <View className='items-center flex-1'>
-              <View className='w-8 h-8 rounded-full items-center justify-center mb-1 bg-white'>
-                <ThemedText
-                  lightColor='#000000'
-                  darkColor='#000000'
-                  className='text-xs font-semibold'
-                >
-                  1
-                </ThemedText>
-              </View>
-              <ThemedText
-                lightColor='#ffffff'
-                darkColor='#ffffff'
-                className='text-xs text-center'
-              >
-                Opciones de producto
-              </ThemedText>
-            </View>
-            <View className='items-center flex-1'>
-              <View className='w-8 h-8 rounded-full items-center justify-center mb-1 bg-orange-500'>
-                <ThemedText
-                  lightColor='#ffffff'
-                  darkColor='#ffffff'
-                  className='text-xs font-semibold'
-                >
-                  2
-                </ThemedText>
-              </View>
-              <ThemedText
-                lightColor='#f97316'
-                darkColor='#f97316'
-                className='text-xs text-center'
-              >
-                Métodos de pago
-              </ThemedText>
-            </View>
-            <View className='items-center flex-1'>
-              <View className='w-8 h-8 rounded-full items-center justify-center mb-1 bg-white'>
-                <ThemedText
-                  lightColor='#000000'
-                  darkColor='#000000'
-                  className='text-xs font-semibold'
-                >
-                  3
-                </ThemedText>
-              </View>
-              <ThemedText
-                lightColor='#ffffff'
-                darkColor='#ffffff'
-                className='text-xs text-center'
-              >
-                Confirmación de compra
-              </ThemedText>
-            </View>
-          </View>
-        </View>
-
-        {/* Plan principal */}
-        <View className='mb-4 border border-orange-500/80 rounded-2xl px-4 py-3 bg-black/90'>
-          <ThemedText
-            lightColor='#f97316'
-            darkColor='#f97316'
-            className='text-xs tracking-[0.2em] mb-1'
-          >
-            SUSCRIPCIÓN
-          </ThemedText>
-          <View className='flex-row items-baseline justify-between'>
-            <View className='flex-1 mr-2'>
-              <ThemedText
-                lightColor='#ffffff'
-                darkColor='#ffffff'
-                className='text-xl font-extrabold mb-1'
-              >
-                {params.title ?? 'Plan seleccionado'}
-              </ThemedText>
-              <ThemedText
-                lightColor='#d1d5db'
-                darkColor='#d1d5db'
-                className='text-xs'
-              >
-                Más beneficios para tu vida fitness
-              </ThemedText>
-            </View>
-            <View className='items-end'>
-              <ThemedText
-                lightColor='#ffffff'
-                darkColor='#ffffff'
-                className='text-2xl font-extrabold'
-              >
-                ${params.price ?? '--'}
-              </ThemedText>
-              <ThemedText
-                lightColor='#d1d5db'
-                darkColor='#d1d5db'
-                className='text-xs mt-[-4]'
-              >
-                /mes
-              </ThemedText>
-            </View>
-          </View>
-        </View>
-
-        {/* Complementos seleccionados (si hay) */}
-        {selectedAddons.map((addon) => (
-          <View
-            key={addon.id}
-            className='mb-4 border border-orange-500/80 rounded-2xl px-4 py-3 bg-black/90'
-          >
-            <ThemedText
-              lightColor='#f97316'
-              darkColor='#f97316'
-              className='text-xs tracking-[0.2em] mb-1'
-            >
-              SERVICIO ADICIONAL
+    <SafeAreaView className="flex-1 bg-white">
+      <ScrollView className="flex-1 px-6 pt-8 pb-10">
+        <View className="items-center mb-8">
+            <ThemedText className="text-3xl font-bold text-center mb-2" style={{ fontFamily: 'BebasNeue-Regular' }}>
+                MÉTODO DE PAGO
             </ThemedText>
-            <View className='flex-row items-baseline justify-between'>
-              <View className='flex-1 mr-2'>
-                <ThemedText
-                  lightColor='#ffffff'
-                  darkColor='#ffffff'
-                  className='text-sm font-extrabold mb-1 uppercase'
-                >
-                  {addon.title}
-                </ThemedText>
-                {addon.sessionsIncluded ? (
-                  <ThemedText
-                    lightColor='#d1d5db'
-                    darkColor='#d1d5db'
-                    className='text-xs'
-                  >
-                    {addon.sessionsIncluded} sesiones incluidas
-                  </ThemedText>
-                ) : null}
-              </View>
-              <View className='items-end'>
-                <ThemedText
-                  lightColor='#ffffff'
-                  darkColor='#ffffff'
-                  className='text-2xl font-extrabold'
-                >
-                  ${addon.price.toFixed(2)}
-                </ThemedText>
-                <ThemedText
-                  lightColor='#d1d5db'
-                  darkColor='#d1d5db'
-                  className='text-xs mt-[-4]'
-                >
-                  /mes
-                </ThemedText>
-              </View>
-            </View>
-          </View>
-        ))}
-
-        {/* Selección de sucursal */}
-        <View className='mt-2 mb-8'>
-          <ThemedText
-            lightColor='#e5e7eb'
-            darkColor='#e5e7eb'
-            className='text-sm mb-2'
-          >
-            Seleccionar sucursal
-          </ThemedText>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => {
-              setSelectedBranchIndex((prev) => (prev + 1) % BRANCH_OPTIONS.length);
-            }}
-            className='border border-neutral-700 rounded-md h-12 px-3 justify-center bg-neutral-900'
-          >
-            <View className='flex-row items-center justify-between'>
-              <ThemedText
-                lightColor='#e5e7eb'
-                darkColor='#e5e7eb'
-                className='text-sm'
-              >
-                {selectedBranch}
-              </ThemedText>
-              <ThemedText
-                lightColor='#e5e7eb'
-                darkColor='#e5e7eb'
-                className='text-lg'
-              >
-                ▾
-              </ThemedText>
-            </View>
-          </TouchableOpacity>
+            <ThemedText className="text-gray-500 text-center">
+                Selecciona cómo deseas pagar tu orden
+            </ThemedText>
         </View>
 
-        <PrimaryButton
-          title='Continuar'
-          onPress={() => {
-            // Aquí luego navegaremos a la pantalla de confirmación de compra
-            console.log('Sucursal seleccionada:', selectedBranch);
-            console.log('Plan:', params, 'Addons seleccionados:', selectedAddons);
-          }}
-        />
+        <View className="bg-neutral-900 rounded-2xl p-6 mb-8 shadow-lg">
+            <ThemedText className="text-gray-400 text-xs uppercase tracking-widest mb-1">TOTAL A PAGAR</ThemedText>
+            <View className="flex-row items-end mb-4">
+                <ThemedText className="text-4xl font-bold text-white mr-2">
+                    ${parseFloat(params.totalAmount || '0').toFixed(2)}
+                </ThemedText>
+                <ThemedText className="text-lg text-orange-500 font-bold mb-1">
+                    {params.currency || 'USD'}
+                </ThemedText>
+            </View>
+            <View className="h-[1px] bg-neutral-700 w-full mb-4" />
+            <View className="flex-row justify-between">
+                <ThemedText className="text-gray-300">Concepto:</ThemedText>
+                <ThemedText className="text-white font-bold max-w-[60%] text-right" numberOfLines={1}>
+                    {params.title || 'Membresía VitalFit'}
+                </ThemedText>
+            </View>
+        </View>
+
+        <ThemedText className="text-lg font-bold mb-4 text-neutral-800">Opciones disponibles</ThemedText>
+
+        {loadingMethods ? (
+            <ActivityIndicator size="large" color="#f97316" className="py-10" />
+        ) : (
+            <View className="mb-8">
+                {methods.map((method) => {
+                    const isSelected = selectedMethodId === method.method_id;
+                    return (
+                        <TouchableOpacity
+                            key={method.method_id}
+                            activeOpacity={0.9}
+                            onPress={() => setSelectedMethodId(method.method_id)}
+                            className={`flex-row items-center p-4 mb-3 rounded-xl border ${
+                                isSelected 
+                                    ? 'border-orange-500 bg-orange-50' 
+                                    : 'border-neutral-200 bg-white'
+                            }`}
+                        >
+                            <View className={`w-10 h-10 rounded-full items-center justify-center mr-4 ${isSelected ? 'bg-orange-200' : 'bg-orange-50'}`}>
+                                {renderMethodIcon(method.name)}
+                            </View>
+                            <View className="flex-1">
+                                <ThemedText className={`font-bold text-base ${isSelected ? 'text-orange-900' : 'text-neutral-900'}`}>
+                                    {method.name}
+                                </ThemedText>
+                                {method.description ? (
+                                    <ThemedText className="text-xs text-gray-500 mt-0.5">
+                                        {method.description}
+                                    </ThemedText>
+                                ) : null}
+                            </View>
+                            <View className={`w-6 h-6 rounded-full border items-center justify-center ${isSelected ? 'border-orange-500 bg-orange-500' : 'border-gray-300'}`}>
+                                {isSelected && <CheckCircleIcon size={20} color="white" />}
+                            </View>
+                        </TouchableOpacity>
+                    );
+                })}
+                {methods.length === 0 && (
+                    <ThemedText className="text-center text-gray-500 py-4">No hay métodos disponibles para esta sucursal.</ThemedText>
+                )}
+            </View>
+        )}
+
+        <View className="mb-8">
+            {loading ? (
+                <ActivityIndicator size="large" color="#f97316" />
+            ) : (
+                <PrimaryButton 
+                    title={selectedMethodId ? "Continuar" : "Seleccione un método"}
+                    onPress={handlePay}
+                />
+            )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
