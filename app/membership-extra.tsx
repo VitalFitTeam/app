@@ -1,305 +1,229 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
+import vitalFitApi from '@/services/vitalfitSdk';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
-import { PlusIcon } from 'react-native-heroicons/outline';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, TouchableOpacity, View } from 'react-native';
+import { CheckCircleIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-type Addon = {
-  id: string;
-  title: string;
+interface PackageItem {
+  packageId?: string;
+  package_id?: string;
+  name: string;
   description: string;
   price: number;
-  sessionsIncluded?: number;
-};
-
-const OPTIONAL_ADDONS: Addon[] = [
-  {
-    id: 'pt-4',
-    title: 'Entrenamiento personal - 4 sesiones',
-    description:
-      'Paquete de 4 sesiones de entrenamiento personalizado con instructor certificado.',
-    price: 25,
-    sessionsIncluded: 4,
-  },
-  {
-    id: 'pt-8',
-    title: 'Entrenamiento personal - 8 sesiones',
-    description: 'Aumenta la frecuencia de tus sesiones para acelerar resultados.',
-    price: 45,
-    sessionsIncluded: 8,
-  },
-  {
-    id: 'nutrition-pack',
-    title: 'Pack nutricional',
-    description: 'Asesoría nutricional y plan de alimentación personalizado.',
-    price: 30,
-  },
-];
+}
 
 export default function MembershipExtraScreen() {
-  const params = useLocalSearchParams<{ id?: string; title?: string; price?: string }>();
   const router = useRouter();
-  const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>([]);
-  const [addonsExpanded, setAddonsExpanded] = useState(true);
+  
+  const params = useLocalSearchParams<{
+    mainItemId?: string;
+    mainItemTitle?: string;
+    mainItemPrice?: string;
+    mainItemType?: string;
+    startDate?: string;
+    userId?: string;
+    branchId?: string;
+  }>();
 
-  const selectedAddons = useMemo(
-    () => OPTIONAL_ADDONS.filter((a) => selectedAddonIds.includes(a.id)),
-    [selectedAddonIds],
-  );
+  const [loading, setLoading] = useState(true);
+  const [packages, setPackages] = useState<PackageItem[]>([]);
+  const [selectedPackagesIds, setSelectedPackagesIds] = useState<string[]>([]);
 
-  const currentStep: number = 2;
+  useEffect(() => {
+    const loadPackages = async () => {
+      try {
+        // Obtenemos token solo para asegurar sesión, aunque getPackages es público
+        await AsyncStorage.getItem('token');
+        
+        const response = await vitalFitApi.public.getPackages({
+          page: 1, 
+          limit: 50, 
+          currency: 'USD'
+        });
+        
+         
+        // @ts-expect-error: Manejo flexible de respuesta
+        const data = response.data || response.results || response.items || [];
+        setPackages(data);
+      } catch (e) {
+        console.error('Error cargando paquetes:', e);
+        Alert.alert('Aviso', 'No se pudieron cargar los paquetes adicionales.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPackages();
+  }, []);
+
+  const togglePackage = (pkgId: string) => {
+    if (selectedPackagesIds.includes(pkgId)) {
+      setSelectedPackagesIds(prev => prev.filter(id => id !== pkgId));
+    } else {
+      setSelectedPackagesIds(prev => [...prev, pkgId]);
+    }
+  };
+
+  const onContinue = () => {
+    const selectedObjects = packages.filter(p => {
+        const id = p.packageId || p.package_id;
+        return id && selectedPackagesIds.includes(id);
+    });
+
+    router.push({
+      pathname: '/membership-confirm',
+      params: {
+        ...params,
+        packagesJson: JSON.stringify(selectedObjects)
+      }
+    } as never);
+  };
+
+  const renderPackage = ({ item }: { item: PackageItem }) => {
+    const id = item.packageId || item.package_id || '';
+    const isSelected = selectedPackagesIds.includes(id);
+
+    return (
+      <TouchableOpacity 
+        activeOpacity={0.8}
+        onPress={() => togglePackage(id)}
+        className={`p-4 mb-3 rounded-2xl border ${
+          isSelected 
+            ? 'border-orange-500 bg-orange-50' 
+            : 'border-neutral-200 bg-white'
+        }`}
+      >
+        <View className="flex-row justify-between items-center">
+          <View className="flex-1 pr-4">
+            <ThemedText 
+              lightColor="#111827" 
+              darkColor="#111827" 
+              className="font-bold text-lg mb-1"
+            >
+              {item.name}
+            </ThemedText>
+            <ThemedText 
+              lightColor="#6b7280" 
+              darkColor="#6b7280" 
+              className="text-xs"
+              numberOfLines={2}
+            >
+              {item.description}
+            </ThemedText>
+          </View>
+          
+          <View className="items-end">
+             <ThemedText 
+               lightColor="#f97316" 
+               darkColor="#f97316" 
+               className="font-extrabold text-xl"
+             >
+               ${item.price}
+             </ThemedText>
+             {isSelected ? (
+                <View className="flex-row items-center mt-1">
+                    <CheckCircleIcon size={16} color="#f97316" />
+                    <ThemedText className="text-xs text-orange-600 font-bold ml-1">
+                        AGREGADO
+                    </ThemedText>
+                </View>
+             ) : (
+                <ThemedText className="text-xs text-gray-400 mt-1">
+                    Clic para agregar
+                </ThemedText>
+             )}
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
-    <SafeAreaView className='flex-1 bg-white'>
-      <ScrollView className='flex-1 px-6 pt-8 pb-32'>
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-1 px-6 pt-8 pb-4">
+        
+        {/* Header de Pasos */}
         <View className='mb-6'>
           <ThemedText
             lightColor='#f97316'
             darkColor='#f97316'
             className='text-4xl mb-4 text-center'
-            style={{ fontFamily: 'BebasNeue-Regular' }}
-          >
-            COMPRAR MEMBRESÍA
+            style={{ fontFamily: 'BebasNeue-Regular' }}>
+            EXTRAS
           </ThemedText>
-
           <View className='flex-row justify-between items-center mb-4'>
+            {/* Paso 1 */}
             <View className='items-center flex-1'>
-              <View
-                className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
-                  currentStep === 1 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
-                }`}
-              >
-                <ThemedText
-                  lightColor={currentStep === 1 ? '#ffffff' : '#111827'}
-                  darkColor={currentStep === 1 ? '#ffffff' : '#111827'}
-                  className='text-[10px] font-semibold'
-                  style={{ fontFamily: 'Montserrat_500Medium' }}
-                >
-                  1
-                </ThemedText>
+              <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
+                <ThemedText className='text-[10px] font-semibold text-gray-800'>1</ThemedText>
               </View>
-              <ThemedText
-                lightColor={currentStep === 1 ? '#f97316' : '#111827'}
-                darkColor={currentStep === 1 ? '#f97316' : '#111827'}
-                className='text-[11px] text-center'
-                style={{ fontFamily: 'Montserrat_500Medium' }}
-              >
-                Opciones de producto
-              </ThemedText>
+              <ThemedText className='text-[11px] text-center text-gray-800'>Opciones</ThemedText>
             </View>
+            
+            {/* Paso 2 (Activo) */}
             <View className='items-center flex-1'>
-              <View
-                className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
-                  currentStep === 2 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
-                }`}
-              >
-                <ThemedText
-                  lightColor={currentStep === 2 ? '#ffffff' : '#111827'}
-                  darkColor={currentStep === 2 ? '#ffffff' : '#111827'}
-                  className='text-[10px] font-semibold'
-                  style={{ fontFamily: 'Montserrat_500Medium' }}
-                >
-                  2
-                </ThemedText>
+              <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-orange-500 border-orange-500'>
+                <ThemedText className='text-[10px] font-semibold text-white'>2</ThemedText>
               </View>
-              <ThemedText
-                lightColor={currentStep === 2 ? '#f97316' : '#111827'}
-                darkColor={currentStep === 2 ? '#f97316' : '#111827'}
-                className='text-[11px] text-center'
-                style={{ fontFamily: 'Montserrat_500Medium' }}
-              >
-                Métodos de pago
-              </ThemedText>
+              <ThemedText className='text-[11px] text-center text-orange-600 font-bold'>Extras</ThemedText>
             </View>
+            
+            {/* Paso 3 */}
             <View className='items-center flex-1'>
-              <View
-                className={`w-8 h-8 rounded-full items-center justify-center mb-1 border ${
-                  currentStep === 3 ? 'bg-orange-500 border-orange-500' : 'bg-white border-neutral-400'
-                }`}
-              >
-                <ThemedText
-                  lightColor={currentStep === 3 ? '#ffffff' : '#111827'}
-                  darkColor={currentStep === 3 ? '#ffffff' : '#111827'}
-                  className='text-[10px] font-semibold'
-                  style={{ fontFamily: 'Montserrat_500Medium' }}
-                >
-                  3
-                </ThemedText>
+              <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
+                <ThemedText className='text-[10px] font-semibold text-gray-800'>3</ThemedText>
               </View>
-              <ThemedText
-                lightColor={currentStep === 3 ? '#f97316' : '#111827'}
-                darkColor={currentStep === 3 ? '#f97316' : '#111827'}
-                className='text-[11px] text-center'
-                style={{ fontFamily: 'Montserrat_500Medium' }}
-              >
-                Confirmación de compra
-              </ThemedText>
+              <ThemedText className='text-[11px] text-center text-gray-800'>Confirmación</ThemedText>
             </View>
           </View>
         </View>
 
-        {/* Plan principal */}
-        <View className='mb-6 border border-orange-500/80 rounded-2xl px-4 py-3 bg-white'>
-          <View className='flex-row items-center justify-between'>
-            <View className='flex-1 mr-2'>
-              <ThemedText
-                lightColor='#111827'
-                darkColor='#ffffff'
-                className='text-xl mb-1'
-                style={{ fontFamily: 'Montserrat_400Regular' }}
-              >
-                {params.title ?? 'Plan seleccionado'}
-              </ThemedText>
-              <ThemedText
-                lightColor='#4b5563'
-                darkColor='#d1d5db'
-                className='text-xs'
-                style={{ fontFamily: 'Montserrat_400Regular' }}
-              >
-                Más beneficios para tu vida fitness
-              </ThemedText>
-            </View>
-            <View className='items-end'>
-              <ThemedText
-                lightColor='#111827'
-                darkColor='#ffffff'
-                className='text-2xl'
-                style={{ fontFamily: 'Montserrat_700Bold' }}
-              >
-                ${params.price ?? '--'}
-              </ThemedText>
-              <ThemedText
-                lightColor='#4b5563'
-                darkColor='#d1d5db'
-                className='text-xs mt-[-4]'
-                style={{ fontFamily: 'Montserrat_500Medium' }}
-              >
-                /mes
-              </ThemedText>
-            </View>
+        <View className="mb-4">
+            <ThemedText className="text-xl font-bold mb-1">
+                Paquetes Adicionales
+            </ThemedText>
+            <ThemedText className="text-sm text-gray-500">
+                Selecciona clases extra o servicios complementarios para tu membresía.
+            </ThemedText>
+        </View>
+
+        {loading ? (
+          <View className="flex-1 justify-center items-center">
+             <ActivityIndicator size="large" color="#f97316" />
           </View>
-        </View>
-
-        {/* Barra de complementos */}
-        <View className='mb-3'>
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => setAddonsExpanded((prev) => !prev)}
-            className='w-full flex-row items-center justify-between border border-neutral-300 rounded-md px-4 py-3 bg-white'
-          >
-            <ThemedText
-              lightColor='#111827'
-              darkColor='#e5e7eb'
-              className='text-sm'
-              style={{ fontFamily: 'Montserrat_400Regular' }}
-            >
-              Complementa tu plan (Opcional)
-            </ThemedText>
-            <ThemedText
-              lightColor='#4b5563'
-              darkColor='#e5e7eb'
-              className='text-lg'
-            >
-              {addonsExpanded ? '▴' : '▾'}
-            </ThemedText>
-          </TouchableOpacity>
-        </View>
-
-        {/* Lista de complementos */}
-        {addonsExpanded && OPTIONAL_ADDONS.map((addon) => {
-          const isSelected = selectedAddonIds.includes(addon.id);
-          return (
-            <View
-              key={addon.id}
-              className='border border-orange-500/70 rounded-2xl px-4 py-3 mb-3 bg-white'
-            >
-              <ThemedText
-                lightColor='#f97316'
-                darkColor='#f97316'
-                className='text-xs mb-1 uppercase'
-                style={{ fontFamily: 'Montserrat_600SemiBold' }}
-              >
-                {addon.title}
-              </ThemedText>
-              <ThemedText
-                lightColor='#111827'
-                darkColor='#e5e7eb'
-                className='text-xs mb-1'
-                style={{ fontFamily: 'Montserrat_400Regular' }}
-              >
-                {addon.description}
-              </ThemedText>
-              {addon.sessionsIncluded ? (
-                <ThemedText
-                  lightColor='#6b7280'
-                  darkColor='#9ca3af'
-                  className='text-[11px] mb-2'
-                  style={{ fontFamily: 'Montserrat_400Regular' }}
-                >
-                  {addon.sessionsIncluded} sesiones incluidas
-                </ThemedText>
-              ) : null}
-
-              <View className='flex-row items-center justify-between mt-1'>
-                <ThemedText
-                  lightColor='#111827'
-                  darkColor='#ffffff'
-                  className='text-xl'
-                  style={{ fontFamily: 'Montserrat_700Bold' }}
-                >
-                  ${addon.price.toFixed(2).replace('.', ',')}
-                </ThemedText>
-                <TouchableOpacity
-                  activeOpacity={0.9}
-                  onPress={() => {
-                    setSelectedAddonIds((prev) =>
-                      prev.includes(addon.id)
-                        ? prev.filter((id) => id !== addon.id)
-                        : [...prev, addon.id],
-                    );
-                  }}
-                  className='flex-row items-center justify-center px-5 h-11 rounded-xl bg-orange-500'
-                >
-                  <PlusIcon size={18} color='#ffffff' />
-                  <ThemedText
-                    lightColor='#ffffff'
-                    darkColor='#ffffff'
-                    className='text-sm ml-2'
-                    style={{ fontFamily: 'Montserrat_500Medium' }}
-                  >
-                    {isSelected ? 'Agregado' : 'Agregar'}
-                  </ThemedText>
-                </TouchableOpacity>
-              </View>
-            </View>
-          );
-        })}
-
-        <View className='mt-6 mb-16'>
-          <PrimaryButton
-            title='Continuar'
-            onPress={() => {
-              const addonsPayload = selectedAddons.map(addon => ({
-                id: addon.id,
-                title: addon.title,
-                price: addon.price,
-                sessionsIncluded: addon.sessionsIncluded,
-              }));
-              router.push({
-                pathname: '/membership-methods',
-                params: {
-                  id: params.id ?? '',
-                  title: params.title ?? '',
-                  price: params.price ?? '',
-                  addonsJson: JSON.stringify(addonsPayload),
-                },
-              } as never);
-            }}
+        ) : (
+          <FlatList
+            data={packages}
+            renderItem={renderPackage}
+            keyExtractor={(item) => item.packageId || item.package_id || Math.random().toString()}
+            className="flex-1"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            ListEmptyComponent={
+                <View className="py-10 items-center">
+                    <ThemedText className="text-gray-400 text-center">
+                        No hay paquetes adicionales disponibles en este momento.
+                    </ThemedText>
+                </View>
+            }
           />
+        )}
+
+        <View className="pt-4 border-t border-gray-100">
+            <PrimaryButton 
+                title={`Continuar (${selectedPackagesIds.length} extras)`} 
+                onPress={onContinue} 
+            />
+            <TouchableOpacity onPress={onContinue} className="mt-3 items-center">
+                <ThemedText className="text-gray-500 text-sm underline">
+                    Saltar y continuar sin extras
+                </ThemedText>
+            </TouchableOpacity>
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
