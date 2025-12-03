@@ -64,7 +64,7 @@ export default function RootLayout() {
                     />
                     <Stack.Screen name='(instructor)' options={{ headerShown: false }} />
                     <Stack.Screen name='(recepcionist)' options={{ headerShown: false }} />
-                    
+
                     {/* Pantalla de idioma */}
                     <Stack.Screen name='language' />
 
@@ -72,7 +72,7 @@ export default function RootLayout() {
                         name='cancel-membership'
                         options={{
                             // 2. Usamos las claves de traducción aquí
-                            title: t('nav.membership'), 
+                            title: t('nav.membership'),
                             headerShown: true,
                             headerBackTitle: t('nav.back'),
                         }}
@@ -109,7 +109,7 @@ export default function RootLayout() {
                         name='membership-payment'
                         options={{
                             title: '',
-                            headerShown: true,
+                            headerShown: false,
                             headerBackTitle: '', // Si quisieras traducir esto sería t('nav.back')
                             headerStyle: { backgroundColor: '#000000' },
                             headerTintColor: '#ffffff',
@@ -182,6 +182,13 @@ export default function RootLayout() {
                     />
                     <Stack.Screen
                         name='instructor-profile-personal'
+                        options={{
+                            headerShown: false,
+                            title: '',
+                        }}
+                    />
+                    <Stack.Screen
+                        name="services"
                         options={{
                             headerShown: false,
                             title: '',
