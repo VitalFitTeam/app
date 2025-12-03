@@ -1,4 +1,4 @@
- 
+
 import MembershipPlanCard from '@/components/auth/dashboard/MembershipPlanCard';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
@@ -61,8 +61,8 @@ export default function MembershipsScreen() {
 	}, []);
 
 	return (
-		<SafeAreaView className='flex-1 bg-white'>
-			<ImageBackground source={require('@/assets/images/chicafit.png')} className='flex-1'>
+		<ImageBackground source={require('@/assets/images/chicafit.png')} className="flex-1" style={{ flex: 1 }} resizeMode="cover">
+			<SafeAreaView className="flex-1 bg-transparent">
 				<View className='flex-1'>
 					<ScrollView className='flex-1'>
 						<View className='flex-1'>
@@ -70,27 +70,59 @@ export default function MembershipsScreen() {
 								<View className='px-6 pb-6'>
 									<View className='items-center'>
 										<ThemedText
-											lightColor='#f97316'
-											darkColor='#f97316'
-											className='mb-1 text-center text-lg tracking-[0.25em]'
-											style={{ fontFamily: 'BebasNeue-Regular' }}>
+											lightColor="#f97316"
+											darkColor="#f97316"
+											className="mb-1 text-center tracking-[0.25em]"
+											style={{
+												fontFamily: 'BebasNeue-Regular',
+												fontSize: 28,
+												textShadowColor: '#000',
+												textShadowRadius: 5,
+												textShadowOffset: { width: 1, height: 1 },
+												paddingVertical: 4,
+												paddingHorizontal: 6,
+												overflow: 'visible',
+											}}
+										>
 											NUESTRAS
 										</ThemedText>
+
 										<ThemedText
 											lightColor='#f97316'
 											darkColor='#f97316'
 											className='mb-3 text-center text-6xl'
-											style={{ fontFamily: 'BebasNeue-Regular' }}>
+											style={{
+												fontFamily: 'BebasNeue-Regular',
+												fontSize: 28,
+												textShadowColor: '#000',
+												textShadowRadius: 5,
+												textShadowOffset: { width: 1, height: 1 },
+												paddingVertical: 4,
+												paddingHorizontal: 6,
+												overflow: 'visible',
+											}}>
 											MEMBRESÍAS
 										</ThemedText>
 										<ThemedText
-											lightColor='#ffffff'
-											darkColor='#e5e7eb'
-											className='px-2 text-center text-sm'
-											style={{ fontFamily: 'Montserrat_400Regular' }}>
+											lightColor="#f97316"
+											darkColor="#e5e7eb"
+											className="px-2 text-center text-sm"
+											style={{
+												fontFamily: 'Montserrat_400Regular',
+												fontSize: 18,
+												textShadowColor: '#000',
+												textShadowRadius: 5,
+												textShadowOffset: { width: 1, height: 1 },
+												paddingVertical: 4,
+												paddingHorizontal: 6,
+												overflow: 'visible',
+											}}
+										>
 											Elige el plan que mejor se adapte a tus necesidades y
 											objetivos de fitness.
 										</ThemedText>
+
+
 									</View>
 								</View>
 							</View>
@@ -146,7 +178,7 @@ export default function MembershipsScreen() {
 						</View>
 					</ScrollView>
 				</View>
-			</ImageBackground>
-		</SafeAreaView>
+			</SafeAreaView>
+		</ImageBackground>
 	);
 }

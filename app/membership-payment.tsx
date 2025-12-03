@@ -161,7 +161,7 @@ export default function MembershipPaymentScreen() {
             </ThemedText>
         </View>
 
-        <View className="bg-neutral-900 rounded-2xl p-6 mb-8 shadow-lg">
+        <View className="rounded-2xl p-6 mb-8 shadow-lg">
             <ThemedText className="text-gray-400 text-xs uppercase tracking-widest mb-1">TOTAL A PAGAR</ThemedText>
             <View className="flex-row items-end mb-4">
                 <ThemedText className="text-4xl font-bold text-white mr-2">

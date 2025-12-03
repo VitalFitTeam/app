@@ -1,9 +1,9 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { ImageSourcePropType, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import HistoryTrainingCard from '@/components/auth/training/HistoryTrainingCard';
-import { useRouter } from 'expo-router';
 import { ArrowLeftIcon } from 'react-native-heroicons/solid';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import HistoryTrainingCard from '../../components/auth/training/HistoryTrainingCard';
 
 export const options = {
   headerShown: false,
