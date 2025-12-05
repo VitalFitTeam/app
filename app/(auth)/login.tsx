@@ -5,13 +5,15 @@ import { ToastNotification } from '@/components/ToastNotification';
 import { Colors, Fonts } from '@/constants/theme';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services/vitalfitSdk';
+import { useAuth, useClerk, useOAuth } from '@clerk/clerk-expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import Checkbox from 'expo-checkbox';
+import * as Linking from 'expo-linking';
 import { Link, useRouter } from 'expo-router';
 import { Eye, EyeOff, SlidersVertical } from 'lucide-react-native';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next'; // 1. Importar el hook
+import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Keyboard,
     KeyboardAvoidingView,
@@ -26,17 +28,19 @@ import {
 export default function LoginScreen() {
     const { toastState, showToast, hideToast } = useToast();
     const router = useRouter();
-    const { t } = useTranslation(); // 2. Inicializar traducción
-    
+    const { t } = useTranslation();
+    const { signOut } = useClerk();
+    const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
+    const { getToken } = useAuth();
     const [isChecked, setChecked] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
     const handleLogin = async () => {
         if (!email || !password) {
-            // Traducción de errores
             showToast('error', t('login.toast.errorTitle'), t('login.toast.emptyFields'));
             return;
         }
@@ -72,7 +76,7 @@ export default function LoginScreen() {
                 router.replace('/(tabs)/dashboard');
             }
         } catch (error: unknown) {
-            let errorMessage = t('login.toast.unexpectedError'); // Mensaje por defecto traducido
+            let errorMessage = t('login.toast.unexpectedError');
             if (isAPIError(error)) {
                 errorMessage = error.messages.join(', ');
             } else if (error instanceof Error) {
@@ -84,6 +88,102 @@ export default function LoginScreen() {
             setIsLoading(false);
         }
     };
+
+    const handleGoogleSignIn = useCallback(async () => {
+        setIsGoogleLoading(true);
+        try {
+            try {
+                await signOut();
+                console.log('🔄 Sesión previa de Clerk cerrada');
+            } catch {
+                console.log('No había sesión previa para cerrar');
+            }
+
+            const { createdSessionId, setActive } = await startOAuthFlow({
+                redirectUrl: Linking.createURL('/(tabs)/dashboard', { scheme: 'vitalfit' }),
+            });
+
+            if (createdSessionId && setActive) {
+                await setActive({ session: createdSessionId });
+
+                console.log('✅ Sesión activada con ID:', createdSessionId);
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // 👇 USAR EL TEMPLATE PERSONALIZADO
+                const clerkToken = await getToken({ template: 'vitalfit-backend' });
+
+                if (clerkToken) {
+                    console.log('✅ Session Token de Clerk obtenido con template vitalfit-backend');
+                    console.log('🔍 Token (primeros 100 chars):', clerkToken.substring(0, 100));
+
+                    try {
+                        const payload = JSON.parse(atob(clerkToken.split('.')[1]));
+                        console.log('📧 Email:', payload.email);
+                        console.log('🆔 User ID:', payload.sub);
+                        console.log('📦 Payload completo:', JSON.stringify(payload, null, 2));
+                    } catch (decodeError) {
+                        console.error('❌ Error al decodificar JWT:', decodeError);
+                    }
+
+                    try {
+                        console.log('📤 Enviando al backend...');
+
+                        const response = await vitalFitApi.auth.oAuthLogin({
+                            session_token: clerkToken
+                        });
+
+                        console.log('✅ Respuesta exitosa del backend');
+
+                        const backendToken = response.token;
+
+                        if (backendToken) {
+                            await AsyncStorage.setItem('token', backendToken);
+                            console.log('✅ Token de backend guardado');
+
+                            const whoamiResponse = await vitalFitApi.user.WhoAmI(backendToken);
+                            const role = whoamiResponse.user?.role?.name?.toLowerCase();
+
+                            if (role === 'instructor') {
+                                router.replace('/(instructor)/dashboard');
+                            } else if (role === 'recepcionist' || role === 'receptionist') {
+                                router.replace('/(recepcionist)/dashboard');
+                            } else {
+                                router.replace('/(tabs)/dashboard');
+                            }
+
+                            showToast('success', '¡Bienvenido!', 'Iniciaste sesión con Google exitosamente');
+                        }
+                    } catch (backendError: unknown) {
+                        console.error('❌ Error al autenticar con el backend:', backendError);
+
+                        if (isAPIError(backendError)) {
+                            const errorMessage = backendError.messages.join(', ');
+                            showToast('error', 'Error de autenticación', errorMessage);
+                        } else if (backendError instanceof Error && backendError.message?.includes('Usuario no encontrado')) {
+                            showToast('error', 'Usuario no registrado', 'Esta cuenta de Google no está registrada en VitalFit');
+                        } else {
+                            showToast('error', 'Error de autenticación', 'No se pudo iniciar sesión con Google');
+                        }
+                    }
+                } else {
+                    console.warn('❌ No se pudo obtener el token de sesión con el template');
+                    showToast('error', 'Error', 'No se pudo obtener el token de Clerk');
+                }
+            }
+        } catch (error: unknown) {
+            console.error('❌ Error en Google Sign-In:', error);
+
+            if (error instanceof Error && error.message?.includes('already signed in')) {
+                showToast('success', 'Ya has iniciado sesión', 'Redirigiendo al dashboard...');
+                router.replace('/(tabs)/dashboard');
+            } else {
+                showToast('error', 'Error de autenticación', 'No se pudo iniciar sesión con Google');
+            }
+        } finally {
+            setIsGoogleLoading(false);
+        }
+    }, [startOAuthFlow, getToken, signOut, router, showToast]);
 
     return (
         <KeyboardAvoidingView
@@ -110,14 +210,12 @@ export default function LoginScreen() {
                             <LogoSimple size={250} />
                         </View>
 
-                        {/* Título */}
                         <Text
                             className='text-4xl text-black mb-2 uppercase text-center'
                             style={{ fontFamily: Fonts.title }}>
                             {t('login.title')}
                         </Text>
 
-                        {/* Subtítulo */}
                         <Text className='text-gray-500 text-center mb-8 text-lg'>
                             {t('login.subtitle')}
                         </Text>
@@ -206,9 +304,11 @@ export default function LoginScreen() {
                                 onPress={handleLogin}
                                 disabled={isLoading}
                             />
-                            <SocialButton 
-                                title={t('login.googleSignIn')} 
-                                iconName='google' 
+                            <SocialButton
+                                title={isGoogleLoading ? 'Iniciando...' : t('login.googleSignIn')}
+                                iconName='google'
+                                onPress={handleGoogleSignIn}
+                                disabled={isGoogleLoading}
                             />
                         </View>
 

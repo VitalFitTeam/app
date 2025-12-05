@@ -15,11 +15,11 @@ import { isAPIError, SignUpRequest, UserGender } from '@vitalfit/sdk';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next'; // 1. Importar hook
+import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function RegisterScreen() {
-    const { t } = useTranslation(); // 2. Inicializar
+    const { t } = useTranslation(); 
     const router = useRouter();
     const [step, setStep] = useState(1);
     const { toastState, showToast, hideToast } = useToast();
