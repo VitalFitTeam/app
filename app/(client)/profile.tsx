@@ -1,6 +1,7 @@
 import { ClientQRModal } from '@/components/client/ClientQRModal';
 import { ThemedView } from '@/components/themed-view';
 import vitalFitApi from '@/services/vitalfitSdk';
+import { useClerk } from '@clerk/clerk-expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import { Image } from 'expo-image';
@@ -8,18 +9,19 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
-    ArrowRightOnRectangleIcon,
-    BellIcon,
-    ChevronRightIcon,
-    GlobeAltIcon,
-    QrCodeIcon,
-    QuestionMarkCircleIcon,
-    ShieldCheckIcon,
-    UserCircleIcon,
+  ArrowRightOnRectangleIcon,
+  BellIcon,
+  ChevronRightIcon,
+  GlobeAltIcon,
+  QrCodeIcon,
+  QuestionMarkCircleIcon,
+  ShieldCheckIcon,
+  UserCircleIcon,
 } from 'react-native-heroicons/outline';
 
 export default function ClientProfileScreen() {
   const router = useRouter();
+  const { signOut } = useClerk(); 
   const [loading, setLoading] = useState(true);
   const [firstName, setFirstName] = useState<string | null>(null);
   const [lastName, setLastName] = useState<string | null>(null);
@@ -66,9 +68,23 @@ export default function ClientProfileScreen() {
 
   const handleConfirmLogout = async () => {
     try {
-      await AsyncStorage.removeItem('token');
+      console.log('Cerrando sesión...');
+      
+      // 1. Limpiar AsyncStorage
+      await AsyncStorage.multiRemove(['token', 'temp_email', 'temp_password', 'temp_gender']);
+      console.log('AsyncStorage limpiado');
+      
+      // 2. Cerrar sesión de Clerk
+      try {
+        await signOut();
+        console.log('Sesión de Clerk cerrada');
+      } catch (error) {
+        console.log('No había sesión de Clerk activa: ', error);
+      }
+      
+      console.log('Logout completado');
     } catch (error) {
-      console.error('Error al eliminar el token en logout:', error);
+      console.error('Error al cerrar sesión:', error);
     } finally {
       setLogoutModalVisible(false);
       router.replace('/(auth)/login');
@@ -137,7 +153,7 @@ export default function ClientProfileScreen() {
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
           onPress={() => {
-            router.push('/membership-entry');
+            router.replace('/membership-entry');
           }}>
           <View className='flex-row items-center'>
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
@@ -169,7 +185,7 @@ export default function ClientProfileScreen() {
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
           onPress={() => {
-            router.replace('/profile/settings');
+            router.replace('/profile/profile-settings');
           }}>
           <View className='flex-row items-center'>
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>

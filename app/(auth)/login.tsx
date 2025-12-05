@@ -61,19 +61,22 @@ export default function LoginScreen() {
             if (token) {
                 await AsyncStorage.setItem('token', token);
                 console.log('Token guardado en AsyncStorage');
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+                console.log('✅ Delay completado, token debe estar disponible');
+
+                const whoamiResponse = await vitalFitApi.user.WhoAmI(token);
+                const role = whoamiResponse.user?.role?.name?.toLowerCase();
+
+                if (role === 'instructor') {
+                    router.replace('/(instructor)/dashboard');
+                } else if (role === 'recepcionist' || role === 'receptionist') {
+                    router.replace('/(recepcionist)/dashboard');
+                } else {
+                    router.replace('/(tabs)/dashboard');
+                }
             } else {
                 console.warn('No se recibió token en la respuesta del SDK.');
-            }
-
-            const whoamiResponse = await vitalFitApi.user.WhoAmI(token);
-            const role = whoamiResponse.user?.role?.name?.toLowerCase();
-
-            if (role === 'instructor') {
-                router.replace('/(instructor)/dashboard');
-            } else if (role === 'recepcionist' || role === 'receptionist') {
-                router.replace('/(recepcionist)/dashboard');
-            } else {
-                router.replace('/(tabs)/dashboard');
             }
         } catch (error: unknown) {
             let errorMessage = t('login.toast.unexpectedError');
@@ -110,7 +113,6 @@ export default function LoginScreen() {
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
-                // 👇 USAR EL TEMPLATE PERSONALIZADO
                 const clerkToken = await getToken({ template: 'vitalfit-backend' });
 
                 if (clerkToken) {
@@ -140,6 +142,9 @@ export default function LoginScreen() {
                         if (backendToken) {
                             await AsyncStorage.setItem('token', backendToken);
                             console.log('✅ Token de backend guardado');
+
+                            await new Promise(resolve => setTimeout(resolve, 300));
+                            console.log('✅ Delay completado, token debe estar disponible');
 
                             const whoamiResponse = await vitalFitApi.user.WhoAmI(backendToken);
                             const role = whoamiResponse.user?.role?.name?.toLowerCase();
