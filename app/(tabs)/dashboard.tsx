@@ -36,31 +36,31 @@ export default function DashboardScreen() {
 
 				// Si no hay token, esperar y reintentar
 				if (!token) {
-					console.log('⏳ Token no encontrado en primer intento, esperando...');
+					console.log('Token no encontrado en primer intento, esperando...');
 					await new Promise(resolve => setTimeout(resolve, 500));
 					token = await AsyncStorage.getItem('token');
 				}
 
 				// Si aún no hay token, intentar una vez más
 				if (!token) {
-					console.log('⏳ Token no encontrado en segundo intento, esperando...');
+					console.log('Token no encontrado en segundo intento, esperando...');
 					await new Promise(resolve => setTimeout(resolve, 500));
 					token = await AsyncStorage.getItem('token');
 				}
 
 				if (!token) {
-					console.error('❌ No se encontró token en AsyncStorage después de reintentar');
+					console.error('No se encontró token en AsyncStorage después de reintentar');
 					router.replace('/(auth)/login');
 					return;
 				}
 
-				console.log('✅ Token encontrado en AsyncStorage');
+				console.log('Token encontrado en AsyncStorage');
 				setUserToken(token);
 
 				const userData = await vitalFitApi.user.WhoAmI(token);
 				setFirstName(userData?.user?.first_name || 'Usuario');
 				setLastName(userData?.user?.last_name || null);
-				console.log('✅ Datos del usuario obtenidos correctamente');
+				console.log('Datos del usuario obtenidos correctamente');
 			} catch (error: unknown) {
 				let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
 				if (isAPIError(error)) {
@@ -68,7 +68,7 @@ export default function DashboardScreen() {
 				} else if (error instanceof Error) {
 					errorMessage = error.message;
 				}
-				console.error('❌ Error en la solicitud whoami:', errorMessage);
+				console.error('Error en la solicitud whoami:', errorMessage);
 				router.replace('/(auth)/login');
 			} finally {
 				setLoading(false);

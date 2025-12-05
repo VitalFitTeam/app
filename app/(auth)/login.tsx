@@ -63,7 +63,7 @@ export default function LoginScreen() {
                 console.log('Token guardado en AsyncStorage');
                 
                 await new Promise(resolve => setTimeout(resolve, 300));
-                console.log('✅ Delay completado, token debe estar disponible');
+                console.log('Delay completado, token debe estar disponible');
 
                 const whoamiResponse = await vitalFitApi.user.WhoAmI(token);
                 const role = whoamiResponse.user?.role?.name?.toLowerCase();
@@ -97,7 +97,7 @@ export default function LoginScreen() {
         try {
             try {
                 await signOut();
-                console.log('🔄 Sesión previa de Clerk cerrada');
+                console.log('Sesión previa de Clerk cerrada');
             } catch {
                 console.log('No había sesión previa para cerrar');
             }
@@ -109,42 +109,42 @@ export default function LoginScreen() {
             if (createdSessionId && setActive) {
                 await setActive({ session: createdSessionId });
 
-                console.log('✅ Sesión activada con ID:', createdSessionId);
+                console.log('Sesión activada con ID:', createdSessionId);
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
                 const clerkToken = await getToken({ template: 'vitalfit-backend' });
 
                 if (clerkToken) {
-                    console.log('✅ Session Token de Clerk obtenido con template vitalfit-backend');
-                    console.log('🔍 Token (primeros 100 chars):', clerkToken.substring(0, 100));
+                    console.log('Session Token de Clerk obtenido con template vitalfit-backend');
+                    console.log('Token (primeros 100 chars):', clerkToken.substring(0, 100));
 
                     try {
                         const payload = JSON.parse(atob(clerkToken.split('.')[1]));
-                        console.log('📧 Email:', payload.email);
-                        console.log('🆔 User ID:', payload.sub);
-                        console.log('📦 Payload completo:', JSON.stringify(payload, null, 2));
+                        console.log('Email:', payload.email);
+                        console.log('User ID:', payload.sub);
+                        console.log('Payload completo:', JSON.stringify(payload, null, 2));
                     } catch (decodeError) {
-                        console.error('❌ Error al decodificar JWT:', decodeError);
+                        console.error('Error al decodificar JWT:', decodeError);
                     }
 
                     try {
-                        console.log('📤 Enviando al backend...');
+                        console.log('Enviando al backend...');
 
                         const response = await vitalFitApi.auth.oAuthLogin({
                             session_token: clerkToken
                         });
 
-                        console.log('✅ Respuesta exitosa del backend');
+                        console.log('Respuesta exitosa del backend');
 
                         const backendToken = response.token;
 
                         if (backendToken) {
                             await AsyncStorage.setItem('token', backendToken);
-                            console.log('✅ Token de backend guardado');
+                            console.log('Token de backend guardado');
 
                             await new Promise(resolve => setTimeout(resolve, 300));
-                            console.log('✅ Delay completado, token debe estar disponible');
+                            console.log('Delay completado, token debe estar disponible');
 
                             const whoamiResponse = await vitalFitApi.user.WhoAmI(backendToken);
                             const role = whoamiResponse.user?.role?.name?.toLowerCase();
@@ -160,7 +160,7 @@ export default function LoginScreen() {
                             showToast('success', '¡Bienvenido!', 'Iniciaste sesión con Google exitosamente');
                         }
                     } catch (backendError: unknown) {
-                        console.error('❌ Error al autenticar con el backend:', backendError);
+                        console.error('Error al autenticar con el backend:', backendError);
 
                         if (isAPIError(backendError)) {
                             const errorMessage = backendError.messages.join(', ');
@@ -172,12 +172,12 @@ export default function LoginScreen() {
                         }
                     }
                 } else {
-                    console.warn('❌ No se pudo obtener el token de sesión con el template');
+                    console.warn('No se pudo obtener el token de sesión con el template');
                     showToast('error', 'Error', 'No se pudo obtener el token de Clerk');
                 }
             }
         } catch (error: unknown) {
-            console.error('❌ Error en Google Sign-In:', error);
+            console.error('Error en Google Sign-In:', error);
 
             if (error instanceof Error && error.message?.includes('already signed in')) {
                 showToast('success', 'Ya has iniciado sesión', 'Redirigiendo al dashboard...');

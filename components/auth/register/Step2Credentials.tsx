@@ -36,47 +36,47 @@ export function Step2Credentials({ control, errors, onNextStep}: Props) {
 
     const handleGoogleSignUp = async () => {
         setIsGoogleLoading(true);
-        console.log('🔵 handleGoogleSignUp llamado');
+        console.log('handleGoogleSignUp llamado');
 
         try {
             try {
                 await signOut();
-                console.log('🔄 Sesión previa cerrada');
+                console.log('Sesión previa cerrada');
             } catch {
-                console.log('ℹ️ No había sesión previa');
+                console.log('No había sesión previa');
             }
 
-            console.log('🔵 Iniciando OAuth flow...');
+            console.log('Iniciando OAuth flow...');
             const { createdSessionId, setActive } = await startOAuthFlow({
                 redirectUrl: Linking.createURL('/(auth)/register', { scheme: 'vitalfit' }),
             });
 
-            console.log('🔵 OAuth flow completado:', { createdSessionId });
+            console.log('OAuth flow completado:', { createdSessionId });
 
             if (createdSessionId && setActive) {
-                console.log('🔵 Activando sesión...');
+                console.log('Activando sesión...');
                 await setActive({ session: createdSessionId });
-                console.log('✅ Sesión activada con ID:', createdSessionId);
+                console.log('Sesión activada con ID:', createdSessionId);
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
                 const clerkToken = await getToken({ template: 'vitalfit-backend' });
 
                 if (clerkToken) {
-                    console.log('✅ Token de Clerk obtenido');
+                    console.log('Token de Clerk obtenido');
 
                     try {
-                        console.log('📤 Enviando al backend...');
+                        console.log('Enviando al backend...');
                         const response = await vitalFitApi.auth.oAuthLogin({
                             session_token: clerkToken
                         });
 
-                        console.log('✅ Usuario ya registrado, iniciando sesión...');
+                        console.log('Usuario ya registrado, iniciando sesión...');
                         const backendToken = response.token;
 
                         if (backendToken) {
                             await AsyncStorage.setItem('token', backendToken);
-                            console.log('✅ Token de backend guardado');
+                            console.log('Token de backend guardado');
 
                             const whoamiResponse = await vitalFitApi.user.WhoAmI(backendToken);
                             const role = whoamiResponse.user?.role?.name?.toLowerCase();
@@ -92,7 +92,7 @@ export function Step2Credentials({ control, errors, onNextStep}: Props) {
                             }
                         }
                     } catch (loginError: unknown) {
-                        console.log('ℹ️ Usuario no existe, continuando con registro...');
+                        console.log('Usuario no existe, continuando con registro...');
 
                         if (isAPIError(loginError)) {
                             const errorMessages = loginError.messages.join(', ').toLowerCase();
@@ -100,26 +100,26 @@ export function Step2Credentials({ control, errors, onNextStep}: Props) {
                             if (errorMessages.includes('usuario no encontrado') ||
                                 errorMessages.includes('not found') ||
                                 errorMessages.includes('unauthorized')) {
-                                console.log('✅ Continuando con flujo de registro');
+                                console.log('Continuando con flujo de registro');
                                 router.replace('/(auth)/register?oauth=google');
                             } else {
                                 showToast('error', 'Error de autenticación', loginError.messages.join(', '));
                             }
                         } else {
-                            console.error('❌ Error inesperado:', loginError);
+                            console.error('Error inesperado:', loginError);
                             showToast('error', 'Error', 'No se pudo completar la autenticación con Google');
                         }
                     }
                 } else {
-                    console.warn('❌ No se pudo obtener el token de sesión');
+                    console.warn('No se pudo obtener el token de sesión');
                     showToast('error', 'Error', 'No se pudo obtener el token de Clerk');
                 }
             } else {
-                console.warn('❌ No se creó sesión o setActive no está disponible');
+                console.warn('No se creó sesión o setActive no está disponible');
                 showToast('error', 'Error', 'No se pudo completar el inicio de sesión con Google');
             }
         } catch (err: unknown) {
-            console.error('❌ OAuth error:', err);
+            console.error('OAuth error:', err);
 
             if (err instanceof Error && err.message?.includes('already signed in')) {
                 showToast('success', 'Ya has iniciado sesión', 'Redirigiendo...');

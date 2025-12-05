@@ -14,7 +14,6 @@ import '../services/i18n';
 
 SplashScreen.preventAutoHideAsync();
 
-// Configuración del token cache para Clerk
 const tokenCache = {
     async getToken(key: string) {
         try {
