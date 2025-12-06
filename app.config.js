@@ -12,6 +12,7 @@ export default {
 		newArchEnabled: true,
 		ios: {
 			supportsTablet: true,
+			bundleIdentifier: 'com.mrwisz.VitalFit',
 		},
 		android: {
 			adaptiveIcon: {
@@ -30,6 +31,7 @@ export default {
 		},
 		plugins: [
 			'expo-router',
+			'expo-secure-store', 
 			[
 				'expo-splash-screen',
 				{

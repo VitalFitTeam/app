@@ -9,18 +9,29 @@ import { Colors, Fonts } from '@/constants/theme';
 import { useToast } from '@/hooks/useToast';
 import { RegisterData, RegisterSchema, Step1Schema, Step2Schema } from '@/schemas/register';
 import vitalFitApi from '@/services/vitalfitSdk';
+import { useUser } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError, SignUpRequest, UserGender } from '@vitalfit/sdk';
-import { Link, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next'; // 1. Importar hook
+import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+function generateSecurePassword() {
+    const random = Math.random().toString(36).slice(-10);
+    return `A${random}!1`;
+}
+
 export default function RegisterScreen() {
-    const { t } = useTranslation(); // 2. Inicializar
+    const { t } = useTranslation();
     const router = useRouter();
+    const params = useLocalSearchParams();
+    const isOAuthFlow = params.oauth === 'google';
+
+    const { user, isSignedIn } = useUser();
+
     const [step, setStep] = useState(1);
     const { toastState, showToast, hideToast } = useToast();
 
@@ -30,15 +41,39 @@ export default function RegisterScreen() {
         trigger,
         formState: { errors },
         getValues,
+        setValue,
         setError,
     } = useForm<RegisterData>({
         resolver: zodResolver(RegisterSchema),
-        defaultValues: { acceptTerms: false },
+        defaultValues: {
+            acceptTerms: false,
+        },
     });
 
+    useEffect(() => {
+        if (isOAuthFlow && isSignedIn && user) {
+            // Pre-llenar datos del usuario de Google
+            if (user.firstName) setValue('name', user.firstName);
+            if (user.lastName) setValue('lastName', user.lastName);
+            if (user.emailAddresses?.[0]?.emailAddress) {
+                setValue('email', user.emailAddresses[0].emailAddress);
+            }
+            if (user.phoneNumbers?.[0]?.phoneNumber) {
+                setValue('phone', user.phoneNumbers[0].phoneNumber);
+            }
+            if (user.imageUrl) {
+                setValue('profile_picture_url', user.imageUrl);
+            }
+
+            // Generar contraseña automática
+            const autoPassword = generateSecurePassword();
+            setValue('password', autoPassword);
+            setValue('confirmPassword', autoPassword);
+        }
+    }, [isOAuthFlow, isSignedIn, user, setValue]);
+
     const handleRegistration = async (data: RegisterData) => {
-        // ... Lógica de envío (se mantiene igual, solo limpiamos para el ejemplo) ...
-        const cleanedData = { ...data }; // Simplificado para el ejemplo
+        const cleanedData = { ...data };
 
         try {
             const payload: SignUpRequest = {
@@ -50,15 +85,15 @@ export default function RegisterScreen() {
                 identity_document: cleanedData.documentId,
                 birth_date: new Date(cleanedData.birthDate).toISOString().split('T')[0],
                 phone: cleanedData.phone,
-                profile_picture_url: '',
+                profile_picture_url: cleanedData.profile_picture_url || '',
                 role_name: 'client',
             };
 
             await vitalFitApi.auth.signUp(payload);
+
             await AsyncStorage.setItem('temp_email', cleanedData.email);
             await AsyncStorage.setItem('temp_password', cleanedData.password);
 
-            // TRADUCCIÓN DE TOAST DE ÉXITO
             showToast(
                 'success',
                 t('register.toast.successTitle'),
@@ -68,14 +103,16 @@ export default function RegisterScreen() {
             setTimeout(() => {
                 router.replace('/(auth)/confirm-email');
             }, 2000);
+
         } catch (error: unknown) {
-            // TRADUCCIÓN DE ERRORES
             let errorMessage = t('register.toast.unexpectedError');
+
             if (isAPIError(error)) {
                 errorMessage = error.messages.join(', ');
             } else if (error instanceof Error) {
                 errorMessage = error.message;
             }
+
             showToast('error', t('register.toast.errorTitle'), errorMessage);
         }
     };
@@ -83,22 +120,39 @@ export default function RegisterScreen() {
     const onSubmitPress = handleSubmit(handleRegistration);
 
     const nextStep = async () => {
-        const fieldsToValidate: (keyof RegisterData)[] =
-            step === 1 ? ['gender'] : ['email', 'password', 'confirmPassword'];
+        let fieldsToValidate: (keyof RegisterData)[] = [];
+
+        if (step === 1) {
+            fieldsToValidate = ['gender'];
+        } else if (step === 2 && !isOAuthFlow) {
+            fieldsToValidate = ['email', 'password', 'confirmPassword'];
+        }
 
         await trigger(fieldsToValidate);
-        const currentSchema = step === 1 ? Step1Schema : Step2Schema;
-        const result = currentSchema.safeParse(getValues());
 
-        if (result.success) {
-            setStep(step + 1);
-        } else {
-            result.error.issues.forEach((issue) => {
-                setError(issue.path[0] as keyof RegisterData, {
-                    type: 'manual',
-                    message: issue.message,
+        const currentSchema =
+            step === 1 ? Step1Schema :
+            step === 2 && !isOAuthFlow ? Step2Schema :
+            null;
+
+        if (currentSchema) {
+            const result = currentSchema.safeParse(getValues());
+            if (!result.success) {
+                result.error.issues.forEach((issue) => {
+                    setError(issue.path[0] as keyof RegisterData, {
+                        type: 'manual',
+                        message: issue.message,
+                    });
                 });
-            });
+                return;
+            }
+        }
+
+        // Si está en step 1 y es OAuth, saltar directo a step 3
+        if (step === 1 && isOAuthFlow) {
+            setStep(3);
+        } else {
+            setStep(step + 1);
         }
     };
 
@@ -107,6 +161,7 @@ export default function RegisterScreen() {
             style={styles.keyboardView}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
+
             <ToastNotification
                 visible={toastState.visible}
                 type={toastState.type}
@@ -119,16 +174,17 @@ export default function RegisterScreen() {
                 contentContainerStyle={styles.scrollContent}
                 keyboardShouldPersistTaps='handled'
                 showsVerticalScrollIndicator={false}>
+
                 <ThemedView style={styles.container}>
                     <View style={styles.formContainer}>
                         <Logo />
-                        
-                        {/* TÍTULOS TRADUCIDOS */}
+
                         {step === 1 && (
                             <ThemedText style={[styles.mainTitle, { fontFamily: Fonts.title }]}>
                                 {t('register.step1Title')}
                             </ThemedText>
                         )}
+
                         {step === 2 && (
                             <>
                                 <ThemedText style={[styles.mainTitle, { fontFamily: Fonts.title }]}>
@@ -139,6 +195,7 @@ export default function RegisterScreen() {
                                 </Text>
                             </>
                         )}
+
                         {step === 3 && (
                             <Text className='text-gray-500 text-center mb-8 text-lg'>
                                 {t('register.step3Subtitle')}
@@ -153,13 +210,16 @@ export default function RegisterScreen() {
                                     onNextStep={nextStep}
                                 />
                             )}
+
                             {step === 2 && (
                                 <Step2Credentials
                                     control={control}
                                     errors={errors}
                                     onNextStep={nextStep}
+                                    isSignedIn={isSignedIn}
                                 />
                             )}
+
                             {step === 3 && (
                                 <Step3PersonalDetails
                                     control={control}
@@ -179,6 +239,7 @@ export default function RegisterScreen() {
                                 </Text>
                             </Link>
                         </View>
+
                     </View>
                 </ThemedView>
             </ScrollView>

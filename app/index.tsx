@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
 import { Global } from 'iconsax-react-native';
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next'; // 1. Importa el hook
+import { useTranslation } from 'react-i18next';
 import { Image, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundCarousel, SignInButton, SignUpButton } from '../components/auth/home';
@@ -17,9 +17,9 @@ export default function HomeScreen() {
 	});
 	const insets = useSafeAreaInsets();
 	const router = useRouter();
-	const { t } = useTranslation(); // 2. Obtén la función 't'
+	const { t } = useTranslation(); 
 
-	// 3. Define los textos de los slides usando 't'
+
 	const slideTexts = [t('slide1'), t('slide2'), t('slide3')];
 
 	if (!fontsLoaded) return null;
@@ -59,7 +59,7 @@ export default function HomeScreen() {
 					paddingHorizontal: 24,
 					paddingTop: 48,
 				}}>
-				{/* 4. Usa el array de textos traducidos */}
+
 				<Text className='mb-6 text-center font-montserrat-bold text-[30px] leading-[36px] text-white'>
 					{slideTexts[index]}
 				</Text>
@@ -75,7 +75,6 @@ export default function HomeScreen() {
 					))}
 				</View>
 
-				{/* 5. Usa 't' para el botón de idioma */}
 				<Link href='/language' asChild>
 					<TouchableOpacity className='mb-4 flex-row items-center justify-center py-2'>
 						<Global color='white' size={16} variant='Outline' />
@@ -95,17 +94,17 @@ export default function HomeScreen() {
 						marginTop: 16,
 					}}>
 					<View style={{ flex: 1, marginRight: 8 }}>
-						{/* 6. Usa 't' para las etiquetas de los botones */}
+
 						<SignInButton
 							label={t('signIn')}
-							onPress={() => router.push('/(auth)/login')}
+							onPress={() => router.replace('/(auth)/login')}
 						/>
 					</View>
 
 					<View style={{ flex: 1, marginLeft: 8 }}>
 						<SignUpButton
 							label={t('signUp')}
-							onPress={() => router.push('/(auth)/register')}
+							onPress={() => router.replace('/(auth)/register')}
 						/>
 					</View>
 				</View>
