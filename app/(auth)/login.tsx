@@ -11,13 +11,15 @@ import { isAPIError } from '@vitalfit/sdk';
 import Checkbox from 'expo-checkbox';
 import * as Linking from 'expo-linking';
 import { Link, useRouter } from 'expo-router';
-import { Eye, EyeOff, SlidersVertical } from 'lucide-react-native';
-import { useCallback, useState } from 'react';
+import { ArrowLeft, Eye, EyeOff, SlidersVertical } from 'lucide-react-native';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+    BackHandler,
     Keyboard,
     KeyboardAvoidingView,
     Platform,
+    ScrollView,
     Text,
     TextInput,
     TouchableOpacity,
@@ -28,6 +30,20 @@ import {
 export default function LoginScreen() {
     const { toastState, showToast, hideToast } = useToast();
     const router = useRouter();
+
+    useEffect(() => {
+        const onBackPress = () => {
+            router.replace('/');
+            return true;
+        };
+
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+
+        return () => subscription.remove();
+    }, [router]);
     const { t } = useTranslation();
     const { signOut } = useClerk();
     const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
@@ -192,24 +208,32 @@ export default function LoginScreen() {
 
     return (
         <KeyboardAvoidingView
-            style={{ flex: 1 }}
+            style={{ flex: 1, backgroundColor: '#FFFFFF' }}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <ToastNotification
+                visible={toastState.visible}
+                type={toastState.type}
+                title={toastState.title}
+                message={toastState.message}
+                onClose={hideToast}
+            />
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View
-                    style={{
-                        flex: 1,
+                <ScrollView
+                    contentContainerStyle={{
+                        flexGrow: 1,
                         justifyContent: 'center',
                         paddingHorizontal: 32,
                         paddingVertical: 16,
                     }}
-                    className='bg-white'>
-                    <ToastNotification
-                        visible={toastState.visible}
-                        type={toastState.type}
-                        title={toastState.title}
-                        message={toastState.message}
-                        onClose={hideToast}
-                    />
+                    keyboardShouldPersistTaps='handled'
+                    showsVerticalScrollIndicator={false}
+                    style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+                    <TouchableOpacity
+                        onPress={() => router.replace('/')}
+                        className='absolute top-4 left-4 z-10 w-10 h-10 items-center justify-center'
+                        style={{ backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: 20 }}>
+                        <ArrowLeft size={24} color='#000' />
+                    </TouchableOpacity>
                     <View className='w-full max-w-sm self-center'>
                         <View className='items-center mb-2'>
                             <LogoSimple size={250} />
@@ -330,7 +354,7 @@ export default function LoginScreen() {
                             </Link>
                         </View>
                     </View>
-                </View>
+                </ScrollView>
             </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
     );

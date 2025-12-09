@@ -14,7 +14,6 @@ import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } fr
 import { CheckCircleIcon, TrashIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Interfaces locales para manejar respuestas del SDK
 interface BranchLike {
   branch_id?: string;
   id?: string;

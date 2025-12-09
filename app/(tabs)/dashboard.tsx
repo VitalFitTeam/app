@@ -14,15 +14,16 @@ import { isAPIError } from '@vitalfit/sdk';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, BackHandler, Text as RNText, ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function DashboardScreen() {
 	const router = useRouter();
+	const insets = useSafeAreaInsets();
 	const [firstName, setFirstName] = useState<string | null>(null);
 	const [lastName, setLastName] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [qrModalVisible, setQrModalVisible] = useState(false);
 	const [userToken, setUserToken] = useState<string>('');
-	// TODO: reemplazar cuando exista endpoint real de membresía
 	const hasMembership = true;
 
 
@@ -160,8 +161,8 @@ export default function DashboardScreen() {
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{
 					paddingHorizontal: 16,
-					paddingTop: 40,
-					paddingBottom: 120,
+					paddingTop: Math.max(insets.top, 40),
+					paddingBottom: Math.max(insets.bottom + 80, 120),
 				}}>
 				<UserHeader
 					name={displayName}

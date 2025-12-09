@@ -5,11 +5,13 @@ import { useTranslation } from 'react-i18next'; // <--- 1. Importamos el hook
 import { HapticTab } from '@/components/haptic-tab';
 import { Dumbbell } from 'lucide-react-native';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CalendarIcon, HomeIcon, UserIcon, UsersIcon } from 'react-native-heroicons/solid';
 
 export default function TabLayout() {
     // 2. Obtenemos la función para traducir
-    const { t } = useTranslation(); 
+    const { t } = useTranslation();
+    const insets = useSafeAreaInsets(); 
 
     return (
         <Tabs
@@ -23,7 +25,7 @@ export default function TabLayout() {
                     borderTopWidth: 0,
                     borderRadius: 0,
                     marginHorizontal: 0,
-                    height: 60,
+                    height: 60 + insets.bottom,
                     position: 'absolute',
                     left: 0,
                     right: 0,
@@ -31,7 +33,7 @@ export default function TabLayout() {
                     paddingHorizontal: 8,
                     overflow: 'hidden',
                     elevation: 0,
-                    paddingBottom: 6,
+                    paddingBottom: Math.max(insets.bottom, 6),
                     paddingTop: 0,
                 },
                 tabBarItemStyle: {

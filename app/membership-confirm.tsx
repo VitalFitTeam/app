@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mainCurrencies } from '@vitalfit/sdk';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, ScrollView, TouchableOpacity, View } from 'react-native';
 import { CurrencyDollarIcon, MapPinIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -45,6 +45,7 @@ export default function MembershipConfirmScreen() {
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const [exchangeRate, setExchangeRate] = useState(1);
   const [loadingRate, setLoadingRate] = useState(false);
+  const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
 
   // 1. Cargar Sucursales y Token inicial
   useEffect(() => {
@@ -253,26 +254,71 @@ export default function MembershipConfirmScreen() {
         {/* Selector de Moneda */}
         <View className="mb-6">
             <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">MONEDA DE PAGO</ThemedText>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row py-1">
-                {mainCurrencies.map((currency) => {
-                    const isSelected = selectedCurrency === currency.code;
-                    return (
-                        <TouchableOpacity
-                            key={currency.code}
-                            onPress={() => setSelectedCurrency(currency.code)}
-                            disabled={loadingRate}
-                            className={`mr-3 px-4 py-2 rounded-lg border flex-row items-center ${
-                                isSelected ? 'bg-blue-50 border-blue-500' : 'bg-white border-neutral-200'
-                            }`}
-                        >
-                            <CurrencyDollarIcon size={14} color={isSelected ? '#3b82f6' : '#9ca3af'} />
-                            <ThemedText className={`ml-2 text-sm font-bold ${isSelected ? 'text-blue-800' : 'text-gray-600'}`}>
-                                {currency.code}
-                            </ThemedText>
-                        </TouchableOpacity>
-                    )
-                })}
-            </ScrollView>
+            <TouchableOpacity
+                onPress={() => setCurrencyDropdownOpen(true)}
+                disabled={loadingRate}
+                className="px-4 py-3 rounded-lg border border-neutral-200 bg-white flex-row items-center justify-between"
+            >
+                <View className="flex-row items-center">
+                    <CurrencyDollarIcon size={16} color="#3b82f6" />
+                    <ThemedText className="ml-2 text-sm font-bold text-gray-800">
+                        {mainCurrencies.find(c => c.code === selectedCurrency)?.code || 'USD'}
+                    </ThemedText>
+                </View>
+                <ThemedText className="text-gray-400">▼</ThemedText>
+            </TouchableOpacity>
+
+            {/* Modal Dropdown */}
+            <Modal
+                visible={currencyDropdownOpen}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setCurrencyDropdownOpen(false)}
+            >
+                <TouchableOpacity
+                    className="flex-1 bg-black/50 justify-center items-center"
+                    activeOpacity={1}
+                    onPress={() => setCurrencyDropdownOpen(false)}
+                >
+                    <View className="bg-white rounded-2xl w-4/5 max-h-96 overflow-hidden" style={{ elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84 }}>
+                        <View className="px-4 py-3 border-b border-neutral-200">
+                            <ThemedText className="text-sm font-bold text-gray-700 uppercase">Seleccionar Moneda</ThemedText>
+                        </View>
+                        <ScrollView className="max-h-80">
+                            {mainCurrencies.map((currency) => {
+                                const isSelected = selectedCurrency === currency.code;
+                                return (
+                                    <TouchableOpacity
+                                        key={currency.code}
+                                        onPress={() => {
+                                            setSelectedCurrency(currency.code);
+                                            setCurrencyDropdownOpen(false);
+                                        }}
+                                        className={`px-4 py-4 border-b border-neutral-100 flex-row items-center justify-between ${
+                                            isSelected ? 'bg-blue-50' : 'bg-white'
+                                        }`}
+                                    >
+                                        <View className="flex-row items-center">
+                                            <CurrencyDollarIcon size={18} color={isSelected ? '#3b82f6' : '#9ca3af'} />
+                                            <View className="ml-3">
+                                                <ThemedText className={`text-base font-bold ${isSelected ? 'text-blue-800' : 'text-gray-800'}`}>
+                                                    {currency.code}
+                                                </ThemedText>
+                                                <ThemedText className="text-xs text-gray-500">
+                                                    {currency.name}
+                                                </ThemedText>
+                                            </View>
+                                        </View>
+                                        {isSelected && (
+                                            <ThemedText className="text-blue-600 font-bold">✓</ThemedText>
+                                        )}
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </ScrollView>
+                    </View>
+                </TouchableOpacity>
+            </Modal>
         </View>
 
         {/* Detalle de Costos */}

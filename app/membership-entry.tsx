@@ -3,14 +3,30 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { Dumbbell } from 'lucide-react-native';
 import React from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { BackHandler, ScrollView, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MembershipEntryScreen() {
 	const router = useRouter();
+
+	useFocusEffect(
+		React.useCallback(() => {
+			const onBackPress = () => {
+				router.replace('/(tabs)/dashboard');
+				return true;
+			};
+
+			const subscription = BackHandler.addEventListener(
+				'hardwareBackPress',
+				onBackPress
+			);
+
+			return () => subscription.remove();
+		}, [router])
+	);
 
 	return (
 		<SafeAreaView className='flex-1 bg-white'>
@@ -164,7 +180,7 @@ export default function MembershipEntryScreen() {
 					<View className='mt-10'>
 						<PrimaryButton
 							title='Volver al inicio'
-							onPress={() => router.back()}
+							onPress={() => router.replace('/(tabs)/dashboard')}
 						/>
 					</View>
 				</ScrollView>
