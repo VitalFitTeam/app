@@ -14,14 +14,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MembershipPaymentTransferScreen() {
   const router = useRouter();
-  
+
   // Recibimos los datos de la factura
   const params = useLocalSearchParams<{
-    invoiceId: string;
+    invoiceId?: string;
     totalAmount: string;
     methodId: string;
     methodName: string;
     currency: string;
+    // New deferred params
+    invoiceItemsJson?: string;
+    userId?: string;
+    branchId?: string;
   }>();
 
   // Estados del formulario
@@ -49,15 +53,33 @@ export default function MembershipPaymentTransferScreen() {
       const token = await AsyncStorage.getItem('token');
       if (!token) throw new Error('Sesión expirada');
 
+      let finalInvoiceId = params.invoiceId;
+
+      // Si no hay factura, crearla
+      if (!finalInvoiceId && params.invoiceItemsJson && params.branchId) {
+        const invoiceItems = JSON.parse(params.invoiceItemsJson);
+        const invoiceResponse = await vitalFitApi.billing.createInvoice({
+          branch_id: params.branchId,
+          user_id: params.userId || null,
+          items: invoiceItems
+        }, token);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const responseData = invoiceResponse as any;
+        finalInvoiceId = responseData.invoice_id || responseData.id || responseData.data?.invoice_id;
+      }
+
+      if (!finalInvoiceId) throw new Error("No se pudo generar la factura para el pago.");
+
       // 2. Ejecutar pago en el backend
       await vitalFitApi.billing.AddPaymentToInvoice({
-        invoice_id: params.invoiceId,
+        invoice_id: finalInvoiceId,
         payment_method_id: params.methodId,
         amount_paid: Number(params.totalAmount),
         currency_paid: params.currency || 'USD',
         transaction_id: reference,
         // Guardamos el titular en el campo de recibo/notas
-        receipt_url: `Titular: ${senderName}` 
+        receipt_url: `Titular: ${senderName}`
       }, token);
 
       // 3. Éxito
@@ -89,18 +111,18 @@ export default function MembershipPaymentTransferScreen() {
       />
 
       <ScrollView className='flex-1 px-6 pt-6 pb-32'>
-        
+
         <ThemedText
-            lightColor='#f97316'
-            darkColor='#f97316'
-            className='text-3xl mb-2 text-center uppercase'
-            style={{ fontFamily: 'BebasNeue-Regular' }}
+          lightColor='#f97316'
+          darkColor='#f97316'
+          className='text-3xl mb-2 text-center uppercase'
+          style={{ fontFamily: 'BebasNeue-Regular' }}
         >
-            {params.methodName || 'TRANSFERENCIA'}
+          {params.methodName || 'TRANSFERENCIA'}
         </ThemedText>
-        
+
         <ThemedText className="text-center text-gray-500 mb-6">
-            Reporta los detalles de tu transacción
+          Reporta los detalles de tu transacción
         </ThemedText>
 
         {/* Datos Bancarios (Ejemplo dinámico según si es Zelle o Banco) */}
@@ -108,33 +130,33 @@ export default function MembershipPaymentTransferScreen() {
           <ThemedText className='text-xs font-bold tracking-widest mb-3 text-gray-500 uppercase'>
             CUENTA DESTINO
           </ThemedText>
-          
+
           {params.methodName?.toLowerCase().includes('zelle') ? (
-             <View className='space-y-2'>
-                <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>Email:</ThemedText>
-                    <ThemedText className='font-bold text-gray-900'>pagos@vitalfit.com</ThemedText>
-                </View>
-                <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>Titular:</ThemedText>
-                    <ThemedText className='font-bold text-gray-900'>VitalFit LLC</ThemedText>
-                </View>
-             </View>
+            <View className='space-y-2'>
+              <View className='flex-row justify-between'>
+                <ThemedText className='text-gray-600'>Email:</ThemedText>
+                <ThemedText className='font-bold text-gray-900'>pagos@vitalfit.com</ThemedText>
+              </View>
+              <View className='flex-row justify-between'>
+                <ThemedText className='text-gray-600'>Titular:</ThemedText>
+                <ThemedText className='font-bold text-gray-900'>VitalFit LLC</ThemedText>
+              </View>
+            </View>
           ) : (
-             <View className='space-y-2'>
-                <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>Banco:</ThemedText>
-                    <ThemedText className='font-bold text-gray-900'>Banco Nacional</ThemedText>
-                </View>
-                <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>Cuenta:</ThemedText>
-                    <ThemedText className='font-bold text-gray-900'>0134-XXXX-XXXX-XXXX</ThemedText>
-                </View>
-                <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>RIF:</ThemedText>
-                    <ThemedText className='font-bold text-gray-900'>J-12345678-9</ThemedText>
-                </View>
-             </View>
+            <View className='space-y-2'>
+              <View className='flex-row justify-between'>
+                <ThemedText className='text-gray-600'>Banco:</ThemedText>
+                <ThemedText className='font-bold text-gray-900'>Banco Nacional</ThemedText>
+              </View>
+              <View className='flex-row justify-between'>
+                <ThemedText className='text-gray-600'>Cuenta:</ThemedText>
+                <ThemedText className='font-bold text-gray-900'>0134-XXXX-XXXX-XXXX</ThemedText>
+              </View>
+              <View className='flex-row justify-between'>
+                <ThemedText className='text-gray-600'>RIF:</ThemedText>
+                <ThemedText className='font-bold text-gray-900'>J-12345678-9</ThemedText>
+              </View>
+            </View>
           )}
         </View>
 
@@ -159,7 +181,7 @@ export default function MembershipPaymentTransferScreen() {
               TOTAL A TRANSFERIR
             </ThemedText>
             <ThemedText className='text-white font-bold text-xs'>
-               Orden #{params.invoiceId?.slice(0,8)}
+              Orden #{params.invoiceId?.slice(0, 8)}
             </ThemedText>
           </View>
           <View className='items-end'>
@@ -174,15 +196,15 @@ export default function MembershipPaymentTransferScreen() {
 
         {/* Formulario */}
         <View className='mb-8 space-y-4'>
-          
-          <StyledTextInput 
+
+          <StyledTextInput
             label="Nombre del Titular de la Cuenta"
             placeholder="Quien realizó la transferencia"
             value={senderName}
             onChangeText={setSenderName}
           />
 
-          <StyledTextInput 
+          <StyledTextInput
             label="Número de Referencia / Confirmación"
             placeholder="Ej: 12345678"
             value={reference}
@@ -206,14 +228,14 @@ export default function MembershipPaymentTransferScreen() {
         </View>
 
         <View className='mb-10'>
-            {loading ? (
-                <ActivityIndicator size="large" color="#f97316" />
-            ) : (
-                <PrimaryButton
-                    title='Confirmar Pago'
-                    onPress={handleProcessPayment}
-                />
-            )}
+          {loading ? (
+            <ActivityIndicator size="large" color="#f97316" />
+          ) : (
+            <PrimaryButton
+              title='Confirmar Pago'
+              onPress={handleProcessPayment}
+            />
+          )}
         </View>
 
       </ScrollView>

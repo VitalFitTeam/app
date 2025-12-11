@@ -24,11 +24,13 @@ export default function DashboardScreen() {
 	const [loading, setLoading] = useState(true);
 	const [qrModalVisible, setQrModalVisible] = useState(false);
 	const [userToken, setUserToken] = useState<string>('');
-	const hasMembership = true;
+	// Estado de membresía dinámico
+	const [hasMembership, setHasMembership] = useState(false);
+	const [membershipStatus, setMembershipStatus] = useState<string>('');
 
 
 	useEffect(() => {
-		 
+
 		const fetchUser = async () => {
 			try {
 				await new Promise(resolve => setTimeout(resolve, 3000));
@@ -58,10 +60,23 @@ export default function DashboardScreen() {
 				console.log('Token encontrado en AsyncStorage');
 				setUserToken(token);
 
-				const userData = await vitalFitApi.user.WhoAmI(token);
-				setFirstName(userData?.user?.first_name || 'Usuario');
-				setLastName(userData?.user?.last_name || null);
-				console.log('Datos del usuario obtenidos correctamente');
+				const response = await vitalFitApi.user.WhoAmI(token);
+				// Tipado flexible para acceder a propiedades no definidas explícitamente en el SDK
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				const userObj = response?.user as any;
+
+				setFirstName(userObj?.first_name || 'Usuario');
+				setLastName(userObj?.last_name || null);
+
+				// Determinar estado de membresía
+				// Verificamos varias posibles propiedades comunes
+				const status = userObj?.membership_status || userObj?.status || 'inactive';
+				const isActive = status === 'active' || status === 'ACTIVA' || status === 'paid';
+
+				setHasMembership(isActive);
+				setMembershipStatus(isActive ? 'Membresía activa' : 'Inactiva');
+
+				console.log('Datos del usuario obtenidos correctamente', { isActive, status });
 			} catch (error: unknown) {
 				let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
 				if (isAPIError(error)) {
@@ -174,7 +189,8 @@ export default function DashboardScreen() {
 
 				<MembershipCard
 					hasMembership={hasMembership}
-					daysRemaining={15}
+					membershipStatus={membershipStatus}
+					daysRemaining={15} // TODO: Calcular días restantes reales
 					onQRPress={() => setQrModalVisible(true)}
 					onGetMembershipPress={() => router.replace('/membership-entry')}
 				/>

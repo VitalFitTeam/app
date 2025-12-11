@@ -15,14 +15,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MembershipPaymentPagoMovilScreen() {
   const router = useRouter();
-  
+
   // Recibimos los datos finales de la factura
   const params = useLocalSearchParams<{
-    invoiceId: string;
+    invoiceId?: string;
     totalAmount: string;
     methodId: string;
     methodName: string;
     currency: string;
+    // New deferred params
+    invoiceItemsJson?: string;
+    userId?: string;
+    branchId?: string;
   }>();
 
   // Estados del formulario
@@ -52,15 +56,33 @@ export default function MembershipPaymentPagoMovilScreen() {
       const token = await AsyncStorage.getItem('token');
       if (!token) throw new Error('Sesión expirada');
 
+      let finalInvoiceId = params.invoiceId;
+
+      // Si no hay factura, crearla
+      if (!finalInvoiceId && params.invoiceItemsJson && params.branchId) {
+        const invoiceItems = JSON.parse(params.invoiceItemsJson);
+        const invoiceResponse = await vitalFitApi.billing.createInvoice({
+          branch_id: params.branchId,
+          user_id: params.userId || null,
+          items: invoiceItems
+        }, token);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const responseData = invoiceResponse as any;
+        finalInvoiceId = responseData.invoice_id || responseData.id || responseData.data?.invoice_id;
+      }
+
+      if (!finalInvoiceId) throw new Error("No se pudo generar la factura.");
+
       // Ejecutar pago en el backend
       await vitalFitApi.billing.AddPaymentToInvoice({
-        invoice_id: params.invoiceId,
+        invoice_id: finalInvoiceId,
         payment_method_id: params.methodId,
         amount_paid: Number(params.totalAmount),
         currency_paid: params.currency || 'VES', // Asumimos VES para pago móvil, o lo que venga
         transaction_id: reference,
         // Guardamos cédula y teléfono en el campo de recibo/notas para referencia administrativa
-        receipt_url: `CI: ${documentNumber} - Tlf: ${phone}` 
+        receipt_url: `CI: ${documentNumber} - Tlf: ${phone}`
       }, token);
 
       showToast('success', 'Pago Reportado', 'Tu pago ha sido enviado a verificación.');
@@ -91,14 +113,14 @@ export default function MembershipPaymentPagoMovilScreen() {
       />
 
       <ScrollView className='flex-1 px-6 pt-6 pb-32'>
-        
+
         <ThemedText
-            lightColor='#f97316'
-            darkColor='#f97316'
-            className='text-3xl mb-6 text-center'
-            style={{ fontFamily: 'BebasNeue-Regular' }}
+          lightColor='#f97316'
+          darkColor='#f97316'
+          className='text-3xl mb-6 text-center'
+          style={{ fontFamily: 'BebasNeue-Regular' }}
         >
-            PAGO MÓVIL
+          PAGO MÓVIL
         </ThemedText>
 
         {/* Datos Bancarios del Comercio */}
@@ -106,23 +128,23 @@ export default function MembershipPaymentPagoMovilScreen() {
           <ThemedText className='text-xs font-bold tracking-widest mb-3 text-orange-800 uppercase'>
             DATOS PARA EL PAGO
           </ThemedText>
-          
+
           <View className='space-y-3'>
             <View className='flex-row justify-between border-b border-orange-200 pb-2'>
-                <ThemedText className='text-gray-600 text-sm'>Banco:</ThemedText>
-                <ThemedText className='font-bold text-gray-900'>Banco de Venezuela</ThemedText>
+              <ThemedText className='text-gray-600 text-sm'>Banco:</ThemedText>
+              <ThemedText className='font-bold text-gray-900'>Banco de Venezuela</ThemedText>
             </View>
             <View className='flex-row justify-between border-b border-orange-200 pb-2'>
-                <ThemedText className='text-gray-600 text-sm'>Teléfono:</ThemedText>
-                <ThemedText className='font-bold text-gray-900'>0414-1234567</ThemedText>
+              <ThemedText className='text-gray-600 text-sm'>Teléfono:</ThemedText>
+              <ThemedText className='font-bold text-gray-900'>0414-1234567</ThemedText>
             </View>
             <View className='flex-row justify-between border-b border-orange-200 pb-2'>
-                <ThemedText className='text-gray-600 text-sm'>RIF:</ThemedText>
-                <ThemedText className='font-bold text-gray-900'>J-12345678-9</ThemedText>
+              <ThemedText className='text-gray-600 text-sm'>RIF:</ThemedText>
+              <ThemedText className='font-bold text-gray-900'>J-12345678-9</ThemedText>
             </View>
             <View className='flex-row justify-between pt-1'>
-                <ThemedText className='text-gray-600 text-sm'>Titular:</ThemedText>
-                <ThemedText className='font-bold text-gray-900'>VitalFit Cabudare</ThemedText>
+              <ThemedText className='text-gray-600 text-sm'>Titular:</ThemedText>
+              <ThemedText className='font-bold text-gray-900'>VitalFit Cabudare</ThemedText>
             </View>
           </View>
         </View>
@@ -148,7 +170,7 @@ export default function MembershipPaymentPagoMovilScreen() {
               TOTAL A PAGAR
             </ThemedText>
             <ThemedText className='text-white font-bold text-xs'>
-               Orden #{params.invoiceId?.slice(0,8)}
+              Orden #{params.invoiceId?.slice(0, 8)}
             </ThemedText>
           </View>
           <View className='items-end'>
@@ -163,29 +185,29 @@ export default function MembershipPaymentPagoMovilScreen() {
 
         {/* Formulario */}
         <View className='mb-8 space-y-4'>
-          
+
           {/* Teléfono */}
           <View>
             <ThemedText className='text-sm mb-2 text-gray-600 font-medium'>Teléfono Origen</ThemedText>
             <View className='border border-gray-300 rounded-xl bg-white overflow-hidden'>
-                <PhoneInput
+              <PhoneInput
                 ref={phoneInputRef}
                 value={phone}
                 onChangePhoneNumber={(ph) => setPhone(ph)}
                 defaultCountry='VE'
                 placeholder='0414 1234567'
                 phoneInputStyles={{
-                    container: { backgroundColor: 'transparent', borderWidth: 0, height: 50 },
-                    flagContainer: { backgroundColor: 'transparent' },
-                    callingCode: { color: '#4b5563' },
-                    input: { color: '#111827' },
+                  container: { backgroundColor: 'transparent', borderWidth: 0, height: 50 },
+                  flagContainer: { backgroundColor: 'transparent' },
+                  callingCode: { color: '#4b5563' },
+                  input: { color: '#111827' },
                 }}
-                />
+              />
             </View>
           </View>
 
           {/* Cédula */}
-          <StyledTextInput 
+          <StyledTextInput
             label="Cédula / RIF del Titular"
             placeholder="V-12345678"
             value={documentNumber}
@@ -193,7 +215,7 @@ export default function MembershipPaymentPagoMovilScreen() {
           />
 
           {/* Referencia */}
-          <StyledTextInput 
+          <StyledTextInput
             label="Número de Referencia (Últimos 4 dígitos)"
             placeholder="Ej: 5678"
             value={reference}
@@ -217,14 +239,14 @@ export default function MembershipPaymentPagoMovilScreen() {
         </View>
 
         <View className='mb-10'>
-            {loading ? (
-                <ActivityIndicator size="large" color="#f97316" />
-            ) : (
-                <PrimaryButton
-                    title='Reportar Pago'
-                    onPress={handleProcessPayment}
-                />
-            )}
+          {loading ? (
+            <ActivityIndicator size="large" color="#f97316" />
+          ) : (
+            <PrimaryButton
+              title='Reportar Pago'
+              onPress={handleProcessPayment}
+            />
+          )}
         </View>
 
       </ScrollView>
