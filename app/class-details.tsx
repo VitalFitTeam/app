@@ -4,6 +4,8 @@ import { ThemedView } from '@/components/themed-view';
 import { useReservations } from '@/contexts/reservations';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services/vitalfitSdk';
+import { isAPIError } from '@vitalfit/sdk';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -22,7 +24,9 @@ const styles = StyleSheet.create({
 
 export default function ClassDetailsScreen() {
   const router = useRouter();
-  const { time, title, instructor, imageUrl, capacity, occupied, mode } = useLocalSearchParams();
+  const { time, title, instructor, imageUrl, capacity, occupied, mode, classId, serviceId, instructorId, bookingId } =
+    useLocalSearchParams();
+
   const { isReserved, reserve, cancel } = useReservations();
 
   const todayFormatted = useMemo(() => {
@@ -37,22 +41,100 @@ export default function ClassDetailsScreen() {
     }
   }, []);
 
+  const [serviceDescription, setServiceDescription] = useState<string | null>(null);
+  const [serviceImageUrl, setServiceImageUrl] = useState<string | null>(null);
+  const [instructorImageUrl, setInstructorImageUrl] = useState<string | null>(null);
+
+  type ApiServiceImage = { image_url?: string; is_primary?: boolean };
+  type ApiServiceDetail = { description?: string; images?: ApiServiceImage[] };
+  type ApiInstructorDetail = {
+    avatar_url?: string;
+    image_url?: string;
+    profile_image_url?: string;
+  };
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) return;
+
+        if (serviceId) {
+          try {
+            const serviceResp = await vitalFitApi.client.get({
+              url: `/services/${String(serviceId)}`,
+              jwt: token,
+            });
+            const s =
+              (serviceResp as { data?: ApiServiceDetail }).data ??
+              (serviceResp as ApiServiceDetail | undefined);
+            if (s) {
+              if (typeof s.description === 'string') {
+                setServiceDescription(s.description);
+              }
+              const images: ApiServiceImage[] = Array.isArray(s.images) ? s.images : [];
+              if (images.length > 0) {
+                const primary = images.find((img) => img.is_primary) ?? images[0];
+                if (primary?.image_url) {
+                  setServiceImageUrl(primary.image_url);
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error cargando servicio para detalle de clase:', error);
+          }
+        }
+
+        if (instructorId) {
+          try {
+            const instResp = await vitalFitApi.client.get({
+              url: `/instructor/${String(instructorId)}`,
+              jwt: token,
+            });
+            const inst =
+              (instResp as { data?: ApiInstructorDetail }).data ??
+              (instResp as ApiInstructorDetail | undefined);
+            const avatar = inst?.avatar_url || inst?.image_url || inst?.profile_image_url;
+            if (typeof avatar === 'string' && avatar.startsWith('http')) {
+              setInstructorImageUrl(avatar);
+            }
+          } catch (error) {
+            console.error('Error cargando instructor para detalle de clase:', error);
+          }
+        }
+      } catch {
+        // ignorar
+      }
+    })();
+  }, [serviceId, instructorId]);
+
   const heroSource = useMemo(() => {
-    const t = String(title || '').toLowerCase();
-    const localByTitle: Record<string, number> = {
-      zumba: require('@/assets/images/zumba-w.jpg'),
-      spinning: require('@/assets/images/spinning-w.jpg'),
-      'yoga flow': require('@/assets/images/yoga-w.jpg'),
-      crossfit: require('@/assets/images/crossfit-w.jpg'),
-    };
-    const fromTitle = localByTitle[t];
+    // Priorizar imagen real del servicio, luego la que viene de Schedule
+    if (serviceImageUrl && /^https?:\/\//i.test(serviceImageUrl)) {
+      return { uri: serviceImageUrl };
+    }
+
+    if (typeof imageUrl === 'number') {
+      return imageUrl;
+    }
+
     const url = imageUrl as string | undefined;
-    if (url && /^https?:\/\//i.test(url)) return { uri: url };
-    if (fromTitle) return fromTitle;
-    return require('@/assets/images/yoga-w.jpg');
-  }, [imageUrl, title]);
+    if (url && /^https?:\/\//i.test(url)) {
+      return { uri: url };
+    }
+
+    // Solo usar imagen mock si NO hay serviceId asociado
+    if (!serviceId) {
+      return require('@/assets/images/yoga-w.jpg');
+    }
+
+    return null;
+  }, [imageUrl, serviceImageUrl, serviceId]);
 
   const description = useMemo(() => {
+    if (serviceDescription) return serviceDescription;
+    // Si hay servicio asociado pero aún no tenemos descripción, no mostrar texto mock
+    if (serviceId) return '';
     const t = String(title || '').toLowerCase();
     const map: Record<string, string> = {
       zumba: 'Clase de baile fitness con ritmos latinos para mejorar resistencia y coordinación. Ideal para todos los niveles y enfocada en divertirse mientras quemas calorías.',
@@ -67,18 +149,22 @@ export default function ClassDetailsScreen() {
       map[t] ||
       'Entrenamiento diseñado para mejorar tu condición física con foco en técnica y progreso seguro. Incluye trabajo de fuerza, movilidad y resistencia.'
     );
-  }, [title]);
+  }, [serviceDescription, serviceId, title]);
 
   const capNum = Number(capacity ?? 25);
   const occNumInitial = Number(occupied ?? 18);
-  const [forceFull, setForceFull] = useState(false);
+  const [forceFull] = useState(false);
+
   const [showCancelModal, setShowCancelModal] = useState(false);
   const isFullInitial = occNumInitial >= capNum;
   const effectiveFull = isFullInitial || forceFull;
   const occNum = effectiveFull ? capNum : occNumInitial;
 
   const id = useMemo(() => `${String(title || '')}|${String(time || '')}`, [title, time]);
-  const reserved = isReserved(id);
+  const reservedFromContext = isReserved(id);
+  const hasBookingId = Boolean(bookingId);
+  const reserved = reservedFromContext || hasBookingId;
+
   const { showToast } = useToast();
   const isCrossfitCompleted =
     String(title || '').toLowerCase() === 'crossfit' && effectiveFull;
@@ -612,20 +698,13 @@ export default function ClassDetailsScreen() {
           </ThemedText>
         </View>
 
-        <View className='flex-row items-center mb-3'>
-          <StarIcon size={16} color='#F59E0B' />
-          <ThemedText
-            lightColor='#4b5563'
-            darkColor='#e5e5e5'
-            className='ml-2 text-sm'
-            style={{ fontFamily: 'Montserrat_400Regular' }}>
-            4.9 (231 reviews)
-          </ThemedText>
-        </View>
-
         <View className='flex-row items-center mb-4'>
           <Image
-            source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+            source={
+              instructorImageUrl && instructorImageUrl.startsWith('http')
+                ? { uri: instructorImageUrl }
+                : { uri: 'https://randomuser.me/api/portraits/men/32.jpg' }
+            }
             style={{ width: 28, height: 28, borderRadius: 9999 }}
             contentFit='cover'
           />
@@ -655,33 +734,6 @@ export default function ClassDetailsScreen() {
           </ThemedText>
         </View>
 
-        <View className='mb-4'>
-          <ThemedText
-            lightColor='#f97316'
-            darkColor='#f97316'
-            className='font-semibold'
-            style={{ fontFamily: 'Montserrat_600SemiBold' }}>
-            Nivel: intermedio
-          </ThemedText>
-        </View>
-
-        <View className='mb-4 flex-row items-baseline'>
-          <ThemedText
-            lightColor='#111827'
-            darkColor='#ffffff'
-            className='font-semibold text-sm'
-            style={{ fontFamily: 'Montserrat_600SemiBold' }}>
-            Ubicación / Sala:
-          </ThemedText>
-          <ThemedText
-            lightColor='#6b7280'
-            darkColor='#d4d4d4'
-            className='text-sm ml-1'
-            style={{ fontFamily: 'Montserrat_400Regular' }}>
-            Sala B - Planta 2
-          </ThemedText>
-        </View>
-
         {isCrossfitCompleted ? (
           <View className='mb-6 items-center'>
             <View className='flex-row items-center rounded-full px-4 py-2 bg-emerald-50'>
@@ -702,24 +754,49 @@ export default function ClassDetailsScreen() {
               style={{ backgroundColor: effectiveFull ? '#6b7280' : reserved ? '#ef4444' : '#f97316' }}
               onPress={async () => {
                 if (effectiveFull) return;
+
                 if (reserved) {
                   setShowCancelModal(true);
                   return;
                 }
-                const lowerTitle = String(title || '').toLowerCase();
-                const img =
-                  typeof heroSource === 'number'
-                    ? heroSource
-                    : (imageUrl as string | number | undefined);
-                if (lowerTitle === 'yoga flow') {
-                  showToast(
-                    'error',
-                    'Clase llena',
-                    'La clase se llenó mientras la reservabas.'
-                  );
-                  return;
-                }
-                if (lowerTitle === 'crossfit') {
+
+                try {
+                  const token = await AsyncStorage.getItem('token');
+                  if (!token) {
+                    showToast(
+                      'error',
+                      'Sesión no válida',
+                      'Inicia sesión nuevamente para reservar la clase.',
+                    );
+                    return;
+                  }
+
+                  if (!classId) {
+                    showToast(
+                      'error',
+                      'No se pudo reservar',
+                      'Falta el identificador de la clase.',
+                    );
+                    return;
+                  }
+
+                  // Obtener el user_id a partir del JWT para enviarlo en el payload
+                  const whoAmI = (await vitalFitApi.user.WhoAmI(token)) as unknown as {
+                    user?: { id?: string; user_id?: string };
+                  };
+                  const userId = whoAmI?.user?.id || whoAmI?.user?.user_id;
+
+                  await vitalFitApi.client.post({
+                    url: `/schedule/${String(classId)}/book`,
+                    jwt: token,
+                    data: userId ? { user_id: String(userId) } : undefined,
+                  });
+
+                  const img =
+                    typeof heroSource === 'number'
+                      ? heroSource
+                      : (imageUrl as string | number | undefined);
+
                   await reserve({
                     id,
                     title: String(title || ''),
@@ -727,27 +804,23 @@ export default function ClassDetailsScreen() {
                     instructor: String(instructor || ''),
                     imageUrl: img,
                   });
-                  setForceFull(true);
+
                   showToast(
                     'success',
                     'Clase reservada',
-                    'Su clase ha sido reservada correctamente'
+                    'Tu clase ha sido reservada correctamente.',
                   );
-                  return;
-                }
-                await reserve({
-                  id,
-                  title: String(title || ''),
-                  time: String(time || ''),
-                  instructor: String(instructor || ''),
-                  imageUrl: img,
-                });
-                if (lowerTitle === 'spinning') {
-                  showToast(
-                    'success',
-                    'Clase reservada',
-                    'Su clase ha sido reservada correctamente'
-                  );
+
+                  router.back();
+                } catch (error: unknown) {
+                  let message = 'Ocurrió un error al reservar la clase.';
+                  if (isAPIError(error)) {
+                    message = error.messages.join(', ');
+                  } else if (error instanceof Error) {
+                    message = error.message;
+                  }
+                  console.error('Error al reservar clase:', error);
+                  showToast('error', 'No se pudo reservar', message);
                 }
               }}
             />
@@ -790,8 +863,44 @@ export default function ClassDetailsScreen() {
               <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={async () => {
-                  await cancel(id);
-                  setShowCancelModal(false);
+                  try {
+                    const token = await AsyncStorage.getItem('token');
+                    if (!token) {
+                      showToast(
+                        'error',
+                        'Sesión no válida',
+                        'Inicia sesión nuevamente para cancelar la reserva.',
+                      );
+                      return;
+                    }
+
+                    if (bookingId) {
+                      await vitalFitApi.client.patch({
+                        url: `/bookings/${String(bookingId)}/cancel`,
+                        jwt: token,
+                      });
+                    }
+
+                    await cancel(id);
+                    setShowCancelModal(false);
+
+                    showToast(
+                      'success',
+                      'Reserva cancelada',
+                      'Tu reserva ha sido cancelada correctamente.',
+                    );
+
+                    router.back();
+                  } catch (error: unknown) {
+                    let message = 'Ocurrió un error al cancelar la reserva.';
+                    if (isAPIError(error)) {
+                      message = error.messages.join(', ');
+                    } else if (error instanceof Error) {
+                      message = error.message;
+                    }
+                    console.error('Error al cancelar reserva:', error);
+                    showToast('error', 'No se pudo cancelar', message);
+                  }
                 }}
                 className='py-3 rounded-2xl items-center'
                 style={{ backgroundColor: '#f97316' }}>
