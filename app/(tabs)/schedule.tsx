@@ -1,6 +1,6 @@
 import { MonthCalendar } from '@/components/auth/dashboard/monthcalendar';
 import { WeekCalendar } from '@/components/auth/dashboard/weekcalendar';
-import RoutinesCarousel, { RoutineChip } from '@/components/auth/training/RoutinesCarousel';
+
 import ClassCard from '@/components/ClassCard';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -10,16 +10,10 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-const exploreRoutineChips: RoutineChip[] = [
-    { id: 'yoga', label: 'Yoga', image: require('@/assets/images/yoga (2).png') },
-    { id: 'hiit', label: 'HIIT', image: require('@/assets/images/hiit.png') },
-    { id: 'kick', label: 'Kick\nBoxing', image: require('@/assets/images/kick boxing.png') },
-    { id: 'pilates', label: 'Pilates', image: require('@/assets/images/pilates.png') },
-];
+import { ActivityIndicator, Image, NativeScrollEvent, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const PAGE_SIZE = 8;
 
@@ -41,6 +35,7 @@ type ClassItem = {
     imageUrl: string | number;
     capacity: number;
     occupied: number;
+    rawDate: string;
 };
 
 type BookingItem = {
@@ -55,6 +50,7 @@ type BookingItem = {
     imageUrl: string | number;
     capacity: number;
     occupied: number;
+    rawDate: string;
 };
 
 type ApiServiceImage = {
@@ -108,7 +104,7 @@ type ApiBookingItem = {
 
 export default function HorariosScreen() {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<'classes' | 'reservas' | 'explorar'>('classes');
+    const [activeTab, setActiveTab] = useState<'classes' | 'reservas'>('classes');
     const { isReserved } = useReservations();
     const [branches, setBranches] = useState<BranchItem[]>([]);
     const [selectedBranchId, setSelectedBranchId] = useState<string>('');
@@ -117,12 +113,37 @@ export default function HorariosScreen() {
     const [classes, setClasses] = useState<ClassItem[]>([]);
     const [loadingClasses, setLoadingClasses] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+    const [visibleClassesCount, setVisibleClassesCount] = useState(PAGE_SIZE);
     const [bookings, setBookings] = useState<BookingItem[]>([]);
     const [loadingBookings, setLoadingBookings] = useState(false);
     const [bookingsError, setBookingsError] = useState<string | null>(null);
     const [visibleBookingsCount, setVisibleBookingsCount] = useState(PAGE_SIZE);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [selectedClassesDate, setSelectedClassesDate] = useState<string>(
+        new Date().toISOString().split('T')[0],
+    );
+    const [selectedBookingsDate, setSelectedBookingsDate] = useState<string>('');
+
+    const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }: NativeScrollEvent) => {
+        const paddingToBottom = 100;
+        return layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
+    };
+
+    const handleScroll = ({ nativeEvent }: { nativeEvent: NativeScrollEvent }) => {
+        if (activeTab === 'classes') {
+            if (isCloseToBottom(nativeEvent)) {
+                setVisibleClassesCount((prev) =>
+                    Math.min(prev + PAGE_SIZE, classes.length),
+                );
+            }
+        } else if (activeTab === 'reservas') {
+            if (isCloseToBottom(nativeEvent)) {
+                setVisibleBookingsCount((prev) =>
+                    Math.min(prev + PAGE_SIZE, bookings.length),
+                );
+            }
+        }
+    };
 
     useEffect(() => {
         const initBranches = async () => {
@@ -242,6 +263,7 @@ export default function HorariosScreen() {
 
                 const mapped: ClassItem[] = items.map((item) => {
                     const startsAt = item.starts_at || item.startsAt || '';
+
                     const endsAt = item.ends_at || item.endsAt || '';
 
                     const extractTime = (value: string) => {
@@ -271,11 +293,12 @@ export default function HorariosScreen() {
                         imageUrl: serviceImageMap[sid] || require('@/assets/images/rutina.png'),
                         capacity: item.max_capacity || 0,
                         occupied: item.occupied || 0,
+                        rawDate: String(startsAt).split('T')[0] || '',
                     };
                 });
 
                 setClasses(mapped);
-                setVisibleCount(PAGE_SIZE);
+                setVisibleClassesCount(PAGE_SIZE);
             } catch (error) {
                 console.error('Error cargando clases en Schedule:', error);
                 setErrorMessage('No se pudieron cargar las clases. Intenta nuevamente.');
@@ -408,6 +431,7 @@ export default function HorariosScreen() {
 
                 const mappedBookings: BookingItem[] = items.map((item) => {
                     const startsAt = item.starts_at || item.startsAt || '';
+
                     const endsAt = item.ends_at || item.endsAt || '';
 
                     const extractTime = (value: string) => {
@@ -443,6 +467,7 @@ export default function HorariosScreen() {
                         imageUrl: serviceImageMap[String(sid)] || require('@/assets/images/rutina.png'),
                         capacity: item.max_capacity || 0,
                         occupied: item.occupied || 0,
+                        rawDate: String(startsAt).split('T')[0] || '',
                     };
                 });
 
@@ -461,15 +486,29 @@ export default function HorariosScreen() {
         }
     }, [activeTab, selectedBranchId, refreshKey]);
 
+    const filteredClasses = useMemo(
+        () => classes.filter((item) => !selectedClassesDate || item.rawDate === selectedClassesDate),
+        [classes, selectedClassesDate],
+    );
+
+    const filteredBookings = useMemo(
+        () => bookings.filter((item) => !selectedBookingsDate || item.rawDate === selectedBookingsDate),
+        [bookings, selectedBookingsDate],
+    );
+
+    const visibleClasses = filteredClasses.slice(0, visibleClassesCount);
+    const visibleBookings = filteredBookings.slice(0, visibleBookingsCount);
+
     return (
         <ThemedView lightColor='#FFFFFF' darkColor='#050816' style={{ flex: 1 }}>
             <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 24, paddingBottom: 80 }}
+                    onScroll={handleScroll}
+                    scrollEventThrottle={16}
                 >
                     <View className='items-center mb-6'>
-
                         <Image
                             source={require('@/assets/images/Frame.png')}
                             style={{ width: 150, height: 50, resizeMode: 'contain' }}
@@ -487,7 +526,27 @@ export default function HorariosScreen() {
                     </View>
 
                     <View className='mb-6'>
-                        {activeTab === 'reservas' ? <MonthCalendar /> : <WeekCalendar />}
+                        {activeTab === 'reservas' ? (
+                            <MonthCalendar
+                                initialDate={selectedBookingsDate || undefined}
+                                onDateSelect={(day) => {
+                                    if (day?.dateString) {
+                                        setSelectedBookingsDate(day.dateString);
+                                        setVisibleBookingsCount(PAGE_SIZE);
+                                    }
+                                }}
+                            />
+                        ) : (
+                            <WeekCalendar
+                                initialDate={selectedClassesDate}
+                                onDateSelect={(day) => {
+                                    if (day?.dateString) {
+                                        setSelectedClassesDate(day.dateString);
+                                        setVisibleClassesCount(PAGE_SIZE);
+                                    }
+                                }}
+                            />
+                        )}
                     </View>
 
                     <View className='flex-row mb-6 border rounded-2xl border-neutral-600 bg-neutral-900/90 p-1'>
@@ -521,26 +580,10 @@ export default function HorariosScreen() {
                                 Reservas
                             </ThemedText>
                         </Pressable>
-                        <Pressable
-                            onPress={() => setActiveTab('explorar')}
-                            style={({ pressed }) => [{ transform: [{ scale: pressed ? 1.05 : 1 }] }]}
-                            className={`flex-1 items-center py-2.5 rounded-xl ${
-                                activeTab === 'explorar' ? 'bg-neutral-700' : 'bg-transparent'
-                            }`}
-                        >
-                            <ThemedText
-                                lightColor={activeTab === 'explorar' ? '#ffffff' : '#6b7280'}
-                                darkColor={activeTab === 'explorar' ? '#ffffff' : '#6b7280'}
-                                className='text-base font-semibold'
-                            >
-                                Explorar
-                            </ThemedText>
-                        </Pressable>
                     </View>
 
                     <View className='mb-6 z-50'>
                         <View className='flex-row items-center justify-between mt-2 z-50'>
-
                             <ThemedText
                                 lightColor='#111827'
                                 darkColor='#ffffff'
@@ -604,12 +647,6 @@ export default function HorariosScreen() {
                         </View>
                     </View>
 
-                    {activeTab === 'explorar' && (
-                        <View className='mb-5'>
-                            <RoutinesCarousel items={exploreRoutineChips} showTitle={false} />
-                        </View>
-                    )}
-
                     {activeTab === 'classes' && (
                         <View>
                             {loadingClasses && (
@@ -625,7 +662,7 @@ export default function HorariosScreen() {
                                     No hay clases programadas para esta sede.
                                 </ThemedText>
                             )}
-                            {classes.slice(0, visibleCount).map((classItem, index) => (
+                            {visibleClasses.map((classItem, index) => (
                                 <ClassCard
                                     key={classItem.classId || index.toString()}
                                     time={classItem.time}
@@ -649,29 +686,12 @@ export default function HorariosScreen() {
                                                 classId: classItem.classId,
                                                 serviceId: classItem.serviceId,
                                                 instructorId: classItem.instructorId,
+                                                startsAt: classItem.startsAt,
                                             },
                                         });
                                     }}
                                 />
                             ))}
-                            {!loadingClasses &&
-                                !errorMessage &&
-                                classes.length > visibleCount && (
-                                    <View className='items-center mt-2 mb-4'>
-                                        <Pressable
-                                            onPress={() =>
-                                                setVisibleCount((prev) =>
-                                                    Math.min(prev + PAGE_SIZE, classes.length),
-                                                )
-                                            }
-                                            className='px-4 py-2 rounded-full border border-orange-500'
-                                        >
-                                            <ThemedText className='text-sm font-semibold text-orange-500'>
-                                                Cargar más
-                                            </ThemedText>
-                                        </Pressable>
-                                    </View>
-                                )}
                         </View>
                     )}
 
@@ -698,7 +718,7 @@ export default function HorariosScreen() {
                             )}
 
                             {!loadingBookings && !bookingsError &&
-                                bookings.slice(0, visibleBookingsCount).map((booking) => (
+                                visibleBookings.map((booking) => (
                                     <ClassCard
                                         key={booking.bookingId}
                                         time={booking.time}
@@ -723,30 +743,12 @@ export default function HorariosScreen() {
                                                     serviceId: booking.serviceId,
                                                     instructorId: booking.instructorId,
                                                     bookingId: booking.bookingId,
+                                                    startsAt: booking.rawDate,
                                                 },
                                             });
                                         }}
                                     />
                                 ))}
-
-                            {!loadingBookings &&
-                                !bookingsError &&
-                                bookings.length > visibleBookingsCount && (
-                                    <View className='items-center mt-2 mb-4'>
-                                        <Pressable
-                                            onPress={() =>
-                                                setVisibleBookingsCount((prev) =>
-                                                    Math.min(prev + PAGE_SIZE, bookings.length),
-                                                )
-                                            }
-                                            className='px-4 py-2 rounded-full border border-orange-500'
-                                        >
-                                            <ThemedText className='text-sm font-semibold text-orange-500'>
-                                                Cargar más
-                                            </ThemedText>
-                                        </Pressable>
-                                    </View>
-                                )}
                         </View>
                     )}
                 </ScrollView>

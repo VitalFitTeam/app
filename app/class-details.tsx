@@ -24,14 +24,21 @@ const styles = StyleSheet.create({
 
 export default function ClassDetailsScreen() {
   const router = useRouter();
-  const { time, title, instructor, imageUrl, capacity, occupied, mode, classId, serviceId, instructorId, bookingId } =
+  const { time, title, instructor, imageUrl, capacity, occupied, mode, classId, serviceId, instructorId, bookingId, startsAt } =
     useLocalSearchParams();
 
   const { isReserved, reserve, cancel } = useReservations();
 
-  const todayFormatted = useMemo(() => {
+  const classDateFormatted = useMemo(() => {
     try {
-      return new Date().toLocaleDateString('es-ES', {
+      const dateToFormat = startsAt ? new Date(String(startsAt)) : new Date();
+      
+      // Ajuste básico para evitar desfase de zona horaria si rawDate es YYYY-MM-DD puro
+      if (startsAt && String(startsAt).match(/^\d{4}-\d{2}-\d{2}$/)) {
+        dateToFormat.setMinutes(dateToFormat.getMinutes() + dateToFormat.getTimezoneOffset());
+      }
+
+      return dateToFormat.toLocaleDateString('es-ES', {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
@@ -39,7 +46,7 @@ export default function ClassDetailsScreen() {
     } catch {
       return '';
     }
-  }, []);
+  }, [startsAt]);
 
   const [serviceDescription, setServiceDescription] = useState<string | null>(null);
   const [serviceImageUrl, setServiceImageUrl] = useState<string | null>(null);
@@ -109,7 +116,6 @@ export default function ClassDetailsScreen() {
   }, [serviceId, instructorId]);
 
   const heroSource = useMemo(() => {
-    // Priorizar imagen real del servicio, luego la que viene de Schedule
     if (serviceImageUrl && /^https?:\/\//i.test(serviceImageUrl)) {
       return { uri: serviceImageUrl };
     }
@@ -123,7 +129,6 @@ export default function ClassDetailsScreen() {
       return { uri: url };
     }
 
-    // Solo usar imagen mock si NO hay serviceId asociado
     if (!serviceId) {
       return require('@/assets/images/yoga-w.jpg');
     }
@@ -133,7 +138,6 @@ export default function ClassDetailsScreen() {
 
   const description = useMemo(() => {
     if (serviceDescription) return serviceDescription;
-    // Si hay servicio asociado pero aún no tenemos descripción, no mostrar texto mock
     if (serviceId) return '';
     const t = String(title || '').toLowerCase();
     const map: Record<string, string> = {
@@ -273,7 +277,7 @@ export default function ClassDetailsScreen() {
               darkColor='#d4d4d4'
               className='text-sm'
               style={{ fontFamily: 'Montserrat_400Regular' }}>
-              {todayFormatted}
+              {classDateFormatted}
             </ThemedText>
           </View>
 
@@ -526,7 +530,6 @@ export default function ClassDetailsScreen() {
                   );
                 })}
 
-                {/* Separador naranja y notas internas de la clase */}
                 <View className='h-[1px] bg-[#f97316] w-full mb-4 mt-1' />
 
                 <View className='mt-1'>
@@ -644,7 +647,7 @@ export default function ClassDetailsScreen() {
             darkColor='#d4d4d4'
             className='text-sm'
             style={{ fontFamily: 'Montserrat_400Regular' }}>
-            {todayFormatted}
+            {classDateFormatted}
           </ThemedText>
         </View>
 
@@ -780,7 +783,6 @@ export default function ClassDetailsScreen() {
                     return;
                   }
 
-                  // Obtener el user_id a partir del JWT para enviarlo en el payload
                   const whoAmI = (await vitalFitApi.user.WhoAmI(token)) as unknown as {
                     user?: { id?: string; user_id?: string };
                   };
