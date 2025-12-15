@@ -98,7 +98,7 @@ export default function ClassCard({
 						</View>
 					</View>
 					{reserved ? (
-						<View className='absolute top-3 left-3 bg-orange-500 rounded-full px-2 py-1'>
+						<View className='absolute top-3 right-3 bg-orange-500 rounded-full px-2 py-1'>
 							<ThemedText
 								lightColor='#ffffff'
 								darkColor='#ffffff'

@@ -1,7 +1,9 @@
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
+import { useUser } from '@/contexts/UserContext';
 import vitalFitApi from '@/services/vitalfitSdk';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -68,6 +70,8 @@ type ProfileFormData = z.infer<typeof ProfileSchema>;
 
 export default function MyProfileScreen() {
     const router = useRouter();
+    const { user, updateLocalUser } = useUser();
+
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -113,61 +117,32 @@ export default function MyProfileScreen() {
     });
 
     useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const token = await AsyncStorage.getItem('token');
-                if (!token) {
-                    console.error('No se encontró token en AsyncStorage');
-                    setLoading(false);
-                    return;
-                }
+        if (!user) {
+            setLoading(false);
+            return;
+        }
 
-                const userData = await vitalFitApi.user.WhoAmI(token);
-                const apiUserId = userData?.user?.user_id || '';
-                const apiFirstName = userData?.user?.first_name || '';
-                const apiLastName = userData?.user?.last_name || '';
-                const apiEmail = userData?.user?.email || '';
-                const apiPhone = userData?.user?.phone || '';
-                const apiDocumentId = userData?.user?.identity_document || '';
-                const apiBirthDate = userData?.user?.birth_date || '';
-                const apiGender = userData?.user?.gender || '';
+        setUserId(user.userId);
+        setFirstName(user.firstName);
+        setLastName(user.lastName);
+        setEmail(user.email);
+        setPhone(user.phone);
+        setDocumentId(user.identityDocument);
+        setGender(user.gender);
 
-                const normalizedGender = apiGender === 'male' ? 'M' : apiGender === 'female' ? 'F' : '';
+        if (user.birthDate) {
+            const parsedDate = new Date(user.birthDate);
+            setBirthDate(format(parsedDate, 'yyyy-MM-dd'));
+        }
 
-                setUserId(apiUserId);
-                setFirstName(apiFirstName);
-                setLastName(apiLastName);
-                setEmail(apiEmail);
-                setPhone(apiPhone);
-                setDocumentId(apiDocumentId);
-                setGender(normalizedGender);
-                
-                if (apiBirthDate) {
-                    const parsedDate = new Date(apiBirthDate);
-                    setBirthDate(format(parsedDate, 'yyyy-MM-dd'));
-                }
-
-                setValue('firstName', apiFirstName);
-                setValue('lastName', apiLastName);
-                setValue('documentId', apiDocumentId);
-                setValue('birthDate', apiBirthDate);
-                setValue('phone', apiPhone);
-                setValue('gender', normalizedGender);
-            } catch (error: unknown) {
-                let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
-                if (isAPIError(error)) {
-                    errorMessage = error.messages.join(', ');
-                } else if (error instanceof Error) {
-                    errorMessage = error.message;
-                }
-                console.error('Error en WhoAmI (Perfil personal cliente):', errorMessage);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUser();
-    }, [setValue]);
+        setValue('firstName', user.firstName);
+        setValue('lastName', user.lastName);
+        setValue('documentId', user.identityDocument);
+        setValue('birthDate', user.birthDate);
+        setValue('phone', user.phone);
+        setValue('gender', user.gender);
+        setLoading(false);
+    }, [setValue, user]);
 
     const onSubmit = async (data: ProfileFormData) => {
         setSaving(true);
@@ -220,6 +195,14 @@ export default function MyProfileScreen() {
             setDocumentId(data.documentId);
             setPhone(data.phone || '');
             setGender(data.gender);
+            updateLocalUser({
+                firstName: data.firstName,
+                lastName: data.lastName,
+                identityDocument: data.documentId,
+                phone: data.phone || '',
+                gender: data.gender,
+                birthDate: data.birthDate,
+            });
 
             if (data.birthDate) {
                 const date = new Date(data.birthDate);

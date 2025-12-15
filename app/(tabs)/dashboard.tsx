@@ -8,9 +8,8 @@ import { UpcomingRoutinesSection } from '@/components/auth/dashboard/upcomingrou
 import { UserHeader } from '@/components/auth/dashboard/userheader';
 import WeeklyChallengeBanner from '@/components/auth/dashboard/WeeklyChallengeBanner';
 import { ThemedView } from '@/components/themed-view';
-import vitalFitApi from '@/services/vitalfitSdk';
+import { useUser } from '@/contexts/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isAPIError } from '@vitalfit/sdk';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, BackHandler, Text as RNText, ScrollView, View } from 'react-native';
@@ -19,8 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function DashboardScreen() {
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
-	const [firstName, setFirstName] = useState<string | null>(null);
-	const [lastName, setLastName] = useState<string | null>(null);
+	const { user, loading: userLoading } = useUser();
 	const [loading, setLoading] = useState(true);
 	const [qrModalVisible, setQrModalVisible] = useState(false);
 	const [userToken, setUserToken] = useState<string>('');
@@ -28,57 +26,23 @@ export default function DashboardScreen() {
 
 
 	useEffect(() => {
-		 
-		const fetchUser = async () => {
+		const init = async () => {
 			try {
-				await new Promise(resolve => setTimeout(resolve, 3000));
-				// Intentar obtener el token con retry logic
-				let token = await AsyncStorage.getItem('token');
-
-				// Si no hay token, esperar y reintentar
+				const token = await AsyncStorage.getItem('token');
 				if (!token) {
-					console.log('Token no encontrado en primer intento, esperando...');
-					await new Promise(resolve => setTimeout(resolve, 500));
-					token = await AsyncStorage.getItem('token');
-				}
-
-				// Si aún no hay token, intentar una vez más
-				if (!token) {
-					console.log('Token no encontrado en segundo intento, esperando...');
-					await new Promise(resolve => setTimeout(resolve, 500));
-					token = await AsyncStorage.getItem('token');
-				}
-
-				if (!token) {
-					console.error('No se encontró token en AsyncStorage después de reintentar');
+					console.error('No se encontró token en AsyncStorage');
 					router.replace('/(auth)/login');
 					return;
 				}
 
-				console.log('Token encontrado en AsyncStorage');
 				setUserToken(token);
-
-				const userData = await vitalFitApi.user.WhoAmI(token);
-				setFirstName(userData?.user?.first_name || 'Usuario');
-				setLastName(userData?.user?.last_name || null);
-				console.log('Datos del usuario obtenidos correctamente');
-			} catch (error: unknown) {
-				let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
-				if (isAPIError(error)) {
-					errorMessage = error.messages.join(', ');
-				} else if (error instanceof Error) {
-					errorMessage = error.message;
-				}
-				console.error('Error en la solicitud whoami:', errorMessage);
-				router.replace('/(auth)/login');
 			} finally {
 				setLoading(false);
 			}
 		};
 
-		fetchUser();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+		init();
+	}, [router]);
 
 	useFocusEffect(
 		React.useCallback(() => {
@@ -143,7 +107,7 @@ export default function DashboardScreen() {
 		},
 	];
 
-	if (loading) {
+	if (loading || userLoading) {
 		return (
 			<ThemedView className='flex-1 justify-center items-center bg-white dark:bg-neutral-950'>
 				<ActivityIndicator size='large' color='#F27F2A' />
@@ -151,9 +115,11 @@ export default function DashboardScreen() {
 		);
 	}
 
-	const displayName = lastName
-		? `${firstName ?? 'Usuario'} ${lastName}`
-		: firstName ?? 'Usuario';
+	const displayName = user
+		? user.lastName
+			? `${user.firstName || 'Usuario'} ${user.lastName}`
+			: user.firstName || 'Usuario'
+		: 'Usuario';
 
 	return (
 		<ThemedView className='flex-1 bg-white dark:bg-neutral-950'>

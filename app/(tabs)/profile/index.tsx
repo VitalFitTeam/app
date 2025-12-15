@@ -1,10 +1,9 @@
 import { ClientQRModal } from '@/components/client/ClientQRModal';
-import vitalFitApi from '@/services/vitalfitSdk';
+import { useUser } from '@/contexts/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isAPIError } from '@vitalfit/sdk';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
   ArrowRightOnRectangleIcon,
@@ -22,39 +21,9 @@ import {
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [firstName, setFirstName] = useState<string | null>(null);
-  const [lastName, setLastName] = useState<string | null>(null);
+  const { user, loading } = useUser();
   const [qrModalVisible, setQrModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        if (!token) {
-          console.error('No se encontró token en AsyncStorage');
-          return;
-        }
-
-        const userData = await vitalFitApi.user.WhoAmI(token);
-        setFirstName(userData?.user?.first_name || 'Cliente');
-        setLastName(userData?.user?.last_name || '');
-      } catch (error: unknown) {
-        let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
-        if (isAPIError(error)) {
-          errorMessage = error.messages.join(', ');
-        } else if (error instanceof Error) {
-          errorMessage = error.message;
-        }
-        console.error('Error en la solicitud whoami (Perfil cliente):', errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   if (loading) {
     return (
@@ -64,7 +33,11 @@ export default function ProfileScreen() {
     );
   }
 
-  const displayName = lastName ? `${firstName ?? 'Cliente'} ${lastName}` : firstName ?? 'Cliente';
+  const displayName = user
+    ? user.lastName
+      ? `${user.firstName || 'Cliente'} ${user.lastName}`
+      : user.firstName || 'Cliente'
+    : 'Cliente';
 
   const handleConfirmLogout = async () => {
     try {
@@ -198,7 +171,7 @@ export default function ProfileScreen() {
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
           onPress={() => {
-            router.push('/profile/settings');
+            router.push('/profile/profile-settings');
           }}
         >
           <View className="flex-row items-center">
