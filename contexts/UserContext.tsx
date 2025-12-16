@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { ClientMembership } from '@vitalfit/sdk';
 import { isAPIError } from '@vitalfit/sdk';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
@@ -13,6 +14,7 @@ export type UserData = {
 	gender: string;
 	birthDate: string;
 	identityDocument: string;
+	membership?: ClientMembership;
 };
 
 type UserContextType = {
@@ -62,6 +64,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				gender: normalizedGender,
 				birthDate: apiUser.birth_date || '',
 				identityDocument: apiUser.identity_document || '',
+				membership: apiUser.client_membership,
 			});
 		} catch (err: unknown) {
 			let message = 'Ocurrió un error inesperado al obtener los datos del usuario.';

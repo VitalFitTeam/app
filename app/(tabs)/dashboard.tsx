@@ -22,7 +22,31 @@ export default function DashboardScreen() {
 	const [loading, setLoading] = useState(true);
 	const [qrModalVisible, setQrModalVisible] = useState(false);
 	const [userToken, setUserToken] = useState<string>('');
-	const hasMembership = true;
+
+	// [LOGICA NUEVA]
+	// 1. Determinar si tiene membresía basándose en los datos del contexto
+	// Verificamos que exista el objeto y que su status sea 'Active' (tal cual devuelve tu backend)
+	const hasMembership = user?.membership?.status === 'Active';
+
+	// 2. Calcular días restantes
+	const calculateDaysRemaining = () => {
+		if (!hasMembership || !user?.membership?.end_date) return 0;
+
+		const now = new Date();
+		const endDate = new Date(user.membership.end_date);
+
+		// Diferencia en milisegundos
+		const diffTime = endDate.getTime() - now.getTime();
+		// Convertir a días (redondeando hacia arriba)
+		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+		return diffDays > 0 ? diffDays : 0;
+	};
+
+	const daysRemaining = calculateDaysRemaining();
+
+	// 3. Nombre del plan
+	const planStatusText = hasMembership ? 'Membresía Activa' : 'Sin plan activo';
 
 
 	useEffect(() => {
@@ -132,7 +156,7 @@ export default function DashboardScreen() {
 				}}>
 				<UserHeader
 					name={displayName}
-					avatarUrl='https://randomuser.me/api/portraits/men/32.jpg'
+					avatarUrl={'https://randomuser.me/api/portraits/men/32.jpg'} // Ajuste opcional si tienes foto
 					onBadgesPress={() => console.log('Abrir vista de medallas/insignias')}
 				/>
 
@@ -140,7 +164,8 @@ export default function DashboardScreen() {
 
 				<MembershipCard
 					hasMembership={hasMembership}
-					daysRemaining={15}
+					daysRemaining={daysRemaining}
+					membershipStatus={planStatusText}
 					onQRPress={() => setQrModalVisible(true)}
 					onGetMembershipPress={() => router.replace('/membership-entry')}
 				/>
@@ -165,8 +190,6 @@ export default function DashboardScreen() {
 						<WeeklyChallengeBanner
 							onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
 						/>
-
-						<BirthdayOfferBanner onPress={() => router.replace('/membership-entry')} />
 
 						<CrossFitBanner
 							imageSource={require('@/assets/images/crossfit.png')}
