@@ -2,19 +2,20 @@ import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
 import { useUser } from '@/contexts/UserContext';
+import { uploadProfilePicture } from '@/services/imageUpload';
 import vitalFitApi from '@/services/vitalfitSdk';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { isAPIError } from '@vitalfit/sdk';
 import { format } from 'date-fns';
 import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { Calendar } from 'lucide-react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon, PencilSquareIcon, PhoneIcon, UserCircleIcon } from 'react-native-heroicons/solid';
 import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
 import { z } from 'zod';
@@ -22,48 +23,25 @@ import { z } from 'zod';
 const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
 
 const ProfileSchema = z.object({
-    firstName: z
-        .string()
-        .min(1, 'El nombre es requerido.')
-        .regex(nameRegex, 'El nombre solo puede contener letras.'),
-    lastName: z
-        .string()
-        .min(1, 'El apellido es requerido.')
-        .regex(nameRegex, 'El apellido solo puede contener letras.'),
-    documentId: z
-        .string()
-        .min(6, 'El documento debe tener al menos 6 dígitos.')
-        .regex(/^[0-9]+$/, 'El documento solo puede contener números.'),
-    birthDate: z
-        .string()
-        .min(1, 'La fecha de nacimiento es requerida.')
-        .refine(
-            (date) => {
-                const birthDate = new Date(date);
-                const today = new Date();
-                let age = today.getFullYear() - birthDate.getFullYear();
-                const m = today.getMonth() - birthDate.getMonth();
-                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                    age--;
-                }
-                return age >= 18;
-            },
-            { message: 'Debes ser mayor de 18 años.' },
-        ),
-    phone: z
-        .string()
-        .optional()
-        .refine(
-            (phone) => {
-                if (!phone) return true;
-                const numericPhone = phone.replace(/\D/g, '');
-                return numericPhone.length >= 10 && numericPhone.length <= 15;
-            },
-            { message: 'El número de teléfono debe tener entre 10 y 15 dígitos.' },
-        ),
-    gender: z
-        .string()
-        .min(1, 'El género es requerido.'),
+    firstName: z.string().min(1, 'El nombre es requerido.').regex(nameRegex, 'El nombre solo puede contener letras.'),
+    lastName: z.string().min(1, 'El apellido es requerido.').regex(nameRegex, 'El apellido solo puede contener letras.'),
+    documentId: z.string().min(6, 'El documento debe tener al menos 6 dígitos.').regex(/^[0-9]+$/, 'El documento solo puede contener números.'),
+    birthDate: z.string().min(1, 'La fecha de nacimiento es requerida.').refine((date) => {
+        const birthDate = new Date(date);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age >= 18;
+    }, { message: 'Debes ser mayor de 18 años.' }),
+    phone: z.string().optional().refine((phone) => {
+        if (!phone) return true;
+        const numericPhone = phone.replace(/\D/g, '');
+        return numericPhone.length >= 10 && numericPhone.length <= 15;
+    }, { message: 'El número de teléfono debe tener entre 10 y 15 dígitos.' }),
+    gender: z.string().min(1, 'El género es requerido.'),
 });
 
 type ProfileFormData = z.infer<typeof ProfileSchema>;
@@ -71,40 +49,20 @@ type ProfileFormData = z.infer<typeof ProfileSchema>;
 export default function MyProfileScreen() {
     const router = useRouter();
     const { user, updateLocalUser } = useUser();
-
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [saving, setSaving] = useState(false);
     const phoneInputRef = useRef<IPhoneInputRef>(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [toast, setToast] = useState<{
-        visible: boolean;
-        type: 'success' | 'error';
-        title: string;
-        message: string;
-    }>({
+    const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
+    const [toast, setToast] = useState<{ visible: boolean; type: 'success' | 'error'; title: string; message: string; }>({
         visible: false,
         type: 'success',
         title: '',
         message: '',
     });
 
-    const [userId, setUserId] = useState('');
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [documentId, setDocumentId] = useState('');
-    const [birthDate, setBirthDate] = useState('mm/dd/yy');
-    const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
-    const [gender, setGender] = useState('');
-
-    const {
-        control,
-        handleSubmit,
-        formState: { errors },
-        setValue,
-        reset,
-    } = useForm<ProfileFormData>({
+    const { control, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>({
         resolver: zodResolver(ProfileSchema),
         defaultValues: {
             firstName: '',
@@ -122,79 +80,92 @@ export default function MyProfileScreen() {
             return;
         }
 
-        setUserId(user.userId);
-        setFirstName(user.firstName);
-        setLastName(user.lastName);
-        setEmail(user.email);
-        setPhone(user.phone);
-        setDocumentId(user.identityDocument);
-        setGender(user.gender);
+        setSelectedImage(user.profilePicture);
+        
+        const formattedBirthDate = user.birthDate ? format(new Date(user.birthDate), 'yyyy-MM-dd') : '';
 
-        if (user.birthDate) {
-            const parsedDate = new Date(user.birthDate);
-            setBirthDate(format(parsedDate, 'yyyy-MM-dd'));
-        }
+        reset({
+            firstName: user.firstName || '',
+            lastName: user.lastName || '',
+            documentId: user.identityDocument || '',
+            birthDate: formattedBirthDate,
+            phone: user.phone || '',
+            gender: user.gender || '',
+        });
 
-        setValue('firstName', user.firstName);
-        setValue('lastName', user.lastName);
-        setValue('documentId', user.identityDocument);
-        setValue('birthDate', user.birthDate);
-        setValue('phone', user.phone);
-        setValue('gender', user.gender);
         setLoading(false);
-    }, [setValue, user]);
+    }, [user, reset]);
 
-    const onSubmit = async (data: ProfileFormData) => {
-        setSaving(true);
+    const handleImagePick = useCallback(async () => {
         try {
-            const token = await AsyncStorage.getItem('token');
-            if (!token) {
-                console.error('No se encontró token en AsyncStorage');
-                setToast({
-                    visible: true,
-                    type: 'error',
-                    title: 'Error',
-                    message: 'No se encontró token de autenticación',
-                });
-                setSaving(false);
+            const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            
+            if (permissionResult.status !== 'granted') {
+                Alert.alert("Permisos necesarios", "Necesitamos acceso a tu galería para cambiar la foto de perfil.");
                 return;
             }
 
-            if (!userId) {
-                console.error('No se encontró userId');
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.5,
+            });
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                setSelectedImage(result.assets[0].uri);
+            }
+        } catch {
+            Alert.alert("Error", "No se pudo abrir la galería.");
+        }
+    }, []);
+
+    const onSubmit = useCallback(async (data: ProfileFormData) => {
+        setSaving(true);
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (!token || !user?.userId) {
                 setToast({
                     visible: true,
                     type: 'error',
                     title: 'Error',
-                    message: 'No se encontró el ID del usuario',
+                    message: !token ? 'No se encontró token de autenticación' : 'No se encontró el ID del usuario',
                 });
                 setSaving(false);
                 return;
             }
 
             const genderForApi = data.gender === 'M' ? 'male' : 'female';
+            let finalProfilePictureUrl = user.profilePicture;
+
+            if (selectedImage && selectedImage !== user.profilePicture) {
+                try {
+                    finalProfilePictureUrl = await uploadProfilePicture(selectedImage);
+                } catch {
+                    setToast({
+                        visible: true,
+                        type: 'error',
+                        title: 'Error',
+                        message: 'No se pudo subir la imagen de perfil',
+                    });
+                    setSaving(false);
+                    return;
+                }
+            }
 
             const updateData = {
                 first_name: data.firstName,
                 last_name: data.lastName,
                 birth_date: data.birthDate,
                 gender: genderForApi,
-                email: email,
+                email: user.email,
                 phone: data.phone || undefined,
                 identity_document: data.documentId,
+                profile_picture_url: finalProfilePictureUrl,
             };
 
-            console.log('Enviando datos:', updateData);
+            await vitalFitApi.user.updateUserClient(user.userId, updateData, token);
 
-            await vitalFitApi.user.updateUserClient(userId, updateData, token);
-
-            console.log('Actualización exitosa');
-
-            setFirstName(data.firstName);
-            setLastName(data.lastName);
-            setDocumentId(data.documentId);
-            setPhone(data.phone || '');
-            setGender(data.gender);
             updateLocalUser({
                 firstName: data.firstName,
                 lastName: data.lastName,
@@ -202,12 +173,8 @@ export default function MyProfileScreen() {
                 phone: data.phone || '',
                 gender: data.gender,
                 birthDate: data.birthDate,
+                profilePicture: finalProfilePictureUrl,
             });
-
-            if (data.birthDate) {
-                const date = new Date(data.birthDate);
-                setBirthDate(format(date, 'yyyy-MM-dd'));
-            }
 
             setIsEditing(false);
             setToast({
@@ -217,16 +184,12 @@ export default function MyProfileScreen() {
                 message: 'Tus cambios se guardaron correctamente',
             });
         } catch (error: unknown) {
-            console.error('Error completo:', error);
             let errorMessage = 'Ocurrió un error inesperado al actualizar el perfil.';
             if (isAPIError(error)) {
-                console.error('Error de API:', error.messages);
                 errorMessage = error.messages.join(', ');
             } else if (error instanceof Error) {
-                console.error('Error estándar:', error.message);
                 errorMessage = error.message;
             }
-            console.error('Error al actualizar el perfil (perfil cliente):', errorMessage);
             setToast({
                 visible: true,
                 type: 'error',
@@ -236,27 +199,41 @@ export default function MyProfileScreen() {
         } finally {
             setSaving(false);
         }
-    };
+    }, [user, selectedImage, updateLocalUser]);
 
-    const handleToggleEdit = () => {
+    const handleToggleEdit = useCallback(() => {
         if (isEditing) {
             handleSubmit(onSubmit)();
         } else {
             setIsEditing(true);
         }
-    };
+    }, [isEditing, handleSubmit, onSubmit]);
 
-    const handleCancelEdit = () => {
-        reset({
-            firstName,
-            lastName,
-            documentId,
-            birthDate: birthDate !== 'mm/dd/yy' ? birthDate : '',
-            phone,
-            gender,
-        });
+    const handleCancelEdit = useCallback(() => {
+        if (user) {
+            const formattedBirthDate = user.birthDate ? format(new Date(user.birthDate), 'yyyy-MM-dd') : '';
+            reset({
+                firstName: user.firstName || '',
+                lastName: user.lastName || '',
+                documentId: user.identityDocument || '',
+                birthDate: formattedBirthDate,
+                phone: user.phone || '',
+                gender: user.gender || '',
+            });
+            setSelectedImage(user.profilePicture);
+        }
         setIsEditing(false);
-    };
+    }, [user, reset]);
+
+    const displayName = useMemo(() => {
+        if (!user) return 'Cliente';
+        return user.lastName && user.firstName ? `${user.firstName} ${user.lastName}` : user.firstName || user.lastName || 'Cliente';
+    }, [user]);
+
+    const profileImageSource = useMemo(() => {
+        if (selectedImage) return { uri: selectedImage };
+        return user?.gender === 'F' ? require('@/assets/images/Female.svg') : require('@/assets/images/Man.svg');
+    }, [selectedImage, user?.gender]);
 
     if (loading) {
         return (
@@ -265,9 +242,6 @@ export default function MyProfileScreen() {
             </ThemedView>
         );
     }
-
-    const displayName =
-        lastName && firstName ? `${firstName} ${lastName}` : firstName || lastName || 'Cliente';
 
     return (
         <ThemedView className='flex-1 bg-white pt-10'>
@@ -280,10 +254,10 @@ export default function MyProfileScreen() {
             />
             <ScrollView
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
-                <View
-                    className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'
-                    style={{ position: 'relative' }}>
+                contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}
+                removeClippedSubviews={true}
+            >
+                <View className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center' style={{ position: 'relative' }}>
                     <TouchableOpacity
                         activeOpacity={0.7}
                         onPress={() => router.back()}
@@ -295,40 +269,29 @@ export default function MyProfileScreen() {
                 </View>
 
                 <View className='mb-4 items-center'>
-                    <View style={{ position: 'relative', marginBottom: 12 }}>
+                    <TouchableOpacity
+                        activeOpacity={0.9}
+                        onPress={isEditing ? handleImagePick : undefined}
+                        disabled={!isEditing}
+                        style={{ position: 'relative', marginBottom: 12 }}>
                         <View className='w-24 h-24 rounded-full overflow-hidden bg-[#FED7AA] items-center justify-center'>
                             <Image
-                                source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+                                source={profileImageSource}
                                 style={{ width: '100%', height: '100%' }}
+                                contentFit='cover'
+                                cachePolicy='memory-disk'
                             />
                         </View>
                         {isEditing && (
-                            <View
-                                style={{
-                                    position: 'absolute',
-                                    right: 0,
-                                    bottom: 0,
-                                    width: 28,
-                                    height: 28,
-                                    borderRadius: 14,
-                                    backgroundColor: '#f97316',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    borderWidth: 2,
-                                    borderColor: '#FFFFFF',
-                                }}>
+                            <View style={{ position: 'absolute', right: 0, bottom: 0, width: 28, height: 28, borderRadius: 14, backgroundColor: '#f97316', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FFFFFF' }}>
                                 <PencilSquareIcon width={16} height={16} color='#FFFFFF' />
                             </View>
                         )}
-                    </View>
+                    </TouchableOpacity>
                     <Text style={{ color: '#111827', fontSize: 20, fontWeight: '600' }}>{displayName}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
                         <Text style={{ color: '#6b7280', fontSize: 13, marginRight: 4 }}>Nivel 24</Text>
-                        <Image
-                            source={require('@/assets/images/medal2.png')}
-                            style={{ width: 14, height: 14 }}
-                            contentFit='contain'
-                        />
+                        <Image source={require('@/assets/images/medal2.png')} style={{ width: 14, height: 14 }} contentFit='contain' />
                     </View>
                     <Text style={{ color: '#f97316', fontSize: 13, marginTop: 2 }}>Premium</Text>
                 </View>
@@ -356,9 +319,7 @@ export default function MyProfileScreen() {
                             style={{ backgroundColor: '#9CA3AF' }}
                             onPress={handleCancelEdit}
                             disabled={saving}>
-                            <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>
-                                Cancelar
-                            </Text>
+                            <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>Cancelar</Text>
                         </TouchableOpacity>
                     )}
                 </View>
@@ -366,9 +327,7 @@ export default function MyProfileScreen() {
                 <View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
                     <View className='flex-row items-center mb-3'>
                         <UserCircleIcon width={18} height={18} color='#111827' />
-                        <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>
-                            Información Personal
-                        </Text>
+                        <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>Información Personal</Text>
                     </View>
 
                     <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Nombre</Text>
@@ -390,18 +349,10 @@ export default function MyProfileScreen() {
                     ) : (
                         <TextInput
                             editable={false}
-                            value={firstName}
+                            value={user?.firstName}
                             placeholder='Nombre'
                             placeholderTextColor='#9CA3AF'
-                            style={{
-                                backgroundColor: '#E5E7EB',
-                                borderRadius: 10,
-                                paddingHorizontal: 10,
-                                paddingVertical: 8,
-                                fontSize: 13,
-                                color: '#111827',
-                                marginBottom: 10,
-                            }}
+                            style={styles.readOnlyInput}
                         />
                     )}
 
@@ -424,18 +375,10 @@ export default function MyProfileScreen() {
                     ) : (
                         <TextInput
                             editable={false}
-                            value={lastName}
+                            value={user?.lastName}
                             placeholder='Apellido'
                             placeholderTextColor='#9CA3AF'
-                            style={{
-                                backgroundColor: '#E5E7EB',
-                                borderRadius: 10,
-                                paddingHorizontal: 10,
-                                paddingVertical: 8,
-                                fontSize: 13,
-                                color: '#111827',
-                                marginBottom: 10,
-                            }}
+                            style={styles.readOnlyInput}
                         />
                     )}
 
@@ -459,19 +402,11 @@ export default function MyProfileScreen() {
                     ) : (
                         <TextInput
                             editable={false}
-                            value={documentId}
+                            value={user?.identityDocument}
                             placeholder='Documento de identidad'
                             placeholderTextColor='#9CA3AF'
                             keyboardType='numeric'
-                            style={{
-                                backgroundColor: '#E5E7EB',
-                                borderRadius: 10,
-                                paddingHorizontal: 10,
-                                paddingVertical: 8,
-                                fontSize: 13,
-                                color: '#111827',
-                                marginBottom: 10,
-                            }}
+                            style={styles.readOnlyInput}
                         />
                     )}
 
@@ -495,12 +430,7 @@ export default function MyProfileScreen() {
                                                 placeholder='yyyy-mm-dd'
                                                 error={errors.birthDate?.message}
                                             />
-                                            <View
-                                                style={{
-                                                    position: 'absolute',
-                                                    right: 10,
-                                                    bottom: 10,
-                                                }}>
+                                            <View style={{ position: 'absolute', right: 10, bottom: 10 }}>
                                                 <Calendar size={18} color='#9CA3AF' />
                                             </View>
                                         </TouchableOpacity>
@@ -509,7 +439,7 @@ export default function MyProfileScreen() {
                                                 value={date}
                                                 mode='date'
                                                 display='default'
-                                                onChange={(event, selectedDate) => {
+                                                onChange={(_event, selectedDate) => {
                                                     setShowDatePicker(false);
                                                     if (selectedDate) {
                                                         onChange(selectedDate.toISOString());
@@ -525,26 +455,12 @@ export default function MyProfileScreen() {
                         <View style={{ position: 'relative' }}>
                             <TextInput
                                 editable={false}
-                                value={birthDate}
+                                value={user?.birthDate ? format(new Date(user.birthDate), 'yyyy-MM-dd') : ''}
                                 placeholder='mm/dd/yy'
                                 placeholderTextColor='#9CA3AF'
-                                style={{
-                                    backgroundColor: '#E5E7EB',
-                                    borderRadius: 10,
-                                    paddingHorizontal: 10,
-                                    paddingVertical: 8,
-                                    fontSize: 13,
-                                    color: '#111827',
-                                    paddingRight: 32,
-                                    marginBottom: 10,
-                                }}
+                                style={[styles.readOnlyInput, { paddingRight: 32 }]}
                             />
-                            <View
-                                style={{
-                                    position: 'absolute',
-                                    right: 10,
-                                    top: 10,
-                                }}>
+                            <View style={{ position: 'absolute', right: 10, top: 10 }}>
                                 <Calendar size={18} color='#9CA3AF' />
                             </View>
                         </View>
@@ -561,54 +477,27 @@ export default function MyProfileScreen() {
                                         <TouchableOpacity
                                             activeOpacity={0.7}
                                             onPress={() => onChange('M')}
-                                            style={{
-                                                flex: 1,
-                                                backgroundColor: value === 'M' ? '#f97316' : '#E5E7EB',
-                                                borderRadius: 10,
-                                                paddingVertical: 10,
-                                                alignItems: 'center',
-                                            }}>
-                                            <Text style={{ color: value === 'M' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>
-                                                Masculino
-                                            </Text>
+                                            style={[styles.genderButton, { backgroundColor: value === 'M' ? '#f97316' : '#E5E7EB' }]}>
+                                            <Text style={{ color: value === 'M' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>Masculino</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity
                                             activeOpacity={0.7}
                                             onPress={() => onChange('F')}
-                                            style={{
-                                                flex: 1,
-                                                backgroundColor: value === 'F' ? '#f97316' : '#E5E7EB',
-                                                borderRadius: 10,
-                                                paddingVertical: 10,
-                                                alignItems: 'center',
-                                            }}>
-                                            <Text style={{ color: value === 'F' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>
-                                                Femenino
-                                            </Text>
+                                            style={[styles.genderButton, { backgroundColor: value === 'F' ? '#f97316' : '#E5E7EB' }]}>
+                                            <Text style={{ color: value === 'F' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>Femenino</Text>
                                         </TouchableOpacity>
                                     </View>
-                                    {errors.gender && (
-                                        <Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>
-                                            {errors.gender.message}
-                                        </Text>
-                                    )}
+                                    {errors.gender && <Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{errors.gender.message}</Text>}
                                 </View>
                             )}
                         />
                     ) : (
                         <TextInput
                             editable={false}
-                            value={gender === 'M' ? 'Masculino' : gender === 'F' ? 'Femenino' : ''}
+                            value={user?.gender === 'M' ? 'Masculino' : user?.gender === 'F' ? 'Femenino' : ''}
                             placeholder='Género'
                             placeholderTextColor='#9CA3AF'
-                            style={{
-                                backgroundColor: '#E5E7EB',
-                                borderRadius: 10,
-                                paddingHorizontal: 10,
-                                paddingVertical: 8,
-                                fontSize: 13,
-                                color: '#111827',
-                            }}
+                            style={styles.readOnlyInput}
                         />
                     )}
                 </View>
@@ -616,27 +505,17 @@ export default function MyProfileScreen() {
                 <View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
                     <View className='flex-row items-center mb-3'>
                         <PhoneIcon width={18} height={18} color='#111827' />
-                        <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>
-                            Información de contacto
-                        </Text>
+                        <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>Información de contacto</Text>
                     </View>
 
                     <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Correo electrónico</Text>
                     <TextInput
                         editable={false}
-                        value={email}
+                        value={user?.email}
                         placeholder='Correo electrónico'
                         placeholderTextColor='#9CA3AF'
                         keyboardType='email-address'
-                        style={{
-                            backgroundColor: '#E5E7EB',
-                            borderRadius: 10,
-                            paddingHorizontal: 10,
-                            paddingVertical: 8,
-                            fontSize: 13,
-                            color: '#111827',
-                            marginBottom: 10,
-                        }}
+                        style={styles.readOnlyInput}
                     />
 
                     <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Teléfono</Text>
@@ -653,10 +532,7 @@ export default function MyProfileScreen() {
                                         defaultCountry='VE'
                                         placeholder='Número de teléfono'
                                         phoneInputStyles={{
-                                            container: {
-                                                ...styles.phoneContainer,
-                                                opacity: 1,
-                                            },
+                                            container: { ...styles.phoneContainer, opacity: 1 },
                                             flagContainer: styles.flagContainer,
                                             flag: styles.flag,
                                             caret: styles.caret,
@@ -665,29 +541,18 @@ export default function MyProfileScreen() {
                                             input: styles.phoneInput,
                                         }}
                                     />
-                                    {errors.phone && (
-                                        <Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>
-                                            {errors.phone.message}
-                                        </Text>
-                                    )}
+                                    {errors.phone && <Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{errors.phone.message}</Text>}
                                 </View>
                             )}
                         />
                     ) : (
                         <TextInput
                             editable={false}
-                            value={phone}
+                            value={user?.phone}
                             placeholder='Teléfono'
                             placeholderTextColor='#9CA3AF'
                             keyboardType='phone-pad'
-                            style={{
-                                backgroundColor: '#E5E7EB',
-                                borderRadius: 10,
-                                paddingHorizontal: 10,
-                                paddingVertical: 8,
-                                fontSize: 13,
-                                color: '#111827',
-                            }}
+                            style={styles.readOnlyInput}
                         />
                     )}
                 </View>
@@ -697,6 +562,21 @@ export default function MyProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+    readOnlyInput: {
+        backgroundColor: '#E5E7EB',
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        fontSize: 13,
+        color: '#111827',
+        marginBottom: 10,
+    },
+    genderButton: {
+        flex: 1,
+        borderRadius: 10,
+        paddingVertical: 10,
+        alignItems: 'center',
+    },
     phoneContainer: {
         width: '100%',
         backgroundColor: '#FFFFFF',

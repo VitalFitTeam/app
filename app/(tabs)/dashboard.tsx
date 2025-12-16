@@ -24,7 +24,6 @@ export default function DashboardScreen() {
 	const [userToken, setUserToken] = useState<string>('');
 	const hasMembership = true;
 
-
 	useEffect(() => {
 		const init = async () => {
 			try {
@@ -60,7 +59,6 @@ export default function DashboardScreen() {
 		}, [])
 	);
 
-	// Datos mock - reemplazar con llamadas a la API cuando estén disponibles
 	const mockChallenges = [
 		{ id: '1', title: 'Retos completados', current: 2, total: 5, iconType: 'trophy' as const },
 		{
@@ -132,7 +130,8 @@ export default function DashboardScreen() {
 				}}>
 				<UserHeader
 					name={displayName}
-					avatarUrl='https://randomuser.me/api/portraits/men/32.jpg'
+					avatarUrl={user?.profilePicture}
+					gender={user?.gender}
 					onBadgesPress={() => console.log('Abrir vista de medallas/insignias')}
 				/>
 
@@ -157,7 +156,6 @@ export default function DashboardScreen() {
 					}
 				/>
 
-				{/* Banners adicionales */}
 				{hasMembership ? (
 					<View className='gap-3'>
 						<BirthdayOfferBanner onPress={() => router.replace('/membership-entry')} />
@@ -176,7 +174,6 @@ export default function DashboardScreen() {
 					</View>
 				) : (
 					<>
-						{/* Servicios ya viene de UpcomingRoutinesSection en modo guest */}
 						<BirthdayOfferBanner onPress={() => router.replace('/membership-entry')} />
 
 						<RNText style={{ color: '#111827', fontWeight: '700', fontSize: 18, marginTop: 16, marginBottom: 8 }}>
