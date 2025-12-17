@@ -22,7 +22,18 @@ export default function DashboardScreen() {
 	const [loading, setLoading] = useState(true);
 	const [qrModalVisible, setQrModalVisible] = useState(false);
 	const [userToken, setUserToken] = useState<string>('');
-	const hasMembership = true;
+	const hasMembership = user?.membership?.status === 'Active';
+
+	const calculateDaysRemaining = () => {
+		if (!hasMembership || !user?.membership?.end_date) return 0;
+		const end = new Date(user.membership.end_date);
+		const now = new Date();
+		const diff = end.getTime() - now.getTime();
+		return Math.ceil(diff / (1000 * 3600 * 24));
+	};
+
+	const daysRemaining = calculateDaysRemaining();
+	const planStatusText = hasMembership ? 'Membresía Activa' : 'Sin plan activo';
 
 	useEffect(() => {
 		const init = async () => {
@@ -139,7 +150,8 @@ export default function DashboardScreen() {
 
 				<MembershipCard
 					hasMembership={hasMembership}
-					daysRemaining={15}
+					daysRemaining={daysRemaining}
+					membershipStatus={planStatusText}
 					onQRPress={() => setQrModalVisible(true)}
 					onGetMembershipPress={() => router.replace('/membership-entry')}
 				/>

@@ -13,6 +13,8 @@ export type UserData = {
 	gender: string;
 	birthDate: string;
 	identityDocument: string;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	membership?: { status: string; end_date: string;[key: string]: any };
 	profilePicture?: string;
 };
 
@@ -65,6 +67,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				birthDate: apiUser.birth_date || '',
 				identityDocument: apiUser.identity_document || '',
 				profilePicture: apiUser.profile_picture_url || undefined,
+				membership: apiUser.client_membership,
 			});
 		} catch (err: unknown) {
 			let message = 'Ocurrió un error inesperado al obtener los datos del usuario.';

@@ -6,7 +6,7 @@ export default {
 		slug: 'VitalFit',
 		version: '1.0.0',
 		orientation: 'portrait',
-		icon: './assets/images/icon.png',
+		icon: './assets/images/isotipo.png',
 		scheme: 'vitalfit',
 		userInterfaceStyle: 'automatic',
 		newArchEnabled: true,
@@ -31,17 +31,23 @@ export default {
 		},
 		plugins: [
 			'expo-router',
-			'expo-secure-store', 
+			'expo-secure-store',
 			[
 				'expo-splash-screen',
 				{
-					image: './assets/images/splash-icon.png',
+					image: './assets/images/isotipo.svg',
 					imageWidth: 200,
 					resizeMode: 'contain',
 					backgroundColor: '#ffffff',
 					dark: {
 						backgroundColor: '#000000',
 					},
+				},
+			],
+			[
+				'expo-camera',
+				{
+					cameraPermission: 'Permite a VitalFit acceder a tu cámara para escanear códigos QR de miembros.',
 				},
 			],
 			'expo-font',

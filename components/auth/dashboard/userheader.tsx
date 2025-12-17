@@ -29,8 +29,8 @@ export const UserHeader: React.FC<Props> = ({
 	const [showNotifications, setShowNotifications] = useState(false);
 	const firstName = name.split(' ')[0];
 
-	const defaultImage = gender === 'F' 
-		? require('@/assets/images/Female.svg') 
+	const defaultImage = gender === 'F'
+		? require('@/assets/images/Female.svg')
 		: require('@/assets/images/Man.svg');
 
 	const imageSource = avatarUrl ? { uri: avatarUrl } : defaultImage;
