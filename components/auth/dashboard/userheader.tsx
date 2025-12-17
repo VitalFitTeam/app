@@ -11,6 +11,7 @@ interface Notification {
 interface Props {
 	name: string;
 	avatarUrl?: string;
+	gender?: string;
 	notifications?: Notification[];
 	onBadgesPress?: () => void;
 }
@@ -18,6 +19,7 @@ interface Props {
 export const UserHeader: React.FC<Props> = ({
 	name,
 	avatarUrl,
+	gender,
 	notifications = [
 		{ id: '1', title: 'Tu clase comienza en 10 minutos', time: 'Hace 5 min' },
 		{ id: '2', title: 'Pago de membresía recibido', time: 'Hace 1 hora' },
@@ -26,6 +28,12 @@ export const UserHeader: React.FC<Props> = ({
 }) => {
 	const [showNotifications, setShowNotifications] = useState(false);
 	const firstName = name.split(' ')[0];
+
+	const defaultImage = gender === 'F'
+		? require('@/assets/images/Female.svg')
+		: require('@/assets/images/Man.svg');
+
+	const imageSource = avatarUrl ? { uri: avatarUrl } : defaultImage;
 
 	return (
 		<View className='mt-2 mb-6'>
@@ -40,14 +48,12 @@ export const UserHeader: React.FC<Props> = ({
 			<View className='flex-row justify-between items-center mt-6'>
 				<View className='flex-row items-center flex-1'>
 					<Image
-						source={
-							avatarUrl ? { uri: avatarUrl } : require('@/assets/images/usuario.png')
-						}
+						source={imageSource}
 						style={{
 							width: 70,
 							height: 70,
 							borderRadius: 35,
-							backgroundColor: '#D1D5DB',
+							backgroundColor: '#FED7AA',
 							marginRight: 12,
 						}}
 					/>

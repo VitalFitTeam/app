@@ -50,18 +50,24 @@ export default function ProfileScreen() {
     }
   };
 
+  const defaultImage = user?.gender === 'F' 
+    ? require('@/assets/images/Female.svg') 
+    : require('@/assets/images/Man.svg');
+
+  const profileImageSource = user?.profilePicture ? { uri: user.profilePicture } : defaultImage;
+
   return (
     <View className="flex-1 bg-white dark:bg-neutral-950">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 40, paddingBottom: 96 }}
       >
-        {/* Avatar e info básica */}
         <View className="mb-4 items-start">
           <View className="w-24 h-24 rounded-full overflow-hidden mb-3 bg-[#FED7AA] items-center justify-center">
             <Image
-              source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+              source={profileImageSource}
               style={{ width: '100%', height: '100%' }}
+              contentFit='cover'
             />
           </View>
           <Text className="text-[20px] font-semibold text-[#111827]">{displayName}</Text>
@@ -76,7 +82,6 @@ export default function ProfileScreen() {
           <Text className="text-[13px] text-[#f97316] mt-0.5">Premium</Text>
         </View>
 
-        {/* About Me */}
         <View className="mb-4">
           <Text className="text-[14px] font-semibold text-[#111827] mb-1">Sobre mí</Text>
           <Text className="text-[13px] text-[#4b5563] leading-5">
@@ -85,7 +90,6 @@ export default function ProfileScreen() {
           </Text>
         </View>
 
-        {/* Estadísticas (Entrenamientos, Insignias, Puntos) */}
         <View className="w-full bg-[#F3F4F6] rounded-2xl py-3 px-3 mb-6 flex-row justify-between">
           <View className="flex-1 items-center">
             <Text className="text-[18px] font-semibold text-[#111827]">6</Text>
@@ -103,7 +107,6 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Botón Check in (QR) */}
         <TouchableOpacity
           activeOpacity={0.85}
           className="w-full rounded-2xl border border-[#d1d5db] py-3 px-4 mb-4 flex-row items-center justify-center bg-white"
@@ -113,7 +116,6 @@ export default function ProfileScreen() {
           <Text className="ml-2 text-[13px] font-medium text-[#111827]">Check in</Text>
         </TouchableOpacity>
 
-        {/* Código de referidos */}
         <TouchableOpacity
           activeOpacity={0.85}
           className="w-full rounded-2xl mb-6 flex-row items-center justify-between"
@@ -144,12 +146,10 @@ export default function ProfileScreen() {
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
 
-        {/* Configuración */}
         <View className="mb-2">
           <Text className="text-[14px] font-semibold text-[#111827] mb-2">Configuración</Text>
         </View>
 
-        {/* Opción: Información personal */}
         <TouchableOpacity
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
@@ -166,7 +166,6 @@ export default function ProfileScreen() {
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
 
-        {/* Opción: Seguridad */}
         <TouchableOpacity
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
@@ -183,7 +182,6 @@ export default function ProfileScreen() {
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
 
-        {/* Opción: Mi membresía */}
         <TouchableOpacity
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
@@ -200,7 +198,6 @@ export default function ProfileScreen() {
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
 
-        {/* Opción: Insignias */}
         <TouchableOpacity
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
@@ -217,7 +214,6 @@ export default function ProfileScreen() {
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
 
-        {/* Opción: Idioma */}
         <TouchableOpacity
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
@@ -234,7 +230,6 @@ export default function ProfileScreen() {
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
 
-        {/* Opción: Notificaciones */}
         <TouchableOpacity
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
@@ -251,7 +246,6 @@ export default function ProfileScreen() {
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
 
-        {/* Opción: Ayuda y soporte */}
         <TouchableOpacity
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
@@ -268,7 +262,6 @@ export default function ProfileScreen() {
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
 
-        {/* Opción: Términos y condiciones */}
         <TouchableOpacity
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
@@ -285,7 +278,6 @@ export default function ProfileScreen() {
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
 
-        {/* Opción: Cerrar sesión */}
         <TouchableOpacity
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-6"
@@ -303,7 +295,6 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Modal QR de cliente */}
       <ClientQRModal visible={qrModalVisible} onClose={() => setQrModalVisible(false)} />
 
       <Modal

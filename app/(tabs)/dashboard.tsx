@@ -22,32 +22,18 @@ export default function DashboardScreen() {
 	const [loading, setLoading] = useState(true);
 	const [qrModalVisible, setQrModalVisible] = useState(false);
 	const [userToken, setUserToken] = useState<string>('');
-
-	// [LOGICA NUEVA]
-	// 1. Determinar si tiene membresía basándose en los datos del contexto
-	// Verificamos que exista el objeto y que su status sea 'Active' (tal cual devuelve tu backend)
 	const hasMembership = user?.membership?.status === 'Active';
 
-	// 2. Calcular días restantes
 	const calculateDaysRemaining = () => {
 		if (!hasMembership || !user?.membership?.end_date) return 0;
-
+		const end = new Date(user.membership.end_date);
 		const now = new Date();
-		const endDate = new Date(user.membership.end_date);
-
-		// Diferencia en milisegundos
-		const diffTime = endDate.getTime() - now.getTime();
-		// Convertir a días (redondeando hacia arriba)
-		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-		return diffDays > 0 ? diffDays : 0;
+		const diff = end.getTime() - now.getTime();
+		return Math.ceil(diff / (1000 * 3600 * 24));
 	};
 
 	const daysRemaining = calculateDaysRemaining();
-
-	// 3. Nombre del plan
 	const planStatusText = hasMembership ? 'Membresía Activa' : 'Sin plan activo';
-
 
 	useEffect(() => {
 		const init = async () => {
@@ -84,7 +70,6 @@ export default function DashboardScreen() {
 		}, [])
 	);
 
-	// Datos mock - reemplazar con llamadas a la API cuando estén disponibles
 	const mockChallenges = [
 		{ id: '1', title: 'Retos completados', current: 2, total: 5, iconType: 'trophy' as const },
 		{
@@ -156,7 +141,8 @@ export default function DashboardScreen() {
 				}}>
 				<UserHeader
 					name={displayName}
-					avatarUrl={'https://randomuser.me/api/portraits/men/32.jpg'} // Ajuste opcional si tienes foto
+					avatarUrl={user?.profilePicture}
+					gender={user?.gender}
 					onBadgesPress={() => console.log('Abrir vista de medallas/insignias')}
 				/>
 
@@ -182,7 +168,6 @@ export default function DashboardScreen() {
 					}
 				/>
 
-				{/* Banners adicionales */}
 				{hasMembership ? (
 					<View className='gap-3'>
 						<BirthdayOfferBanner onPress={() => router.replace('/membership-entry')} />
@@ -190,6 +175,8 @@ export default function DashboardScreen() {
 						<WeeklyChallengeBanner
 							onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
 						/>
+
+						<BirthdayOfferBanner onPress={() => router.replace('/membership-entry')} />
 
 						<CrossFitBanner
 							imageSource={require('@/assets/images/crossfit.png')}
@@ -199,7 +186,6 @@ export default function DashboardScreen() {
 					</View>
 				) : (
 					<>
-						{/* Servicios ya viene de UpcomingRoutinesSection en modo guest */}
 						<BirthdayOfferBanner onPress={() => router.replace('/membership-entry')} />
 
 						<RNText style={{ color: '#111827', fontWeight: '700', fontSize: 18, marginTop: 16, marginBottom: 8 }}>
