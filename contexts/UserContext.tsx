@@ -13,6 +13,7 @@ export type UserData = {
 	gender: string;
 	birthDate: string;
 	identityDocument: string;
+	profilePicture?: string;
 };
 
 type UserContextType = {
@@ -42,6 +43,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				return;
 			}
 
+			// CORRECCIÓN: Restauro la obtención del objeto usuario de la respuesta
 			const userData = await vitalFitApi.user.WhoAmI(token);
 			const apiUser = userData?.user;
 
@@ -62,6 +64,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				gender: normalizedGender,
 				birthDate: apiUser.birth_date || '',
 				identityDocument: apiUser.identity_document || '',
+				profilePicture: apiUser.profile_picture_url || undefined,
 			});
 		} catch (err: unknown) {
 			let message = 'Ocurrió un error inesperado al obtener los datos del usuario.';
@@ -86,14 +89,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 	const value = useMemo<UserContextType>(
 		() => ({ user, loading, error, fetchUser, updateLocalUser }),
-		[user, loading, error, fetchUser, updateLocalUser],
+		[user, loading, error, fetchUser, updateLocalUser]
 	);
 
 	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
 export function useUser() {
-	const ctx = useContext(UserContext);
-	if (!ctx) throw new Error('useUser must be used within a UserProvider');
-	return ctx;
+	const context = useContext(UserContext);
+	if (context === undefined) {
+		throw new Error('useUser debe ser usado dentro de un UserProvider');
+	}
+	return context;
 }
