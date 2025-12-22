@@ -176,7 +176,6 @@ export function Step3PersonalDetails({ control, errors, onSubmit, onPrevStep }: 
 }
 
 const styles = StyleSheet.create({
-    // ... Tus estilos se mantienen igual ...
     label: { fontSize: 14, fontWeight: '500', color: '#5C5E60', marginBottom: 8 },
     phoneContainer: { backgroundColor: '#FFFFFF', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB', paddingHorizontal: 12, height: 48 },
     flagContainer: { backgroundColor: 'transparent', justifyContent: 'center' },

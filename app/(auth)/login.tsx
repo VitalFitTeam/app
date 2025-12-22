@@ -192,10 +192,21 @@ export default function LoginScreen() {
                         console.error('Error al autenticar con el backend:', backendError);
 
                         if (isAPIError(backendError)) {
-                            const errorMessage = backendError.messages.join(', ');
-                            showToast('error', 'Error de autenticación', errorMessage);
+                            const errorMessages = backendError.messages.join(', ').toLowerCase();
+
+                            if (errorMessages.includes('usuario no encontrado') ||
+                                errorMessages.includes('not found') ||
+                                errorMessages.includes('unauthorized')) {
+                                console.log('Usuario no registrado, redirigiendo al flujo de registro');
+                                showToast('success', 'Cuenta no registrada', 'Vamos a completar tu registro con Google');
+                                router.replace('/(auth)/register?oauth=google');
+                            } else {
+                                showToast('error', 'Error de autenticación', backendError.messages.join(', '));
+                            }
                         } else if (backendError instanceof Error && backendError.message?.includes('Usuario no encontrado')) {
-                            showToast('error', 'Usuario no registrado', 'Esta cuenta de Google no está registrada en VitalFit');
+                            console.log('Usuario no registrado, redirigiendo al flujo de registro');
+                            showToast('success', 'Cuenta no registrada', 'Vamos a completar tu registro con Google');
+                            router.replace('/(auth)/register?oauth=google');
                         } else {
                             showToast('error', 'Error de autenticación', 'No se pudo iniciar sesión con Google');
                         }
