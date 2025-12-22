@@ -3,7 +3,7 @@ import { RegisterData } from '@/schemas/register';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import Checkbox from 'expo-checkbox';
-import { Calendar } from 'lucide-react-native';
+import { ArrowLeft, Calendar } from 'lucide-react-native';
 import { useState } from 'react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 import { useTranslation } from 'react-i18next'; // <---
@@ -16,18 +16,37 @@ interface Props {
     control: Control<RegisterData>;
     errors: FieldErrors<RegisterData>;
     onSubmit: () => void;
+    onPrevStep: () => void;
 }
 
-export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
+export function Step3PersonalDetails({ control, errors, onSubmit, onPrevStep }: Props) {
     const { t } = useTranslation();
     const [showPicker, setShowPicker] = useState(false);
 
     return (
-        <ScrollView
-            style={{ width: '100%' }}
-            contentContainerStyle={{ alignItems: 'center', paddingVertical: 16, gap: 16 }}>
-            
-            <Controller
+        <>
+            <TouchableOpacity
+                onPress={onPrevStep}
+                style={{
+                    position: 'absolute',
+                    top: -200,
+                    left: 8,
+                    zIndex: 10,
+                    width: 40,
+                    height: 40,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'rgba(0,0,0,0.05)',
+                    borderRadius: 20,
+                }}>
+                <ArrowLeft size={24} color='#000' />
+            </TouchableOpacity>
+
+            <ScrollView
+                style={{ width: '100%' }}
+                contentContainerStyle={{ alignItems: 'center', paddingVertical: 16, gap: 16 }}>
+
+                <Controller
                 control={control}
                 name='name'
                 render={({ field: { onChange, onBlur, value } }) => (
@@ -152,11 +171,11 @@ export function Step3PersonalDetails({ control, errors, onSubmit }: Props) {
                 onPress={onSubmit}
             />
         </ScrollView>
+        </>
     );
 }
 
 const styles = StyleSheet.create({
-    // ... Tus estilos se mantienen igual ...
     label: { fontSize: 14, fontWeight: '500', color: '#5C5E60', marginBottom: 8 },
     phoneContainer: { backgroundColor: '#FFFFFF', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB', paddingHorizontal: 12, height: 48 },
     flagContainer: { backgroundColor: 'transparent', justifyContent: 'center' },

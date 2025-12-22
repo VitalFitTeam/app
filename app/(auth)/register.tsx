@@ -17,7 +17,9 @@ import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { BackHandler, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { ArrowLeft } from 'lucide-react-native';
 
 function generateSecurePassword() {
     const random = Math.random().toString(36).slice(-10);
@@ -156,26 +158,58 @@ export default function RegisterScreen() {
         }
     };
 
+    const prevStep = () => {
+        setStep(step - 1);
+    };
+
+    useEffect(() => {
+        const onBackPress = () => {
+            if (step === 1) {
+                router.replace('/');
+                return true;
+            } else {
+                setStep(step - 1);
+                return true;
+            }
+        };
+
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+
+        return () => subscription.remove();
+    }, [step, router]);
+
     return (
-        <KeyboardAvoidingView
-            style={styles.keyboardView}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+            <KeyboardAvoidingView
+                style={styles.keyboardView}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
 
-            <ToastNotification
-                visible={toastState.visible}
-                type={toastState.type}
-                title={toastState.title}
-                message={toastState.message}
-                onClose={hideToast}
-            />
+                <ToastNotification
+                    visible={toastState.visible}
+                    type={toastState.type}
+                    title={toastState.title}
+                    message={toastState.message}
+                    onClose={hideToast}
+                />
 
-            <ScrollView
-                contentContainerStyle={styles.scrollContent}
-                keyboardShouldPersistTaps='handled'
-                showsVerticalScrollIndicator={false}>
+                <ScrollView
+                    contentContainerStyle={styles.scrollContent}
+                    keyboardShouldPersistTaps='handled'
+                    showsVerticalScrollIndicator={false}>
 
-                <ThemedView style={styles.container}>
+                    {step === 1 && (
+                        <TouchableOpacity
+                            onPress={() => router.replace('/')}
+                            style={styles.backButton}>
+                            <ArrowLeft size={24} color='#000' />
+                        </TouchableOpacity>
+                    )}
+
+                    <ThemedView style={styles.container}>
                     <View style={styles.formContainer}>
                         <Logo />
 
@@ -216,6 +250,7 @@ export default function RegisterScreen() {
                                     control={control}
                                     errors={errors}
                                     onNextStep={nextStep}
+                                    onPrevStep={prevStep}
                                     isSignedIn={isSignedIn}
                                 />
                             )}
@@ -225,6 +260,7 @@ export default function RegisterScreen() {
                                     control={control}
                                     errors={errors}
                                     onSubmit={onSubmitPress}
+                                    onPrevStep={prevStep}
                                 />
                             )}
                         </View>
@@ -244,6 +280,7 @@ export default function RegisterScreen() {
                 </ThemedView>
             </ScrollView>
         </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }
 
@@ -254,7 +291,19 @@ const styles = StyleSheet.create({
     formContainer: { width: '100%', maxWidth: 384, paddingHorizontal: 24, alignItems: 'center', flex: 1 },
     stepContainer: { flex: 1, width: '100%', alignItems: 'center', gap: 16 },
     mainTitle: { fontSize: 32, marginBottom: 8, textAlign: 'center', color: '#F27F2A', lineHeight: 38 },
-    footer: { marginTop: 'auto', paddingBottom: 40 },
+    footer: { marginTop: 'auto', paddingBottom: 16 },
     footerText: { color: '#5C5E60' },
     footerLink: { color: Colors.light.tint, fontWeight: '600' },
+    backButton: {
+        position: 'absolute',
+        top: 16,
+        left: 16,
+        zIndex: 10,
+        width: 40,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(0,0,0,0.05)',
+        borderRadius: 20,
+    },
 });
