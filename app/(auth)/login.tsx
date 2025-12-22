@@ -27,6 +27,7 @@ import {
     TouchableWithoutFeedback,
     View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
     const { toastState, showToast, hideToast } = useToast();
@@ -219,54 +220,55 @@ export default function LoginScreen() {
     }, [startOAuthFlow, getToken, signOut, router, showToast]);
 
     return (
-        <KeyboardAvoidingView
-            style={{ flex: 1, backgroundColor: '#FFFFFF' }}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <ToastNotification
-                visible={toastState.visible}
-                type={toastState.type}
-                title={toastState.title}
-                message={toastState.message}
-                onClose={hideToast}
-            />
-            <LoadingModal
-                visible={isGoogleLoading}
-                message="Autenticando con Google..."
-            />
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <ScrollView
-                    contentContainerStyle={{
-                        flexGrow: 1,
-                        justifyContent: 'center',
-                        paddingHorizontal: 32,
-                        paddingVertical: 16,
-                    }}
-                    keyboardShouldPersistTaps='handled'
-                    showsVerticalScrollIndicator={false}
-                    style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-                    <TouchableOpacity
-                        onPress={() => router.replace('/')}
-                        className='absolute top-4 left-4 z-10 w-10 h-10 items-center justify-center'
-                        style={{ backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: 20 }}>
-                        <ArrowLeft size={24} color='#000' />
-                    </TouchableOpacity>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+            <KeyboardAvoidingView
+                style={{ flex: 1, backgroundColor: '#FFFFFF' }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                <ToastNotification
+                    visible={toastState.visible}
+                    type={toastState.type}
+                    title={toastState.title}
+                    message={toastState.message}
+                    onClose={hideToast}
+                />
+                <LoadingModal
+                    visible={isGoogleLoading}
+                    message="Autenticando con Google..."
+                />
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <ScrollView
+                        contentContainerStyle={{
+                            flexGrow: 1,
+                            paddingHorizontal: 32,
+                            paddingTop: 8,
+                            paddingBottom: 16,
+                        }}
+                        keyboardShouldPersistTaps='handled'
+                        showsVerticalScrollIndicator={false}
+                        style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+                        <TouchableOpacity
+                            onPress={() => router.replace('/')}
+                            className='absolute top-4 left-4 z-10 w-10 h-10 items-center justify-center'
+                            style={{ backgroundColor: 'rgba(0,0,0,0.05)', borderRadius: 20 }}>
+                            <ArrowLeft size={24} color='#000' />
+                        </TouchableOpacity>
                     <View className='w-full max-w-sm self-center'>
-                        <View className='items-center mb-2'>
-                            <LogoSimple size={250} />
+                        <View className='items-center mb-1 mt-12'>
+                            <LogoSimple size={180} />
                         </View>
 
                         <Text
-                            className='text-4xl text-black mb-2 uppercase text-center'
+                            className='text-3xl text-black mb-1 uppercase text-center'
                             style={{ fontFamily: Fonts.title }}>
                             {t('login.title')}
                         </Text>
 
-                        <Text className='text-gray-500 text-center mb-8 text-lg'>
+                        <Text className='text-gray-500 text-center mb-4 text-base'>
                             {t('login.subtitle')}
                         </Text>
 
-                        <View className='px-2 mt-6 gap-6'>
-                            <View className='mb-4'>
+                        <View className='px-2 mt-2 gap-3'>
+                            <View className='mb-2'>
                                 <Text className='text-black font-bold text-sm mb-1 ml-1'>
                                     {t('login.emailLabel')}
                                 </Text>
@@ -276,12 +278,12 @@ export default function LoginScreen() {
                                     onChangeText={setEmail}
                                     keyboardType='email-address'
                                     autoCapitalize='none'
-                                    style={{ height: 48 }}
+                                    style={{ height: 44 }}
                                     className='border border-gray-300 rounded-md px-4'
                                 />
                             </View>
 
-                            <View className='mb-4'>
+                            <View className='mb-2'>
                                 <View className='flex-row items-center mb-1 ml-1'>
                                     <SlidersVertical
                                         size={16}
@@ -293,7 +295,7 @@ export default function LoginScreen() {
                                     </Text>
                                 </View>
                                 <View
-                                    style={{ height: 48 }}
+                                    style={{ height: 44 }}
                                     className='flex-row items-center border border-gray-300 rounded-md px-4'>
                                     <TextInput
                                         placeholder={t('login.passwordPlaceholder')}
@@ -314,7 +316,7 @@ export default function LoginScreen() {
                             </View>
                         </View>
 
-                        <View className='w-full flex-row justify-between items-center my-4'>
+                        <View className='w-full flex-row justify-between items-center my-3'>
                             <View className='flex-row items-center'>
                                 <Checkbox
                                     value={isChecked}
@@ -343,7 +345,7 @@ export default function LoginScreen() {
                             </Link>
                         </View>
 
-                        <View className='gap-4 mb-4'>
+                        <View className='gap-3 mb-3'>
                             <PrimaryButton
                                 title={isLoading ? t('login.signingInButton') : t('login.signInButton')}
                                 onPress={handleLogin}
@@ -357,7 +359,7 @@ export default function LoginScreen() {
                             />
                         </View>
 
-                        <View className='mt-1 flex-row justify-center items-center'>
+                        <View className='flex-row justify-center items-center'>
                             <Text className='text-gray-600'>
                                 {t('login.noAccount')}
                             </Text>
@@ -373,5 +375,6 @@ export default function LoginScreen() {
                 </ScrollView>
             </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }

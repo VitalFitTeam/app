@@ -8,8 +8,9 @@ import { isAPIError } from '@vitalfit/sdk';
 import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { SlidersVertical } from 'lucide-react-native';
+import { ArrowLeft, SlidersVertical } from 'lucide-react-native';
 import { useState } from 'react';
+import { TouchableOpacity } from 'react-native';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { PrimaryButton } from '../../PrimaryButton';
@@ -22,10 +23,11 @@ interface Props {
     control: Control<RegisterData>;
     errors: FieldErrors<RegisterData>;
     onNextStep: () => void;
+    onPrevStep: () => void;
     isSignedIn?: boolean;
 }
 
-export function Step2Credentials({ control, errors, onNextStep}: Props) {
+export function Step2Credentials({ control, errors, onNextStep, onPrevStep}: Props) {
     const { t } = useTranslation();
     const router = useRouter();
     const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
@@ -134,6 +136,22 @@ export function Step2Credentials({ control, errors, onNextStep}: Props) {
 
     return (
         <>
+            <TouchableOpacity
+                onPress={onPrevStep}
+                style={{
+                    position: 'absolute',
+                    top: -244,
+                    left: -8,
+                    zIndex: 10,
+                    width: 40,
+                    height: 40,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'rgba(0,0,0,0.05)',
+                    borderRadius: 20,
+                }}>
+                <ArrowLeft size={24} color='#000' />
+            </TouchableOpacity>
             <Controller
                 control={control}
                 name='email'
