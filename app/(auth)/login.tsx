@@ -1,5 +1,6 @@
 import { LogoSimple } from '@/components/auth/Logo';
 import { SocialButton } from '@/components/auth/SocialButton';
+import { LoadingModal } from '@/components/LoadingModal';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ToastNotification } from '@/components/ToastNotification';
 import { Colors, Fonts } from '@/constants/theme';
@@ -118,8 +119,9 @@ export default function LoginScreen() {
                 console.log('No había sesión previa para cerrar');
             }
 
+            // Redirigimos de vuelta a login para evitar "unmatched route"
             const { createdSessionId, setActive } = await startOAuthFlow({
-                redirectUrl: Linking.createURL('/(tabs)/dashboard', { scheme: 'vitalfit' }),
+                redirectUrl: Linking.createURL('/(auth)/login', { scheme: 'vitalfit' }),
             });
 
             if (createdSessionId && setActive) {
@@ -159,21 +161,31 @@ export default function LoginScreen() {
                             await AsyncStorage.setItem('token', backendToken);
                             console.log('Token de backend guardado');
 
-                            await new Promise(resolve => setTimeout(resolve, 300));
-                            console.log('Delay completado, token debe estar disponible');
+                            // Esperamos 1 segundo para asegurar que el token esté disponible en AsyncStorage
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            console.log('Delay completado, verificando token...');
 
-                            const whoamiResponse = await vitalFitApi.user.WhoAmI(backendToken);
-                            const role = whoamiResponse.user?.role?.name?.toLowerCase();
+                            // Verificamos que el token esté realmente guardado antes de navegar
+                            const savedToken = await AsyncStorage.getItem('token');
+                            if (savedToken) {
+                                console.log('Token verificado en AsyncStorage');
 
-                            if (role === 'instructor') {
-                                router.replace('/(instructor)/dashboard');
-                            } else if (role === 'recepcionist' || role === 'receptionist') {
-                                router.replace('/(recepcionist)/dashboard');
+                                const whoamiResponse = await vitalFitApi.user.WhoAmI(backendToken);
+                                const role = whoamiResponse.user?.role?.name?.toLowerCase();
+
+                                if (role === 'instructor') {
+                                    router.replace('/(instructor)/dashboard');
+                                } else if (role === 'recepcionist' || role === 'receptionist') {
+                                    router.replace('/(recepcionist)/dashboard');
+                                } else {
+                                    router.replace('/(tabs)/dashboard');
+                                }
+
+                                showToast('success', '¡Bienvenido!', 'Iniciaste sesión con Google exitosamente');
                             } else {
-                                router.replace('/(tabs)/dashboard');
+                                console.error('El token no se guardó correctamente en AsyncStorage');
+                                showToast('error', 'Error', 'No se pudo guardar la sesión');
                             }
-
-                            showToast('success', '¡Bienvenido!', 'Iniciaste sesión con Google exitosamente');
                         }
                     } catch (backendError: unknown) {
                         console.error('Error al autenticar con el backend:', backendError);
@@ -216,6 +228,10 @@ export default function LoginScreen() {
                 title={toastState.title}
                 message={toastState.message}
                 onClose={hideToast}
+            />
+            <LoadingModal
+                visible={isGoogleLoading}
+                message="Autenticando con Google..."
             />
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <ScrollView
