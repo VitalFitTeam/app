@@ -1,5 +1,6 @@
 import { ClientQRModal } from '@/components/client/ClientQRModal';
 import { useUser } from '@/contexts/UserContext';
+import { useReservations } from '@/contexts/reservations'; // <--- Importar useReservations
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -21,7 +22,8 @@ import {
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, loading } = useUser();
+  const { user, loading, clearUser } = useUser(); // <--- Traer clearUser
+  const { clearReservations } = useReservations(); // <--- Traer clearReservations
   const [qrModalVisible, setQrModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
@@ -41,11 +43,20 @@ export default function ProfileScreen() {
 
   const handleConfirmLogout = async () => {
     try {
+      // 1. Borrar token de sesión principal
       await AsyncStorage.removeItem('token');
+      
+      // 2. Limpiar estado de reservas (Memoria + AsyncStorage)
+      await clearReservations();
+      
+      // 3. Limpiar contexto de usuario (Memoria)
+      clearUser();
+
     } catch (error) {
       console.error('Error al eliminar el token en logout:', error);
     } finally {
       setLogoutModalVisible(false);
+      // Usar replace para que no pueda volver atrás con el botón físico
       router.replace('/(auth)/login');
     }
   };
