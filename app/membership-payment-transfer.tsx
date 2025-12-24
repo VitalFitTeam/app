@@ -32,6 +32,8 @@ export default function MembershipPaymentTransferScreen() {
   // Hook de notificaciones
   const { toastState, showToast, hideToast } = useToast();
 
+  const currencySymbol = params.currency === 'EUR' ? '€' : params.currency === 'VES' ? 'Bs' : '$';
+
   const handleProcessPayment = async () => {
     // 1. Validaciones
     if (!reference || !senderName) {
@@ -164,10 +166,10 @@ export default function MembershipPaymentTransferScreen() {
           </View>
           <View className='items-end'>
             <ThemedText className='text-3xl font-bold text-white' style={{ fontFamily: 'BebasNeue-Regular' }}>
-              ${parseFloat(params.totalAmount).toFixed(2)}
+              {currencySymbol}{parseFloat(params.totalAmount).toFixed(2)}
             </ThemedText>
             <ThemedText className='text-white/90 text-xs font-bold'>
-              {params.currency}
+              {params.currency || 'USD'}
             </ThemedText>
           </View>
         </LinearGradient>

@@ -35,15 +35,14 @@ export default function MembershipsScreen() {
 				const token = await AsyncStorage.getItem('token');
 				const jwt = token || '';
 
+				// Forzamos USD como moneda base
 				const response = await vitalFitApi.membership.publicGetMemberships(
 					jwt,
 					{ page: 1, limit: 100, sort: 'asc' as const },
 					'USD',
 				);
 
-				// CORRECCIÓN: Eliminado @ts-ignore innecesario
 				const fetchedPlans = response.data || [];
-
 				setPlans(fetchedPlans);
 
 				if (fetchedPlans.length > 0) {
@@ -121,8 +120,6 @@ export default function MembershipsScreen() {
 											Elige el plan que mejor se adapte a tus necesidades y
 											objetivos de fitness.
 										</ThemedText>
-
-
 									</View>
 								</View>
 							</View>
@@ -167,7 +164,8 @@ export default function MembershipsScreen() {
 														`&title=${encodeURIComponent(selectedPlan.name)}` +
 														`&price=${selectedPlan.price}` +
 														`&period=${encodeURIComponent(`${selectedPlan.duration_days} días`)}`;
-
+													
+													// Ya no pasamos currency aquí
 													router.push(href as never);
 												}}
 											/>

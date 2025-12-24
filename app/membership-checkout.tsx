@@ -49,7 +49,7 @@ export default function MembershipCheckoutScreen() {
     price?: string;
     period?: string;
     type?: string;
-  }>();
+  }>(); // Eliminado currency
   const router = useRouter();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -114,8 +114,6 @@ export default function MembershipCheckoutScreen() {
         throw new Error('No se encontró una sucursal disponible para asignar la factura.');
       }
 
-      // 3. CAMBIO IMPORTANTE: NO CREAMOS LA FACTURA AQUÍ.
-      // Pasamos los datos a la pantalla de Extras para crearla allá junto con los paquetes.
       router.push({
         pathname: '/membership-extra',
         params: {
@@ -129,6 +127,7 @@ export default function MembershipCheckoutScreen() {
           // Datos de contexto para crear la factura luego
           userId: userId,
           branchId: branchId,
+          // Eliminado currency
         },
       } as never);
 
