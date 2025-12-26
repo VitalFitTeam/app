@@ -4,6 +4,7 @@ import { LoadingModal } from '@/components/LoadingModal';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ToastNotification } from '@/components/ToastNotification';
 import { Colors, Fonts } from '@/constants/theme';
+import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services/vitalfitSdk';
 import { useAuth, useClerk, useOAuth } from '@clerk/clerk-expo';
@@ -32,6 +33,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function LoginScreen() {
     const { toastState, showToast, hideToast } = useToast();
     const router = useRouter();
+    const { fetchUser } = useUser();
 
     useEffect(() => {
         const onBackPress = () => {
@@ -79,6 +81,9 @@ export default function LoginScreen() {
             if (token) {
                 await AsyncStorage.setItem('token', token);
                 console.log('Token guardado en AsyncStorage');
+                
+                // Actualizamos el contexto global antes de navegar
+                await fetchUser();
                 
                 await new Promise(resolve => setTimeout(resolve, 300));
                 console.log('Delay completado, token debe estar disponible');
@@ -162,6 +167,9 @@ export default function LoginScreen() {
                             await AsyncStorage.setItem('token', backendToken);
                             console.log('Token de backend guardado');
 
+                            // Actualizamos el contexto global antes de navegar
+                            await fetchUser();
+
                             // Esperamos 1 segundo para asegurar que el token esté disponible en AsyncStorage
                             await new Promise(resolve => setTimeout(resolve, 1000));
                             console.log('Delay completado, verificando token...');
@@ -228,7 +236,7 @@ export default function LoginScreen() {
         } finally {
             setIsGoogleLoading(false);
         }
-    }, [startOAuthFlow, getToken, signOut, router, showToast]);
+    }, [startOAuthFlow, getToken, signOut, router, showToast, fetchUser]);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>

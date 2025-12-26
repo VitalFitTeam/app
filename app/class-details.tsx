@@ -2,6 +2,7 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useReservations } from '@/contexts/reservations';
+import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services/vitalfitSdk';
 import { isAPIError } from '@vitalfit/sdk';
@@ -28,12 +29,13 @@ export default function ClassDetailsScreen() {
     useLocalSearchParams();
 
   const { isReserved, reserve, cancel } = useReservations();
+  const { user } = useUser();
+  const hasMembership = user?.membership?.status === 'Active';
 
   const classDateFormatted = useMemo(() => {
     try {
       const dateToFormat = startsAt ? new Date(String(startsAt)) : new Date();
       
-      // Ajuste básico para evitar desfase de zona horaria si rawDate es YYYY-MM-DD puro
       if (startsAt && String(startsAt).match(/^\d{4}-\d{2}-\d{2}$/)) {
         dateToFormat.setMinutes(dateToFormat.getMinutes() + dateToFormat.getTimezoneOffset());
       }
@@ -110,7 +112,7 @@ export default function ClassDetailsScreen() {
           }
         }
       } catch {
-        // ignorar
+        // Se ignora el error de carga inicial
       }
     })();
   }, [serviceId, instructorId]);
@@ -753,8 +755,8 @@ export default function ClassDetailsScreen() {
           <View className='mb-6'>
             <PrimaryButton
               title={effectiveFull ? 'Clase llena' : reserved ? 'Cancelar' : 'Reservar'}
-              disabled={effectiveFull}
-              style={{ backgroundColor: effectiveFull ? '#6b7280' : reserved ? '#ef4444' : '#f97316' }}
+              disabled={effectiveFull || (!hasMembership && !reserved)}
+              style={{ backgroundColor: effectiveFull || (!hasMembership && !reserved) ? '#6b7280' : reserved ? '#ef4444' : '#f97316' }}
               onPress={async () => {
                 if (effectiveFull) return;
 
@@ -826,6 +828,13 @@ export default function ClassDetailsScreen() {
                 }
               }}
             />
+            {!hasMembership && !reserved && (
+              <View className='mt-2 items-center'>
+                <ThemedText lightColor='#ef4444' darkColor='#ef4444' className='text-xs font-medium'>
+                  Necesitas una membresía activa para reservar
+                </ThemedText>
+              </View>
+            )}
           </View>
         )}
         <View className='items-center justify-center mb-2'>

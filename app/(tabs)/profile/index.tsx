@@ -1,5 +1,6 @@
 import { ClientQRModal } from '@/components/client/ClientQRModal';
 import { useUser } from '@/contexts/UserContext';
+import { useReservations } from '@/contexts/reservations';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -9,6 +10,7 @@ import {
   ArrowRightOnRectangleIcon,
   BellIcon,
   ChevronRightIcon,
+  CreditCardIcon,
   GlobeAltIcon,
   LanguageIcon,
   QrCodeIcon,
@@ -21,7 +23,8 @@ import {
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, loading } = useUser();
+  const { user, loading, clearUser } = useUser();
+  const { clearReservations } = useReservations();
   const [qrModalVisible, setQrModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
@@ -42,6 +45,8 @@ export default function ProfileScreen() {
   const handleConfirmLogout = async () => {
     try {
       await AsyncStorage.removeItem('token');
+      await clearReservations();
+      clearUser();
     } catch (error) {
       console.error('Error al eliminar el token en logout:', error);
     } finally {
@@ -274,6 +279,22 @@ export default function ProfileScreen() {
               <GlobeAltIcon width={18} height={18} color="#111827" />
             </View>
             <Text className="text-[13px] text-[#111827]">Términos y condiciones</Text>
+          </View>
+          <ChevronRightIcon width={16} height={16} color="#9ca3af" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.8}
+          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
+          onPress={() => {
+            router.push('/profile/payment-history');
+          }}
+        >
+          <View className="flex-row items-center">
+            <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
+              <CreditCardIcon width={18} height={18} color="#111827" />
+            </View>
+            <Text className="text-[13px] text-[#111827]">Historial de pago</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
