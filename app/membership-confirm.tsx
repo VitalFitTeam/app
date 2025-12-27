@@ -13,12 +13,27 @@ interface BranchItem {
   name: string;
 }
 
-// Array de monedas disponibles (Source of Truth local)
-const CURRENCIES = [
-	{ name: 'USD', symbol: '$', label: 'USD' },
-	{ name: 'VES', symbol: 'Bs', label: 'VES' },
-	{ name: 'EUR', symbol: '€', label: 'EUR' },
+import { mainCurrencies } from '@/app/constants/billing';
+
+// Monedas soportadas por el backend según documentación oficial
+// Mundiales: USD, EUR, JPY, GBP, AUD, CAD, CHF, CNY
+// Latinoamérica: VES (con tasa BCV), BRL, MXN, ARS, COP, CLP, PEN
+// Otras: INR, RUB
+const SUPPORTED_CURRENCY_CODES = [
+    'USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY', // Mundiales
+    'VES', 'BRL', 'MXN', 'ARS', 'COP', 'CLP', 'PEN',        // Latinoamérica
+    'INR', 'RUB'                                             // Otras
 ];
+
+// Array de monedas disponibles (Source of Truth local)
+// Mapeamos para mantener compatibilidad con la UI existente { name: code, symbol, label: code }
+const CURRENCIES = mainCurrencies
+    .filter(c => SUPPORTED_CURRENCY_CODES.includes(c.code))
+    .map(c => ({
+        name: c.code,
+        symbol: c.symbol,
+        label: `${c.code} - ${c.name}`
+    }));
 
 // Tasa de referencia temporal por si falla la API
 const FALLBACK_RATES: Record<string, number> = {
