@@ -16,6 +16,7 @@ type ReservationsContextType = {
 	isReserved: (id: string) => boolean;
 	reserve: (item: ReservationItem) => Promise<void>;
 	cancel: (id: string) => Promise<void>;
+	clearReservations: () => Promise<void>; // <--- Nueva función
 	loading: boolean;
 };
 
@@ -70,9 +71,19 @@ export function ReservationsProvider({ children }: { children: React.ReactNode }
 		[items, persist],
 	);
 
+	// Implementación de la limpieza profunda
+	const clearReservations = useCallback(async () => {
+		setItems({}); // Limpia memoria (RAM)
+		try {
+			await AsyncStorage.removeItem(STORAGE_KEY); // Limpia disco
+		} catch {
+			// noop
+		}
+	}, []);
+
 	const value = useMemo<ReservationsContextType>(
-		() => ({ items, isReserved, reserve, cancel, loading }),
-		[items, isReserved, reserve, cancel, loading],
+		() => ({ items, isReserved, reserve, cancel, clearReservations, loading }),
+		[items, isReserved, reserve, cancel, clearReservations, loading],
 	);
 
 	return <ReservationsContext.Provider value={value}>{children}</ReservationsContext.Provider>;
