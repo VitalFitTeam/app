@@ -52,15 +52,15 @@ export default function EntrenamientoScreen() {
                     {/* Training cards */}
                     <TrainingCard
                         id='routine-1'
-                        title='Fuerza Total – Semana 3'
-                        subtitle='Full Body - Medium'
+                        title={t('training.mock.routineTitle')}
+                        subtitle={t('training.mock.routineSubtitle')}
                         progressPercent={75}
                     />
 
                     <TrainingCard
                         id='routine-2'
-                        title='Fuerza Total – Semana 3'
-                        subtitle='Full Body - Medium'
+                        title={t('training.mock.routineTitle')}
+                        subtitle={t('training.mock.routineSubtitle')}
                         progressPercent={75}
                     />
                 </ScrollView>

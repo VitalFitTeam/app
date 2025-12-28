@@ -1,6 +1,6 @@
 {
   "translation": {
-    "language": "Idioma",
+    "languageLabel": "Idioma",
     "save": "Guardar",
     "signIn": "Acceder",
     "signUp": "Registrarse",
@@ -416,6 +416,10 @@
         "hiit": "HIIT",
         "kickBoxing": "Kick Boxing",
         "pilates": "Pilates"
+      },
+      "mock": {
+        "routineTitle": "Fuerza Total – Semana 3",
+        "routineSubtitle": "Full Body - Medium"
       }
     },
     "clientProfile": {
@@ -423,7 +427,11 @@
       "activeMembership": "Membresía activa",
       "myQr": "Mi código QR",
       "membership": "Membresía",
-      "description": "Desde tu perfil puedes gestionar tu información personal, revisar tu membresía y configurar tus notificaciones y preferencias de cuenta."
+      "description": "Desde tu perfil puedes gestionar tu información personal, revisar tu membresía y configurar tus notificaciones y preferencias de cuenta.",
+      "defaultName": "Cliente",
+      "error": {
+        "fetchUser": "Ocurrió un error inesperado al obtener los datos del usuario."
+      }
     },
     "myProfile": {
       "title": "Mi perfil",
@@ -439,6 +447,35 @@
       "toast": {
         "successTitle": "¡Perfil actualizado!",
         "successMessage": "Tus cambios se guardaron correctamente"
+      }
+    },
+    "myMembership": {
+      "title": "Mi membresía",
+      "currentPlan": "Plan actual",
+      "currentSubscription": "SUSCRIPCIÓN ACTUAL",
+      "active": "Activo",
+      "expirationDate": "Fecha de vencimiento",
+      "viewDetails": "Ver detalles",
+      "allPlans": "Todos los planes",
+      "update": "Actualizar",
+      "mockDate": "11 de Diciembre del 2025"
+    },
+    "language": {
+      "title": "Idioma",
+      "changeLanguage": "Cambiar idioma",
+      "selectOption": "Selecciona una opción de las opciones de configuración"
+    },
+    "notificationsSettings": {
+      "title": "Configurar",
+      "notifications": "Notificaciones",
+      "description": "Gestiona cómo quieres recibir notificaciones",
+      "classReminders": {
+        "title": "Recordatorio de clases",
+        "description": "Recibe notificaciones antes de tus clases"
+      },
+      "routineUpdates": {
+        "title": "Actualizaciones de rutina",
+        "description": "Cuando tu progreso o rutinas cambien"
       }
     },
     "membershipEntry": {
@@ -598,6 +635,57 @@
         "paymentReported": "Pago Reportado",
         "sentToVerification": "Tu pago ha sido enviado a verificación.",
         "errorPayment": "Error en el pago"
+      }
+    },
+    "instructor": {
+      "profile": {
+        "defaultName": "Instructor",
+        "specialty": "Functional Strength",
+        "error": {
+          "fetchUser": "Ocurrió un error inesperado al obtener los datos del usuario."
+        },
+        "aboutMe": "Sobre mí",
+        "aboutMeDescription": "Dr. Carly Angel es especialista en fuerza y acondicionamiento. Ayuda a los clientes a construir una base sólida y mejorar el rendimiento con programas de entrenamiento personalizados.",
+        "scanQR": "Escanear QR",
+        "stats": {
+          "experience": "Experiencia",
+          "completed": "Completados",
+          "activeClients": "Clientes Activos"
+        },
+        "settings": "Configuración",
+        "personalInfo": "Información personal",
+        "security": "Seguridad",
+        "language": "Idioma",
+        "notifications": "Notificaciones",
+        "helpSupport": "Ayuda y soporte",
+        "termsConditions": "Términos y condiciones",
+        "logout": "Cerrar sesión",
+        "logoutConfirm": {
+          "title": "¿Cerrar sesión?",
+          "message": "Se cerrará tu sesión actual y deberás iniciar sesión nuevamente.",
+          "cancel": "Cancelar"
+        }
+      },
+      "dashboard": {
+        "defaultName": "Instructor",
+        "error": {
+          "fetchUser": "Ocurrió un error inesperado al obtener los datos del usuario."
+        },
+        "todayClasses": "Clases de hoy",
+        "clientMessages": "Mensajes de Clientes"
+      },
+      "classes": {
+        "title": "Calendario de clases",
+        "calendar": "CALENDARIO",
+        "week": "Semana",
+        "month": "Mes",
+        "classesOfDay": "CLASES DEL DÍA",
+        "noClasses": "No hay clases programadas para esta fecha."
+      },
+      "clients": {
+        "title": "Mis clientes",
+        "assignRoutine": "Asignar nueva rutina",
+        "viewProgress": "Ver progreso"
       }
     }
   }

@@ -40,10 +40,10 @@ export default function ClientProfileScreen() {
         }
 
         const userData = await vitalFitApi.user.WhoAmI(token);
-        setFirstName(userData?.user?.first_name || 'Cliente');
+        setFirstName(userData?.user?.first_name || t('clientProfile.defaultName'));
         setLastName(userData?.user?.last_name || '');
       } catch (error: unknown) {
-        let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
+        let errorMessage = t('clientProfile.error.fetchUser');
         if (isAPIError(error)) {
           errorMessage = error.messages.join(', ');
         } else if (error instanceof Error) {
@@ -56,7 +56,7 @@ export default function ClientProfileScreen() {
     };
 
     fetchUser();
-  }, []);
+  }, [t]);
 
   if (loading) {
     return (

@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { ClockIcon } from 'react-native-heroicons/mini';
 import { ChevronRightIcon } from 'react-native-heroicons/outline';
@@ -55,6 +56,7 @@ const MOCK_CLASSES: InstructorClass[] = [
 type ViewMode = 'week' | 'month';
 
 export default function InstructorClassesScreen() {
+	const { t } = useTranslation();
 	const router = useRouter();
 	const today = new Date().toISOString().split('T')[0];
 
@@ -123,14 +125,14 @@ export default function InstructorClassesScreen() {
 					<ThemedText
 						lightColor='#111827'
 						style={{ fontFamily: 'System', fontSize: 16, fontWeight: '600' }}>
-						Calendario de clases
+						{t('instructor.classes.title')}
 					</ThemedText>
 				</View>
 				<View className='mb-2'>
 					<ThemedText
 						lightColor='#111827'
 						style={{ fontFamily: 'BebasNeue-Regular', fontSize: 24 }}>
-						CALENDARIO
+						{t('instructor.classes.calendar')}
 					</ThemedText>
 				</View>
 
@@ -146,7 +148,7 @@ export default function InstructorClassesScreen() {
 							className={`font-semibold ${
 								viewMode === 'week' ? 'text-[#111827]' : 'text-[#6b7280]'
 							}`}> 
-							Semana
+							{t('instructor.classes.week')}
 						</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
@@ -159,7 +161,7 @@ export default function InstructorClassesScreen() {
 							className={`font-semibold ${
 								viewMode === 'month' ? 'text-[#111827]' : 'text-[#6b7280]'
 							}`}> 
-							Mes
+							{t('instructor.classes.month')}
 						</Text>
 					</TouchableOpacity>
 				</View>
@@ -186,13 +188,13 @@ export default function InstructorClassesScreen() {
 					<ThemedText
 						lightColor='#111827'
 						style={{ fontFamily: 'BebasNeue-Regular', fontSize: 22 }}>
-						CLASES DEL DÍA
+						{t('instructor.classes.classesOfDay')}
 					</ThemedText>
 				</View>
 
 				{classesForSelectedDate.length === 0 ? (
 					<Text className='text-[14px] text-[#6b7280]'>
-						No hay clases programadas para esta fecha.
+						{t('instructor.classes.noClasses')}
 					</Text>
 				) : (
 						classesForSelectedDate.map((cls) => (

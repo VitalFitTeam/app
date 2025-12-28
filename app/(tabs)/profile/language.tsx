@@ -41,16 +41,16 @@ export default function ProfileLanguageScreen() {
             <ChevronLeftIcon width={20} height={20} color="#f97316" />
           </TouchableOpacity>
 
-          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Idioma</Text>
+          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('language.title')}</Text>
         </View>
 
         {/* Descripción */}
         <View style={{ marginBottom: 16 }}>
           <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 4 }}>
-            Cambiar idioma
+            {t('language.changeLanguage')}
           </Text>
           <Text style={{ color: '#4B5563', fontSize: 13, lineHeight: 18 }}>
-            Selecciona una opción de las opciones de configuración
+            {t('language.selectOption')}
           </Text>
         </View>
 

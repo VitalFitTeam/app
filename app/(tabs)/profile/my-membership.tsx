@@ -2,6 +2,7 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedView } from '@/components/themed-view';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, ChevronLeftIcon } from 'react-native-heroicons/solid';
 
@@ -36,6 +37,7 @@ const membershipPlans = [
 ];
 
 export default function MyMembershipScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [currentPlanId] = useState<string>('advanced');
 
@@ -60,14 +62,14 @@ export default function MyMembershipScreen() {
             <ChevronLeftIcon width={20} height={20} color="#f97316" />
           </TouchableOpacity>
 
-          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Mi membresía</Text>
+          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('myMembership.title')}</Text>
         </View>
 
         {/* Plan actual */}
         <View className="mb-4">
           <Text
             className="text-[14px] font-semibold text-[#111827] mb-8">
-            Plan actual
+            {t('myMembership.currentPlan')}
           </Text>
 
           <View
@@ -75,7 +77,7 @@ export default function MyMembershipScreen() {
             style={{ backgroundColor: '#FFFFFF', borderColor: '#F97316' }}>
             <View className="flex-row items-center justify-between mb-2">
               <View>
-                <Text className="text-xs text-[#6B7280] mb-1">SUSCRIPCIÓN ACTUAL</Text>
+                <Text className="text-xs text-[#6B7280] mb-1">{t('myMembership.currentSubscription')}</Text>
                 <Text className="text-lg font-semibold" style={{ color: '#F97316' }}>
                   {currentPlan.title}
                 </Text>
@@ -83,7 +85,7 @@ export default function MyMembershipScreen() {
 
               <View className="px-3 py-1 rounded-full" style={{ backgroundColor: '#FEF3C7' }}>
                 <Text className="text-[10px] font-semibold" style={{ color: '#F97316' }}>
-                  Activo
+                  {t('myMembership.active')}
                 </Text>
               </View>
             </View>
@@ -95,10 +97,10 @@ export default function MyMembershipScreen() {
             <View className="flex-row justify-between items-center">
               <View>
                 <Text className="text-xs mb-1" style={{ color: '#6B7280' }}>
-                  Fecha de vencimiento
+                  {t('myMembership.expirationDate')}
                 </Text>
                 <Text className="text-xs" style={{ color: '#111827' }}>
-                  11 de Diciembre del 2025
+                  {t('myMembership.mockDate')}
                 </Text>
               </View>
 
@@ -108,7 +110,7 @@ export default function MyMembershipScreen() {
                 style={{ borderColor: '#D1D5DB', borderWidth: 1 }}
                 onPress={() => router.push('/profile/membership-details')}>
                 <Text className="text-[11px]" style={{ color: '#111827' }}>
-                  Ver detalles
+                  {t('myMembership.viewDetails')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -119,7 +121,7 @@ export default function MyMembershipScreen() {
         <View className="mb-3">
           <Text
             className="text-[14px] font-semibold text-[#111827] mb-8">
-            Todos los planes
+            {t('myMembership.allPlans')}
           </Text>
 
           {membershipPlans.map(plan => {
@@ -156,7 +158,7 @@ export default function MyMembershipScreen() {
                         style={{ backgroundColor: '#FFF7ED', borderColor: '#FDBA74', borderWidth: 1 }}>
                         <CheckCircleIcon size={14} color="#F97316" />
                         <Text className="ml-1 text-[10px]" style={{ color: '#F97316' }}>
-                          Plan actual
+                          {t('myMembership.currentPlan')}
                         </Text>
                       </View>
                     ) : null}
@@ -165,7 +167,7 @@ export default function MyMembershipScreen() {
 
                 {!isCurrent && (
                   <PrimaryButton
-                    title="Actualizar"
+                    title={t('myMembership.update')}
                     onPress={() => {
                       router.push('/membership-entry');
                     }}

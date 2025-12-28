@@ -1,6 +1,6 @@
 {
   "translation": {
-    "language": "Language",
+    "languageLabel": "Language",
     "save": "Save",
     "signIn": "Sign In",
     "signUp": "Sign Up",
@@ -400,6 +400,10 @@
         "hiit": "HIIT",
         "kickBoxing": "Kick Boxing",
         "pilates": "Pilates"
+      },
+      "mock": {
+        "routineTitle": "Total Strength – Week 3",
+        "routineSubtitle": "Full Body - Medium"
       }
     },
     "clientProfile": {
@@ -407,7 +411,11 @@
       "activeMembership": "Active Membership",
       "myQr": "My QR Code",
       "membership": "Membership",
-      "description": "From your profile you can manage your personal information, check your membership and configure your notifications and account preferences."
+      "description": "From your profile you can manage your personal information, check your membership and configure your notifications and account preferences.",
+      "defaultName": "Client",
+      "error": {
+        "fetchUser": "An unexpected error occurred while fetching user data."
+      }
     },
     "myProfile": {
       "title": "My Profile",
@@ -423,6 +431,35 @@
       "toast": {
         "successTitle": "Profile Updated!",
         "successMessage": "Your changes were saved successfully"
+      }
+    },
+    "myMembership": {
+      "title": "My Membership",
+      "currentPlan": "Current Plan",
+      "currentSubscription": "CURRENT SUBSCRIPTION",
+      "active": "Active",
+      "expirationDate": "Expiration Date",
+      "viewDetails": "View Details",
+      "allPlans": "All Plans",
+      "update": "Update",
+      "mockDate": "December 11, 2025"
+    },
+    "language": {
+      "title": "Language",
+      "changeLanguage": "Change Language",
+      "selectOption": "Select an option from the configuration options"
+    },
+    "notificationsSettings": {
+      "title": "Settings",
+      "notifications": "Notifications",
+      "description": "Manage how you want to receive notifications",
+      "classReminders": {
+        "title": "Class Reminders",
+        "description": "Receive notifications before your classes"
+      },
+      "routineUpdates": {
+        "title": "Routine Updates",
+        "description": "When your progress or routines change"
       }
     },
     "membershipEntry": {
@@ -582,6 +619,57 @@
         "paymentReported": "Payment Reported",
         "sentToVerification": "Your payment has been sent for verification.",
         "errorPayment": "Payment Error"
+      }
+    },
+    "instructor": {
+      "profile": {
+        "defaultName": "Instructor",
+        "specialty": "Functional Strength",
+        "error": {
+          "fetchUser": "An unexpected error occurred while fetching user data."
+        },
+        "aboutMe": "About Me",
+        "aboutMeDescription": "Dr. Carly Angel is a specialist in strength and conditioning. She helps clients build a solid foundation and improve performance with personalized training programs.",
+        "scanQR": "Scan QR",
+        "stats": {
+          "experience": "Experience",
+          "completed": "Completed",
+          "activeClients": "Active Clients"
+        },
+        "settings": "Settings",
+        "personalInfo": "Personal Information",
+        "security": "Security",
+        "language": "Language",
+        "notifications": "Notifications",
+        "helpSupport": "Help and Support",
+        "termsConditions": "Terms and Conditions",
+        "logout": "Logout",
+        "logoutConfirm": {
+          "title": "Logout?",
+          "message": "Your current session will be closed and you will need to log in again.",
+          "cancel": "Cancel"
+        }
+      },
+      "dashboard": {
+        "defaultName": "Instructor",
+        "error": {
+          "fetchUser": "An unexpected error occurred while fetching user data."
+        },
+        "todayClasses": "Today's Classes",
+        "clientMessages": "Client Messages"
+      },
+      "classes": {
+        "title": "Class Calendar",
+        "calendar": "CALENDAR",
+        "week": "Week",
+        "month": "Month",
+        "classesOfDay": "CLASSES OF THE DAY",
+        "noClasses": "No classes scheduled for this date."
+      },
+      "clients": {
+        "title": "My Clients",
+        "assignRoutine": "Assign New Routine",
+        "viewProgress": "View Progress"
       }
     }
   }
