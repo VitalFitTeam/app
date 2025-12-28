@@ -8,12 +8,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { ExclamationTriangleIcon } from 'react-native-heroicons/outline';
 import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MembershipPaymentPagoMovilScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   
   // Recibimos los datos finales de la factura
@@ -38,12 +40,12 @@ export default function MembershipPaymentPagoMovilScreen() {
   const handleProcessPayment = async () => {
     // Validaciones simples
     if (!reference || !documentNumber || !phone) {
-      showToast('warning', 'Campos incompletos', 'Por favor completa todos los campos.');
+      showToast('warning', t('common.attention'), t('payment.toast.incompleteFields'));
       return;
     }
 
     if (reference.length < 4) {
-      showToast('warning', 'Referencia inválida', 'Ingresa al menos los últimos 4 dígitos.');
+      showToast('warning', t('common.attention'), t('payment.toast.invalidReference'));
       return;
     }
 
@@ -63,7 +65,7 @@ export default function MembershipPaymentPagoMovilScreen() {
         receipt_url: `CI: ${documentNumber} - Tlf: ${phone}` 
       }, token);
 
-      showToast('success', 'Pago Reportado', 'Tu pago ha sido enviado a verificación.');
+      showToast('success', t('payment.toast.paymentReported'), t('payment.toast.sentToVerification'));
 
       // Redirigir después de mostrar el éxito
       setTimeout(() => {
@@ -72,8 +74,8 @@ export default function MembershipPaymentPagoMovilScreen() {
 
     } catch (error) {
       console.error(error);
-      const msg = error instanceof Error ? error.message : 'Error desconocido';
-      showToast('error', 'Error en el pago', `No se pudo registrar: ${msg}`);
+      const msg = error instanceof Error ? error.message : t('common.error.unknown');
+      showToast('error', t('payment.toast.errorPayment'), `${t('common.error.unableToRegister')}: ${msg}`);
     } finally {
       setLoading(false);
     }
@@ -98,30 +100,30 @@ export default function MembershipPaymentPagoMovilScreen() {
             className='text-3xl mb-6 text-center'
             style={{ fontFamily: 'BebasNeue-Regular' }}
         >
-            PAGO MÓVIL
+            {t('payment.mobile.title')}
         </ThemedText>
 
         {/* Datos Bancarios del Comercio */}
         <View className='mb-6 border border-orange-500/80 rounded-2xl px-4 py-4 bg-orange-50'>
           <ThemedText className='text-xs font-bold tracking-widest mb-3 text-orange-800 uppercase'>
-            DATOS PARA EL PAGO
+            {t('payment.mobile.bankDetailsTitle')}
           </ThemedText>
           
           <View className='space-y-3'>
             <View className='flex-row justify-between border-b border-orange-200 pb-2'>
-                <ThemedText className='text-gray-600 text-sm'>Banco:</ThemedText>
+                <ThemedText className='text-gray-600 text-sm'>{t('payment.mobile.bankLabels.bank')}</ThemedText>
                 <ThemedText className='font-bold text-gray-900'>Banco de Venezuela</ThemedText>
             </View>
             <View className='flex-row justify-between border-b border-orange-200 pb-2'>
-                <ThemedText className='text-gray-600 text-sm'>Teléfono:</ThemedText>
+                <ThemedText className='text-gray-600 text-sm'>{t('payment.mobile.bankLabels.phone')}</ThemedText>
                 <ThemedText className='font-bold text-gray-900'>0414-1234567</ThemedText>
             </View>
             <View className='flex-row justify-between border-b border-orange-200 pb-2'>
-                <ThemedText className='text-gray-600 text-sm'>RIF:</ThemedText>
+                <ThemedText className='text-gray-600 text-sm'>{t('payment.mobile.bankLabels.rif')}</ThemedText>
                 <ThemedText className='font-bold text-gray-900'>J-12345678-9</ThemedText>
             </View>
             <View className='flex-row justify-between pt-1'>
-                <ThemedText className='text-gray-600 text-sm'>Titular:</ThemedText>
+                <ThemedText className='text-gray-600 text-sm'>{t('payment.mobile.bankLabels.holder')}</ThemedText>
                 <ThemedText className='font-bold text-gray-900'>VitalFit Cabudare</ThemedText>
             </View>
           </View>
@@ -145,7 +147,7 @@ export default function MembershipPaymentPagoMovilScreen() {
         >
           <View>
             <ThemedText className='text-xs text-white/80 tracking-widest mb-1'>
-              TOTAL A PAGAR
+              {t('payment.totalToPay')}
             </ThemedText>
             <ThemedText className='text-white font-bold text-xs'>
                Orden #{params.invoiceId?.slice(0,8)}
@@ -166,7 +168,7 @@ export default function MembershipPaymentPagoMovilScreen() {
           
           {/* Teléfono */}
           <View>
-            <ThemedText className='text-sm mb-2 text-gray-600 font-medium'>Teléfono Origen</ThemedText>
+            <ThemedText className='text-sm mb-2 text-gray-600 font-medium'>{t('payment.form.originPhone')}</ThemedText>
             <View className='border border-gray-300 rounded-xl bg-white overflow-hidden'>
                 <PhoneInput
                 ref={phoneInputRef}
@@ -186,7 +188,7 @@ export default function MembershipPaymentPagoMovilScreen() {
 
           {/* Cédula */}
           <StyledTextInput 
-            label="Cédula / RIF del Titular"
+            label={t('payment.form.document')}
             placeholder="V-12345678"
             value={documentNumber}
             onChangeText={setDocumentNumber}
@@ -194,7 +196,7 @@ export default function MembershipPaymentPagoMovilScreen() {
 
           {/* Referencia */}
           <StyledTextInput 
-            label="Número de Referencia (Últimos 4 dígitos)"
+            label={t('payment.form.reference')}
             placeholder="Ej: 5678"
             value={reference}
             onChangeText={setReference}
@@ -208,10 +210,10 @@ export default function MembershipPaymentPagoMovilScreen() {
           <ExclamationTriangleIcon size={24} color='#3b82f6' />
           <View className='ml-3 flex-1'>
             <ThemedText className='text-xs text-blue-800 font-bold mb-1'>
-              Verificación
+              {t('payment.warning.verificationTitle')}
             </ThemedText>
             <ThemedText className='text-xs text-blue-600'>
-              Tu pago será validado manualmente por administración. Guarda tu comprobante digital.
+              {t('payment.warning.verificationMessage')}
             </ThemedText>
           </View>
         </View>
@@ -221,7 +223,7 @@ export default function MembershipPaymentPagoMovilScreen() {
                 <ActivityIndicator size="large" color="#f97316" />
             ) : (
                 <PrimaryButton
-                    title='Reportar Pago'
+                    title={t('payment.reportPayment')}
                     onPress={handleProcessPayment}
                 />
             )}

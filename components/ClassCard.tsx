@@ -1,6 +1,7 @@
 import { ThemedText } from '@/components/themed-text';
 import { Image } from 'expo-image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { TouchableOpacity, View } from 'react-native';
 
 type ClassData = {
@@ -34,6 +35,7 @@ export default function ClassCard({
 	category,
 	reserved,
 }: ClassCardProps) {
+	const { t } = useTranslation();
 	const classData: ClassData = { time, title, instructor, branch, imageUrl };
 
 	if (variant === 'overlay') {
@@ -64,14 +66,14 @@ export default function ClassCard({
 								darkColor='#E0E0E0'
 								style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14, marginTop: 2 }}
 							>
-								Hoy, {time}
+								{t('common.today')}, {time}
 							</ThemedText>
 							<ThemedText
 								lightColor='#E5E7EB'
 								darkColor='#E5E7EB'
 								style={{ fontFamily: 'Montserrat_400Regular', fontSize: 11, marginTop: 4 }}
 							>
-								Disponibilidad
+								{t('common.availability')}
 							</ThemedText>
 						</View>
 						{/* Parte inferior: instructor a la izquierda y categoría abajo a la derecha */}
@@ -91,7 +93,7 @@ export default function ClassCard({
 										darkColor='#ffffff'
 										style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 11 }}
 									>
-										{category || 'categoría'}
+										{category || t('common.category')}
 									</ThemedText>
 								</View>
 							)}
@@ -103,7 +105,7 @@ export default function ClassCard({
 								lightColor='#ffffff'
 								darkColor='#ffffff'
 								className='text-xs font-bold'>
-								Reservado
+								{t('common.reserved')}
 							</ThemedText>
 						</View>
 					) : null}
@@ -125,7 +127,7 @@ export default function ClassCard({
 				<TouchableOpacity
 					onPress={() => onPress(classData)}
 					className='bg-neutral-100 dark:bg-neutral-800 rounded-full py-2 px-4 mt-4 self-start'>
-					<ThemedText className='font-semibold'>Ver Detalles</ThemedText>
+					<ThemedText className='font-semibold'>{t('common.viewDetails')}</ThemedText>
 				</TouchableOpacity>
 			</View>
 			<View style={{ width: 112, height: 84 }} className='rounded-xl overflow-hidden'>

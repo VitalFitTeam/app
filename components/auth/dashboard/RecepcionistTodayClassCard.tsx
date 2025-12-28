@@ -1,20 +1,22 @@
 import { Dumbbell } from 'lucide-react-native';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, ClockIcon, UserIcon, UsersIcon } from 'react-native-heroicons/mini';
 
 export function RecepcionistTodayClassCard() {
+	const { t } = useTranslation();
 	return (
 		<View className='bg-white dark:bg-neutral-900 rounded-2xl border border-[#BBBBBB] p-4 mt-4'>
 			<View className='flex-row items-center mb-3'>
 				<CheckCircleIcon width={16} height={16} color='#0F172A' />
 				<Text className='ml-2 text-[16px] font-semibold text-neutral-900 dark:text-white'>
-					Clases de Hoy
+					{t('dashboard.todayClasses.title')}
 				</Text>
 			</View>
 
 			<Text className='text-[14px] text-neutral-700 dark:text-neutral-400 mb-4'>
-				Horario y asistencia
+				{t('dashboard.todayClasses.subtitle')}
 			</Text>
 
 			{[1, 2].map((_, index) => (
@@ -28,17 +30,17 @@ export function RecepcionistTodayClassCard() {
 							</View>
 							<View>
 								<Text className='text-[16px] font-extrabold text-neutral-900 dark:text-white leading-tight'>
-									POWERLIFTING
+									{t('dashboard.classStatus.powerlifting')}
 								</Text>
 								<Text className='text-[16px] font-extrabold text-[#F27F2A] leading-tight'>
-									AVANZADO
+									{t('dashboard.classStatus.advanced')}
 								</Text>
 							</View>
 						</View>
 
 						<View className='border border-[#0F172A] rounded-full px-3 py-1'>
 							<Text className='text-[12px] font-semibold text-[#0F172A]'>
-								EN CURSO
+								{t('dashboard.classStatus.inProgress')}
 							</Text>
 						</View>
 					</View>
@@ -47,7 +49,7 @@ export function RecepcionistTodayClassCard() {
 						<View className='flex-row items-center'>
 							<UserIcon width={14} height={14} color='#0F172A' />
 							<Text className='ml-2 text-[14px] text-neutral-800 dark:text-neutral-300'>
-								CARLOS RUÍZ
+								{t('dashboard.mock.carlos')}
 							</Text>
 						</View>
 
@@ -61,7 +63,7 @@ export function RecepcionistTodayClassCard() {
 						<View className='flex-row items-center'>
 							<UsersIcon width={17} height={16} color='#0F172A' />
 							<Text className='ml-2 text-[14px] text-neutral-800 dark:text-neutral-300'>
-								8/121 INSCRITOS
+								8/121 {t('dashboard.todayClasses.registered')}
 							</Text>
 						</View>
 					</View>
@@ -70,7 +72,7 @@ export function RecepcionistTodayClassCard() {
 						activeOpacity={0.8}
 						className='border border-[#F27F2A] rounded-xl py-2 mt-1'>
 						<Text className='text-center text-[#F27F2A] font-medium text-[14px]'>
-							Ver detalles
+							{t('common.viewDetails')}
 						</Text>
 					</TouchableOpacity>
 				</View>

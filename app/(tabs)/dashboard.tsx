@@ -12,10 +12,12 @@ import { useUser } from '@/contexts/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, BackHandler, Text as RNText, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function DashboardScreen() {
+	const { t } = useTranslation();
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const { user, loading: userLoading } = useUser();
@@ -33,7 +35,7 @@ export default function DashboardScreen() {
 	};
 
 	const daysRemaining = calculateDaysRemaining();
-	const planStatusText = hasMembership ? 'Membresía Activa' : 'Sin plan activo';
+	const planStatusText = hasMembership ? t('dashboard.member.activeMembership') : t('dashboard.member.noActivePlan');
 
 	useEffect(() => {
 		const init = async () => {
@@ -71,15 +73,15 @@ export default function DashboardScreen() {
 	);
 
 	const mockChallenges = [
-		{ id: '1', title: 'Retos completados', current: 2, total: 5, iconType: 'trophy' as const },
+		{ id: '1', title: t('dashboard.member.completedChallenges'), current: 2, total: 5, iconType: 'trophy' as const },
 		{
 			id: '2',
-			title: 'Entrenamiento semanal',
+			title: t('dashboard.member.weeklyTraining'),
 			current: 8,
 			total: 10,
 			iconType: 'dumbbell' as const,
 		},
-		{ id: '3', title: 'Progreso', current: 4, total: 5, iconType: 'target' as const },
+		{ id: '3', title: t('dashboard.member.progress'), current: 4, total: 5, iconType: 'target' as const },
 	];
 
 	const mockClasses = [
@@ -126,9 +128,9 @@ export default function DashboardScreen() {
 
 	const displayName = user
 		? user.lastName
-			? `${user.firstName || 'Usuario'} ${user.lastName}`
-			: user.firstName || 'Usuario'
-		: 'Usuario';
+			? `${user.firstName || t('dashboard.defaultUser')} ${user.lastName}`
+			: user.firstName || t('dashboard.defaultUser')
+		: t('dashboard.defaultUser');
 
 	return (
 		<ThemedView className='flex-1 bg-white dark:bg-neutral-950'>
@@ -189,17 +191,17 @@ export default function DashboardScreen() {
 						<BirthdayOfferBanner onPress={() => router.replace('/membership-entry')} />
 
 						<RNText style={{ color: '#111827', fontWeight: '700', fontSize: 18, marginTop: 16, marginBottom: 8 }}>
-							Paquetes
+							{t('dashboard.member.packages')}
 						</RNText>
 						<View className='gap-3 mb-4'>
 							<CrossFitBanner
 								imageSource={require('@/assets/images/rutina.png')}
-								title='CrossFit - 4 sesiones'
+								title={t('dashboard.banners.crossfit4')}
 								onPress={() => router.replace('/membership-entry')}
 							/>
 							<CrossFitBanner
 								imageSource={require('@/assets/images/rutin.png')}
-								title='CrossFit - 4 sesiones'
+								title={t('dashboard.banners.crossfit4')}
 								onPress={() => router.replace('/membership-entry')}
 							/>
 						</View>

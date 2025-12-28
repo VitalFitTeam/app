@@ -4,6 +4,7 @@ import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Modal, ScrollView, TouchableOpacity, View } from 'react-native';
 import { CurrencyDollarIcon, MapPinIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -43,6 +44,7 @@ const FALLBACK_RATES: Record<string, number> = {
 };
 
 export default function MembershipConfirmScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{
     mainItemId?: string;
@@ -104,28 +106,30 @@ export default function MembershipConfirmScreen() {
       try {
         const token = await AsyncStorage.getItem('token');
         
-        console.log(`[Debbug] Solicitando tasa para ${currency}...`);
+        console.log(`[Debug] Solicitando tasa para ${currency}...`);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const response: any = await vitalFitApi.client.get({
-            url: `/billing/rates/${currency}`,
-            jwt: token || undefined
+        // Llamada directa al endpoint de tasas de cambio
+        const response = await vitalFitApi.client.get({
+          url: `/billing/rates/${currency}`,
+          jwt: token || '',
         });
-
 
         console.log('[Debug] Respuesta Tasa:', response);
 
         let fetchedRate = 1;
         // La API puede devolver { "VES": 291.35 } o { rate: 291.35 } o { data: { rate: ... } }
-        if (typeof response === 'number') {
-            fetchedRate = response;
-        } else if (response?.[currency]) {
-            // Caso: { "VES": 291.35 }
-            fetchedRate = response[currency];
-        } else if (response?.rate) {
-            fetchedRate = response.rate;
-        } else if (response?.data?.rate) {
-            fetchedRate = response.data.rate;
+        // La implementación del SDK debería devolver la respuesta parseada
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const anyResponse = response as any;
+
+        if (typeof anyResponse === 'number') {
+            fetchedRate = anyResponse;
+        } else if (anyResponse?.[currency]) {
+            fetchedRate = anyResponse[currency];
+        } else if (anyResponse?.rate) {
+            fetchedRate = anyResponse.rate;
+        } else if (anyResponse?.data?.rate) {
+            fetchedRate = anyResponse.data.rate;
         }
         
         if (!fetchedRate || fetchedRate === 0) throw new Error("Tasa inválida (0 o null)");
@@ -175,7 +179,7 @@ export default function MembershipConfirmScreen() {
 
   const handleConfirmOrder = async () => {
     if (!selectedBranchId) {
-      Alert.alert("Atención", "Por favor selecciona una sucursal.");
+      Alert.alert(t('common.attention'), t('confirm.alert.selectBranch'));
       return;
     }
 
@@ -187,7 +191,7 @@ export default function MembershipConfirmScreen() {
       }
 
       const token = await AsyncStorage.getItem('token');
-      if (!token) throw new Error('Sesión no válida');
+      if (!token) throw new Error(t('confirm.error.invalidSession'));
 
       const invoiceItems = [];
       if (params.mainItemId) {
@@ -216,15 +220,16 @@ export default function MembershipConfirmScreen() {
       const responseData = invoiceResponse as any;
       const invoiceId = responseData.invoice_id || responseData.id || responseData.data?.invoice_id;
 
-      if (!invoiceId) throw new Error('No se recibió ID de factura');
+      if (!invoiceId) throw new Error(t('confirm.error.invoiceIdMissing'));
 
       setExistingInvoiceId(invoiceId);
       navigateToPayment(invoiceId);
 
     } catch (error) {
       console.error(error);
-      const msg = error instanceof Error ? error.message : 'Error desconocido';
-      Alert.alert('Error', msg);
+      console.error(error);
+      const msg = error instanceof Error ? error.message : t('common.error.unknown');
+      Alert.alert(t('common.error.title'), msg);
     } finally {
       setProcessing(false);
     }
@@ -250,36 +255,36 @@ export default function MembershipConfirmScreen() {
         {/* Header Pasos */}
         <View className='mb-8'>
           <ThemedText lightColor='#f97316' darkColor='#f97316' className='text-4xl mb-4 text-center' style={{ fontFamily: 'BebasNeue-Regular' }}>
-            RESUMEN DE ORDEN
+            {t('confirm.title')}
           </ThemedText>
           <View className='flex-row justify-between items-center mb-4'>
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
                 <ThemedText className='text-[10px] font-semibold text-gray-800'>1</ThemedText>
               </View>
-              <ThemedText className='text-[11px] text-center text-gray-800'>Opciones</ThemedText>
+              <ThemedText className='text-[11px] text-center text-gray-800'>{t('checkout.steps.options')}</ThemedText>
             </View>
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
                 <ThemedText className='text-[10px] font-semibold text-gray-800'>2</ThemedText>
               </View>
-              <ThemedText className='text-[11px] text-center text-gray-800'>Extras</ThemedText>
+              <ThemedText className='text-[11px] text-center text-gray-800'>{t('checkout.steps.extras')}</ThemedText>
             </View>
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-orange-500 border-orange-500'>
                 <ThemedText className='text-[10px] font-semibold text-white'>3</ThemedText>
               </View>
-              <ThemedText className='text-[11px] text-center text-orange-600 font-bold'>Confirmación</ThemedText>
+              <ThemedText className='text-[11px] text-center text-orange-600 font-bold'>{t('checkout.steps.confirmation')}</ThemedText>
             </View>
           </View>
         </View>
 
         {/* Sección: Configuración */}
-        <ThemedText className="text-xl font-bold mb-4">Configuración de Pago</ThemedText>
+        <ThemedText className="text-xl font-bold mb-4">{t('confirm.paymentConfig')}</ThemedText>
 
         {/* Selector de Sucursal */}
         <View className="mb-4">
-          <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">SUCURSAL</ThemedText>
+          <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.branch')}</ThemedText>
           {loadingBranches ? (
             <ActivityIndicator size="small" color="#f97316" />
           ) : (
@@ -307,7 +312,7 @@ export default function MembershipConfirmScreen() {
         
         {/* Selector de Moneda */}
         <View className="mb-6">
-            <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">MONEDA A PAGAR</ThemedText>
+            <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.currency')}</ThemedText>
             <TouchableOpacity 
                 onPress={() => setCurrencyModalVisible(true)}
                 className="flex-row items-center justify-between border border-gray-300 rounded-xl p-4 bg-white"
@@ -333,7 +338,7 @@ export default function MembershipConfirmScreen() {
                     onPress={() => setCurrencyModalVisible(false)}
                 >
                     <View className="bg-white w-full rounded-2xl overflow-hidden p-4">
-                        <ThemedText className="font-bold text-lg mb-4 text-center">Selecciona Moneda</ThemedText>
+                        <ThemedText className="font-bold text-lg mb-4 text-center">{t('confirm.selectCurrency')}</ThemedText>
                         {CURRENCIES.map((curr) => (
                             <TouchableOpacity
                                 key={curr.name}
@@ -359,7 +364,7 @@ export default function MembershipConfirmScreen() {
         {/* Detalle de Costos (Base USD) */}
         <View className="bg-neutral-50 p-5 rounded-2xl border border-neutral-200 mb-6">
           <ThemedText className="text-xs text-orange-500 font-bold tracking-widest uppercase mb-3">
-             DETALLE (USD)
+             {t('confirm.detailUSD')}
           </ThemedText>
 
           <View className="flex-row justify-between mb-2">
@@ -378,7 +383,7 @@ export default function MembershipConfirmScreen() {
           <View className="h-[1px] bg-neutral-200 my-2" />
 
           <View className="flex-row justify-between items-center">
-            <ThemedText className="font-bold text-neutral-500">Total USD</ThemedText>
+            <ThemedText className="font-bold text-neutral-500">{t('confirm.totalUSD')}</ThemedText>
             <ThemedText className="font-bold text-lg text-neutral-900">${grandTotalUSD.toFixed(2)}</ThemedText>
           </View>
         </View>
@@ -387,10 +392,10 @@ export default function MembershipConfirmScreen() {
         <View className="mt-2 border-t border-neutral-100 pt-4 mb-8">
           <View className="flex-row justify-between items-end">
             <View>
-              <ThemedText className="text-xl text-neutral-500">Total a Pagar</ThemedText>
+              <ThemedText className="text-xl text-neutral-500">{t('confirm.totalToPay')}</ThemedText>
               {currency !== 'USD' && (
                   <ThemedText className="text-xs text-gray-400 mt-1">
-                      Tasa aprox: {rate.toFixed(2)}
+                      {t('confirm.approxRate')} {rate.toFixed(2)}
                   </ThemedText>
               )}
             </View>
@@ -414,11 +419,11 @@ export default function MembershipConfirmScreen() {
         {processing ? (
           <View className="items-center py-4">
             <ActivityIndicator size="large" color="#f97316" />
-            <ThemedText className="text-xs text-gray-400 mt-2">Generando orden...</ThemedText>
+            <ThemedText className="text-xs text-gray-400 mt-2">{t('confirm.generatingOrder')}</ThemedText>
           </View>
         ) : (
           <PrimaryButton
-            title="Confirmar y Pagar"
+            title={t('confirm.confirmWithPay')}
             onPress={handleConfirmOrder}
             disabled={loadingRate}
           />

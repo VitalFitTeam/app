@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ActivityIndicator, Image, NativeScrollEvent, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -103,6 +104,7 @@ type ApiBookingItem = {
 };
 
 export default function HorariosScreen() {
+    const { t } = useTranslation();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<'classes' | 'reservas'>('classes');
     const { isReserved } = useReservations();
@@ -521,7 +523,7 @@ export default function HorariosScreen() {
                             darkColor='#ffffff'
                             style={{ fontFamily: 'BebasNeue-Regular', fontSize: 28, marginBottom: 8 }}
                         >
-                            CALENDARIO
+                            {t('schedule.calendar')}
                         </ThemedText>
                     </View>
 
@@ -562,7 +564,7 @@ export default function HorariosScreen() {
                                 darkColor={activeTab === 'classes' ? '#ffffff' : '#6b7280'}
                                 className='text-base font-semibold'
                             >
-                                Horarios
+                                {t('schedule.tabs.classes')}
                             </ThemedText>
                         </Pressable>
                         <Pressable
@@ -577,7 +579,7 @@ export default function HorariosScreen() {
                                 darkColor={activeTab === 'reservas' ? '#ffffff' : '#6b7280'}
                                 className='text-base font-semibold text-center'
                             >
-                                Reservas
+                                {t('schedule.tabs.reservations')}
                             </ThemedText>
                         </Pressable>
                     </View>
@@ -589,7 +591,7 @@ export default function HorariosScreen() {
                                 darkColor='#ffffff'
                                 style={{ fontFamily: 'BebasNeue-Regular', fontSize: 28, marginBottom: 8 }}
                             >
-                                Próximas clases
+                                {t('schedule.upcomingClasses')}
                             </ThemedText>
 
                             <View style={{ width: 180, zIndex: 100 }}>
@@ -601,7 +603,7 @@ export default function HorariosScreen() {
                                     <ThemedText className='text-sm font-semibold text-neutral-800' numberOfLines={1}>
                                         {loadingBranches
                                             ? 'Cargando...'
-                                            : branches.find((b) => b.branch_id === selectedBranchId)?.name || 'Seleccionar'}
+                                            : branches.find((b) => b.branch_id === selectedBranchId)?.name || t('common.selectBranch')}
                                     </ThemedText>
                                     <Ionicons
                                         name={branchMenuVisible ? 'chevron-up' : 'chevron-down'}
@@ -638,7 +640,7 @@ export default function HorariosScreen() {
                                         })}
                                         {branches.length === 0 && (
                                             <View className='px-4 py-3'>
-                                                <ThemedText className='text-sm text-neutral-400'>Sin sedes</ThemedText>
+                                                <ThemedText className='text-sm text-neutral-400'>{t('schedule.noClassesBranch')}</ThemedText>
                                             </View>
                                         )}
                                     </View>
@@ -659,7 +661,7 @@ export default function HorariosScreen() {
                             )}
                             {!loadingClasses && !errorMessage && classes.length === 0 && selectedBranchId && (
                                 <ThemedText className='text-center text-sm text-neutral-500 mb-4'>
-                                    No hay clases programadas para esta sede.
+                                    {t('schedule.noClassesBranch')}
                                 </ThemedText>
                             )}
                             {visibleClasses.map((classItem, index) => (
@@ -671,10 +673,10 @@ export default function HorariosScreen() {
                                     branch={classItem.branch}
                                     imageUrl={classItem.imageUrl}
                                     variant='overlay'
-                                    category={`Disponibles: ${Math.max(
+                                    category={`${t('common.available')}: ${Math.max(
                                         (classItem.capacity || 0) - (classItem.occupied || 0),
                                         0,
-                                    )} de ${classItem.capacity || 0}`}
+                                    )} ${t('common.of')} ${classItem.capacity || 0}`}
                                     reserved={isReserved(`${classItem.title}|${classItem.time}`)}
                                     onPress={(classData) => {
                                         router.push({
@@ -697,7 +699,7 @@ export default function HorariosScreen() {
 
                     {activeTab === 'reservas' && (
                         <View>
-                            <ThemedText className='text-xl font-bold mb-4'>Mis reservas</ThemedText>
+                            <ThemedText className='text-xl font-bold mb-4'>{t('schedule.myBookings')}</ThemedText>
 
                             {loadingBookings && (
                                 <View className='items-center py-4'>
@@ -713,7 +715,7 @@ export default function HorariosScreen() {
 
                             {!loadingBookings && !bookingsError && bookings.length === 0 && (
                                 <ThemedText className='text-neutral-500'>
-                                    Aún no tienes reservas.
+                                    {t('schedule.noBookings')}
                                 </ThemedText>
                             )}
 
@@ -727,10 +729,10 @@ export default function HorariosScreen() {
                                         branch={booking.branch}
                                         imageUrl={booking.imageUrl}
                                         variant='overlay'
-                                        category={`Disponibles: ${Math.max(
+                                        category={`${t('common.available')}: ${Math.max(
                                             (booking.capacity || 0) - (booking.occupied || 0),
                                             0,
-                                        )} de ${booking.capacity || 0}`}
+                                        )} ${t('common.of')} ${booking.capacity || 0}`}
                                         reserved
                                         onPress={(classData) => {
                                             router.push({

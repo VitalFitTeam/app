@@ -1,5 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, XCircleIcon, XMarkIcon } from 'react-native-heroicons/outline';
 
@@ -15,12 +16,14 @@ export function CheckInResultModal({
   visible, 
   onClose, 
   success, 
-  userName = 'Usuario',
+  userName,
   message 
 }: CheckInResultModalProps) {
+  const { t } = useTranslation();
+  const displayUserName = userName || t('dashboard.defaultUser');
   const defaultMessage = success 
-    ? `Cliente: ${userName}\nEstado: Acceso Concedido` 
-    : message || 'Acceso denegado';
+    ? `${t('common.client')}: ${displayUserName}\n${t('common.status')}: ${t('common.accessGranted')}` 
+    : message || t('common.accessDenied');
 
   return (
     <Modal
@@ -58,7 +61,7 @@ export function CheckInResultModal({
                 success ? 'text-green-700' : 'text-red-700'
               }`}
             >
-              {success ? 'BIENVENIDO' : 'ACCESO DENEGADO'}
+              {success ? t('common.welcome') : t('common.accessDenied')}
             </ThemedText>
 
             <ThemedText className="text-center text-gray-600 text-base leading-6">
@@ -74,7 +77,7 @@ export function CheckInResultModal({
             }`}
           >
             <ThemedText className="text-white text-center font-bold text-base">
-              Aceptar
+              {t('common.accept')}
             </ThemedText>
           </TouchableOpacity>
         </View>

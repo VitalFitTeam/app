@@ -6,6 +6,7 @@ import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, ImageBackground, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -22,6 +23,7 @@ interface PublicMembershipResponse {
 }
 
 export default function MembershipsScreen() {
+	const { t } = useTranslation();
 	const router = useRouter();
 	const [loading, setLoading] = useState(true);
 	const [plans, setPlans] = useState<PublicMembershipResponse[]>([]);
@@ -50,14 +52,14 @@ export default function MembershipsScreen() {
 				}
 			} catch (error) {
 				console.error('Error al obtener membresías:', error);
-				Alert.alert('Error', 'No se pudieron cargar los planes de membresía.');
+				Alert.alert('Error', t('memberships.error.loadPlans'));
 			} finally {
 				setLoading(false);
 			}
 		};
 
 		fetchMemberships();
-	}, []);
+	}, [t]);
 
 	return (
 		<ImageBackground source={require('@/assets/images/chicafit.png')} className="flex-1" style={{ flex: 1 }} resizeMode="cover">
@@ -83,7 +85,7 @@ export default function MembershipsScreen() {
 												overflow: 'visible',
 											}}
 										>
-											NUESTRAS
+											{t('memberships.titlePrefix')}
 										</ThemedText>
 
 										<ThemedText
@@ -100,7 +102,7 @@ export default function MembershipsScreen() {
 												paddingHorizontal: 6,
 												overflow: 'visible',
 											}}>
-											MEMBRESÍAS
+											{t('memberships.titleSuffix')}
 										</ThemedText>
 										<ThemedText
 											lightColor="#f97316"
@@ -117,8 +119,7 @@ export default function MembershipsScreen() {
 												overflow: 'visible',
 											}}
 										>
-											Elige el plan que mejor se adapte a tus necesidades y
-											objetivos de fitness.
+											{t('memberships.subtitle')}
 										</ThemedText>
 									</View>
 								</View>
@@ -137,9 +138,9 @@ export default function MembershipsScreen() {
 												title={plan.name}
 												price={plan.price.toString()}
 												features={[plan.description]}
-												period={`/${plan.duration_days} días`}
+												period={t('memberships.periodDays', { days: plan.duration_days })}
 												isFree={plan.price === 0}
-												badgeLabel={plan.price === 0 ? 'Gratis' : undefined}
+												badgeLabel={plan.price === 0 ? t('memberships.free') : undefined}
 												isSelected={
 													selectedPlanId === plan.membership_type_id
 												}
@@ -153,8 +154,8 @@ export default function MembershipsScreen() {
 											<PrimaryButton
 												title={
 													selectedPlan
-														? `Adquirir ${selectedPlan.name}`
-														: 'Adquirir'
+														? t('memberships.acquirePlan', { name: selectedPlan.name })
+														: t('memberships.acquire')
 												}
 												onPress={() => {
 													if (!selectedPlan) return;

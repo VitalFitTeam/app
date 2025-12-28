@@ -4,10 +4,12 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, BackHandler, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, MagnifyingGlassIcon, QrCodeIcon } from 'react-native-heroicons/outline';
 
 export default function CheckInScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [isScanning, setIsScanning] = useState(false);
   const [showAllClients, setShowAllClients] = useState(false);
@@ -49,11 +51,11 @@ export default function CheckInScreen() {
     setTimeout(() => {
       setIsScanning(false);
       Alert.alert(
-        'QR Escaneado',
-        'Datos del QR: VITALFIT-MEMBER-12345\n\n¿Deseas procesar este check-in?',
+        t('checkIn.scan.successTitle'),
+        `Datos del QR: VITALFIT-MEMBER-12345\n\n${t('checkIn.scan.confirmMessage')}`,
         [
-          { text: 'Cancelar', style: 'cancel' },
-          { text: 'Procesar', onPress: () => processCheckIn() }
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('common.process'), onPress: () => processCheckIn() }
         ]
       );
     }, 2000);
@@ -61,7 +63,7 @@ export default function CheckInScreen() {
 
   const processCheckIn = () => {
     // Aquí iría la lógica para procesar el check-in
-    Alert.alert('Éxito', 'Check-in procesado correctamente');
+    Alert.alert(t('common.success'), t('checkIn.successMessage'));
   };
 
   return (
@@ -77,14 +79,14 @@ export default function CheckInScreen() {
           style={styles.logo}
           resizeMode="contain"
         />
-        <ThemedText style={styles.title}>Check-in de Clientes</ThemedText>
+        <ThemedText style={styles.title}>{t('checkIn.title')}</ThemedText>
       </View>
 
       {/* Tarjeta principal de Validar Check-in */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <CheckCircleIcon width={20} height={20} color="#1F2937" />
-          <ThemedText style={styles.cardTitle}>Validar Check-in</ThemedText>
+          <ThemedText style={styles.cardTitle}>{t('dashboard.validateCheckIn.title')}</ThemedText>
         </View>
 
         {/* Campo de búsqueda */}
@@ -92,7 +94,7 @@ export default function CheckInScreen() {
           <MagnifyingGlassIcon width={18} height={18} color="#1F2937" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Buscar por documento de identidad"
+            placeholder={t('dashboard.validateCheckIn.searchPlaceholder')}
             placeholderTextColor="#71727A"
           />
         </View>
@@ -104,12 +106,12 @@ export default function CheckInScreen() {
           disabled={isScanning}
         >
           <QrCodeIcon width={16} height={16} color="#FFFFFF" />
-          <ThemedText style={styles.qrButtonText}>Escanear QR</ThemedText>
+          <ThemedText style={styles.qrButtonText}>{t('dashboard.validateCheckIn.scanQr')}</ThemedText>
         </TouchableOpacity>
 
         {/* Mensaje de preview */}
         <ThemedText style={styles.previewMessage}>
-          Función de cámara no disponible en preview
+          {t('checkIn.cameraPreviewUnavailable')}
         </ThemedText>
       </View>
 
@@ -119,14 +121,11 @@ export default function CheckInScreen() {
         totalCapacity={100}
         onClientPress={(client: Client) => {
           console.log('Cliente seleccionado:', client);
-          Alert.alert('Cliente', `Seleccionaste: ${client.name}`);
+          Alert.alert(t('common.client'), `${t('common.selected')}${client.name}`);
         }}
         onViewAllPress={() => {
           setShowAllClients(!showAllClients);
-          console.log(showAllClients ? 'Mostrando menos clientes' : 'Mostrando todos los clientes');
         }}
-        searchPlaceholder="Buscar cliente por nombre"
-        title="Lista de clientes inscritos"
         showViewAllButton={!showAllClients}
       />
       </ScrollView>

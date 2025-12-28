@@ -2,6 +2,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BackHandler, Image, Modal, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon } from 'react-native-heroicons/solid';
 
@@ -17,8 +18,9 @@ export default function EnrollClientScreen() {
     status?: string;
     instructor?: string;
   }>();
+  const { t } = useTranslation();
 
-  const className = params.name || 'NOMBRE DE LA CLASE';
+  const className = params.name || t('enrollClient.defaultClassName');
   const [clientId, setClientId] = useState('');
   const [clientName, setClientName] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -41,7 +43,7 @@ export default function EnrollClientScreen() {
   
   const handleEnroll = () => {
     if (!clientId.trim() || !clientName.trim()) {
-      alert('Por favor completa todos los campos');
+      alert(t('enrollClient.error.completeFields'));
       return;
     }
 
@@ -86,36 +88,36 @@ export default function EnrollClientScreen() {
       
       {/* Contenido principal */}
       <View style={styles.content}>
-        <ThemedText style={styles.title}>Inscribir Cliente</ThemedText>
+        <ThemedText style={styles.title}>{t('enrollClient.title')}</ThemedText>
         
         {/* Información de la clase */}
         <View style={styles.classInfoCard}>
           <ThemedText style={styles.classTitle}>{className}</ThemedText>
           <ThemedText style={styles.classDetails}>
-            {params.date || 'Fecha'} • {params.time || 'Hora'}
+            {params.date || t('enrollClient.placeholders.date')} • {params.time || t('enrollClient.placeholders.time')}
           </ThemedText>
         </View>
 
         {/* Formulario de inscripción */}
         <View style={styles.form}>
           <View style={styles.inputGroup}>
-            <ThemedText style={styles.label}>ID del Cliente</ThemedText>
+            <ThemedText style={styles.label}>{t('enrollClient.form.clientId')}</ThemedText>
             <TextInput
               style={styles.input}
               value={clientId}
               onChangeText={setClientId}
-              placeholder="Ingrese el ID del cliente"
+              placeholder={t('enrollClient.form.clientIdPlaceholder')}
               placeholderTextColor="#9CA3AF"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={styles.label}>Nombre del Cliente</ThemedText>
+            <ThemedText style={styles.label}>{t('enrollClient.form.clientName')}</ThemedText>
             <TextInput
               style={styles.input}
               value={clientName}
               onChangeText={setClientName}
-              placeholder="Ingrese el nombre del cliente"
+              placeholder={t('enrollClient.form.clientNamePlaceholder')}
               placeholderTextColor="#9CA3AF"
             />
           </View>
@@ -126,7 +128,7 @@ export default function EnrollClientScreen() {
             onPress={handleEnroll}
             activeOpacity={0.8}
           >
-            <ThemedText style={styles.enrollButtonText}>Inscribir</ThemedText>
+            <ThemedText style={styles.enrollButtonText}>{t('enrollClient.button')}</ThemedText>
           </TouchableOpacity>
         </View>
       </View>
@@ -148,9 +150,9 @@ export default function EnrollClientScreen() {
               <CheckCircleIcon size={60} color="#10B981" />
             </View>
             
-            <ThemedText style={styles.successTitle}>¡Éxito!</ThemedText>
+            <ThemedText style={styles.successTitle}>{t('enrollClient.success.title') || t('common.success')}</ThemedText>
             <ThemedText style={styles.successMessage}>
-              Cliente inscrito exitosamente
+              {t('enrollClient.success.message')}
             </ThemedText>
             <ThemedText style={styles.className}>
               {className}
@@ -161,7 +163,7 @@ export default function EnrollClientScreen() {
               onPress={handleSuccessClose}
               activeOpacity={0.8}
             >
-              <ThemedText style={styles.successButtonText}>Aceptar</ThemedText>
+              <ThemedText style={styles.successButtonText}>{t('enrollClient.success.button') || t('common.accept')}</ThemedText>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>

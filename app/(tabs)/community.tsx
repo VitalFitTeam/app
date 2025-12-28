@@ -1,11 +1,13 @@
-import WeeklyChallengeBanner from '@/components/auth/dashboard/WeeklyChallengeBanner';
 import ChallengeGrid from '@/components/auth/community/ChallengeGrid';
+import WeeklyChallengeBanner from '@/components/auth/dashboard/WeeklyChallengeBanner';
 import { ThemedView } from '@/components/themed-view';
 import React from 'react';
-import { Image, ScrollView, View, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { Image, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ComunidadScreen() {
+	const { t } = useTranslation();
 	return (
 		<ThemedView style={{ flex: 1, backgroundColor: '#ffffff' }}>
 			<SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
@@ -48,7 +50,7 @@ export default function ComunidadScreen() {
 								letterSpacing: 0.5,
 								textTransform: 'uppercase',
 							}}>
-							UNIRSE A DESAFIOS
+							{t('community.joinChallenges')}
 						</Text>
 					</View>
 				</ScrollView>

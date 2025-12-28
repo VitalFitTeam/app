@@ -13,12 +13,12 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next'; // 1. Importar hook
 import {
-	KeyboardAvoidingView,
-	Platform,
-	ScrollView,
-	Text,
-	TouchableOpacity,
-	View,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -33,7 +33,7 @@ export default function ConfirmEmailScreen() {
     const handleConfirmCode = async () => {
         if (!code.trim()) {
             // "Por favor, ingresa el código..."
-            showToast('error', t('confirmEmail.toast.errorTitle'), 'Por favor, ingresa el código.');
+            showToast('error', t('confirmEmail.toast.errorTitle'), t('confirmEmail.toast.enterCode'));
             return;
         }
 
@@ -46,7 +46,7 @@ export default function ConfirmEmailScreen() {
                 showToast(
                     'error',
                     t('confirmEmail.toast.errorTitle'),
-                    'No se encontró la contraseña temporal.'
+                    t('confirmEmail.toast.tempPasswordNotFound')
                 );
                 setTimeout(() => router.replace('/(auth)/login'), 2000);
                 return;

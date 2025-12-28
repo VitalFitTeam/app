@@ -2,10 +2,12 @@ import { ThemedText } from '@/components/themed-text';
 import { useBranch } from '@/contexts/BranchContext';
 import { BlurView } from 'expo-blur';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, Modal, TouchableOpacity, View } from 'react-native';
 import { BuildingStorefrontIcon, CheckIcon, ChevronDownIcon, XMarkIcon } from 'react-native-heroicons/outline';
 
 export function BranchSelector() {
+  const { t } = useTranslation();
   const { branches, selectedBranch, selectBranch, isLoading } = useBranch();
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -31,7 +33,7 @@ export function BranchSelector() {
       >
         <BuildingStorefrontIcon size={16} color="#F27F2A" />
         <ThemedText className="mx-2 text-sm font-semibold text-neutral-800">
-          {selectedBranch ? selectedBranch.name : 'Seleccionar sede'}
+          {selectedBranch ? selectedBranch.name : t('common.selectBranch')}
         </ThemedText>
         <ChevronDownIcon size={14} color="#6B7280" />
       </TouchableOpacity>
@@ -46,7 +48,7 @@ export function BranchSelector() {
           <View className="w-11/12 max-w-sm bg-white rounded-2xl p-4 shadow-xl overflow-hidden">
             <View className="flex-row justify-between items-center mb-4 pb-2 border-b border-neutral-100">
               <ThemedText className="text-lg font-bold text-neutral-900">
-                Selecciona tu sede
+                {t('common.selectYourBranch')}
               </ThemedText>
               <TouchableOpacity onPress={() => setModalVisible(false)} className="p-1 bg-neutral-100 rounded-full">
                 <XMarkIcon size={20} color="#6B7280" />

@@ -6,10 +6,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Dumbbell } from 'lucide-react-native';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { BackHandler, ScrollView, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MembershipEntryScreen() {
+	const { t } = useTranslation();
 	const router = useRouter();
 
 	useFocusEffect(
@@ -44,7 +46,7 @@ export default function MembershipEntryScreen() {
 							darkColor='#f97316'
 							className='text-lg tracking-[0.18em] mt-1'
 							style={{ fontFamily: 'BebasNeue-Regular' }}>
-							¿Qué deseas adquirir hoy?
+							{t('membershipEntry.title')}
 						</ThemedText>
 					</View>
 
@@ -72,14 +74,14 @@ export default function MembershipEntryScreen() {
 											darkColor='#ffffff'
 											className='text-[13px] font-semibold'
 											style={{ fontFamily: 'BebasNeue-Regular' }}>
-											COMPRAR UNA MEMBRESÍA
+											{t('membershipEntry.buyMembership')}
 										</ThemedText>
 										<ThemedText
 											lightColor='#ffffff'
 											darkColor='#ffffff'
 											className='text-[10px] opacity-95'
 											style={{ fontFamily: 'Montserrat_400Regular' }}>
-											Accede a todas las instalaciones y servicios del gimnasio.
+											{t('membershipEntry.membershipDesc')}
 										</ThemedText>
 									</View>
 								</View>
@@ -89,21 +91,21 @@ export default function MembershipEntryScreen() {
 										darkColor='#ffffff'
 										className='text-[9px] mb-1'
 										style={{ fontFamily: 'Montserrat_400Regular' }}>
-										• Acceso ilimitado
+										• {t('membershipEntry.membershipBullets.access')}
 									</ThemedText>
 									<ThemedText
 										lightColor='#ffffff'
 										darkColor='#ffffff'
 										className='text-[9px] mb-1'
 										style={{ fontFamily: 'Montserrat_400Regular' }}>
-										• Beneficios exclusivos
+										• {t('membershipEntry.membershipBullets.benefits')}
 									</ThemedText>
 									<ThemedText
 										lightColor='#ffffff'
 										darkColor='#ffffff'
 										className='text-[9px]'
 										style={{ fontFamily: 'Montserrat_400Regular' }}>
-										• Descuentos en servicios
+										• {t('membershipEntry.membershipBullets.discounts')}
 									</ThemedText>
 								</View>
 							</LinearGradient>
@@ -139,14 +141,14 @@ export default function MembershipEntryScreen() {
 											darkColor='#ffffff'
 											className='text-[13px] font-semibold'
 											style={{ fontFamily: 'BebasNeue-Regular' }}>
-											COMPRAR UN SERVICIO/PAQUETE
+											{t('membershipEntry.buyService')}
 										</ThemedText>
 										<ThemedText
 											lightColor='#ffffff'
 											darkColor='#ffffff'
 											className='text-[10px] opacity-95'
 											style={{ fontFamily: 'Montserrat_400Regular' }}>
-											Adquiere paquetes de clases o servicios específicos.
+											{t('membershipEntry.serviceDesc')}
 										</ThemedText>
 									</View>
 								</View>
@@ -156,21 +158,21 @@ export default function MembershipEntryScreen() {
 										darkColor='#ffffff'
 										className='text-[9px] mb-1'
 										style={{ fontFamily: 'Montserrat_400Regular' }}>
-										• Paquetes de clases
+										• {t('membershipEntry.serviceBullets.classes')}
 									</ThemedText>
 									<ThemedText
 										lightColor='#ffffff'
 										darkColor='#ffffff'
 										className='text-[9px] mb-1'
 										style={{ fontFamily: 'Montserrat_400Regular' }}>
-										• Entrenamiento personal
+										• {t('membershipEntry.serviceBullets.personalTraining')}
 									</ThemedText>
 									<ThemedText
 										lightColor='#ffffff'
 										darkColor='#ffffff'
 										className='text-[9px]'
 										style={{ fontFamily: 'Montserrat_400Regular' }}>
-										• Servicios individuales
+										• {t('membershipEntry.serviceBullets.individualServices')}
 									</ThemedText>
 								</View>
 							</LinearGradient>
@@ -179,7 +181,7 @@ export default function MembershipEntryScreen() {
 
 					<View className='mt-10'>
 						<PrimaryButton
-							title='Volver al inicio'
+							title={t('membershipEntry.backHome')}
 							onPress={() => router.replace('/(tabs)/dashboard')}
 						/>
 					</View>

@@ -2,6 +2,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export const QRScannerModal: React.FC<Props> = ({ visible, onClose, onScan }) => {
+    const { t } = useTranslation();
     const [permission, requestPermission] = useCameraPermissions();
     const [scanned, setScanned] = useState(false);
     const [processing, setProcessing] = useState(false);
@@ -24,12 +26,12 @@ export const QRScannerModal: React.FC<Props> = ({ visible, onClose, onScan }) =>
         return (
             <Modal visible={visible} animationType="slide" transparent>
                 <ThemedView style={styles.container}>
-                    <Text style={styles.message}>Necesitamos acceso a la cámara para validar membresías.</Text>
+                    <Text style={styles.message}>{t('scanner.permission.message')}</Text>
                     <TouchableOpacity onPress={requestPermission} style={styles.button}>
-                        <Text style={styles.buttonText}>Dar Permiso</Text>
+                        <Text style={styles.buttonText}>{t('scanner.permission.button')}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={onClose} style={styles.closeButtonText}>
-                        <Text style={{ color: 'white', marginTop: 20 }}>Cancelar</Text>
+                        <Text style={{ color: 'white', marginTop: 20 }}>{t('common.cancel')}</Text>
                     </TouchableOpacity>
                 </ThemedView>
             </Modal>
@@ -46,7 +48,7 @@ export const QRScannerModal: React.FC<Props> = ({ visible, onClose, onScan }) =>
             // Llamamos a la función de validación que nos pasan desde el padre
             await onScan(data);
         } catch {
-            Alert.alert("Error", "No se pudo acceder a la cámara");
+            Alert.alert(t('common.error.title'), t('scanner.error.cameraAccess'));
         } finally {
             // Damos un tiempo antes de permitir escanear de nuevo
             setTimeout(() => {
@@ -89,7 +91,7 @@ export const QRScannerModal: React.FC<Props> = ({ visible, onClose, onScan }) =>
 
                 <View style={styles.instructionContainer}>
                     <Text style={styles.instructionText}>
-                        {processing ? "Validando membresía..." : "Escanea el QR del cliente"}
+                        {processing ? t('scanner.validating') : t('scanner.instruction')}
                     </Text>
                 </View>
             </View>

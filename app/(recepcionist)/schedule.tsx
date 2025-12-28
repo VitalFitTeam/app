@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BackHandler, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { CalendarDaysIcon, FunnelIcon } from 'react-native-heroicons/outline';
 
@@ -88,6 +89,7 @@ const monthExtraClasses: ClassType[] = [
 ];
 
 export default function ScheduleScreen() {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>('week');
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -121,17 +123,17 @@ export default function ScheduleScreen() {
     const date = new Date(year, (monthIndex || 1) - 1, dayNumber || 1);
 
     const day = date.getDate();
-    const month = new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(date);
-    const weekday = new Intl.DateTimeFormat('es-ES', { weekday: 'long' }).format(date);
+    const month = new Intl.DateTimeFormat(i18n.language, { month: 'long' }).format(date);
+    const weekday = new Intl.DateTimeFormat(i18n.language, { weekday: 'long' }).format(date);
 
     const capitalizedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
 
-    return `${capitalizedWeekday}, ${day} de ${month}`;
+    return `${capitalizedWeekday}, ${day} ${t('common.of')} ${month}`;
   };
   
 
   const formatHeaderDate = (date: Date) => {
-    return new Intl.DateTimeFormat('es-ES', {
+    return new Intl.DateTimeFormat(i18n.language, {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
@@ -185,7 +187,7 @@ export default function ScheduleScreen() {
                 onPress={() => setViewMode('week')}
               >
                 <ThemedText style={[styles.viewOptionText, viewMode === 'week' && styles.activeViewText]}>
-                  Semana
+                  {t('schedule.week')}
                 </ThemedText>
               </TouchableOpacity>
               <TouchableOpacity
@@ -193,7 +195,7 @@ export default function ScheduleScreen() {
                 onPress={() => setViewMode('month')}
               >
                 <ThemedText style={[styles.viewOptionText, viewMode === 'month' && styles.activeViewText]}>
-                  Mes
+                  {t('schedule.month')}
                 </ThemedText>
               </TouchableOpacity>
             </View>
@@ -202,7 +204,7 @@ export default function ScheduleScreen() {
 
         {/* Calendario */}
         <View style={styles.calendarContainer}>
-          <ThemedText style={styles.sectionTitle}>CALENDARIO</ThemedText>
+          <ThemedText style={styles.sectionTitle}>{t('schedule.calendar')}</ThemedText>
           <View style={styles.calendarWrapper}>
             {viewMode === 'week' ? (
               <WeekCalendar onDateSelect={handleDateSelect} />
@@ -215,10 +217,10 @@ export default function ScheduleScreen() {
         {/* Sección de Reservas */}
         <View style={styles.reservationsSection}>
           <View style={styles.reservationsHeader}>
-            <ThemedText style={styles.sectionTitle}>Reservas</ThemedText>
+            <ThemedText style={styles.sectionTitle}>{t('schedule.reservations')}</ThemedText>
             <TouchableOpacity style={styles.filterButton}>
               <FunnelIcon size={20} color='#6B7280' />
-              <ThemedText style={styles.filterText}>Filtrar</ThemedText>
+              <ThemedText style={styles.filterText}>{t('common.filter')}</ThemedText>
             </TouchableOpacity>
           </View>
 
@@ -249,14 +251,14 @@ export default function ScheduleScreen() {
                       <ThemedText style={styles.className}>{classItem.name}</ThemedText>
                       <View style={[styles.statusBadge, classItem.status === 'available' ? styles.availableBadge : styles.fullBadge]}>
                         <ThemedText style={[styles.statusText, classItem.status === 'available' ? styles.availableText : styles.fullText]}>
-                          {classItem.status === 'available' ? 'Disponible' : 'Llena'}
+                          {classItem.status === 'available' ? t('common.available') : t('common.full')}
                         </ThemedText>
                       </View>
                     </View>
                     
                     <View style={styles.classInfo}>
                       <ThemedText style={styles.classCapacity}>
-                        {classItem.enrolled}/{classItem.capacity} cupos ocupados
+                        {classItem.enrolled}/{classItem.capacity} {t('schedule.spotsOccupied')}
                       </ThemedText>
                       <ThemedText style={styles.classTime}>{classItem.time}</ThemedText>
                     </View>
@@ -279,7 +281,7 @@ export default function ScheduleScreen() {
                         });
                       }}
                     >
-                      <ThemedText style={styles.detailsButtonText}>Ver Detalles</ThemedText>
+                      <ThemedText style={styles.detailsButtonText}>{t('common.viewDetails')}</ThemedText>
                     </TouchableOpacity>
                   </View>
                 ))}

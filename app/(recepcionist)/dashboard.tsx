@@ -12,10 +12,12 @@ import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, ScrollView, TouchableOpacity, View } from 'react-native';
 import { QrCodeIcon } from 'react-native-heroicons/outline';
 
 export default function DashboardRecepcionist() {
+	const { t } = useTranslation();
 	const [loading, setLoading] = useState(true);
 	const [firstName, setFirstName] = useState<string | null>(null);
 	const [scannerVisible, setScannerVisible] = useState(false);
@@ -34,7 +36,7 @@ export default function DashboardRecepcionist() {
 
 			// 1. OBTENER ID DE LA SEDE (BRANCH)
 			if (!selectedBranchId) {
-				Alert.alert("⚠️ ATENCIÓN", "Por favor selecciona una sede antes de escanear.");
+				Alert.alert(`⚠️ ${t('common.attention')}`, t('checkIn.error.selectBranch'));
 				return;
 			}
 			const branchId = selectedBranchId;
@@ -58,7 +60,7 @@ export default function DashboardRecepcionist() {
 
 			// 3. MOSTRAR RESULTADO BASADO EN LA RESPUESTA DEL BACKEND
 			// Manejar diferentes estructuras de respuesta
-			let userName = 'Usuario';
+			let userName = t('dashboard.defaultUser');
 			
 			if (data?.user?.first_name) {
 				userName = `${data.user.first_name} ${data.user.last_name || ''}`.trim();
@@ -79,20 +81,20 @@ export default function DashboardRecepcionist() {
 			console.error("Error en Check-In:", error);
 
 			// Manejo de errores específicos
-			let errorMessage = 'No se pudo procesar el acceso.';
+			let errorMessage = t('checkIn.error.default');
 			
 			if (isAPIError(error)) {
 				if (error.status === 402) {
-					errorMessage = "El usuario tiene pagos pendientes.";
+					errorMessage = t('checkIn.error.paymentPending');
 				} else if (error.status === 403) {
-					errorMessage = "El usuario no tiene permiso para entrar a esta área o sede.";
+					errorMessage = t('checkIn.error.accessDenied');
 				} else if (error.status === 401) {
-					errorMessage = "El código QR ha caducado. Pide al usuario que genere uno nuevo.";
+					errorMessage = t('checkIn.error.qrExpired');
 				} else {
-					errorMessage = error.message || "No se pudo procesar el acceso.";
+					errorMessage = error.message || t('checkIn.error.default');
 				}
 			} else {
-				errorMessage = error.message || "Error de conexión con el servidor.";
+				errorMessage = error.message || t('common.error.connection');
 			}
 
 			// Mostrar modal de error
@@ -108,9 +110,9 @@ export default function DashboardRecepcionist() {
 				const token = await AsyncStorage.getItem('token');
 				if (!token) return;
 				const userData = await vitalFitApi.user.WhoAmI(token);
-				setFirstName(userData?.user?.first_name || 'Recepcionista');
+				setFirstName(userData?.user?.first_name || t('dashboard.recepcionistDefault'));
 			} catch (error: unknown) {
-				let errorMessage = 'Ocurrió un error inesperado.';
+				let errorMessage = t('common.error.unexpected');
 				if (isAPIError(error)) errorMessage = error.messages.join(', ');
 				else if (error instanceof Error) errorMessage = error.message;
 				console.error('Error whoami (Recepcionista):', errorMessage);
@@ -120,7 +122,7 @@ export default function DashboardRecepcionist() {
 		};
 
 		fetchUser();
-	}, []);
+	}, [t]);
 
 	if (loading) {
 		return (
@@ -137,7 +139,7 @@ export default function DashboardRecepcionist() {
 				contentContainerStyle={{ paddingBottom: 100 }}
 			>
 				<UserHeader
-					name={firstName ?? 'Recepcionista'}
+					name={firstName ?? t('dashboard.recepcionistDefault')}
 					avatarUrl='https://randomuser.me/api/portraits/women/44.jpg'
 				/>
 

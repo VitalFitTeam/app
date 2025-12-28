@@ -1,6 +1,7 @@
 import { ThemedText } from '@/components/themed-text';
 import { Image } from 'expo-image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
 type ReservationCardProps = {
@@ -20,19 +21,20 @@ export default function ReservationCard({
 	imageUrl,
 	status,
 }: ReservationCardProps) {
+	const { t } = useTranslation();
 	const statusStyles = {
 		assisted: {
-			text: 'Asistida',
+			text: t('common.status.assisted'),
 			bgColor: 'bg-green-100 dark:bg-green-900',
 			textColor: 'text-green-600 dark:text-green-400',
 		},
 		absent: {
-			text: 'Ausente',
+			text: t('common.status.absent'),
 			bgColor: 'bg-red-100 dark:bg-red-900',
 			textColor: 'text-red-600 dark:text-red-400',
 		},
 		cancelled: {
-			text: 'Cancelada por ti',
+			text: t('common.status.cancelled'),
 			bgColor: 'bg-yellow-100 dark:bg-yellow-900',
 			textColor: 'text-yellow-600 dark:text-yellow-400',
 		},

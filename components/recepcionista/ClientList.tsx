@@ -1,5 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { CalendarDaysIcon, UserIcon } from 'react-native-heroicons/outline';
 
@@ -27,17 +28,22 @@ export default function ClientList({
   onClientPress,
   onViewAllPress,
   showSearch = true,
-  searchPlaceholder = 'Nombre del cliente',
-  title = 'Lista de clientes inscritos',
+  searchPlaceholder,
+  title,
   showViewAllButton = true,
 }: ClientListProps) {
+  const { t } = useTranslation();
+  
+  const displayTitle = title || t('checkIn.clientList.title');
+  const displaySearchPlaceholder = searchPlaceholder || t('checkIn.clientList.searchPlaceholder');
+
   return (
     <View style={styles.container}>
       {/* Campo de búsqueda */}
       {showSearch && (
         <View style={styles.searchWrapper}>
           <TextInput
-            placeholder={searchPlaceholder}
+            placeholder={displaySearchPlaceholder}
             placeholderTextColor='#9CA3AF'
             style={styles.searchInput}
           />
@@ -49,7 +55,7 @@ export default function ClientList({
         <View style={styles.clientsTitleRow}>
           <CalendarDaysIcon size={20} color='#6B7280' />
           <ThemedText style={styles.clientsTitle}>
-            {title} ({clients.length}/{totalCapacity})
+            {displayTitle} ({clients.length}/{totalCapacity})
           </ThemedText>
         </View>
       </View>
@@ -77,7 +83,7 @@ export default function ClientList({
       {/* Botón Ver todos */}
       {onViewAllPress && showViewAllButton && (
         <TouchableOpacity style={styles.viewAllButton} activeOpacity={0.8} onPress={onViewAllPress}>
-          <ThemedText style={styles.viewAllButtonText}>Ver todos los inscritos</ThemedText>
+          <ThemedText style={styles.viewAllButtonText}>{t('common.viewAllRegistered')}</ThemedText>
         </TouchableOpacity>
       )}
     </View>

@@ -2,6 +2,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BackHandler, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BellIcon, Cog6ToothIcon } from 'react-native-heroicons/outline';
 import { ChevronLeftIcon } from 'react-native-heroicons/solid';
@@ -48,6 +49,7 @@ const NotificationItem = ({ title, description }: { title: string; description: 
 
 export default function RecepcionistNotificationsScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleBackPress = useCallback(() => {
     router.replace('/(recepcionist)/profile');
@@ -69,7 +71,7 @@ export default function RecepcionistNotificationsScreen() {
         <TouchableOpacity onPress={() => router.replace('/(recepcionist)/profile')} style={styles.backButton}>
           <ChevronLeftIcon size={28} color='#F97316' />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>Notificaciones</ThemedText>
+        <ThemedText style={styles.headerTitle}>{t('dashboard.notifications.title')}</ThemedText>
         <TouchableOpacity
           onPress={() => router.push('/notification-settings')}
           style={styles.settingsButton}>

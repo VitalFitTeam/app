@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     ActivityIndicator,
     Modal,
@@ -14,8 +15,10 @@ interface LoadingModalProps {
 
 export const LoadingModal: React.FC<LoadingModalProps> = ({
     visible,
-    message = 'Cargando...',
+    message,
 }) => {
+    const { t } = useTranslation();
+    const displayMessage = message || t('common.loading');
     return (
         <Modal
             transparent
@@ -25,7 +28,7 @@ export const LoadingModal: React.FC<LoadingModalProps> = ({
             <View style={styles.overlay}>
                 <View style={styles.container}>
                     <ActivityIndicator size="large" color="#f97316" />
-                    <Text style={styles.message}>{message}</Text>
+                    <Text style={styles.message}>{displayMessage}</Text>
                 </View>
             </View>
         </Modal>
