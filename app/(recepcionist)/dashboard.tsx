@@ -13,8 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Alert, ScrollView, TouchableOpacity, View } from 'react-native';
-import { QrCodeIcon } from 'react-native-heroicons/outline';
+import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
 
 export default function DashboardRecepcionist() {
 	const { t } = useTranslation();
@@ -148,32 +147,12 @@ export default function DashboardRecepcionist() {
 				</View>
 
 				<RecepcionistStatsCardGroup />
-				<ValidateCheckInCard />
+				<ValidateCheckInCard onScanPress={() => setScannerVisible(true)} />
 				<GymCapacityCard />
 				<RecepcionistTodayClassCard />
 			</ScrollView>
 
-			<TouchableOpacity
-				style={{
-					position: 'absolute',
-					bottom: 30,
-					right: 30,
-					backgroundColor: '#F27F2A',
-					width: 60,
-					height: 60,
-					borderRadius: 30,
-					justifyContent: 'center',
-					alignItems: 'center',
-					elevation: 5,
-					shadowColor: '#000',
-					shadowOffset: { width: 0, height: 2 },
-					shadowOpacity: 0.3,
-					shadowRadius: 3,
-				}}
-				onPress={() => setScannerVisible(true)}
-			>
-				<QrCodeIcon color="white" size={30} />
-			</TouchableOpacity>
+
 
 			<QRScannerModal
 				visible={scannerVisible}

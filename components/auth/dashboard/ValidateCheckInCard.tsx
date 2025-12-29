@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, MagnifyingGlassIcon, QrCodeIcon } from 'react-native-heroicons/mini';
 
-export function ValidateCheckInCard() {
+interface ValidateCheckInCardProps {
+	onScanPress?: () => void;
+}
+
+export function ValidateCheckInCard({ onScanPress }: ValidateCheckInCardProps) {
 	const { t } = useTranslation();
 	return (
 		<View className='bg-white dark:bg-neutral-900 rounded-2xl p-4 mt-4 shadow-sm border border-neutral-200 dark:border-neutral-800'>
@@ -24,6 +28,7 @@ export function ValidateCheckInCard() {
 			</View>
 
 			<TouchableOpacity
+				onPress={onScanPress}
 				activeOpacity={0.8}
 				className='flex-row items-center justify-center border border-neutral-300 dark:border-neutral-700 rounded-xl px-3 py-2'>
 				<QrCodeIcon width={16} height={16} color='#0F172A' />

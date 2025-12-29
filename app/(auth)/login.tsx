@@ -4,6 +4,7 @@ import { LoadingModal } from '@/components/LoadingModal';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ToastNotification } from '@/components/ToastNotification';
 import { Colors, Fonts } from '@/constants/theme';
+import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services/vitalfitSdk';
 import { useAuth, useClerk, useOAuth } from '@clerk/clerk-expo';
@@ -32,6 +33,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function LoginScreen() {
     const { toastState, showToast, hideToast } = useToast();
     const router = useRouter();
+    const { fetchUser } = useUser();
 
     useEffect(() => {
         const onBackPress = () => {
@@ -79,6 +81,9 @@ export default function LoginScreen() {
             if (token) {
                 await AsyncStorage.setItem('token', token);
                 console.log('Token guardado en AsyncStorage');
+                
+                // Actualizamos el contexto global antes de navegar
+                await fetchUser();
                 
                 await new Promise(resolve => setTimeout(resolve, 300));
                 console.log('Delay completado, token debe estar disponible');
@@ -162,6 +167,9 @@ export default function LoginScreen() {
                             await AsyncStorage.setItem('token', backendToken);
                             console.log('Token de backend guardado');
 
+                            // Actualizamos el contexto global antes de navegar
+                            await fetchUser();
+
                             // Esperamos 1 segundo para asegurar que el token esté disponible en AsyncStorage
                             await new Promise(resolve => setTimeout(resolve, 1000));
                             console.log('Delay completado, verificando token...');
@@ -182,10 +190,10 @@ export default function LoginScreen() {
                                     router.replace('/(tabs)/dashboard');
                                 }
 
-                                showToast('success', t('login.toast.welcomeTitle'), t('login.toast.googleLoginSuccess'));
+                                showToast('success', '¡Bienvenido!', 'Iniciaste sesión con Google exitosamente');
                             } else {
                                 console.error('El token no se guardó correctamente en AsyncStorage');
-                                showToast('error', t('login.toast.errorTitle'), t('login.toast.sessionSaveError'));
+                                showToast('error', 'Error', 'No se pudo guardar la sesión');
                             }
                         }
                     } catch (backendError: unknown) {
@@ -205,30 +213,30 @@ export default function LoginScreen() {
                             }
                         } else if (backendError instanceof Error && backendError.message?.includes('Usuario no encontrado')) {
                             console.log('Usuario no registrado, redirigiendo al flujo de registro');
-                            showToast('success', t('login.toast.accountNotRegistered'), t('login.toast.completeRegistration'));
+                            showToast('success', 'Cuenta no registrada', 'Vamos a completar tu registro con Google');
                             router.replace('/(auth)/register?oauth=google');
                         } else {
-                            showToast('error', t('login.toast.authError'), t('login.toast.googleLoginError'));
+                            showToast('error', 'Error de autenticación', 'No se pudo iniciar sesión con Google');
                         }
                     }
                 } else {
                     console.warn('No se pudo obtener el token de sesión con el template');
-                    showToast('error', t('login.toast.errorTitle'), t('login.toast.clerkTokenError'));
+                    showToast('error', 'Error', 'No se pudo obtener el token de Clerk');
                 }
             }
         } catch (error: unknown) {
             console.error('Error en Google Sign-In:', error);
 
             if (error instanceof Error && error.message?.includes('already signed in')) {
-                showToast('success', t('login.toast.alreadySignedIn'), t('login.toast.redirectingDashboard'));
+                showToast('success', 'Ya has iniciado sesión', 'Redirigiendo al dashboard...');
                 router.replace('/(tabs)/dashboard');
             } else {
-                showToast('error', t('login.toast.authError'), t('login.toast.googleLoginError'));
+                showToast('error', 'Error de autenticación', 'No se pudo iniciar sesión con Google');
             }
         } finally {
             setIsGoogleLoading(false);
         }
-    }, [startOAuthFlow, getToken, signOut, router, showToast, t]);
+    }, [startOAuthFlow, getToken, signOut, router, showToast, fetchUser]);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
@@ -244,7 +252,7 @@ export default function LoginScreen() {
                 />
                 <LoadingModal
                     visible={isGoogleLoading}
-                    message={t('login.authenticatingGoogle')}
+                    message="Autenticando con Google..."
                 />
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <ScrollView
