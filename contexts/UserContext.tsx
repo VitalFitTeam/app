@@ -24,6 +24,7 @@ type UserContextType = {
 	error: string | null;
 	fetchUser: () => Promise<void>;
 	updateLocalUser: (partial: Partial<UserData>) => void;
+	clearUser: () => void; // <--- Nueva función
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -45,7 +46,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				return;
 			}
 
-			// CORRECCIÓN: Restauro la obtención del objeto usuario de la respuesta
 			const userData = await vitalFitApi.user.WhoAmI(token);
 			const apiUser = userData?.user;
 
@@ -86,13 +86,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 		setUser(prev => (prev ? { ...prev, ...partial } : prev));
 	}, []);
 
+	// Implementación de la limpieza
+	const clearUser = useCallback(() => {
+		setUser(null);
+		setError(null);
+	}, []);
+
 	useEffect(() => {
 		fetchUser();
 	}, [fetchUser]);
 
 	const value = useMemo<UserContextType>(
-		() => ({ user, loading, error, fetchUser, updateLocalUser }),
-		[user, loading, error, fetchUser, updateLocalUser]
+		() => ({ user, loading, error, fetchUser, updateLocalUser, clearUser }),
+		[user, loading, error, fetchUser, updateLocalUser, clearUser]
 	);
 
 	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
