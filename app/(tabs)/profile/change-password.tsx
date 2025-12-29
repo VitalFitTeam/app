@@ -26,9 +26,15 @@ const ChangePasswordSchema = z
       .regex(/[^a-zA-Z0-9]/, 'Debe contener al menos un caracter especial.'),
     confirmPassword: z.string(),
   })
+ 
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: 'Las contraseñas no coinciden.',
     path: ['confirmPassword'],
+  })
+  
+  .refine((data) => data.newPassword !== data.currentPassword, {
+    message: 'La nueva contraseña no puede ser igual a la actual.',
+    path: ['newPassword'],
   });
 
 type FormData = z.infer<typeof ChangePasswordSchema>;
