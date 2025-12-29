@@ -12,7 +12,6 @@ export default function SettingsScreen() {
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
-				{/* Franja superior */}
 				<View
 					className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'
 					style={{ position: 'relative' }}>
@@ -26,17 +25,15 @@ export default function SettingsScreen() {
 					<Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Seguridad</Text>
 				</View>
 
-				{/* Opciones de seguridad */}
 				<View className='mb-2'>
 					<Text className='text-[14px] font-semibold text-[#111827] mb-2'>Opciones</Text>
 				</View>
 
-				{/* Cambiar contraseña */}
 				<TouchableOpacity
 					activeOpacity={0.8}
 					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
 					onPress={() => {
-						router.push('/instructor-change-password');
+						router.push('./change-password');
 					}}>
 					<View className='flex-row items-center'>
 						<View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
