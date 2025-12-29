@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, ImageSourcePropType, Text, TouchableOpacity, View } from 'react-native';
 
-// Definimos los tipos permitidos
 type Gender = 'female' | 'male' | 'prefer-not-to-say';
 
 interface Props {
@@ -12,11 +11,10 @@ interface Props {
 
 type Option = {
     readonly id: Gender;
-    readonly i18nKey: string; // Clave para la traducción
+    readonly i18nKey: string; 
     readonly image?: ImageSourcePropType;
 };
 
-// Configuración de opciones (IDs compatibles con tu backend y claves compatibles con tu JSON)
 const options: readonly Option[] = [
     { 
         id: 'female', 
@@ -30,7 +28,7 @@ const options: readonly Option[] = [
     },
     { 
         id: 'prefer-not-to-say', 
-        i18nKey: 'preferNotToSay' // Coincide con el JSON camelCase
+        i18nKey: 'preferNotToSay' 
     },
 ];
 
@@ -63,7 +61,7 @@ export function GenderSelector({ onSelect, selected }: Props) {
                             className={`text-lg font-bold ${
                                 internalSelected === option.id ? 'text-white' : 'text-black'
                             }`}>
-                            {/* Traducción dinámica usando la clave mapeada */}
+
                             {t(`register.genderSelector.${option.i18nKey}`)}
                         </Text>
                     </View>

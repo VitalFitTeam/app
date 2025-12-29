@@ -9,7 +9,6 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-// Importación del ícono QR
 import { QrCodeIcon } from 'react-native-heroicons/outline';
 
 interface Props {
@@ -48,11 +47,8 @@ export const MembershipCard: React.FC<Props> = ({
 
 	return (
 		<LinearGradient
-			// AJUSTADO: Marrón oscuro para los extremos y naranja brillante en el centro
 			colors={['#4F3521', '#F27F2A', '#4F3521']}
-			// AJUSTADO: El color naranja solo ocupa una pequeña porción del centro
 			locations={[0, 0.5, 1]}
-			// Mantenemos el degradado horizontal
 			start={{ x: 0, y: 0.5 }}
 			end={{ x: 1, y: 0.5 }}
 			style={[styles.card, { width: cardWidth }]}>

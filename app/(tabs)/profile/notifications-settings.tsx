@@ -16,7 +16,6 @@ export default function ClientNotificationsSettingsScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
-        {/* Franja superior */}
         <View
           className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'
           style={{ position: 'relative' }}>
@@ -29,8 +28,6 @@ export default function ClientNotificationsSettingsScreen() {
 
           <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('notificationsSettings.title')}</Text>
         </View>
-
-        {/* Card de configuración */}
         <View
           style={{
             backgroundColor: '#F3F4F6',
@@ -47,8 +44,6 @@ export default function ClientNotificationsSettingsScreen() {
           <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 16 }}>
             {t('notificationsSettings.description')}
           </Text>
-
-          {/* Recordatorio de clases */}
           <View
             style={{
               flexDirection: 'row',
@@ -74,7 +69,6 @@ export default function ClientNotificationsSettingsScreen() {
             />
           </View>
 
-          {/* Actualizaciones de rutina */}
           <View
             style={{
               flexDirection: 'row',

@@ -3,7 +3,7 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 const IMGBB_API_KEY = process.env.EXPO_PUBLIC_IMGBB_API_KEY;
 
 if (!IMGBB_API_KEY) {
-    console.warn('⚠️ Alerta de Seguridad: La variable de entorno EXPO_PUBLIC_IMGBB_API_KEY no está configurada.');
+    console.warn('Alerta de Seguridad: La variable de entorno EXPO_PUBLIC_IMGBB_API_KEY no está configurada.');
 }
 
 const IMGBB_UPLOAD_URL = `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`;

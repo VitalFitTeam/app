@@ -47,130 +47,130 @@ export function Step3PersonalDetails({ control, errors, onSubmit, onPrevStep }: 
                 contentContainerStyle={{ alignItems: 'center', paddingVertical: 16, gap: 16 }}>
 
                 <Controller
-                control={control}
-                name='name'
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <StyledTextInput
-                        label={t('step3PersonalDetails.nameLabel')}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}
-                        error={errors.name?.message}
-                    />
-                )}
-            />
-            <Controller
-                control={control}
-                name='lastName'
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <StyledTextInput
-                        label={t('step3PersonalDetails.lastNameLabel')}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}
-                        error={errors.lastName?.message}
-                    />
-                )}
-            />
-            <Controller
-                control={control}
-                name='documentId'
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <StyledTextInput
-                        label={t('step3PersonalDetails.documentIdLabel')}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}
-                        error={errors.documentId?.message}
-                    />
-                )}
-            />
-
-            <Controller
-                control={control}
-                name='birthDate'
-                render={({ field: { onChange, value } }) => {
-                    const date = value ? new Date(value) : new Date();
-                    return (
-                        <View style={{ width: '100%' }}>
-                            <TouchableOpacity
-                                onPress={() => setShowPicker(true)}
-                                style={{ position: 'relative' }}>
-                                <StyledTextInput
-                                    label={t('step3PersonalDetails.birthDateLabel')}
-                                    value={value ? format(date, 'yyyy-MM-dd') : ''}
-                                    editable={false}
-                                    pointerEvents='none'
-                                    error={errors.birthDate?.message}
-                                />
-                                <View style={{ position: 'absolute', right: 12, bottom: 12 }}>
-                                    <Calendar size={20} color={Colors.light.icon} />
-                                </View>
-                            </TouchableOpacity>
-                            {showPicker && (
-                                <DateTimePicker
-                                    value={date}
-                                    mode='date'
-                                    display='default'
-                                    onChange={(event, selectedDate) => {
-                                        setShowPicker(false);
-                                        if (selectedDate) onChange(selectedDate.toISOString());
-                                    }}
-                                />
-                            )}
-                        </View>
-                    );
-                }}
-            />
-
-            <Controller
-                control={control}
-                name='phone'
-                render={({ field: { onChange, value, ref } }) => (
-                    <View style={{ width: '100%' }}>
-                        <Text style={styles.label}>{t('step3PersonalDetails.phoneLabel')}</Text>
-                        <PhoneInput
-                            ref={ref}
-                            value={value || ''}
-                            onChangePhoneNumber={(phone) => onChange(phone)}
-                            defaultCountry='VE'
-                            placeholder={t('step3PersonalDetails.phonePlaceholder')}
-                            phoneInputStyles={{
-                                container: styles.phoneContainer,
-                                flagContainer: styles.flagContainer,
-                                flag: styles.flag,
-                                caret: styles.caret,
-                                divider: styles.divider,
-                                callingCode: styles.callingCode,
-                                input: styles.phoneInput,
-                            }}
+                    control={control}
+                    name='name'
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <StyledTextInput
+                            label={t('step3PersonalDetails.nameLabel')}
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}
+                            error={errors.name?.message}
                         />
-                        {errors.phone && <Text style={styles.errorText}>{errors.phone.message}</Text>}
-                    </View>
-                )}
-            />
+                    )}
+                />
+                <Controller
+                    control={control}
+                    name='lastName'
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <StyledTextInput
+                            label={t('step3PersonalDetails.lastNameLabel')}
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}
+                            error={errors.lastName?.message}
+                        />
+                    )}
+                />
+                <Controller
+                    control={control}
+                    name='documentId'
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <StyledTextInput
+                            label={t('step3PersonalDetails.documentIdLabel')}
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}
+                            error={errors.documentId?.message}
+                        />
+                    )}
+                />
 
-            <Controller
-                control={control}
-                name='acceptTerms'
-                render={({ field: { onChange, value } }) => (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', gap: 8 }}>
-                        <Checkbox value={value} onValueChange={onChange} color={value ? Colors.light.tint : undefined} />
-                        <Text style={{ color: '#5C5E60' }}>
-                            {t('step3PersonalDetails.acceptTerms')}
-                            <Text style={{ color: Colors.light.tint }}>
-                                {t('step3PersonalDetails.termsAndConditions')}
+                <Controller
+                    control={control}
+                    name='birthDate'
+                    render={({ field: { onChange, value } }) => {
+                        const date = value ? new Date(value) : new Date();
+                        return (
+                            <View style={{ width: '100%' }}>
+                                <TouchableOpacity
+                                    onPress={() => setShowPicker(true)}
+                                    style={{ position: 'relative' }}>
+                                    <StyledTextInput
+                                        label={t('step3PersonalDetails.birthDateLabel')}
+                                        value={value ? format(date, 'yyyy-MM-dd') : ''}
+                                        editable={false}
+                                        pointerEvents='none'
+                                        error={errors.birthDate?.message}
+                                    />
+                                    <View style={{ position: 'absolute', right: 12, bottom: 12 }}>
+                                        <Calendar size={20} color={Colors.light.icon} />
+                                    </View>
+                                </TouchableOpacity>
+                                {showPicker && (
+                                    <DateTimePicker
+                                        value={date}
+                                        mode='date'
+                                        display='default'
+                                        onChange={(event, selectedDate) => {
+                                            setShowPicker(false);
+                                            if (selectedDate) onChange(selectedDate.toISOString());
+                                        }}
+                                    />
+                                )}
+                            </View>
+                        );
+                    }}
+                />
+
+                <Controller
+                    control={control}
+                    name='phone'
+                    render={({ field: { onChange, value, ref } }) => (
+                        <View style={{ width: '100%' }}>
+                            <Text style={styles.label}>{t('step3PersonalDetails.phoneLabel')}</Text>
+                            <PhoneInput
+                                ref={ref}
+                                value={value || ''}
+                                onChangePhoneNumber={(phone) => onChange(phone)}
+                                defaultCountry='VE'
+                                placeholder={t('step3PersonalDetails.phonePlaceholder')}
+                                phoneInputStyles={{
+                                    container: styles.phoneContainer,
+                                    flagContainer: styles.flagContainer,
+                                    flag: styles.flag,
+                                    caret: styles.caret,
+                                    divider: styles.divider,
+                                    callingCode: styles.callingCode,
+                                    input: styles.phoneInput,
+                                }}
+                            />
+                            {errors.phone && <Text style={styles.errorText}>{errors.phone.message}</Text>}
+                        </View>
+                    )}
+                />
+
+                <Controller
+                    control={control}
+                    name='acceptTerms'
+                    render={({ field: { onChange, value } }) => (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', gap: 8 }}>
+                            <Checkbox value={value} onValueChange={onChange} color={value ? Colors.light.tint : undefined} />
+                            <Text style={{ color: '#5C5E60' }}>
+                                {t('step3PersonalDetails.acceptTerms')}
+                                <Text style={{ color: Colors.light.tint }}>
+                                    {t('step3PersonalDetails.termsAndConditions')}
+                                </Text>
                             </Text>
-                        </Text>
-                    </View>
-                )}
-            />
-            
-            <PrimaryButton
-                title={t('step3PersonalDetails.createAccountButton')}
-                onPress={onSubmit}
-            />
-        </ScrollView>
+                        </View>
+                    )}
+                />
+
+                <PrimaryButton
+                    title={t('step3PersonalDetails.createAccountButton')}
+                    onPress={onSubmit}
+                />
+            </ScrollView>
         </>
     );
 }

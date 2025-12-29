@@ -6,10 +6,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-/* ----------------------------------------------------------
-    INTERFACES
----------------------------------------------------------- */
-
 interface ServiceItem {
   service_id: string;
   name: string;
@@ -27,10 +23,6 @@ interface ServicePublicItem {
   images?: { image_url: string }[];
 }
 
-/* ----------------------------------------------------------
-    CARD COMPONENT MEMOIZADO
----------------------------------------------------------- */
-
 function ServiceCardComponent({
   item,
   onBuy,
@@ -41,7 +33,6 @@ function ServiceCardComponent({
   return (
     <View className='mb-4 rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm'>
       <View className='flex-row'>
-        {/* Imagen */}
         <View className='mr-4 h-24 w-24 items-center justify-center overflow-hidden rounded-xl bg-neutral-100'>
           {item.image_url ? (
             <Image source={{ uri: item.image_url }} className='h-full w-full' resizeMode='cover' />
@@ -50,7 +41,6 @@ function ServiceCardComponent({
           )}
         </View>
 
-        {/* Info */}
         <View className='flex-1 justify-between'>
           <View>
             <ThemedText className='mb-1 text-lg font-bold text-neutral-900' numberOfLines={1}>
@@ -85,10 +75,6 @@ function ServiceCardComponent({
 const ServiceCard = React.memo(ServiceCardComponent);
 
 
-/* ----------------------------------------------------------
-    PANTALLA PRINCIPAL
----------------------------------------------------------- */
-
 export default function ServicesScreen() {
   const router = useRouter();
 
@@ -100,9 +86,6 @@ export default function ServicesScreen() {
   const batchSize = 8;
   const [loadingMore, setLoadingMore] = useState(false);
 
-  /* -----------------------------
-      Fetch inicial
-  ------------------------------*/
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -114,8 +97,6 @@ export default function ServicesScreen() {
           price: 0,
           sortby: 'desc',
         });
-
-
 
         const rawData: ServicePublicItem[] = (response.data as ServicePublicItem[]) ?? [];
         const mapped: ServiceItem[] = rawData.map((item) => ({
@@ -144,7 +125,7 @@ export default function ServicesScreen() {
     const total = allServices.length;
     const nextPageStart = page * batchSize;
 
-    if (nextPageStart >= total) return; // No hay más elementos
+    if (nextPageStart >= total) return; 
 
     setLoadingMore(true);
 
@@ -155,7 +136,6 @@ export default function ServicesScreen() {
       setLoadingMore(false);
     }, 300);
   };
-
 
   const handleBuyService = useCallback((service: ServiceItem) => {
     router.replace({
@@ -169,7 +149,6 @@ export default function ServicesScreen() {
       },
     });
   }, [router]);
-
 
   const renderCard = useCallback(
     ({ item }: { item: ServiceItem }) => <ServiceCard item={item} onBuy={handleBuyService} />,
@@ -201,12 +180,8 @@ export default function ServicesScreen() {
           keyExtractor={(item) => item.service_id}
           contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
-
-          /* INFINITE SCROLL */
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}
-
-          /* OPTIMIZACIÓN EXTRA */
           initialNumToRender={8}
           windowSize={5}
           maxToRenderPerBatch={8}

@@ -81,8 +81,7 @@ export default function LoginScreen() {
             if (token) {
                 await AsyncStorage.setItem('token', token);
                 console.log('Token guardado en AsyncStorage');
-                
-                // Actualizamos el contexto global antes de navegar
+
                 await fetchUser();
                 
                 await new Promise(resolve => setTimeout(resolve, 300));
@@ -125,7 +124,6 @@ export default function LoginScreen() {
                 console.log('No había sesión previa para cerrar');
             }
 
-            // Redirigimos de vuelta a login para evitar "unmatched route"
             const { createdSessionId, setActive } = await startOAuthFlow({
                 redirectUrl: Linking.createURL('/(auth)/login', { scheme: 'vitalfit' }),
             });
@@ -167,14 +165,11 @@ export default function LoginScreen() {
                             await AsyncStorage.setItem('token', backendToken);
                             console.log('Token de backend guardado');
 
-                            // Actualizamos el contexto global antes de navegar
                             await fetchUser();
 
-                            // Esperamos 1 segundo para asegurar que el token esté disponible en AsyncStorage
                             await new Promise(resolve => setTimeout(resolve, 1000));
                             console.log('Delay completado, verificando token...');
 
-                            // Verificamos que el token esté realmente guardado antes de navegar
                             const savedToken = await AsyncStorage.getItem('token');
                             if (savedToken) {
                                 console.log('Token verificado en AsyncStorage');
@@ -189,7 +184,6 @@ export default function LoginScreen() {
                                 } else {
                                     router.replace('/(tabs)/dashboard');
                                 }
-
                                 showToast('success', '¡Bienvenido!', 'Iniciaste sesión con Google exitosamente');
                             } else {
                                 console.error('El token no se guardó correctamente en AsyncStorage');

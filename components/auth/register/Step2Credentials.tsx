@@ -10,9 +10,9 @@ import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { ArrowLeft, SlidersVertical } from 'lucide-react-native';
 import { useState } from 'react';
-import { TouchableOpacity } from 'react-native';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { TouchableOpacity } from 'react-native';
 import { PrimaryButton } from '../../PrimaryButton';
 import { StyledTextInput } from '../../StyledTextInput';
 import { SocialButton } from '../SocialButton';
@@ -27,7 +27,7 @@ interface Props {
     isSignedIn?: boolean;
 }
 
-export function Step2Credentials({ control, errors, onNextStep, onPrevStep}: Props) {
+export function Step2Credentials({ control, errors, onNextStep, onPrevStep }: Props) {
     const { t } = useTranslation();
     const router = useRouter();
     const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });

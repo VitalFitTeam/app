@@ -71,8 +71,8 @@ export const RegisterSchema = z
 			.nullable()
 			.refine(
 				(phone) => {
-					if (!phone) return true; // Permite que el campo esté vacío
-					const numericPhone = phone.replace(/\D/g, ''); // Elimina todo lo que no sea dígito
+					if (!phone) return true; 
+					const numericPhone = phone.replace(/\D/g, ''); 
 					return numericPhone.length >= 10 && numericPhone.length <= 15;
 				},
 				{ message: 'El número de teléfono debe tener entre 10 y 15 dígitos.' },

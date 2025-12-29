@@ -7,15 +7,15 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
-    ChatBubbleBottomCenterTextIcon,
-    ChevronLeftIcon,
-    ClipboardDocumentCheckIcon,
-    EnvelopeIcon,
-    GiftIcon,
-    QrCodeIcon,
-    ShareIcon,
-    UserCircleIcon,
-    UserGroupIcon
+  ChatBubbleBottomCenterTextIcon,
+  ChevronLeftIcon,
+  ClipboardDocumentCheckIcon,
+  EnvelopeIcon,
+  GiftIcon,
+  QrCodeIcon,
+  ShareIcon,
+  UserCircleIcon,
+  UserGroupIcon
 } from 'react-native-heroicons/solid';
 
 const referralsHistory = [
@@ -84,7 +84,6 @@ export default function ReferralsScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 40, paddingBottom: 96 }}>
-        {/* Franja superior */}
         <View
           className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'
           style={{ position: 'relative' }}>
@@ -98,7 +97,6 @@ export default function ReferralsScreen() {
           <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Programa de referidos</Text>
         </View>
 
-        {/* Stats superiores */}
         <View className='flex-row mb-4'>
           <View
             className='flex-1 items-center py-3 rounded-2xl mr-2'
@@ -117,7 +115,6 @@ export default function ReferralsScreen() {
           </View>
         </View>
 
-        {/* Código de referido */}
         <View className='items-center mb-4'>
           <Text style={{ color: '#6B7280', fontSize: 12, letterSpacing: 1 }}>TU CÓDIGO DE REFERIDO</Text>
 
@@ -145,7 +142,6 @@ export default function ReferralsScreen() {
           </Text>
         </View>
 
-        {/* Botones de compartir */}
         <View className='flex-row justify-between mb-4'>
           <TouchableOpacity
             activeOpacity={0.8}
@@ -172,7 +168,6 @@ export default function ReferralsScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Beneficios */}
         <View
           className='rounded-2xl mb-4 px-4 py-3'
           style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1 }}>
@@ -219,7 +214,6 @@ export default function ReferralsScreen() {
           </View>
         </View>
 
-        {/* Historial de referidos */}
         <View className='mb-2'>
           <Text className='text-[14px] font-semibold text-[#111827] mb-2'>Historial de referidos</Text>
         </View>

@@ -13,11 +13,9 @@ export default function PersonalInfoScreen() {
 
   const handleBackPress = useCallback(() => {
     if (isEditing) {
-      // Si está en modo edición, cancelar la edición
       setIsEditing(false);
       return true;
     } else {
-      // Si no está editando, ir al perfil
       router.replace('/(recepcionist)/profile');
       return true;
     }
@@ -36,7 +34,6 @@ export default function PersonalInfoScreen() {
 
   const handleSave = () => {
     setIsEditing(false);
-    // Aquí guardarías los datos
     setShowSuccessModal(true);
   };
 
@@ -46,13 +43,11 @@ export default function PersonalInfoScreen() {
 
   const handleCancel = () => {
     setIsEditing(false);
-    // Aquí restaurarías los valores originales
   };
 
   return (
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Avatar + nombre */}
         <View style={styles.headerRow}>
           <Image
             source={{ uri: 'https://randomuser.me/api/portraits/women/32.jpg' }}
@@ -64,14 +59,12 @@ export default function PersonalInfoScreen() {
           </View>
         </View>
 
-        {/* Botón editar */}
         {!isEditing && (
           <TouchableOpacity style={styles.editButton} activeOpacity={0.8} onPress={handleEdit}>
             <ThemedText style={styles.editButtonText}>{t('personalInfo.editButton')}</ThemedText>
           </TouchableOpacity>
         )}
 
-        {/* Información Personal */}
         <View style={styles.card}>
           <ThemedText style={styles.cardTitle}>{t('personalInfo.sections.personal')}</ThemedText>
 
@@ -117,7 +110,6 @@ export default function PersonalInfoScreen() {
           </View>
         </View>
 
-        {/* Información de contacto */}
         <View style={styles.card}>
           <ThemedText style={styles.cardTitle}>{t('personalInfo.sections.contact')}</ThemedText>
 
@@ -144,7 +136,6 @@ export default function PersonalInfoScreen() {
           </View>
         </View>
 
-        {/* Botones de acción en modo edición */}
         {isEditing && (
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.cancelButton} activeOpacity={0.8} onPress={handleCancel}>
@@ -156,8 +147,6 @@ export default function PersonalInfoScreen() {
           </View>
         )}
       </ScrollView>
-
-      {/* Modal de éxito */}
       <Modal
         transparent={true}
         visible={showSuccessModal}
@@ -291,7 +280,6 @@ const styles = StyleSheet.create({
     color: '#000000',
     backgroundColor: '#FFFFFF',
   },
-  // Estilos del modal
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

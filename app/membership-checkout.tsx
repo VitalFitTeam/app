@@ -21,9 +21,6 @@ interface BranchLike {
   branch_map_id?: string;
 }
 
-// Eliminado PLAN_BENEFITS hardcoded ya que se usa i18n
-
-
 export default function MembershipCheckoutScreen() {
   const { t } = useTranslation();
   const params = useLocalSearchParams<{
@@ -32,7 +29,7 @@ export default function MembershipCheckoutScreen() {
     price?: string;
     period?: string;
     type?: string;
-  }>(); // Eliminado currency
+  }>(); 
   const router = useRouter();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,7 +47,6 @@ export default function MembershipCheckoutScreen() {
   });
 
   const onContinue = async () => {
-    // 1. Validar el formulario (Fecha de inicio)
     const result = MembershipCheckoutSchema.safeParse(getValues());
 
     if (!result.success) {
@@ -77,7 +73,6 @@ export default function MembershipCheckoutScreen() {
         return;
       }
 
-      // 2. Obtener datos necesarios (Usuario y Sucursal)
       const [userResponse, branchesResponse] = await Promise.all([
         vitalFitApi.user.WhoAmI(token),
         vitalFitApi.public.getBranchMap(token),
@@ -85,8 +80,6 @@ export default function MembershipCheckoutScreen() {
 
       const userId = userResponse.user?.user_id;
       const firstBranch = branchesResponse.data?.[0];
-
-      // Normalizar objeto de sucursal
       const branchObj = firstBranch as unknown as BranchLike;
       const branchId = branchObj?.branch_id || branchObj?.id || branchObj?.branch_map_id;
 
@@ -100,17 +93,13 @@ export default function MembershipCheckoutScreen() {
       router.push({
         pathname: '/membership-extra',
         params: {
-          // Datos del ítem principal (Membresía o Servicio)
           mainItemId: params.id,
           mainItemTitle: params.title,
           mainItemPrice: params.price,
-          mainItemType: params.type || 'membership', // Default a 'membership'
+          mainItemType: params.type || 'membership', 
           startDate: result.data.startDate,
-          
-          // Datos de contexto para crear la factura luego
           userId: userId,
           branchId: branchId,
-          // Eliminado currency
         },
       } as never);
 
@@ -125,15 +114,12 @@ export default function MembershipCheckoutScreen() {
 
   const benefits = useMemo(() => {
     if (!params.id) return [];
-    // Intentar obtener beneficios desde traducciones usando la clave del plan
     const translationKey = `checkout.benefits.${params.id}`;
     const translatedBenefits = t(translationKey, { returnObjects: true });
     
     if (Array.isArray(translatedBenefits)) {
         return translatedBenefits as string[];
     }
-    
-    // Fallback si no existe traducción o no es array (aunque debería estar en los JSONs)
     return [];
   }, [params.id, t]);
 
@@ -150,8 +136,7 @@ export default function MembershipCheckoutScreen() {
             style={{ fontFamily: 'BebasNeue-Regular' }}>
             {t('checkout.title')}
           </ThemedText>
-          
-          {/* Indicador de Pasos Visuales */}
+
           <View className='flex-row justify-between items-center mb-4'>
             <View className='items-center flex-1'>
               <View
@@ -224,8 +209,6 @@ export default function MembershipCheckoutScreen() {
             </View>
           </View>
         </View>
-
-        {/* Resumen del Plan Seleccionado */}
         <View className='mb-6'>
           <View className='flex-row items-center justify-between'>
             <View className='flex-1 mr-2'>
@@ -271,7 +254,6 @@ export default function MembershipCheckoutScreen() {
           </View>
         </View>
 
-        {/* Lista de Beneficios */}
         <View className='mb-6'>
           {benefits.map((benefit) => (
             <View key={benefit} className='flex-row items-center mb-3'>
@@ -287,7 +269,6 @@ export default function MembershipCheckoutScreen() {
           ))}
         </View>
 
-        {/* Selector de Fecha */}
         <View className='mb-8'>
           <ThemedText
             lightColor='#111827'

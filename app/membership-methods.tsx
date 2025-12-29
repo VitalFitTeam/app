@@ -26,8 +26,7 @@ export default function MembershipMethodsScreen() {
             if(!token) return;
             
             const res = await vitalFitApi.paymentMethod.getBranchPaymentMethods(params.branchId as string, token);
-            
-            // Limpiamos los comentarios innecesarios ya que el acceso es válido
+
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const data = (res.data || res || []) as any[];
             setMethods(data as BranchPaymentMethod[]);

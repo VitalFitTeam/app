@@ -52,7 +52,6 @@ export default function ClassCard({
 					/>
 					<View className='absolute inset-0 bg-black/25' />
 					<View className='absolute inset-0 p-4 justify-between'>
-						{/* Parte superior: título, hora y etiqueta pequeña */}
 						<View>
 							<ThemedText
 								lightColor='#ffffff'
@@ -76,7 +75,6 @@ export default function ClassCard({
 								{t('common.availability')}
 							</ThemedText>
 						</View>
-						{/* Parte inferior: instructor a la izquierda y categoría abajo a la derecha */}
 						<View className='flex-row items-center justify-between mt-2'>
 							<ThemedText
 								lightColor='#E5E7EB'

@@ -12,23 +12,19 @@ export default function SecurityScreen() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
-  // Estados para los valores del formulario
+
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleBackPress = useCallback(() => {
     if (isEditing) {
-      // Si está en modo edición, cancelar la edición
       setIsEditing(false);
-      // Restaurar valores originales
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
       return true;
     } else {
-      // Si no está editando, ir al perfil
       router.replace('/(recepcionist)/profile');
       return true;
     }
@@ -70,7 +66,6 @@ export default function SecurityScreen() {
     }
     
     setIsEditing(false);
-    // Aquí guardarías los datos
     setShowSuccessModal(true);
   };
 
@@ -80,7 +75,6 @@ export default function SecurityScreen() {
 
   const handleCancel = () => {
     setIsEditing(false);
-    // Restaurar valores originales
     setCurrentPassword('');
     setNewPassword('');
     setConfirmPassword('');
@@ -89,7 +83,6 @@ export default function SecurityScreen() {
   return (
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Avatar + nombre */}
         <View style={styles.headerRow}>
           <Image
             source={{ uri: 'https://randomuser.me/api/portraits/women/32.jpg' }}
@@ -101,14 +94,12 @@ export default function SecurityScreen() {
           </View>
         </View>
 
-        {/* Botón editar */}
         {!isEditing && (
           <TouchableOpacity style={styles.editButton} activeOpacity={0.8} onPress={handleEdit}>
             <ThemedText style={styles.editButtonText}>Editar Seguridad</ThemedText>
           </TouchableOpacity>
         )}
 
-        {/* Cambiar contraseña */}
         <View style={styles.card}>
           <ThemedText style={styles.cardTitle}>Cambiar contraseña</ThemedText>
 
@@ -191,7 +182,6 @@ export default function SecurityScreen() {
           </View>
         </View>
 
-        {/* Botones de acción en modo edición */}
         {isEditing && (
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.cancelButton} activeOpacity={0.8} onPress={handleCancel}>
@@ -204,7 +194,6 @@ export default function SecurityScreen() {
         )}
       </ScrollView>
 
-      {/* Modal de éxito */}
       <Modal
         transparent={true}
         visible={showSuccessModal}
@@ -350,7 +339,6 @@ const styles = StyleSheet.create({
     right: 12,
     padding: 4,
   },
-  // Estilos del modal
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

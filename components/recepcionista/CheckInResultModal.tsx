@@ -34,15 +34,12 @@ export function CheckInResultModal({
     >
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.9)' }}>
         <View className="w-11/12 max-w-sm bg-white rounded-3xl p-6 shadow-xl">
-          {/* Botón cerrar */}
           <TouchableOpacity 
             onPress={onClose} 
             className="absolute top-4 right-4 p-1 bg-neutral-100 rounded-full z-10"
           >
             <XMarkIcon size={20} color="#6B7280" />
           </TouchableOpacity>
-
-          {/* Icono principal */}
           <View className="items-center mb-4">
             <View 
               className={`w-20 h-20 rounded-full items-center justify-center mb-4 ${
@@ -68,8 +65,6 @@ export function CheckInResultModal({
               {defaultMessage}
             </ThemedText>
           </View>
-
-          {/* Botón de acción */}
           <TouchableOpacity
             onPress={onClose}
             className={`mt-4 py-3 px-6 rounded-xl ${

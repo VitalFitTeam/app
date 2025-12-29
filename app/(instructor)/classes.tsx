@@ -12,8 +12,8 @@ import { ChevronRightIcon } from 'react-native-heroicons/outline';
 type InstructorClass = {
 	id: string;
 	title: string;
-	date: string; // YYYY-MM-DD
-	time: string; // HH:mm
+	date: string; 
+	time: string; 
 	durationMinutes: number;
 	location: string;
 	capacity: number;
@@ -136,7 +136,6 @@ export default function InstructorClassesScreen() {
 					</ThemedText>
 				</View>
 
-				{/* Toggle Semana / Mes */}
 				<View className='flex-row bg-[#F3F4F6] rounded-2xl p-1 mb-4'>
 					<TouchableOpacity
 						className={`flex-1 py-2 rounded-xl items-center ${
@@ -166,7 +165,6 @@ export default function InstructorClassesScreen() {
 					</TouchableOpacity>
 				</View>
 
-				{/* Calendario */}
 				<View className='mb-6'>
 					{viewMode === 'week' ? (
 						<WeekCalendar
@@ -183,7 +181,6 @@ export default function InstructorClassesScreen() {
 					)}
 				</View>
 
-				{/* Lista de clases del día */}
 				<View className='mb-2'>
 					<ThemedText
 						lightColor='#111827'

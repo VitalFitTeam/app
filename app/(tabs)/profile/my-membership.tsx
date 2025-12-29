@@ -51,7 +51,6 @@ export default function MyMembershipScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 40, paddingBottom: 96 }}>
-        {/* Franja superior */}
         <View
           className="w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center"
           style={{ position: 'relative' }}>
@@ -65,7 +64,6 @@ export default function MyMembershipScreen() {
           <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('myMembership.title')}</Text>
         </View>
 
-        {/* Plan actual */}
         <View className="mb-4">
           <Text
             className="text-[14px] font-semibold text-[#111827] mb-8">
@@ -117,7 +115,6 @@ export default function MyMembershipScreen() {
           </View>
         </View>
 
-        {/* Todos los planes */}
         <View className="mb-3">
           <Text
             className="text-[14px] font-semibold text-[#111827] mb-8">

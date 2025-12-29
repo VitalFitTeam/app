@@ -13,11 +13,13 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, BackHandler, ScrollView, Text, View } from 'react-native';
 import { CalendarDaysIcon, ClockIcon } from 'react-native-heroicons/mini';
 import { ChatBubbleLeftRightIcon, ChevronRightIcon, UserIcon } from 'react-native-heroicons/outline';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type TabType = 'clientes' | 'clases' | 'mensajes';
 
 export default function DashboardInstructor() {
 	const { t } = useTranslation();
+	const insets = useSafeAreaInsets();
 	const [loading, setLoading] = useState(true);
 	const [firstName, setFirstName] = useState<string | null>(null);
 	const [activeTab, setActiveTab] = useState<TabType>('clientes');
@@ -107,7 +109,7 @@ export default function DashboardInstructor() {
 		<ThemedView className='flex-1 bg-white px-2 pt-10'>
 			<ScrollView
 				showsVerticalScrollIndicator={false}
-				contentContainerStyle={{ paddingBottom: 96 }}>
+				contentContainerStyle={{ paddingBottom: Math.max(insets.bottom + 80, 96) }}>
 				<UserHeader
 					name={firstName ?? t('instructor.dashboard.defaultName')}
 					avatarUrl='https://randomuser.me/api/portraits/men/31.jpg'

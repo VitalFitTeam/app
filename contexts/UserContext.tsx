@@ -24,7 +24,7 @@ type UserContextType = {
 	error: string | null;
 	fetchUser: () => Promise<void>;
 	updateLocalUser: (partial: Partial<UserData>) => void;
-	clearUser: () => void; // <--- Nueva función
+	clearUser: () => void; 
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -86,7 +86,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 		setUser(prev => (prev ? { ...prev, ...partial } : prev));
 	}, []);
 
-	// Implementación de la limpieza
 	const clearUser = useCallback(() => {
 		setUser(null);
 		setError(null);

@@ -1,4 +1,3 @@
-// components/auth/Logo.tsx
 import { Image } from 'expo-image';
 
 export function Logo() {

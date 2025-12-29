@@ -21,20 +21,13 @@ export default function CheckInScreen() {
     level: `Nivel ${Math.floor(Math.random() * 10) + 1}`,
     time: `${15 + Math.floor(Math.random() * 4)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
   }));
-
-  // Mostrar solo los primeros 7 clientes inicialmente
   const displayedClients = showAllClients ? clients : clients.slice(0, 7);
-
-  // Resetear a lista corta y scroll hacia arriba cuando la pantalla obtiene foco
   useFocusEffect(
     useCallback(() => {
       setShowAllClients(false);
-      // Scroll hacia arriba con un pequeño delay para asegurar que el componente esté montado
       setTimeout(() => {
         scrollViewRef.current?.scrollTo({ y: 0, animated: true });
       }, 100);
-
-      // Manejar el botón de atrás para ir al inicio
       const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
         router.replace('/(recepcionist)/dashboard');
         return true;
@@ -46,8 +39,6 @@ export default function CheckInScreen() {
 
   const handleScanQR = () => {
     setIsScanning(true);
-    
-    // Simular escaneo de QR
     setTimeout(() => {
       setIsScanning(false);
       Alert.alert(
@@ -62,7 +53,6 @@ export default function CheckInScreen() {
   };
 
   const processCheckIn = () => {
-    // Aquí iría la lógica para procesar el check-in
     Alert.alert(t('common.success'), t('checkIn.successMessage'));
   };
 
@@ -72,7 +62,6 @@ export default function CheckInScreen() {
         ref={scrollViewRef}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        {/* Header con logo y título */}
         <View style={styles.header}>
         <Image 
           source={require('@/assets/images/Frame.png')} 
@@ -82,14 +71,12 @@ export default function CheckInScreen() {
         <ThemedText style={styles.title}>{t('checkIn.title')}</ThemedText>
       </View>
 
-      {/* Tarjeta principal de Validar Check-in */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <CheckCircleIcon width={20} height={20} color="#1F2937" />
           <ThemedText style={styles.cardTitle}>{t('dashboard.validateCheckIn.title')}</ThemedText>
         </View>
 
-        {/* Campo de búsqueda */}
         <View style={styles.searchContainer}>
           <MagnifyingGlassIcon width={18} height={18} color="#1F2937" />
           <TextInput
@@ -99,7 +86,6 @@ export default function CheckInScreen() {
           />
         </View>
 
-        {/* Botón Escanear QR */}
         <TouchableOpacity 
           style={styles.qrButton}
           onPress={handleScanQR}
@@ -109,13 +95,11 @@ export default function CheckInScreen() {
           <ThemedText style={styles.qrButtonText}>{t('dashboard.validateCheckIn.scanQr')}</ThemedText>
         </TouchableOpacity>
 
-        {/* Mensaje de preview */}
         <ThemedText style={styles.previewMessage}>
           {t('checkIn.cameraPreviewUnavailable')}
         </ThemedText>
       </View>
 
-      {/* Lista de clientes usando el componente reutilizable */}
       <ClientList
         clients={displayedClients}
         totalCapacity={100}

@@ -87,8 +87,6 @@ export default function ClassDetailsScreen() {
     status?: string;
     instructor?: string;
   }>();
-
-  // Manejar el botón de atrás para ir a horarios
   useFocusEffect(
     useCallback(() => {
       const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -160,7 +158,6 @@ export default function ClassDetailsScreen() {
             </ThemedText>
           </View>
 
-          {/* Lista de clientes implementado inline */}
           <View style={styles.searchWrapper}>
             <TextInput
               placeholder={t('checkIn.clientList.searchPlaceholder')}

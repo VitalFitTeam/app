@@ -69,14 +69,13 @@ export const UpcomingRoutinesSection: React.FC<Props> = ({ routines, mode = 'mem
 const styles = StyleSheet.create({
 	container: {
 		marginVertical: 16,
-		// Eliminado alignSelf para permitir que el texto del título se centre
 	},
 	sectionTitle: {
 		fontFamily: 'BebasNeue-Regular',
 		fontSize: 28,
 		color: '#000000',
 		marginBottom: 12,
-		textAlign: 'center', // ¡CORRECCIÓN APLICADA AQUÍ!
+		textAlign: 'center', 
 	},
 	card: {
 		alignSelf: 'center',

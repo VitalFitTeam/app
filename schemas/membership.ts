@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Paso 1: Checkout de membresía (solo requiere fecha de inicio por ahora)
 export const MembershipCheckoutSchema = z.object({
   startDate: z
     .string()
@@ -9,7 +8,6 @@ export const MembershipCheckoutSchema = z.object({
 
 export type MembershipCheckoutData = z.infer<typeof MembershipCheckoutSchema>;
 
-// Paso 2: Selección de sucursal y resumen antes de métodos de pago
 export const MembershipPaymentSchema = z.object({
   id: z.string().min(1, 'El plan seleccionado es inválido.'),
   title: z.string().min(1, 'El nombre del plan es requerido.'),
@@ -20,7 +18,6 @@ export const MembershipPaymentSchema = z.object({
 
 export type MembershipPaymentData = z.infer<typeof MembershipPaymentSchema>;
 
-// Paso 3A: Pago por transferencia bancaria
 export const MembershipTransferPaymentSchema = MembershipPaymentSchema.extend({
   reference: z
     .string()
@@ -45,7 +42,6 @@ export type MembershipTransferPaymentData = z.infer<
   typeof MembershipTransferPaymentSchema
 >;
 
-// Paso 3B: Pago por Pago Móvil
 export const MembershipPagoMovilPaymentSchema = MembershipPaymentSchema.extend({
   reference: z
     .string()

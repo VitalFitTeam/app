@@ -66,7 +66,6 @@ export default function RecepcionistNotificationsScreen() {
   return (
     <ThemedView style={styles.container}>
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace('/(recepcionist)/profile')} style={styles.backButton}>
           <ChevronLeftIcon size={28} color='#F97316' />

@@ -13,7 +13,6 @@ if (!API_URL) {
 		'La variable EXPO_PUBLIC_API_URL no está configurada en el APK.\n\nRevisa el archivo app.config.js o EAS Secrets.',
 	);
 
-	//	API_URL = 'https://api-rm8x.onrender.com/v1';
 } else {
 	console.log('API_URL detectada:', API_URL);
 }

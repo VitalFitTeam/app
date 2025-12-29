@@ -1,15 +1,13 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedView } from '@/components/themed-view';
+import vitalFitApi from '@/services/vitalfitSdk';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isAPIError } from '@vitalfit/sdk';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon, ShieldCheckIcon } from 'react-native-heroicons/solid';
-
-import vitalFitApi from '@/services/vitalfitSdk';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isAPIError } from '@vitalfit/sdk';
-
 
 export default function InstructorChangePasswordScreen() {
   const router = useRouter();

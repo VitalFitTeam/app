@@ -28,7 +28,6 @@ export default function ProfileLanguageScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 40, paddingBottom: 96 }}
       >
-        {/* Franja superior */}
         <View
           className="w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center"
           style={{ position: 'relative' }}
@@ -44,7 +43,6 @@ export default function ProfileLanguageScreen() {
           <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('language.title')}</Text>
         </View>
 
-        {/* Descripción */}
         <View style={{ marginBottom: 16 }}>
           <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 4 }}>
             {t('language.changeLanguage')}
@@ -54,7 +52,6 @@ export default function ProfileLanguageScreen() {
           </Text>
         </View>
 
-        {/* Opciones de idioma */}
         <View>
           {LANGUAGES.map(lang => {
             const isSelected = selectedLanguage === lang.code;

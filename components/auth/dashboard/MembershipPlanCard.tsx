@@ -43,7 +43,6 @@ export default function MembershipCard({
 					>
 						{title}
 					</ThemedText>
-					{/* Badge sólo se muestra en la columna derecha junto al check */}
 				</View>
 				{features.length > 0 && (
 					<ThemedText
@@ -56,10 +55,9 @@ export default function MembershipCard({
 						{features[0]}
 					</ThemedText>
 				)}
-				{/* Sin precio en esta columna; va en la columna derecha junto al indicador */}
+
 			</View>
 			<View className='items-end justify-center'>
-				{/* Precio o badge alineado con el círculo */}
 				{isFree ? (
 					badgeLabel ? (
 						<View className='flex-row items-center mb-1'>
@@ -72,7 +70,7 @@ export default function MembershipCard({
 										{badgeLabel}
 									</ThemedText>
 								</View>
-							{/* Círculo / check */}
+
 							<View
 								style={{
 									width: 22,

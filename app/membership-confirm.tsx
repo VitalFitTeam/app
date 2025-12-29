@@ -16,18 +16,12 @@ interface BranchItem {
 
 import { mainCurrencies } from '@/app/constants/billing';
 
-// Monedas soportadas por el backend según documentación oficial
-// Mundiales: USD, EUR, JPY, GBP, AUD, CAD, CHF, CNY
-// Latinoamérica: VES (con tasa BCV), BRL, MXN, ARS, COP, CLP, PEN
-// Otras: INR, RUB
 const SUPPORTED_CURRENCY_CODES = [
-    'USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY', // Mundiales
-    'VES', 'BRL', 'MXN', 'ARS', 'COP', 'CLP', 'PEN',        // Latinoamérica
-    'INR', 'RUB'                                             // Otras
+    'USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY', 
+    'VES', 'BRL', 'MXN', 'ARS', 'COP', 'CLP', 'PEN',        
+    'INR', 'RUB'                                             
 ];
 
-// Array de monedas disponibles (Source of Truth local)
-// Mapeamos para mantener compatibilidad con la UI existente { name: code, symbol, label: code }
 const CURRENCIES = mainCurrencies
     .filter(c => SUPPORTED_CURRENCY_CODES.includes(c.code))
     .map(c => ({
@@ -36,11 +30,10 @@ const CURRENCIES = mainCurrencies
         label: `${c.code} - ${c.name}`
     }));
 
-// Tasa de referencia temporal por si falla la API
 const FALLBACK_RATES: Record<string, number> = {
   'USD': 1,
   'EUR': 0.95,
-  'VES': 60.00, // Tasa ejemplo aprox
+  'VES': 60.00, 
 };
 
 export default function MembershipConfirmScreen() {
@@ -59,12 +52,9 @@ export default function MembershipConfirmScreen() {
 
   const [processing, setProcessing] = useState(false);
 
-  // Estados para Sucursales
   const [branches, setBranches] = useState<BranchItem[]>([]);
   const [selectedBranchId, setSelectedBranchId] = useState<string>(params.branchId || '');
   const [loadingBranches, setLoadingBranches] = useState(true);
-
-  // Estados para Moneda y Conversión
   const [currency, setCurrency] = useState('USD');
   const [rate, setRate] = useState(1);
   const [loadingRate, setLoadingRate] = useState(false);
@@ -72,7 +62,6 @@ export default function MembershipConfirmScreen() {
 
   const selectedCurrencySymbol = CURRENCIES.find(c => c.name === currency)?.symbol || '$';
 
-  // 1. Cargar Sucursales
   useEffect(() => {
     const init = async () => {
       try {
@@ -93,8 +82,7 @@ export default function MembershipConfirmScreen() {
     };
     init();
   }, [params.branchId]);
-  
-  // 2. Fetch Rate cuando cambia la moneda
+
   useEffect(() => {
     const fetchRate = async () => {
       if (currency === 'USD') {
@@ -107,8 +95,6 @@ export default function MembershipConfirmScreen() {
         const token = await AsyncStorage.getItem('token');
         
         console.log(`[Debug] Solicitando tasa para ${currency}...`);
-
-        // Llamada directa al endpoint de tasas de cambio
         const response = await vitalFitApi.client.get({
           url: `/billing/rates/${currency}`,
           jwt: token || '',
@@ -117,8 +103,7 @@ export default function MembershipConfirmScreen() {
         console.log('[Debug] Respuesta Tasa:', response);
 
         let fetchedRate = 1;
-        // La API puede devolver { "VES": 291.35 } o { rate: 291.35 } o { data: { rate: ... } }
-        // La implementación del SDK debería devolver la respuesta parseada
+        //Wilder puta
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const anyResponse = response as any;
 
@@ -139,13 +124,9 @@ export default function MembershipConfirmScreen() {
 
       } catch (error) {
         console.error(`[Error] Falló obtención de tasa para ${currency}:`, error);
-        
-        // Usar Fallback
         const fallback = FALLBACK_RATES[currency] || 1;
         console.log(`[Debug] Usando tasa fallback para ${currency}: ${fallback}`);
         
-        // No mostramos alerta intrusiva cada vez, solo si es manual o muy necesario.
-        // Opcional: Mostrar un Toast o warning visual pequeño.
         if (fallback !== 1) {
             setRate(fallback);
         } else {
@@ -166,13 +147,11 @@ export default function MembershipConfirmScreen() {
     } catch { return []; }
   }, [params.packagesJson]);
 
-  // Cálculos de Totales en USD
   const mainPriceUSD = parseFloat(params.mainItemPrice || '0');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const packagesTotalUSD = selectedPackages.reduce((sum: number, pkg: any) => sum + (pkg.price || 0), 0);
   const grandTotalUSD = mainPriceUSD + packagesTotalUSD;
 
-  // Total Convertido
   const grandTotalConverted = grandTotalUSD * rate;
 
   const [existingInvoiceId, setExistingInvoiceId] = useState<string | null>(null);
@@ -209,13 +188,11 @@ export default function MembershipConfirmScreen() {
         }
       });
 
-      // Crear factura
       const invoiceResponse = await vitalFitApi.billing.createInvoice({
         branch_id: selectedBranchId,
         user_id: params.userId || null,
         items: invoiceItems,
       }, token);
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const responseData = invoiceResponse as any;
       const invoiceId = responseData.invoice_id || responseData.id || responseData.data?.invoice_id;
@@ -240,8 +217,8 @@ export default function MembershipConfirmScreen() {
       pathname: '/membership-payment',
       params: {
         invoiceId: invoiceId,
-        totalAmount: grandTotalConverted.toFixed(2), // Enviamos el monto YA CONVERTIDO
-        currency: currency, // La moneda seleccionada
+        totalAmount: grandTotalConverted.toFixed(2), 
+        currency: currency, 
         title: params.mainItemTitle,
         branchId: selectedBranchId
       }
@@ -252,7 +229,6 @@ export default function MembershipConfirmScreen() {
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView className="flex-1 px-6 pt-8 pb-32">
 
-        {/* Header Pasos */}
         <View className='mb-8'>
           <ThemedText lightColor='#f97316' darkColor='#f97316' className='text-4xl mb-4 text-center' style={{ fontFamily: 'BebasNeue-Regular' }}>
             {t('confirm.title')}
@@ -279,10 +255,8 @@ export default function MembershipConfirmScreen() {
           </View>
         </View>
 
-        {/* Sección: Configuración */}
         <ThemedText className="text-xl font-bold mb-4">{t('confirm.paymentConfig')}</ThemedText>
 
-        {/* Selector de Sucursal */}
         <View className="mb-4">
           <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.branch')}</ThemedText>
           {loadingBranches ? (
@@ -309,8 +283,7 @@ export default function MembershipConfirmScreen() {
             </ScrollView>
           )}
         </View>
-        
-        {/* Selector de Moneda */}
+
         <View className="mb-6">
             <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.currency')}</ThemedText>
             <TouchableOpacity 
@@ -361,7 +334,6 @@ export default function MembershipConfirmScreen() {
             </Modal>
         </View>
 
-        {/* Detalle de Costos (Base USD) */}
         <View className="bg-neutral-50 p-5 rounded-2xl border border-neutral-200 mb-6">
           <ThemedText className="text-xs text-orange-500 font-bold tracking-widest uppercase mb-3">
              {t('confirm.detailUSD')}
@@ -371,7 +343,6 @@ export default function MembershipConfirmScreen() {
             <ThemedText className="text-neutral-700">{params.mainItemTitle}</ThemedText>
             <ThemedText className="font-bold text-neutral-900">${mainPriceUSD.toFixed(2)}</ThemedText>
           </View>
-
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {selectedPackages.map((pkg: any, index: number) => (
             <View key={index} className="flex-row justify-between mb-2">
@@ -388,7 +359,6 @@ export default function MembershipConfirmScreen() {
           </View>
         </View>
 
-        {/* Sección Total Final Convertido */}
         <View className="mt-2 border-t border-neutral-100 pt-4 mb-8">
           <View className="flex-row justify-between items-end">
             <View>
@@ -415,7 +385,6 @@ export default function MembershipConfirmScreen() {
           </View>
         </View>
 
-        {/* Botón Acción */}
         {processing ? (
           <View className="items-center py-4">
             <ActivityIndicator size="large" color="#f97316" />

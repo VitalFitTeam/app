@@ -1,9 +1,9 @@
-import React from 'react';
-import { Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import React from 'react';
+import { Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, XMarkIcon } from 'react-native-heroicons/solid';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const options = {
   headerShown: false,
@@ -23,14 +23,12 @@ export default function RoutineDetailsScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }} edges={['top', 'left', 'right']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
-        {/* Header image carousel */}
         <View style={{ width: '100%', height: 220 }}>
           <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
             { [require('@/assets/images/rutin.png')].map((src, idx) => (
               <Image key={idx} source={src} style={{ width, height: 220 }} resizeMode="cover" />
             )) }
           </ScrollView>
-          {/* Close button overlay */}
           <TouchableOpacity
             onPress={() => router.back()}
             activeOpacity={0.8}
@@ -42,13 +40,9 @@ export default function RoutineDetailsScreen() {
 
         <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
           <Text style={{ color: '#111827', fontWeight: '700', fontSize: 16, marginBottom: 8 }}>LISTA DE EJERCICIOS</Text>
-
-          {/* Barra de progreso */}
           <View style={{ height: 8, backgroundColor: '#E5E7EB', borderRadius: 4, overflow: 'hidden', marginBottom: 16 }}>
             <View style={{ width: '40%', height: '100%', backgroundColor: '#F27F2A' }} />
           </View>
-
-          {/* Exercise cards con gradiente marrón acentuado y check en esquina */}
           <View>
             {exercises.map((ex) => (
               <LinearGradient
@@ -59,12 +53,10 @@ export default function RoutineDetailsScreen() {
                 end={{ x: 1, y: 0.5 }}
                 style={{ borderRadius: 16, padding: 14, marginBottom: 12 }}
               >
-                {/* Ícono check en esquina superior derecha */}
                 <View style={{ position: 'absolute', top: 8, right: 8 }}>
                   <CheckCircleIcon size={20} color="#F27F2A" />
                 </View>
 
-                {/* Contenido de la tarjeta sobre el gradiente directamente (sin contenedor adicional naranja) */}
                 <Text style={{ color: '#FFFFFF', fontWeight: '500', fontSize: 16, marginBottom: 10 }}>{ex.title}</Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
                   <View>

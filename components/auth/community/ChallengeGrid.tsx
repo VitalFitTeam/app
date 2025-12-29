@@ -17,7 +17,6 @@ export default function ChallengeGrid({
 			<Text className='text-neutral-500 font-semibold mb-3'>Challenge</Text>
 
 			<View className='flex-row justify-between'>
-				{/* Plank Challenge */}
 				<TouchableOpacity
 					activeOpacity={0.85}
 					onPress={onPlankPress}
@@ -40,8 +39,6 @@ export default function ChallengeGrid({
 						</Text>
 					</View>
 				</TouchableOpacity>
-
-				{/* Sprint Challenge */}
 				<TouchableOpacity
 					activeOpacity={0.85}
 					onPress={onSprintPress}
@@ -65,7 +62,6 @@ export default function ChallengeGrid({
 					</View>
 				</TouchableOpacity>
 
-				{/* Squat Challenge */}
 				<TouchableOpacity
 					activeOpacity={0.85}
 					onPress={onSquatPress}

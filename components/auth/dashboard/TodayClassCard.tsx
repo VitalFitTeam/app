@@ -5,8 +5,8 @@ import { CalendarDaysIcon, ChevronRightIcon, ClockIcon } from 'react-native-hero
 type TodayClassProps = {
 	title?: string;
 	dateLabel?: string;
-	spotsLabel?: string; // ej: "10/15"
-	timeLabel?: string; // ej: "07:00 (90 MIN)"
+	spotsLabel?: string; 
+	timeLabel?: string; 
 	headerTitle?: string;
 };
 
