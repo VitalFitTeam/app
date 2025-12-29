@@ -62,8 +62,18 @@ export default function MembershipConfirmScreen() {
   const [loadingRate, setLoadingRate] = useState(false);
   const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
 
+  // Estado para el impuesto (valor decimal directo del API, ej: 0.21)
+  const [taxRate, setTaxRate] = useState<number>(0);
+  const [loadingTax, setLoadingTax] = useState(false);
+
   const selectedCurrencySymbol = CURRENCIES.find(c => c.name === currency)?.symbol || '$';
   const selectedBranchName = branches.find(b => b.branch_id === selectedBranchId)?.name || t('confirm.selectBranch');
+
+  // Convierte 0.21 -> "21%"
+  const formatTaxRate = (decimalRate: number): string => {
+    const percentage = Math.round(decimalRate * 100);
+    return `${percentage}%`;
+  };
 
   useEffect(() => {
     const init = async () => {
@@ -120,17 +130,11 @@ export default function MembershipConfirmScreen() {
 
         setRate(fetchedRate);
 
-
       } catch (error) {
         console.error(`[Error] Falló obtención de tasa para ${currency}:`, error);
-        
         const fallback = FALLBACK_RATES[currency] || 1;
-        
-        if (fallback !== 1) {
-            setRate(fallback);
-        } else {
-            setRate(1);
-        }
+        if (fallback !== 1) setRate(fallback);
+        else setRate(1);
       } finally {
         setLoadingRate(false);
       }
@@ -139,6 +143,58 @@ export default function MembershipConfirmScreen() {
     fetchRate();
   }, [currency]);
 
+  useEffect(() => {
+    const fetchTax = async () => {
+      if (!selectedBranchId) return;
+
+      setLoadingTax(true);
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) return;
+
+        console.log('[DEBUG] Solicitando impuesto para Branch ID:', selectedBranchId);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const response = await (vitalFitApi.billing as any).getTaxRateByBranch(token, selectedBranchId);
+        
+        console.log('[DEBUG] Respuesta Impuesto RAW:', response);
+
+        let extractedRate = 0;
+
+        if (typeof response === 'number') {
+            extractedRate = response;
+        } else if (typeof response === 'string') {
+            extractedRate = parseFloat(response);
+        } else if (typeof response === 'object' && response !== null) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const r = response as any;
+            
+            // AQUI ESTABA EL ERROR: Ahora buscamos explícitamente 'tax_rate'
+            if (r.tax_rate !== undefined && r.tax_rate !== null) extractedRate = Number(r.tax_rate);
+            else if (r.rate !== undefined && r.rate !== null) extractedRate = Number(r.rate);
+            else if (r.value !== undefined && r.value !== null) extractedRate = Number(r.value);
+            else if (r.data?.tax_rate !== undefined) extractedRate = Number(r.data.tax_rate);
+            else if (r.data?.rate !== undefined) extractedRate = Number(r.data.rate);
+        }
+
+        console.log('[DEBUG] Tasa extraída (decimal):', extractedRate);
+        
+        if (!isNaN(extractedRate)) {
+            setTaxRate(extractedRate);
+        } else {
+            setTaxRate(0);
+        }
+        
+      } catch (error) {
+        console.error("Error fetching tax rate", error);
+        setTaxRate(0);
+      } finally {
+        setLoadingTax(false);
+      }
+    };
+
+    fetchTax();
+  }, [selectedBranchId]);
 
   const selectedPackages = useMemo(() => {
     try {
@@ -149,7 +205,13 @@ export default function MembershipConfirmScreen() {
   const mainPriceUSD = parseFloat(params.mainItemPrice || '0');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const packagesTotalUSD = selectedPackages.reduce((sum: number, pkg: any) => sum + (pkg.price || 0), 0);
-  const grandTotalUSD = mainPriceUSD + packagesTotalUSD;
+  
+  const subTotalUSD = mainPriceUSD + packagesTotalUSD;
+  
+  // Cálculo: 100 * 0.21 = 21
+  const taxAmountUSD = subTotalUSD * taxRate;
+  
+  const grandTotalUSD = subTotalUSD + taxAmountUSD;
 
   const grandTotalConverted = grandTotalUSD * rate;
 
@@ -260,6 +322,7 @@ export default function MembershipConfirmScreen() {
 
         <ThemedText className="text-xl font-bold mb-4">{t('confirm.paymentConfig')}</ThemedText>
 
+        {/* Selección de Sucursal */}
         <View className="mb-4">
           <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.branch')}</ThemedText>
           {loadingBranches ? (
@@ -321,6 +384,7 @@ export default function MembershipConfirmScreen() {
           )}
         </View>
         
+        {/* Selección de Moneda */}
         <View className="mb-6">
             <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.currency')}</ThemedText>
             <TouchableOpacity 
@@ -373,6 +437,7 @@ export default function MembershipConfirmScreen() {
             </Modal>
         </View>
 
+        {/* Detalle de Costos */}
         <View className="bg-neutral-50 p-5 rounded-2xl border border-neutral-200 mb-6">
           <ThemedText className="text-xs text-orange-500 font-bold tracking-widest uppercase mb-3">
              {t('confirm.detailUSD')}
@@ -395,12 +460,24 @@ export default function MembershipConfirmScreen() {
 
           <View className="h-[1px] bg-neutral-200 my-2" />
 
+          {/* Campo de Impuesto */}
+          {loadingTax ? (
+             <ActivityIndicator size="small" color="#f97316" className="my-2" />
+          ) : (
+            <View className="flex-row justify-between mb-2">
+                {/* Visualización: muestra el porcentaje entero (21%) */}
+                <ThemedText className="text-neutral-600 text-sm flex-1 mr-2">Impuesto ({formatTaxRate(taxRate)})</ThemedText>
+                <ThemedText className="font-bold text-neutral-800 text-sm">${taxAmountUSD.toFixed(2)}</ThemedText>
+            </View>
+          )}
+
           <View className="flex-row justify-between items-center">
             <ThemedText className="font-bold text-neutral-500">{t('confirm.totalUSD')}</ThemedText>
             <ThemedText className="font-bold text-lg text-neutral-900">${grandTotalUSD.toFixed(2)}</ThemedText>
           </View>
         </View>
 
+        {/* Total Final Convertido */}
         <View className="mt-2 border-t border-neutral-100 pt-4 mb-8">
           <View className="flex-row justify-between items-end">
             <View>
@@ -436,7 +513,7 @@ export default function MembershipConfirmScreen() {
           <PrimaryButton
             title={t('confirm.confirmWithPay')}
             onPress={handleConfirmOrder}
-            disabled={loadingRate}
+            disabled={loadingRate || loadingTax}
           />
         )}
 
