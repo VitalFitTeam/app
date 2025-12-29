@@ -1,4 +1,5 @@
 import { ReservationsProvider } from '@/contexts/reservations';
+import { UserProvider } from '@/contexts/UserContext';
 import { ClerkProvider } from '@clerk/clerk-expo';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -54,7 +55,8 @@ export default function RootLayout() {
 
     return (
         <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-            <ReservationsProvider>
+            <UserProvider>
+                <ReservationsProvider>
                 <ThemeProvider value={DefaultTheme}>
                     <Stack>
                         <Stack.Screen name='index' options={{ headerShown: false }} />
@@ -220,7 +222,8 @@ export default function RootLayout() {
                     </Stack>
                     <StatusBar style='auto' />
                 </ThemeProvider>
-            </ReservationsProvider>
+                </ReservationsProvider>
+            </UserProvider>
         </ClerkProvider>
     );
 }
