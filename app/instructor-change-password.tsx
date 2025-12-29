@@ -1,12 +1,15 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedView } from '@/components/themed-view';
-import vitalFitApi from '@/services/vitalfitSdk';
-import { isAPIError } from '@vitalfit/sdk';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon, ShieldCheckIcon } from 'react-native-heroicons/solid';
+
+import vitalFitApi from '@/services/vitalfitSdk';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isAPIError } from '@vitalfit/sdk';
+
 
 export default function InstructorChangePasswordScreen() {
   const router = useRouter();
@@ -26,8 +29,6 @@ export default function InstructorChangePasswordScreen() {
     setIsLoading(true);
     setErrorMessage(null);
     try {
-      // Opcional: llamar a un endpoint de validación si existe.
-      // Por ahora asumimos que el backend validará junto con el cambio final.
       setStep(2);
     } finally {
       setIsLoading(false);
@@ -47,20 +48,30 @@ export default function InstructorChangePasswordScreen() {
     setIsLoading(true);
     setErrorMessage(null);
     try {
-      await vitalFitApi.client.post({
-        url: '/auth/password/change',
-        data: {
-          current_password: currentPassword,
-          password: newPassword,
-          confirm_password: confirmPassword,
-        },
-      });
+      const token = await AsyncStorage.getItem('token');
+      if (!token) throw new Error('No se encontró sesión activa');
 
-      router.back();
+      await vitalFitApi.user.UpgradePassword(
+        token,
+        currentPassword,
+        newPassword,
+        confirmPassword
+      );
+
+      Alert.alert('Éxito', 'Contraseña actualizada correctamente', [
+        { text: 'OK', onPress: () => router.back() },
+      ]);
     } catch (error: unknown) {
       let message = 'Ocurrió un error al cambiar la contraseña.';
+      
       if (isAPIError(error)) {
-        message = error.messages.join(', ');
+        if (error.status === 401) {
+          message = 'La contraseña actual es incorrecta.';
+        } else if (error.messages && error.messages.length > 0) {
+          message = error.messages.join(', ');
+        } else if (error.message && error.message !== 'Ocurrió un error inesperado') {
+          message = error.message;
+        }
       } else if (error instanceof Error) {
         message = error.message;
       }
@@ -79,7 +90,6 @@ export default function InstructorChangePasswordScreen() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
-          {/* Franja superior */}
           <View
             className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'
             style={{ position: 'relative' }}>
@@ -98,7 +108,6 @@ export default function InstructorChangePasswordScreen() {
             </Text>
           </View>
 
-          {/* Header de seguridad */}
           <View className='mb-4 flex-row items-center'>
             <View className='w-9 h-9 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
               <ShieldCheckIcon width={20} height={20} color='#111827' />
