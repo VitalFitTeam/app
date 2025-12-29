@@ -1,3 +1,4 @@
+
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
 import vitalFitApi from '@/services/vitalfitSdk';
@@ -27,25 +28,24 @@ export default function MembershipExtraScreen() {
     startDate?: string;
     userId?: string;
     branchId?: string;
-  }>();
+  }>(); // Eliminado currency
 
   const [loading, setLoading] = useState(true);
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [selectedPackagesIds, setSelectedPackagesIds] = useState<string[]>([]);
-
+  
   useEffect(() => {
     const loadPackages = async () => {
       try {
-        // Obtenemos token solo para asegurar sesión, aunque getPackages es público
         await AsyncStorage.getItem('token');
         
+        // Forzamos USD al cargar paquetes
         const response = await vitalFitApi.public.getPackages({
           page: 1, 
           limit: 50, 
-          currency: 'USD'
+          currency: 'USD' 
         });
         
-         
         // @ts-expect-error: Manejo flexible de respuesta
         const data = response.data || response.results || response.items || [];
         setPackages(data);
@@ -121,7 +121,7 @@ export default function MembershipExtraScreen() {
                darkColor="#f97316" 
                className="font-extrabold text-xl"
              >
-               ${item.price}
+               ${item.price} {/* Siempre es USD */}
              </ThemedText>
              {isSelected ? (
                 <View className="flex-row items-center mt-1">

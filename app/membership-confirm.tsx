@@ -1,11 +1,10 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
 import vitalFitApi from '@/services/vitalfitSdk';
-// Importamos la constante de monedas directamente del SDK
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { mainCurrencies } from '@vitalfit/sdk';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Modal, ScrollView, TouchableOpacity, View } from 'react-native';
 import { CurrencyDollarIcon, MapPinIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,13 +14,37 @@ interface BranchItem {
   name: string;
 }
 
-// Tipo para la respuesta de tasas
-interface RateResponse {
-  rate?: number;
-  data?: { rate?: number };
-}
+import { mainCurrencies } from '@/app/constants/billing';
+
+// Monedas soportadas por el backend según documentación oficial
+// Mundiales: USD, EUR, JPY, GBP, AUD, CAD, CHF, CNY
+// Latinoamérica: VES (con tasa BCV), BRL, MXN, ARS, COP, CLP, PEN
+// Otras: INR, RUB
+const SUPPORTED_CURRENCY_CODES = [
+    'USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY', // Mundiales
+    'VES', 'BRL', 'MXN', 'ARS', 'COP', 'CLP', 'PEN',        // Latinoamérica
+    'INR', 'RUB'                                             // Otras
+];
+
+// Array de monedas disponibles (Source of Truth local)
+// Mapeamos para mantener compatibilidad con la UI existente { name: code, symbol, label: code }
+const CURRENCIES = mainCurrencies
+    .filter(c => SUPPORTED_CURRENCY_CODES.includes(c.code))
+    .map(c => ({
+        name: c.code,
+        symbol: c.symbol,
+        label: `${c.code} - ${c.name}`
+    }));
+
+// Tasa de referencia temporal por si falla la API
+const FALLBACK_RATES: Record<string, number> = {
+  'USD': 1,
+  'EUR': 0.95,
+  'VES': 60.00, // Tasa ejemplo aprox
+};
 
 export default function MembershipConfirmScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{
     mainItemId?: string;
@@ -41,20 +64,20 @@ export default function MembershipConfirmScreen() {
   const [selectedBranchId, setSelectedBranchId] = useState<string>(params.branchId || '');
   const [loadingBranches, setLoadingBranches] = useState(true);
 
-  // Estados para Moneda
-  const [selectedCurrency, setSelectedCurrency] = useState('USD');
-  const [exchangeRate, setExchangeRate] = useState(1);
+  // Estados para Moneda y Conversión
+  const [currency, setCurrency] = useState('USD');
+  const [rate, setRate] = useState(1);
   const [loadingRate, setLoadingRate] = useState(false);
-  const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
+  const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
 
-  // 1. Cargar Sucursales y Token inicial
+  const selectedCurrencySymbol = CURRENCIES.find(c => c.name === currency)?.symbol || '$';
+
+  // 1. Cargar Sucursales
   useEffect(() => {
     const init = async () => {
       try {
         const token = await AsyncStorage.getItem('token');
         const response = await vitalFitApi.public.getBranchMap(token || '');
-
-
 
         const data = response.data || response || [];
         setBranches(data as BranchItem[]);
@@ -70,49 +93,72 @@ export default function MembershipConfirmScreen() {
     };
     init();
   }, [params.branchId]);
-
-  // 2. Efecto para cargar tasa de cambio
+  
+  // 2. Fetch Rate cuando cambia la moneda
   useEffect(() => {
     const fetchRate = async () => {
-      if (selectedCurrency === 'USD') {
-        setExchangeRate(1);
+      if (currency === 'USD') {
+        setRate(1);
         return;
       }
 
       setLoadingRate(true);
       try {
         const token = await AsyncStorage.getItem('token');
+        
+        console.log(`[Debug] Solicitando tasa para ${currency}...`);
 
+        // Llamada directa al endpoint de tasas de cambio
         const response = await vitalFitApi.client.get({
-          url: `/billing/rates/${selectedCurrency}`,
-          jwt: token || undefined
-        }) as RateResponse | number;
+          url: `/billing/rates/${currency}`,
+          jwt: token || '',
+        });
 
-        let rate = 1;
-        if (typeof response === 'number') {
-          rate = response;
-        } else if (response && typeof response === 'object' && 'rate' in response && typeof response.rate === 'number') {
-          rate = response.rate;
-        } else if (response && typeof response === 'object' && 'data' in response && response.data && typeof response.data.rate === 'number') {
-          rate = response.data.rate;
-        }
+        console.log('[Debug] Respuesta Tasa:', response);
 
-        if (rate) {
-          setExchangeRate(rate);
-        } else {
-          setExchangeRate(1);
+        let fetchedRate = 1;
+        // La API puede devolver { "VES": 291.35 } o { rate: 291.35 } o { data: { rate: ... } }
+        // La implementación del SDK debería devolver la respuesta parseada
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const anyResponse = response as any;
+
+        if (typeof anyResponse === 'number') {
+            fetchedRate = anyResponse;
+        } else if (anyResponse?.[currency]) {
+            fetchedRate = anyResponse[currency];
+        } else if (anyResponse?.rate) {
+            fetchedRate = anyResponse.rate;
+        } else if (anyResponse?.data?.rate) {
+            fetchedRate = anyResponse.data.rate;
         }
+        
+        if (!fetchedRate || fetchedRate === 0) throw new Error("Tasa inválida (0 o null)");
+
+        setRate(fetchedRate);
+
+
       } catch (error) {
-        // CORRECCIÓN: Usamos la variable 'error' en el log para evitar el warning de unused-vars
-        console.log(`No se pudo obtener tasa para ${selectedCurrency}, usando referencia 1:1. Detalles:`, error);
-        setExchangeRate(1);
+        console.error(`[Error] Falló obtención de tasa para ${currency}:`, error);
+        
+        // Usar Fallback
+        const fallback = FALLBACK_RATES[currency] || 1;
+        console.log(`[Debug] Usando tasa fallback para ${currency}: ${fallback}`);
+        
+        // No mostramos alerta intrusiva cada vez, solo si es manual o muy necesario.
+        // Opcional: Mostrar un Toast o warning visual pequeño.
+        if (fallback !== 1) {
+            setRate(fallback);
+        } else {
+            setRate(1);
+        }
       } finally {
         setLoadingRate(false);
       }
     };
 
     fetchRate();
-  }, [selectedCurrency]);
+  }, [currency]);
+
 
   const selectedPackages = useMemo(() => {
     try {
@@ -120,35 +166,32 @@ export default function MembershipConfirmScreen() {
     } catch { return []; }
   }, [params.packagesJson]);
 
+  // Cálculos de Totales en USD
   const mainPriceUSD = parseFloat(params.mainItemPrice || '0');
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const packagesTotalUSD = selectedPackages.reduce((sum: number, pkg: any) => sum + (pkg.price || 0), 0);
   const grandTotalUSD = mainPriceUSD + packagesTotalUSD;
-  const grandTotalConverted = grandTotalUSD * exchangeRate;
 
-  const selectedBranchName = branches.find(b => b.branch_id === selectedBranchId)?.name || 'Seleccionar';
+  // Total Convertido
+  const grandTotalConverted = grandTotalUSD * rate;
 
-  // Estado para controlar Idempotencia (Factura ya creada en esta sesión)
   const [existingInvoiceId, setExistingInvoiceId] = useState<string | null>(null);
 
   const handleConfirmOrder = async () => {
     if (!selectedBranchId) {
-      Alert.alert("Atención", "Por favor selecciona una sucursal.");
+      Alert.alert(t('common.attention'), t('confirm.alert.selectBranch'));
       return;
     }
 
     setProcessing(true);
     try {
-      // 1. Verificación de Idempotencia: Si ya creamos factura, no creamos otra
       if (existingInvoiceId) {
-        console.log("Factura existente detectada, reusando:", existingInvoiceId);
         navigateToPayment(existingInvoiceId);
         return;
       }
 
       const token = await AsyncStorage.getItem('token');
-      if (!token) throw new Error('Sesión no válida');
+      if (!token) throw new Error(t('confirm.error.invalidSession'));
 
       const invoiceItems = [];
       if (params.mainItemId) {
@@ -166,28 +209,27 @@ export default function MembershipConfirmScreen() {
         }
       });
 
+      // Crear factura
       const invoiceResponse = await vitalFitApi.billing.createInvoice({
         branch_id: selectedBranchId,
         user_id: params.userId || null,
-        items: invoiceItems
+        items: invoiceItems,
       }, token);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const responseData = invoiceResponse as any;
       const invoiceId = responseData.invoice_id || responseData.id || responseData.data?.invoice_id;
 
-      if (!invoiceId) throw new Error('No se recibió ID de factura');
+      if (!invoiceId) throw new Error(t('confirm.error.invoiceIdMissing'));
 
-      // 2. Guardamos el ID para evitar duplicados si el usuario vuelve a presionar
       setExistingInvoiceId(invoiceId);
-
-      // 3. Navegamos
       navigateToPayment(invoiceId);
 
     } catch (error) {
       console.error(error);
-      const msg = error instanceof Error ? error.message : 'Error desconocido';
-      Alert.alert('Error', msg);
+      console.error(error);
+      const msg = error instanceof Error ? error.message : t('common.error.unknown');
+      Alert.alert(t('common.error.title'), msg);
     } finally {
       setProcessing(false);
     }
@@ -198,8 +240,8 @@ export default function MembershipConfirmScreen() {
       pathname: '/membership-payment',
       params: {
         invoiceId: invoiceId,
-        totalAmount: grandTotalConverted.toFixed(2),
-        currency: selectedCurrency,
+        totalAmount: grandTotalConverted.toFixed(2), // Enviamos el monto YA CONVERTIDO
+        currency: currency, // La moneda seleccionada
         title: params.mainItemTitle,
         branchId: selectedBranchId
       }
@@ -213,36 +255,36 @@ export default function MembershipConfirmScreen() {
         {/* Header Pasos */}
         <View className='mb-8'>
           <ThemedText lightColor='#f97316' darkColor='#f97316' className='text-4xl mb-4 text-center' style={{ fontFamily: 'BebasNeue-Regular' }}>
-            RESUMEN
+            {t('confirm.title')}
           </ThemedText>
           <View className='flex-row justify-between items-center mb-4'>
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
                 <ThemedText className='text-[10px] font-semibold text-gray-800'>1</ThemedText>
               </View>
-              <ThemedText className='text-[11px] text-center text-gray-800'>Opciones</ThemedText>
+              <ThemedText className='text-[11px] text-center text-gray-800'>{t('checkout.steps.options')}</ThemedText>
             </View>
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
                 <ThemedText className='text-[10px] font-semibold text-gray-800'>2</ThemedText>
               </View>
-              <ThemedText className='text-[11px] text-center text-gray-800'>Extras</ThemedText>
+              <ThemedText className='text-[11px] text-center text-gray-800'>{t('checkout.steps.extras')}</ThemedText>
             </View>
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-orange-500 border-orange-500'>
                 <ThemedText className='text-[10px] font-semibold text-white'>3</ThemedText>
               </View>
-              <ThemedText className='text-[11px] text-center text-orange-600 font-bold'>Confirmación</ThemedText>
+              <ThemedText className='text-[11px] text-center text-orange-600 font-bold'>{t('checkout.steps.confirmation')}</ThemedText>
             </View>
           </View>
         </View>
 
         {/* Sección: Configuración */}
-        <ThemedText className="text-xl font-bold mb-4">Configuración</ThemedText>
+        <ThemedText className="text-xl font-bold mb-4">{t('confirm.paymentConfig')}</ThemedText>
 
         {/* Selector de Sucursal */}
         <View className="mb-4">
-          <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">SUCURSAL</ThemedText>
+          <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.branch')}</ThemedText>
           {loadingBranches ? (
             <ActivityIndicator size="small" color="#f97316" />
           ) : (
@@ -267,79 +309,63 @@ export default function MembershipConfirmScreen() {
             </ScrollView>
           )}
         </View>
-
+        
         {/* Selector de Moneda */}
         <View className="mb-6">
-          <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">MONEDA DE PAGO</ThemedText>
-          <TouchableOpacity
-            onPress={() => setCurrencyDropdownOpen(true)}
-            disabled={loadingRate}
-            className="px-4 py-3 rounded-lg border border-neutral-200 bg-white flex-row items-center justify-between"
-          >
-            <View className="flex-row items-center">
-              <CurrencyDollarIcon size={16} color="#3b82f6" />
-              <ThemedText className="ml-2 text-sm font-bold text-gray-800">
-                {mainCurrencies.find(c => c.code === selectedCurrency)?.code || 'USD'}
-              </ThemedText>
-            </View>
-            <ThemedText className="text-gray-400">▼</ThemedText>
-          </TouchableOpacity>
-
-          {/* Modal Dropdown */}
-          <Modal
-            visible={currencyDropdownOpen}
-            transparent={true}
-            animationType="fade"
-            onRequestClose={() => setCurrencyDropdownOpen(false)}
-          >
-            <TouchableOpacity
-              className="flex-1 bg-black/50 justify-center items-center"
-              activeOpacity={1}
-              onPress={() => setCurrencyDropdownOpen(false)}
+            <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.currency')}</ThemedText>
+            <TouchableOpacity 
+                onPress={() => setCurrencyModalVisible(true)}
+                className="flex-row items-center justify-between border border-gray-300 rounded-xl p-4 bg-white"
             >
-              <View className="bg-white rounded-2xl w-4/5 max-h-96 overflow-hidden" style={{ elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84 }}>
-                <View className="px-4 py-3 border-b border-neutral-200">
-                  <ThemedText className="text-sm font-bold text-gray-700 uppercase">Seleccionar Moneda</ThemedText>
+                <View className="flex-row items-center">
+                    <CurrencyDollarIcon size={20} color="#f97316" />
+                    <ThemedText className="ml-3 font-bold text-lg text-gray-800">
+                        {currency} ({selectedCurrencySymbol})
+                    </ThemedText>
                 </View>
-                <ScrollView className="max-h-80">
-                  {mainCurrencies.map((currency) => {
-                    const isSelected = selectedCurrency === currency.code;
-                    return (
-                      <TouchableOpacity
-                        key={currency.code}
-                        onPress={() => {
-                          setSelectedCurrency(currency.code);
-                          setCurrencyDropdownOpen(false);
-                        }}
-                        className={`px-4 py-4 border-b border-neutral-100 flex-row items-center justify-between ${isSelected ? 'bg-blue-50' : 'bg-white'
-                          }`}
-                      >
-                        <View className="flex-row items-center">
-                          <CurrencyDollarIcon size={18} color={isSelected ? '#3b82f6' : '#9ca3af'} />
-                          <View className="ml-3">
-                            <ThemedText className={`text-base font-bold ${isSelected ? 'text-blue-800' : 'text-gray-800'}`}>
-                              {currency.code}
-                            </ThemedText>
-                            <ThemedText className="text-xs text-gray-500">
-                              {currency.name}
-                            </ThemedText>
-                          </View>
-                        </View>
-                        {isSelected && (
-                          <ThemedText className="text-blue-600 font-bold">✓</ThemedText>
-                        )}
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              </View>
+                <ThemedText className="text-gray-400">▼</ThemedText>
             </TouchableOpacity>
-          </Modal>
+
+            <Modal
+                transparent={true}
+                visible={currencyModalVisible}
+                animationType="fade"
+                onRequestClose={() => setCurrencyModalVisible(false)}
+            >
+                <TouchableOpacity 
+                    className="flex-1 bg-black/50 justify-center items-center px-6"
+                    activeOpacity={1}
+                    onPress={() => setCurrencyModalVisible(false)}
+                >
+                    <View className="bg-white w-full rounded-2xl overflow-hidden p-4">
+                        <ThemedText className="font-bold text-lg mb-4 text-center">{t('confirm.selectCurrency')}</ThemedText>
+                        {CURRENCIES.map((curr) => (
+                            <TouchableOpacity
+                                key={curr.name}
+                                onPress={() => {
+                                    setCurrency(curr.name);
+                                    setCurrencyModalVisible(false);
+                                }}
+                                className={`p-4 border-b border-gray-100 flex-row justify-between items-center ${
+                                    currency === curr.name ? 'bg-orange-50' : ''
+                                }`}
+                            >
+                                <ThemedText className="font-bold">{curr.label}</ThemedText>
+                                {currency === curr.name && (
+                                    <ThemedText className="text-orange-500 font-bold">✓</ThemedText>
+                                )}
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </TouchableOpacity>
+            </Modal>
         </View>
 
-        {/* Detalle de Costos */}
+        {/* Detalle de Costos (Base USD) */}
         <View className="bg-neutral-50 p-5 rounded-2xl border border-neutral-200 mb-6">
-          <ThemedText className="text-xs text-orange-500 font-bold tracking-widest uppercase mb-3">DETALLE (USD)</ThemedText>
+          <ThemedText className="text-xs text-orange-500 font-bold tracking-widest uppercase mb-3">
+             {t('confirm.detailUSD')}
+          </ThemedText>
 
           <View className="flex-row justify-between mb-2">
             <ThemedText className="text-neutral-700">{params.mainItemTitle}</ThemedText>
@@ -357,35 +383,34 @@ export default function MembershipConfirmScreen() {
           <View className="h-[1px] bg-neutral-200 my-2" />
 
           <View className="flex-row justify-between items-center">
-            <ThemedText className="font-bold text-neutral-500">Subtotal USD</ThemedText>
+            <ThemedText className="font-bold text-neutral-500">{t('confirm.totalUSD')}</ThemedText>
             <ThemedText className="font-bold text-lg text-neutral-900">${grandTotalUSD.toFixed(2)}</ThemedText>
           </View>
         </View>
 
-        {/* Sección Total Final */}
+        {/* Sección Total Final Convertido */}
         <View className="mt-2 border-t border-neutral-100 pt-4 mb-8">
           <View className="flex-row justify-between items-end">
             <View>
-              <ThemedText className="text-xl text-neutral-500">Total a pagar</ThemedText>
-              {selectedCurrency !== 'USD' && (
-                <ThemedText className="text-xs text-gray-400 mt-1">
-                  Tasa aprox: {exchangeRate.toFixed(4)}
-                </ThemedText>
+              <ThemedText className="text-xl text-neutral-500">{t('confirm.totalToPay')}</ThemedText>
+              {currency !== 'USD' && (
+                  <ThemedText className="text-xs text-gray-400 mt-1">
+                      {t('confirm.approxRate')} {rate.toFixed(2)}
+                  </ThemedText>
               )}
-              <ThemedText className="text-xs text-gray-400 mt-1">Sede: {selectedBranchName}</ThemedText>
             </View>
 
             <View className="items-end">
-              {loadingRate ? (
-                <ActivityIndicator size="small" color="#f97316" />
-              ) : (
-                <>
-                  <ThemedText className="text-4xl font-extrabold text-orange-600" style={{ fontFamily: 'BebasNeue-Regular' }}>
-                    {selectedCurrency === 'USD' ? '$' : ''}{grandTotalConverted.toFixed(2)}
-                  </ThemedText>
-                  <ThemedText className="text-sm font-bold text-gray-500">{selectedCurrency}</ThemedText>
-                </>
-              )}
+                {loadingRate ? (
+                    <ActivityIndicator size="small" color="#f97316" />
+                ) : (
+                    <>
+                        <ThemedText className="text-4xl font-extrabold text-orange-600" style={{ fontFamily: 'BebasNeue-Regular' }}>
+                        {selectedCurrencySymbol}{grandTotalConverted.toFixed(2)}
+                        </ThemedText>
+                        <ThemedText className="text-sm font-bold text-gray-500">{currency}</ThemedText>
+                    </>
+                )}
             </View>
           </View>
         </View>
@@ -394,11 +419,11 @@ export default function MembershipConfirmScreen() {
         {processing ? (
           <View className="items-center py-4">
             <ActivityIndicator size="large" color="#f97316" />
-            <ThemedText className="text-xs text-gray-400 mt-2">Generando orden...</ThemedText>
+            <ThemedText className="text-xs text-gray-400 mt-2">{t('confirm.generatingOrder')}</ThemedText>
           </View>
         ) : (
           <PrimaryButton
-            title="Confirmar y Pagar"
+            title={t('confirm.confirmWithPay')}
             onPress={handleConfirmOrder}
             disabled={loadingRate}
           />

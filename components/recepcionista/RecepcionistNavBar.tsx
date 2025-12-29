@@ -1,9 +1,11 @@
 import { HapticTab } from '@/components/haptic-tab';
 import { Tabs } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { CalendarIcon, HomeIcon, QrCodeIcon, UserIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RecepcionistNavBar() {
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Tabs
@@ -42,21 +44,21 @@ export default function RecepcionistNavBar() {
       <Tabs.Screen
         name='dashboard'
         options={{
-          title: 'Inicio',
+          title: t('nav.dashboard'),
           tabBarIcon: ({ color }) => <HomeIcon color={color} size={24} />,
         }}
       />
       <Tabs.Screen
         name='check-in'
         options={{
-          title: 'QR',
+          title: t('nav.qr'),
           tabBarIcon: ({ color }) => <QrCodeIcon color={color} size={24} />,
         }}
       />
       <Tabs.Screen
         name='schedule'
         options={{
-          title: 'Horarios',
+          title: t('nav.schedule'),
           tabBarIcon: ({ color }) => <CalendarIcon color={color} size={24} />,
         }}
       />
@@ -96,7 +98,7 @@ export default function RecepcionistNavBar() {
       <Tabs.Screen
         name='profile'
         options={{
-          title: 'Perfil',
+          title: t('nav.profile'),
           tabBarIcon: ({ color }) => <UserIcon color={color} size={24} />,
         }}
       />

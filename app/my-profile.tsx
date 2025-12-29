@@ -13,18 +13,20 @@ import { Image } from 'expo-image';
 import { Stack, useRouter } from 'expo-router';
 import { Calendar } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
-	ActivityIndicator,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
+    ActivityIndicator,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { ChevronLeftIcon, PencilSquareIcon } from 'react-native-heroicons/solid';
 import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
 
 export default function MyProfileScreen() {
+	const { t } = useTranslation();
 	const router = useRouter();
 	const phoneInputRef = useRef<IPhoneInputRef>(null);
 	const [isEditing, setIsEditing] = useState(false);
@@ -65,7 +67,7 @@ export default function MyProfileScreen() {
 				setBirthDate(userDataResponse.user.birth_date || '');
 				setPhone(userDataResponse.user.phone || '');
 			} catch (error: unknown) {
-				let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
+				let errorMessage = t('common.error.unexpected');
 				if (isAPIError(error)) {
 					errorMessage = error.messages.join(', ');
 				} else if (error instanceof Error) {
@@ -77,7 +79,7 @@ export default function MyProfileScreen() {
 			}
 		};
 		fetchUser();
-	}, []);
+	}, [t]);
 
 	const handleSaveChanges = async () => {
 		try {
@@ -117,11 +119,11 @@ export default function MyProfileScreen() {
 			setToast({
 				visible: true,
 				type: 'success',
-				title: '¡Perfil actualizado!',
-				message: 'Tus cambios se guardaron correctamente',
+				title: t('myProfile.toast.successTitle'),
+				message: t('myProfile.toast.successMessage'),
 			});
 		} catch (error: unknown) {
-			let errorMessage = 'Ocurrió un error inesperado al actualizar el perfil.';
+			let errorMessage = t('common.error.unexpected');
 			if (isAPIError(error)) {
 				errorMessage = error.messages.join(', ');
 			} else if (error instanceof Error) {
@@ -131,7 +133,7 @@ export default function MyProfileScreen() {
 			setToast({
 				visible: true,
 				type: 'error',
-				title: 'Error',
+				title: t('common.error.unexpected'),
 				message: errorMessage,
 			});
 		}
@@ -165,7 +167,7 @@ export default function MyProfileScreen() {
 					<ChevronLeftIcon size={28} color='#F27F2A' />
 				</TouchableOpacity>
 				<ThemedText className='text-xl font-bold' style={{ fontFamily: Fonts.title }}>
-					Mi perfil
+					{t('myProfile.title')}
 				</ThemedText>
 			</View>
 
@@ -191,13 +193,13 @@ export default function MyProfileScreen() {
 						{fullName}
 					</ThemedText>
 					<ThemedText className='text-sm text-neutral-500 dark:text-neutral-400 mt-1'>
-						Cuenta personal
+						{t('myProfile.personalAccount')}
 					</ThemedText>
 				</View>
 
 				<View className='px-6 py-4'>
 					<StyledTextInput
-						label='Nombre'
+						label={t('myProfile.firstName')}
 						value={firstName}
 						onChangeText={setFirstName}
 						editable={isEditing}
@@ -205,7 +207,7 @@ export default function MyProfileScreen() {
 					<View className='mb-4' />
 
 					<StyledTextInput
-						label='Apellido'
+						label={t('myProfile.lastName')}
 						value={lastName}
 						onChangeText={setLastName}
 						editable={isEditing}
@@ -213,14 +215,14 @@ export default function MyProfileScreen() {
 					<View className='mb-4' />
 
 					<StyledTextInput
-						label='Correo electrónico'
+						label={t('myProfile.email')}
 						value={userData?.email || ''}
 						editable={false}
 					/>
 					<View className='mb-4' />
 
 					<StyledTextInput
-						label='Documento de identidad'
+						label={t('myProfile.identityDoc')}
 						value={userData?.identity_document || ''}
 						editable={false}
 					/>
@@ -231,7 +233,7 @@ export default function MyProfileScreen() {
 						style={{ position: 'relative' }}
 						disabled={!isEditing}>
 						<StyledTextInput
-							label='Fecha de nacimiento'
+							label={t('myProfile.birthDate')}
 							value={birthDate ? format(date, 'yyyy-MM-dd') : ''}
 							editable={false}
 							pointerEvents='none'
@@ -261,13 +263,13 @@ export default function MyProfileScreen() {
 					<View className='mb-4' />
 
 					<View>
-						<Text style={styles.label}>Teléfono</Text>
+						<Text style={styles.label}>{t('myProfile.phone')}</Text>
 						<PhoneInput
 							ref={phoneInputRef}
 							value={phone || ''}
 							onChangePhoneNumber={(phoneNumber) => setPhone(phoneNumber)}
 							defaultCountry='VE'
-							placeholder='Número de teléfono'
+							placeholder={t('myProfile.phone')}
 							disabled={!isEditing}
 							phoneInputStyles={{
 								container: {
@@ -287,7 +289,7 @@ export default function MyProfileScreen() {
 
 				<View className='px-6 mt-2 mb-10'>
 					<PrimaryButton
-						title={isEditing ? 'Guardar cambios' : 'Editar'}
+						title={isEditing ? t('myProfile.saveChanges') : t('myProfile.edit')}
 						onPress={() => (isEditing ? handleSaveChanges() : setIsEditing(true))}
 					/>
 				</View>

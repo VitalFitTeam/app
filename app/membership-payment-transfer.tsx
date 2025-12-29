@@ -8,11 +8,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { ExclamationTriangleIcon } from 'react-native-heroicons/outline';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MembershipPaymentTransferScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   
   // Recibimos los datos de la factura
@@ -32,15 +34,17 @@ export default function MembershipPaymentTransferScreen() {
   // Hook de notificaciones
   const { toastState, showToast, hideToast } = useToast();
 
+  const currencySymbol = params.currency === 'EUR' ? '€' : params.currency === 'VES' ? 'Bs' : '$';
+
   const handleProcessPayment = async () => {
     // 1. Validaciones
     if (!reference || !senderName) {
-      showToast('warning', 'Campos incompletos', 'Por favor ingresa el titular y la referencia.');
+      showToast('warning', t('common.attention'), t('payment.toast.incompleteFields'));
       return;
     }
 
     if (reference.length < 4) {
-      showToast('warning', 'Referencia corta', 'Verifica el número de referencia.');
+      showToast('warning', t('common.attention'), t('payment.toast.invalidReference'));
       return;
     }
 
@@ -57,11 +61,11 @@ export default function MembershipPaymentTransferScreen() {
         currency_paid: params.currency || 'USD',
         transaction_id: reference,
         // Guardamos el titular en el campo de recibo/notas
-        receipt_url: `Titular: ${senderName}` 
+        receipt_url: `${t('payment.transfer.holderPrefix')}${senderName}` 
       }, token);
 
       // 3. Éxito
-      showToast('success', 'Pago Registrado', 'Validaremos tu transferencia pronto.');
+      showToast('success', t('payment.toast.paymentReported'), t('payment.toast.sentToVerification'));
 
       // 4. Redirigir
       setTimeout(() => {
@@ -70,8 +74,8 @@ export default function MembershipPaymentTransferScreen() {
 
     } catch (error) {
       console.error(error);
-      const msg = error instanceof Error ? error.message : 'Error desconocido';
-      showToast('error', 'Error', `No se pudo registrar el pago: ${msg}`);
+      const msg = error instanceof Error ? error.message : t('common.error.unknown');
+      showToast('error', t('common.error.title'), `${t('common.error.unableToRegister')}: ${msg}`);
     } finally {
       setLoading(false);
     }
@@ -96,42 +100,42 @@ export default function MembershipPaymentTransferScreen() {
             className='text-3xl mb-2 text-center uppercase'
             style={{ fontFamily: 'BebasNeue-Regular' }}
         >
-            {params.methodName || 'TRANSFERENCIA'}
+            {params.methodName || t('payment.transfer.title')}
         </ThemedText>
         
         <ThemedText className="text-center text-gray-500 mb-6">
-            Reporta los detalles de tu transacción
+            {t('payment.transfer.subtitle')}
         </ThemedText>
 
         {/* Datos Bancarios (Ejemplo dinámico según si es Zelle o Banco) */}
         <View className='mb-6 border border-gray-200 rounded-2xl px-4 py-4 bg-gray-50'>
           <ThemedText className='text-xs font-bold tracking-widest mb-3 text-gray-500 uppercase'>
-            CUENTA DESTINO
+            {t('payment.transfer.destinationAccount')}
           </ThemedText>
           
           {params.methodName?.toLowerCase().includes('zelle') ? (
              <View className='space-y-2'>
                 <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>Email:</ThemedText>
+                    <ThemedText className='text-gray-600'>{t('payment.transfer.labels.email')}</ThemedText>
                     <ThemedText className='font-bold text-gray-900'>pagos@vitalfit.com</ThemedText>
                 </View>
                 <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>Titular:</ThemedText>
+                    <ThemedText className='text-gray-600'>{t('payment.transfer.labels.holder')}</ThemedText>
                     <ThemedText className='font-bold text-gray-900'>VitalFit LLC</ThemedText>
                 </View>
              </View>
           ) : (
              <View className='space-y-2'>
                 <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>Banco:</ThemedText>
+                    <ThemedText className='text-gray-600'>{t('payment.transfer.labels.bank')}</ThemedText>
                     <ThemedText className='font-bold text-gray-900'>Banco Nacional</ThemedText>
                 </View>
                 <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>Cuenta:</ThemedText>
+                    <ThemedText className='text-gray-600'>{t('payment.transfer.labels.account')}</ThemedText>
                     <ThemedText className='font-bold text-gray-900'>0134-XXXX-XXXX-XXXX</ThemedText>
                 </View>
                 <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>RIF:</ThemedText>
+                    <ThemedText className='text-gray-600'>{t('payment.transfer.labels.rif')}</ThemedText>
                     <ThemedText className='font-bold text-gray-900'>J-12345678-9</ThemedText>
                 </View>
              </View>
@@ -156,7 +160,7 @@ export default function MembershipPaymentTransferScreen() {
         >
           <View>
             <ThemedText className='text-xs text-white/80 tracking-widest mb-1'>
-              TOTAL A TRANSFERIR
+              {t('payment.transfer.total')}
             </ThemedText>
             <ThemedText className='text-white font-bold text-xs'>
                Orden #{params.invoiceId?.slice(0,8)}
@@ -164,10 +168,10 @@ export default function MembershipPaymentTransferScreen() {
           </View>
           <View className='items-end'>
             <ThemedText className='text-3xl font-bold text-white' style={{ fontFamily: 'BebasNeue-Regular' }}>
-              ${parseFloat(params.totalAmount).toFixed(2)}
+              {currencySymbol}{parseFloat(params.totalAmount).toFixed(2)}
             </ThemedText>
             <ThemedText className='text-white/90 text-xs font-bold'>
-              {params.currency}
+              {params.currency || 'USD'}
             </ThemedText>
           </View>
         </LinearGradient>
@@ -176,15 +180,15 @@ export default function MembershipPaymentTransferScreen() {
         <View className='mb-8 space-y-4'>
           
           <StyledTextInput 
-            label="Nombre del Titular de la Cuenta"
-            placeholder="Quien realizó la transferencia"
+            label={t('payment.transfer.senderName')}
+            placeholder={t('payment.transfer.senderNamePlaceholder')}
             value={senderName}
             onChangeText={setSenderName}
           />
 
           <StyledTextInput 
-            label="Número de Referencia / Confirmación"
-            placeholder="Ej: 12345678"
+            label={t('payment.transfer.reference')}
+            placeholder={t('payment.transfer.referencePlaceholder')}
             value={reference}
             onChangeText={setReference}
             keyboardType="numeric" // Numérico suele ser mejor para referencias
@@ -197,10 +201,10 @@ export default function MembershipPaymentTransferScreen() {
           <ExclamationTriangleIcon size={24} color='#3b82f6' />
           <View className='ml-3 flex-1'>
             <ThemedText className='text-xs text-blue-800 font-bold mb-1'>
-              Confirmación Manual
+              {t('payment.warning.manualConfirmation')}
             </ThemedText>
             <ThemedText className='text-xs text-blue-600'>
-              Nuestro equipo administrativo verificará la transacción antes de activar tu plan.
+              {t('payment.warning.manualMessage')}
             </ThemedText>
           </View>
         </View>
@@ -210,7 +214,7 @@ export default function MembershipPaymentTransferScreen() {
                 <ActivityIndicator size="large" color="#f97316" />
             ) : (
                 <PrimaryButton
-                    title='Confirmar Pago'
+                    title={t('payment.confirmPayment')}
                     onPress={handleProcessPayment}
                 />
             )}

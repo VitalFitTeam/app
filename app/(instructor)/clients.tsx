@@ -3,11 +3,13 @@ import { ThemedView } from '@/components/themed-view';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { PlusIcon } from 'react-native-heroicons/outline';
 import { UserIcon } from 'react-native-heroicons/solid';
 
 export default function ClientsScreen() {
+	const { t } = useTranslation();
 	const router = useRouter();
 	const clients = useMemo(
 		() => [
@@ -57,7 +59,7 @@ export default function ClientsScreen() {
 					<ThemedText
 						lightColor='#111827'
 						style={{ fontFamily: 'System', fontSize: 16, fontWeight: '600' }}>
-						Mis clientes
+						{t('instructor.clients.title')}
 					</ThemedText>
 				</View>
 
@@ -107,7 +109,7 @@ export default function ClientsScreen() {
 									<Text
 										className='ml-2 text-[12px] text-[#111827]'
 										style={{ fontFamily: 'Montserrat_500Medium' }}>
-										Asignar nueva rutina
+										{t('instructor.clients.assignRoutine')}
 									</Text>
 								</TouchableOpacity>
 
@@ -128,7 +130,7 @@ export default function ClientsScreen() {
 									<Text
 										className='text-[12px] text-white'
 										style={{ fontFamily: 'Montserrat_600SemiBold' }}>
-										Ver progreso
+										{t('instructor.clients.viewProgress')}
 									</Text>
 								</TouchableOpacity>
 						</View>

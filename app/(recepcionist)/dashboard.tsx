@@ -4,18 +4,29 @@ import { RecepcionistTodayClassCard } from '@/components/auth/dashboard/Recepcio
 import { UserHeader } from '@/components/auth/dashboard/userheader';
 import { ValidateCheckInCard } from '@/components/auth/dashboard/ValidateCheckInCard';
 import { QRScannerModal } from '@/components/recepcionist/QRScannerModal';
+import { BranchSelector } from '@/components/recepcionista/BranchSelector';
+import { CheckInResultModal } from '@/components/recepcionista/CheckInResultModal';
 import { ThemedView } from '@/components/themed-view';
+import { useBranch } from '@/contexts/BranchContext';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, TouchableOpacity } from 'react-native';
-import { QrCodeIcon } from 'react-native-heroicons/outline';
+import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
 
 export default function DashboardRecepcionist() {
+	const { t } = useTranslation();
 	const [loading, setLoading] = useState(true);
 	const [firstName, setFirstName] = useState<string | null>(null);
 	const [scannerVisible, setScannerVisible] = useState(false);
+	const { selectedBranchId } = useBranch();
+
+	// Estados para el modal de resultado
+	const [resultModalVisible, setResultModalVisible] = useState(false);
+	const [checkInSuccess, setCheckInSuccess] = useState(false);
+	const [checkInUserName, setCheckInUserName] = useState('');
+	const [checkInMessage, setCheckInMessage] = useState('');
 
 	const handleValidateMembership = async (qrJwtLong: string) => {
 		try {
@@ -23,8 +34,11 @@ export default function DashboardRecepcionist() {
 			if (!token) return;
 
 			// 1. OBTENER ID DE LA SEDE (BRANCH)
-			// Lo ideal es sacarlo del usuario logueado. Si no lo tienes, usa uno fijo por ahora.
-			const branchId = "45e6bbd5-d9fd-490c-9672-a3208852a116"; // Ejemplo UUID válido
+			if (!selectedBranchId) {
+				Alert.alert(`⚠️ ${t('common.attention')}`, t('checkIn.error.selectBranch'));
+				return;
+			}
+			const branchId = selectedBranchId;
 
 			console.log("Enviando Check-In...", { qrJwtLong: qrJwtLong.substring(0, 20) + '...', branchId });
 
@@ -41,12 +55,24 @@ export default function DashboardRecepcionist() {
 
 			const data = response.data || response; // Ajuste por si el SDK devuelve axios response o data directa
 
-			// 3. MOSTRAR RESULTADO BASADO EN LA RESPUESTA DEL BACKEND
-			Alert.alert(
-				"✅ BIENVENIDO",
-				`Cliente: ${data.user.first_name} ${data.user.last_name}\nEstado: Acceso Concedido`
-			);
+			console.log('✅ [Check-In] Respuesta completa:', JSON.stringify(data, null, 2));
 
+			// 3. MOSTRAR RESULTADO BASADO EN LA RESPUESTA DEL BACKEND
+			// Manejar diferentes estructuras de respuesta
+			let userName = t('dashboard.defaultUser');
+			
+			if (data?.user?.first_name) {
+				userName = `${data.user.first_name} ${data.user.last_name || ''}`.trim();
+			} else if (data?.first_name) {
+				userName = `${data.first_name} ${data.last_name || ''}`.trim();
+			} else if (data?.name) {
+				userName = data.name;
+			}
+
+			// Mostrar modal de éxito
+			setCheckInSuccess(true);
+			setCheckInUserName(userName);
+			setResultModalVisible(true);
 			setScannerVisible(false); // Cerrar escáner si fue exitoso
 
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,19 +80,26 @@ export default function DashboardRecepcionist() {
 			console.error("Error en Check-In:", error);
 
 			// Manejo de errores específicos
+			let errorMessage = t('checkIn.error.default');
+			
 			if (isAPIError(error)) {
 				if (error.status === 402) {
-					Alert.alert("⛔ PAGO REQUERIDO", "El usuario tiene pagos pendientes.");
+					errorMessage = t('checkIn.error.paymentPending');
 				} else if (error.status === 403) {
-					Alert.alert("🚫 ACCESO DENEGADO", "El usuario no tiene permiso para entrar a esta área o sede.");
+					errorMessage = t('checkIn.error.accessDenied');
 				} else if (error.status === 401) {
-					Alert.alert("⚠️ QR EXPIRADO", "El código QR ha caducado. Pide al usuario que genere uno nuevo.");
+					errorMessage = t('checkIn.error.qrExpired');
 				} else {
-					Alert.alert("Error", error.message || "No se pudo procesar el acceso.");
+					errorMessage = error.message || t('checkIn.error.default');
 				}
 			} else {
-				Alert.alert("Error", error.message || "Error de conexión con el servidor.");
+				errorMessage = error.message || t('common.error.connection');
 			}
+
+			// Mostrar modal de error
+			setCheckInSuccess(false);
+			setCheckInMessage(errorMessage);
+			setResultModalVisible(true);
 		}
 	};
 
@@ -76,9 +109,9 @@ export default function DashboardRecepcionist() {
 				const token = await AsyncStorage.getItem('token');
 				if (!token) return;
 				const userData = await vitalFitApi.user.WhoAmI(token);
-				setFirstName(userData?.user?.first_name || 'Recepcionista');
+				setFirstName(userData?.user?.first_name || t('dashboard.recepcionistDefault'));
 			} catch (error: unknown) {
-				let errorMessage = 'Ocurrió un error inesperado.';
+				let errorMessage = t('common.error.unexpected');
 				if (isAPIError(error)) errorMessage = error.messages.join(', ');
 				else if (error instanceof Error) errorMessage = error.message;
 				console.error('Error whoami (Recepcionista):', errorMessage);
@@ -88,7 +121,7 @@ export default function DashboardRecepcionist() {
 		};
 
 		fetchUser();
-	}, []);
+	}, [t]);
 
 	if (loading) {
 		return (
@@ -105,42 +138,34 @@ export default function DashboardRecepcionist() {
 				contentContainerStyle={{ paddingBottom: 100 }}
 			>
 				<UserHeader
-					name={firstName ?? 'Recepcionista'}
+					name={firstName ?? t('dashboard.recepcionistDefault')}
 					avatarUrl='https://randomuser.me/api/portraits/women/44.jpg'
 				/>
 
+				<View style={{ alignItems: 'flex-end', paddingHorizontal: 20, marginBottom: 10, marginTop: -15 }}>
+					<BranchSelector />
+				</View>
+
 				<RecepcionistStatsCardGroup />
-				<ValidateCheckInCard />
+				<ValidateCheckInCard onScanPress={() => setScannerVisible(true)} />
 				<GymCapacityCard />
 				<RecepcionistTodayClassCard />
 			</ScrollView>
 
-			<TouchableOpacity
-				style={{
-					position: 'absolute',
-					bottom: 30,
-					right: 30,
-					backgroundColor: '#F27F2A',
-					width: 60,
-					height: 60,
-					borderRadius: 30,
-					justifyContent: 'center',
-					alignItems: 'center',
-					elevation: 5,
-					shadowColor: '#000',
-					shadowOffset: { width: 0, height: 2 },
-					shadowOpacity: 0.3,
-					shadowRadius: 3,
-				}}
-				onPress={() => setScannerVisible(true)}
-			>
-				<QrCodeIcon color="white" size={30} />
-			</TouchableOpacity>
+
 
 			<QRScannerModal
 				visible={scannerVisible}
 				onClose={() => setScannerVisible(false)}
 				onScan={handleValidateMembership}
+			/>
+
+			<CheckInResultModal
+				visible={resultModalVisible}
+				onClose={() => setResultModalVisible(false)}
+				success={checkInSuccess}
+				userName={checkInUserName}
+				message={checkInMessage}
 			/>
 		</ThemedView>
 	);

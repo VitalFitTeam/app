@@ -10,6 +10,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Calendar } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, TrashIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,36 +21,18 @@ interface BranchLike {
   branch_map_id?: string;
 }
 
-const PLAN_BENEFITS: Record<string, string[]> = {
-  'free-trial': ['Acceso limitado al gimnasio', '7 días de acceso libre'],
-  advanced: [
-    'Acceso ilimitado al gimnasio',
-    '7 sesiones con consultor fitness',
-    'Seguimiento nutricional',
-    '5 suplementos gratis',
-    'Credencial de gimnasio',
-    'Entrenador personal',
-  ],
-  athlete: [
-    'Acceso total al gimnasio',
-    'Plan de entrenamiento personalizado',
-    'Seguimiento de progreso mensual',
-  ],
-  premium: [
-    'Todos los beneficios del plan Avanzado',
-    'Sesiones ilimitadas con consultor fitness',
-    'Plan nutricional avanzado',
-  ],
-};
+// Eliminado PLAN_BENEFITS hardcoded ya que se usa i18n
+
 
 export default function MembershipCheckoutScreen() {
+  const { t } = useTranslation();
   const params = useLocalSearchParams<{
     id?: string;
     title?: string;
     price?: string;
     period?: string;
     type?: string;
-  }>();
+  }>(); // Eliminado currency
   const router = useRouter();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -82,7 +65,7 @@ export default function MembershipCheckoutScreen() {
     }
 
     if (!params.id || !params.title || !params.price) {
-      Alert.alert('Error', 'Faltan datos del plan seleccionado.');
+      Alert.alert('Error', t('checkout.error.missingData'));
       return;
     }
 
@@ -90,7 +73,7 @@ export default function MembershipCheckoutScreen() {
     try {
       const token = await AsyncStorage.getItem('token');
       if (!token) {
-        Alert.alert('Error', 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+        Alert.alert('Error', t('common.error.sessionExpired'));
         return;
       }
 
@@ -108,14 +91,12 @@ export default function MembershipCheckoutScreen() {
       const branchId = branchObj?.branch_id || branchObj?.id || branchObj?.branch_map_id;
 
       if (!userId) {
-        throw new Error('No se pudo identificar al usuario.');
+        throw new Error(t('checkout.error.userNotFound'));
       }
       if (!branchId) {
-        throw new Error('No se encontró una sucursal disponible para asignar la factura.');
+        throw new Error(t('checkout.error.branchNotFound'));
       }
 
-      // 3. CAMBIO IMPORTANTE: NO CREAMOS LA FACTURA AQUÍ.
-      // Pasamos los datos a la pantalla de Extras para crearla allá junto con los paquetes.
       router.push({
         pathname: '/membership-extra',
         params: {
@@ -129,13 +110,14 @@ export default function MembershipCheckoutScreen() {
           // Datos de contexto para crear la factura luego
           userId: userId,
           branchId: branchId,
+          // Eliminado currency
         },
       } as never);
 
     } catch (error) {
       console.error('Error en checkout:', error);
-      const msg = error instanceof Error ? error.message : 'Inténtalo de nuevo.';
-      Alert.alert('No se pudo continuar', msg);
+      const msg = error instanceof Error ? error.message : t('common.error.tryAgain');
+      Alert.alert(t('common.error.title'), msg);
     } finally {
       setLoading(false);
     }
@@ -143,8 +125,17 @@ export default function MembershipCheckoutScreen() {
 
   const benefits = useMemo(() => {
     if (!params.id) return [];
-    return PLAN_BENEFITS[params.id] ?? [];
-  }, [params.id]);
+    // Intentar obtener beneficios desde traducciones usando la clave del plan
+    const translationKey = `checkout.benefits.${params.id}`;
+    const translatedBenefits = t(translationKey, { returnObjects: true });
+    
+    if (Array.isArray(translatedBenefits)) {
+        return translatedBenefits as string[];
+    }
+    
+    // Fallback si no existe traducción o no es array (aunque debería estar en los JSONs)
+    return [];
+  }, [params.id, t]);
 
   const currentStep: number = 1;
 
@@ -157,7 +148,7 @@ export default function MembershipCheckoutScreen() {
             darkColor='#f97316'
             className='text-4xl mb-4 text-center'
             style={{ fontFamily: 'BebasNeue-Regular' }}>
-            COMPRAR MEMBRESÍA
+            {t('checkout.title')}
           </ThemedText>
           
           {/* Indicador de Pasos Visuales */}
@@ -182,7 +173,7 @@ export default function MembershipCheckoutScreen() {
                 darkColor={currentStep === 1 ? '#f97316' : '#111827'}
                 className='text-[11px] text-center'
                 style={{ fontFamily: 'Montserrat_500Medium' }}>
-                Opciones
+                {t('checkout.steps.options')}
               </ThemedText>
             </View>
             <View className='items-center flex-1'>
@@ -205,7 +196,7 @@ export default function MembershipCheckoutScreen() {
                 darkColor={currentStep === 2 ? '#f97316' : '#111827'}
                 className='text-[11px] text-center'
                 style={{ fontFamily: 'Montserrat_500Medium' }}>
-                Extras
+                {t('checkout.steps.extras')}
               </ThemedText>
             </View>
             <View className='items-center flex-1'>
@@ -228,7 +219,7 @@ export default function MembershipCheckoutScreen() {
                 darkColor={currentStep === 3 ? '#f97316' : '#111827'}
                 className='text-[11px] text-center'
                 style={{ fontFamily: 'Montserrat_500Medium' }}>
-                Confirmación
+                {t('checkout.steps.confirmation')}
               </ThemedText>
             </View>
           </View>
@@ -243,14 +234,14 @@ export default function MembershipCheckoutScreen() {
                 darkColor='#ffffff'
                 className='text-xl mb-1'
                 style={{ fontFamily: 'Montserrat_400Regular' }}>
-                {params.title ?? 'Plan seleccionado'}
+                {params.title ?? t('checkout.summary.selectedPlan')}
               </ThemedText>
               <ThemedText
                 lightColor='#4b5563'
                 darkColor='#d1d5db'
                 className='text-xs'
                 style={{ fontFamily: 'Montserrat_400Regular' }}>
-                Más beneficios para tu vida fitness
+                {t('checkout.summary.subtitle')}
               </ThemedText>
             </View>
             <View className='flex-row items-center'>
@@ -303,7 +294,7 @@ export default function MembershipCheckoutScreen() {
             darkColor='#e5e7eb'
             className='text-sm mb-2'
             style={{ fontFamily: 'Montserrat_500Medium' }}>
-            Fecha de inicio
+            {t('checkout.startDate')}
           </ThemedText>
           {errors.startDate?.message && (
             <Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>
@@ -351,7 +342,7 @@ export default function MembershipCheckoutScreen() {
           {loading ? (
             <ActivityIndicator size='large' color='#f97316' />
           ) : (
-            <PrimaryButton title='Continuar' onPress={onContinue} />
+            <PrimaryButton title={t('common.continue')} onPress={onContinue} />
           )}
         </View>
       </ScrollView>

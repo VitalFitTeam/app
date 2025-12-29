@@ -33,7 +33,7 @@ export default function LanguageScreen() {
       <View style={styles.container}>
         <Stack.Screen
           options={{
-            title: t('language'), // 'Idioma' o 'Language' según corresponda
+            title: t('languageLabel'), // 'Idioma' o 'Language' según corresponda
             headerBackTitle: t('nav.back'), // 'Volver' o 'Back'
             headerShadowVisible: false,
             headerStyle: { backgroundColor: '#F2F2F7' },

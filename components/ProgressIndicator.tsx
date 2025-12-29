@@ -1,13 +1,19 @@
 import { ThemedView } from '@/components/themed-view';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 
 interface Props {
 	currentStep: number;
 }
 
-const steps = ['Correo', 'Código', 'Cambio'];
-
 export function ProgressIndicator({ currentStep }: Props) {
+	const { t } = useTranslation();
+	const steps = [
+		t('forgotPassword.stepLabels.email'),
+		t('forgotPassword.stepLabels.code'),
+		t('forgotPassword.stepLabels.reset'),
+	];
+
 	return (
 		<ThemedView className='w-full flex-row justify-between items-center my-6'>
 			{steps.map((label, index) => {

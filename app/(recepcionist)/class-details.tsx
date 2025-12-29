@@ -2,47 +2,50 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BackHandler, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { CalendarDaysIcon, UserIcon } from 'react-native-heroicons/outline';
 
-const formatFullDate = (dateString?: string) => {
-  if (!dateString) return 'Fecha sin definir';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const formatFullDate = (dateString: string | undefined, t: any, i18n: any) => {
+  if (!dateString) return t('common.dateUndefined');
   const [year, monthIndex, dayNumber] = dateString.split('-').map(Number);
   const date = new Date(year, (monthIndex || 1) - 1, dayNumber || 1);
 
   const day = date.getDate();
-  const month = new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(date);
-  const weekday = new Intl.DateTimeFormat('es-ES', { weekday: 'long' }).format(date);
+  const month = new Intl.DateTimeFormat(i18n.language, { month: 'long' }).format(date);
+  const weekday = new Intl.DateTimeFormat(i18n.language, { weekday: 'long' }).format(date);
 
   const capitalizedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
 
-  return `${capitalizedWeekday}, ${day} de ${month} de ${year}`;
+  return `${capitalizedWeekday}, ${day} ${t('common.of')} ${month} ${t('common.of')} ${year}`;
 };
 
-const getClassDescription = (name: string) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getClassDescription = (name: string, t: any) => {
   const upper = name.toUpperCase();
 
   if (upper.includes('YOGA')) {
-    return 'Clase enfocada en respiración, estiramientos y posturas que mejoran la flexibilidad, reducen el estrés y fortalecen el cuerpo de forma progresiva.';
+    return t('classes.description.yoga');
   }
 
   if (upper.includes('ZUMBA')) {
-    return 'Clase de baile fitness con ritmos latinos para mejorar resistencia y coordinación. Ideal para todos los niveles y enfocada en divertirse mientras quemas calorías.';
+    return t('classes.description.zumba');
   }
 
   if (upper.includes('SPINNING')) {
-    return 'Entrenamiento cardiovascular en bicicleta fija, ideal para quemar calorías, mejorar la resistencia y fortalecer piernas y glúteos al ritmo de la música.';
+    return t('classes.description.spinning');
   }
 
   if (upper.includes('CROSSFIT')) {
-    return 'Entrenamiento funcional de alta intensidad que combina fuerza, resistencia y potencia usando movimientos variados con tu propio peso y equipamiento.';
+    return t('classes.description.crossfit');
   }
 
   if (upper.includes('PILATES')) {
-    return 'Sesión centrada en el fortalecimiento del core, la postura y la movilidad, con ejercicios controlados que protegen las articulaciones.';
+    return t('classes.description.pilates');
   }
 
-  return 'Este entrenamiento se enfoca en el desarrollo muscular y la resistencia. Incluye ejercicios con pesas, bandas de resistencia y peso corporal. Ideal para todos los niveles.';
+  return t('classes.description.default');
 };
 
 const getClassImage = (name: string) => {
@@ -72,6 +75,7 @@ const getClassImage = (name: string) => {
 };
 
 export default function ClassDetailsScreen() {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{
     id?: string;
@@ -96,16 +100,16 @@ export default function ClassDetailsScreen() {
     }, [router])
   );
 
-  const name = params.name || 'NOMBRE DE LA CLASE';
+  const name = params.name || t('classDetails.defaultName');
   const date = params.date || '2025-07-15';
   const time = params.time || '07:00 - 08:00 AM';
   const capacity = Number(params.capacity || 25);
   const enrolled = Number(params.enrolled || 45);
   const status = params.status || 'available';
-  const instructorName = params.instructor || 'Nombre del Instructor';
+  const instructorName = params.instructor || t('classDetails.defaultInstructor');
 
-  const formattedDate = formatFullDate(date);
-  const description = getClassDescription(name);
+  const formattedDate = formatFullDate(date, t, i18n);
+  const description = getClassDescription(name, t);
   const heroImageSource = getClassImage(name);
 
   const clients = Array.from({ length: enrolled > 0 ? Math.min(enrolled, 4) : 4 }).map((_, index) => ({
@@ -133,10 +137,10 @@ export default function ClassDetailsScreen() {
           <View style={styles.metaBlock}>
             <ThemedText style={styles.dateText}>{formattedDate}</ThemedText>
             <ThemedText style={styles.capacityText}>
-              {enrolled}/{capacity} cupos ocupados
+              {enrolled}/{capacity} {t('schedule.spotsOccupied')}
             </ThemedText>
             <ThemedText style={styles.timeText}>{time}</ThemedText>
-            <ThemedText style={styles.durationText}>(1 hora)</ThemedText>
+            <ThemedText style={styles.durationText}>{t('classDetails.duration')}</ThemedText>
           </View>
 
           <View style={styles.instructorCard}>
@@ -150,7 +154,7 @@ export default function ClassDetailsScreen() {
           </View>
 
           <View style={styles.section}>
-            <ThemedText style={styles.sectionTitle}>Descripción de la clase:</ThemedText>
+            <ThemedText style={styles.sectionTitle}>{t('classDetails.descriptionTitle')}</ThemedText>
             <ThemedText style={styles.sectionBody}>
               {description}
             </ThemedText>
@@ -159,7 +163,7 @@ export default function ClassDetailsScreen() {
           {/* Lista de clientes implementado inline */}
           <View style={styles.searchWrapper}>
             <TextInput
-              placeholder='Nombre del cliente'
+              placeholder={t('checkIn.clientList.searchPlaceholder')}
               placeholderTextColor='#9CA3AF'
               style={styles.searchInput}
             />
@@ -169,7 +173,7 @@ export default function ClassDetailsScreen() {
             <View style={styles.clientsTitleRow}>
               <CalendarDaysIcon size={20} color='#6B7280' />
               <ThemedText style={styles.clientsTitle}>
-                Lista de clientes inscritos ({enrolled}/{capacity})
+                {t('checkIn.clientList.title')} ({enrolled}/{capacity})
               </ThemedText>
             </View>
           </View>
@@ -189,12 +193,12 @@ export default function ClassDetailsScreen() {
           </View>
 
           <TouchableOpacity style={styles.viewAllButton} activeOpacity={0.8}>
-            <ThemedText style={styles.viewAllButtonText}>Ver todos los inscritos</ThemedText>
+            <ThemedText style={styles.viewAllButtonText}>{t('common.viewAllRegistered')}</ThemedText>
           </TouchableOpacity>
 
           {isFull ? (
             <TouchableOpacity style={styles.fullButton} activeOpacity={0.8}>
-              <ThemedText style={styles.fullButtonText}>Clase Llena</ThemedText>
+              <ThemedText style={styles.fullButtonText}>{t('classDetails.classFull')}</ThemedText>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity 
@@ -214,7 +218,7 @@ export default function ClassDetailsScreen() {
                 router.push(`/(recepcionist)/enroll-client?${queryParams.toString()}`);
               }}
             >
-              <ThemedText style={styles.primaryButtonText}>Inscribir Cliente</ThemedText>
+              <ThemedText style={styles.primaryButtonText}>{t('classDetails.enrollClient')}</ThemedText>
             </TouchableOpacity>
           )}
         </View>

@@ -1,6 +1,6 @@
 {
   "translation": {
-    "language": "Language",
+    "languageLabel": "Language",
     "save": "Save",
     "signIn": "Sign In",
     "signUp": "Sign Up",
@@ -15,7 +15,67 @@
       "profile": "Profile",
       "back": "Back",
       "membership": "Membership",
-      "classDetails": "Class Details"
+      "classDetails": "Class Details",
+      "qr": "QR"
+    },
+    "checkIn": {
+      "error": {
+        "selectBranch": "Please select a branch before scanning.",
+        "default": "Access could not be processed.",
+        "paymentPending": "User has pending payments.",
+        "accessDenied": "User does not have permission to enter this area or branch.",
+        "qrExpired": "QR code has expired. Ask the user to generate a new one."
+      },
+      "title": "Client Check-in",
+      "successMessage": "Check-in processed successfully",
+      "cameraPreviewUnavailable": "Camera function not available in preview",
+      "scan": {
+        "successTitle": "QR Scanned",
+        "confirmMessage": "Do you want to process this check-in?"
+      },
+      "clientList": {
+        "title": "Registered Client List",
+        "searchPlaceholder": "Search client by name"
+      }
+    },
+    "common": {
+      "attention": "Attention",
+      "error": {
+        "connection": "Connection error with the server.",
+        "unexpected": "An unexpected error occurred.",
+        "unknown": "Unknown error"
+      },
+      "selectBranch": "Select Branch",
+      "selectYourBranch": "Select your branch",
+      "accept": "Accept",
+      "process": "Process",
+      "success": "Success",
+      "selected": "Selected: ",
+      "cancel": "Cancel",
+      "filter": "Filter",
+      "viewAllRegistered": "View all registered",
+      "available": "Available",
+      "full": "Full",
+      "viewDetails": "View details",
+      "years": "Years",
+      "classes": "Classes",
+      "clients": "Clients",
+      "dateUndefined": "Date undefined",
+      "of": "of",
+      "welcome": "WELCOME",
+      "accessDenied": "ACCESS DENIED",
+      "accessGranted": "Access Granted",
+      "status": {
+        "title": "Status",
+        "assisted": "Assisted",
+        "absent": "Absent",
+        "cancelled": "Cancelled by you"
+      },
+      "client": "Client",
+      "loading": "Loading...",
+      "today": "Today",
+      "category": "Category",
+      "reserved": "Reserved"
     },
     "login": {
       "title": "Sign In",
@@ -37,8 +97,19 @@
         "loginErrorTitle": "Login Error",
         "emptyFields": "Please enter your email and password.",
         "invalidEmail": "Please enter a valid email address.",
-        "unexpectedError": "An unexpected error occurred. Please try again."
-      }
+        "unexpectedError": "An unexpected error occurred. Please try again.",
+        "welcomeTitle": "Welcome!",
+        "googleLoginSuccess": "You signed in with Google successfully",
+        "sessionSaveError": "Could not save session",
+        "accountNotRegistered": "Account not registered",
+        "completeRegistration": "Let's complete your registration with Google",
+        "authError": "Authentication Error",
+        "googleLoginError": "Could not sign in with Google",
+        "clerkTokenError": "Could not get Clerk token",
+        "alreadySignedIn": "Already signed in",
+        "redirectingDashboard": "Redirecting to dashboard..."
+      },
+      "authenticatingGoogle": "Authenticating with Google..."
     },
     "register": {
       "step1Title": "WHAT'S YOUR GENDER?",
@@ -89,6 +160,11 @@
         "step1": "RECOVER YOUR PASSWORD",
         "step2": "VERIFY CODE",
         "step3": "NEW PASSWORD"
+      },
+      "stepLabels": {
+        "email": "Email",
+        "code": "Code",
+        "reset": "Reset"
       },
       "subtitles": {
         "step1": "Enter the email associated with the account to recover your password",
@@ -150,11 +226,57 @@
         "resendTitle": "Code Sent",
         "resendMessage": "Check your inbox.",
         "errorTitle": "Error",
-        "errorMessage": "Invalid code or connection error."
+        "errorMessage": "Invalid code or connection error.",
+        "enterCode": "Please enter the code.",
+        "tempPasswordNotFound": "Temporary password not found."
       }
     },
     "dashboard": {
+      "recepcionistDefault": "Receptionist",
       "defaultUser": "User",
+      "member": {
+        "activeMembership": "Active Membership",
+        "noActivePlan": "No active plan",
+        "completedChallenges": "Completed Challenges",
+        "weeklyTraining": "Weekly Training",
+        "progress": "Progress",
+        "packages": "Packages"
+      },
+      "hello": "Hello, ",
+      "notifications": {
+        "title": "Notifications",
+        "empty": "No new notifications",
+        "mock": {
+          "classStarting": "Your class starts in 10 minutes",
+          "paymentReceived": "Membership payment received"
+        }
+      },
+      "stats": {
+        "monthlyCheckins": "Monthly Check-ins",
+        "classesToday": "Today's Classes",
+        "currentCapacity": "Current Capacity",
+        "vsYesterday": "vs Yesterday"
+      },
+      "validateCheckIn": {
+        "title": "Validate Check-in",
+        "searchPlaceholder": "Search by ID document",
+        "scanQr": "Scan QR"
+      },
+      "capacity": {
+        "title": "Gym Capacity",
+        "subtitle": "Real-time current capacity",
+        "occupancy": "Occupancy",
+        "occupied": "% Occupied",
+        "available": "spaces available"
+      },
+      "todayClasses": {
+        "title": "Today's Classes",
+        "subtitle": "Schedule and attendance",
+        "registered": "REGISTERED"
+      },
+      "classStatus": {
+        "inProgress": "IN PROGRESS"
+      },
       "challenges": {
         "completed": "Completed Challenges",
         "weekly": "Weekly Training",
@@ -173,8 +295,54 @@
         "crossfit4": "CrossFit - 4 sessions"
       }
     },
+    "enrollClient": {
+      "title": "Enroll Client",
+      "defaultClassName": "CLASS NAME",
+      "error": {
+        "completeFields": "Please complete all fields"
+      },
+      "placeholders": {
+        "date": "Date",
+        "time": "Time"
+      },
+      "form": {
+        "clientId": "Client ID",
+        "clientIdPlaceholder": "Enter client ID",
+        "clientName": "Client Name",
+        "clientNamePlaceholder": "Enter client name"
+      },
+      "button": "Enroll",
+      "success": {
+        "message": "Client enrolled successfully"
+      }
+    },
+    "personalInfo": {
+      "editButton": "Edit Information",
+      "sections": {
+        "personal": "Personal Information",
+        "contact": "Contact Information"
+      },
+      "fields": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "id": "Identity Document",
+        "birthDate": "Date of Birth",
+        "email": "Email",
+        "phone": "Phone"
+      },
+      "success": {
+        "message": "Changes saved successfully"
+      }
+    },
     "schedule": {
+      "week": "Week",
+      "month": "Month",
       "calendar": "CALENDAR",
+      "reservations": "Reservations",
+      "spotsOccupied": "spots occupied",
+      "myBookings": "My Bookings",
+      "noBookings": "You have no bookings yet.",
+      "noClassesBranch": "No classes scheduled for this branch.",
       "tabs": {
         "classes": "Classes",
         "reservations": "Bookings",
@@ -189,6 +357,319 @@
         "hiit": "HIIT",
         "kickBoxing": "Kick Boxing",
         "pilates": "Pilates"
+      }
+    },
+    "scanner": {
+      "permission": {
+        "message": "We need camera access to validate memberships.",
+        "button": "Grant Permission"
+      },
+      "validating": "Validating membership...",
+      "instruction": "Scan client QR",
+      "error": {
+        "cameraAccess": "Could not access camera"
+      }
+    },
+    "classDetails": {
+      "defaultName": "CLASS NAME",
+      "defaultInstructor": "Instructor Name",
+      "duration": "(1 hour)",
+      "descriptionTitle": "Class Description:",
+      "classFull": "Class Full",
+      "enrollClient": "Enroll Client"
+    },
+    "classes": {
+      "description": {
+        "yoga": "Class focused on breathing, stretching and postures that improve flexibility, reduce stress and strengthen the body progressively.",
+        "zumba": "Fitness dance class with Latin rhythms to improve endurance and coordination. Ideal for all levels and focused on having fun while burning calories.",
+        "spinning": "Cardiovascular training on a stationary bike, ideal for burning calories, improving endurance and strengthening legs and glutes to the rhythm of music.",
+        "crossfit": "High intensity functional training combining strength, endurance and power using varied movements with your own weight and equipment.",
+        "pilates": "Session focused on core strengthening, posture and mobility, with controlled exercises that protect joints.",
+        "default": "This workout focuses on muscle development and endurance. Includes exercises with weights, resistance bands and body weight. Ideal for all levels."
+      }
+    },
+    "community": {
+      "joinChallenges": "JOIN CHALLENGES"
+    },
+    "training": {
+      "viewHistory": "VIEW HISTORY",
+      "active": "Active",
+      "today": "Today",
+      "routines": {
+        "yoga": "Yoga",
+        "hiit": "HIIT",
+        "kickBoxing": "Kick Boxing",
+        "pilates": "Pilates"
+      },
+      "mock": {
+        "routineTitle": "Total Strength – Week 3",
+        "routineSubtitle": "Full Body - Medium"
+      }
+    },
+    "clientProfile": {
+      "member": "Member",
+      "activeMembership": "Active Membership",
+      "myQr": "My QR Code",
+      "membership": "Membership",
+      "description": "From your profile you can manage your personal information, check your membership and configure your notifications and account preferences.",
+      "defaultName": "Client",
+      "error": {
+        "fetchUser": "An unexpected error occurred while fetching user data."
+      }
+    },
+    "myProfile": {
+      "title": "My Profile",
+      "personalAccount": "Personal Account",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "identityDoc": "Identity Document",
+      "birthDate": "Date of Birth",
+      "phone": "Phone",
+      "edit": "Edit",
+      "saveChanges": "Save Changes",
+      "toast": {
+        "successTitle": "Profile Updated!",
+        "successMessage": "Your changes were saved successfully"
+      }
+    },
+    "myMembership": {
+      "title": "My Membership",
+      "currentPlan": "Current Plan",
+      "currentSubscription": "CURRENT SUBSCRIPTION",
+      "active": "Active",
+      "expirationDate": "Expiration Date",
+      "viewDetails": "View Details",
+      "allPlans": "All Plans",
+      "update": "Update",
+      "mockDate": "December 11, 2025"
+    },
+    "language": {
+      "title": "Language",
+      "changeLanguage": "Change Language",
+      "selectOption": "Select an option from the configuration options"
+    },
+    "notificationsSettings": {
+      "title": "Settings",
+      "notifications": "Notifications",
+      "description": "Manage how you want to receive notifications",
+      "classReminders": {
+        "title": "Class Reminders",
+        "description": "Receive notifications before your classes"
+      },
+      "routineUpdates": {
+        "title": "Routine Updates",
+        "description": "When your progress or routines change"
+      }
+    },
+    "membershipEntry": {
+      "title": "What would you like to buy today?",
+      "buyMembership": "BUY A MEMBERSHIP",
+      "buyService": "BUY A SERVICE/PACKAGE",
+      "membershipDesc": "Access all gym facilities and services.",
+      "serviceDesc": "Purchase class packages or specific services.",
+      "membershipBullets": {
+        "access": "Unlimited access",
+        "benefits": "Exclusive benefits",
+        "discounts": "Service discounts"
+      },
+      "serviceBullets": {
+        "classes": "Class packages",
+        "personalTraining": "Personal training",
+        "individualServices": "Individual services"
+      },
+      "backHome": "Back to Home"
+    },
+    "memberships": {
+      "titlePrefix": "OUR",
+      "titleSuffix": "MEMBERSHIPS",
+      "subtitle": "Choose the plan that best suits your fitness needs and goals.",
+      "free": "Free",
+      "acquire": "Acquire",
+      "acquirePlan": "Acquire {{name}}",
+      "periodDays": "/{{days}} days",
+      "error": {
+        "loadPlans": "Could not load membership plans."
+      }
+    },
+    "checkout": {
+      "title": "BUY MEMBERSHIP",
+      "steps": {
+        "options": "Options",
+        "extras": "Extras",
+        "confirmation": "Confirmation"
+      },
+      "summary": {
+        "selectedPlan": "Selected Plan",
+        "subtitle": "More benefits for your fitness life"
+      },
+      "startDate": "Start Date",
+      "benefits": {
+        "free-trial": [
+          "Limited gym access",
+          "7 days free access"
+        ],
+        "advanced": [
+          "Unlimited gym access",
+          "7 sessions with fitness consultant",
+          "Nutritional tracking",
+          "5 free supplements",
+          "Gym credential",
+          "Personal trainer"
+        ],
+        "athlete": [
+          "Full gym access",
+          "Personalized training plan",
+          "Monthly progress tracking"
+        ],
+        "premium": [
+          "All Advanced plan benefits",
+          "Unlimited sessions with fitness consultant",
+          "Advanced nutritional plan"
+        ]
+      },
+      "error": {
+        "missingData": "Missing data for selected plan.",
+        "userNotFound": "Could not identify user.",
+        "branchNotFound": "No available branch found to assign invoice."
+      }
+    },
+    "confirm": {
+      "title": "ORDER SUMMARY",
+      "paymentConfig": "Payment Configuration",
+      "branch": "BRANCH",
+      "currency": "PAYMENT CURRENCY",
+      "selectCurrency": "Select Currency",
+      "detailUSD": "DETAIL (USD)",
+      "totalUSD": "Total USD",
+      "totalToPay": "Total to Pay",
+      "approxRate": "Approx rate:",
+      "generatingOrder": "Generating order...",
+      "confirmWithPay": "Confirm and Pay",
+      "alert": {
+        "selectBranch": "Please select a branch."
+      },
+      "error": {
+        "invalidSession": "Invalid session",
+        "invoiceIdMissing": "Invoice ID reference not received"
+      }
+    },
+    "payment": {
+      "method": {
+        "title": "PAYMENT METHOD",
+        "subtitle": "Select how you want to pay for your order"
+      },
+      "options": {
+        "title": "Available Options",
+        "noMethods": "No payment methods available for this branch."
+      },
+      "totalToPay": "TOTAL TO PAY",
+      "concept": "Concept:",
+      "selectMethod": "Select a method",
+      "continue": "Continue",
+      "reportPayment": "Report Payment",
+      "confirmPayment": "Confirm Payment",
+      "mobile": {
+        "title": "MOBILE PAYMENT",
+        "bankDetailsTitle": "PAYMENT DETAILS",
+        "bankLabels": {
+          "bank": "Bank:",
+          "phone": "Phone:",
+          "rif": "ID:",
+          "holder": "Holder:"
+        }
+      },
+      "transfer": {
+        "title": "TRANSFER",
+        "subtitle": "Report your transaction details",
+        "destinationAccount": "DESTINATION ACCOUNT",
+        "total": "TOTAL TO TRANSFER",
+        "senderName": "Account Holder Name",
+        "senderNamePlaceholder": "Who made the transfer",
+        "reference": "Reference Number / Confirmation",
+        "labels": {
+          "email": "Email:",
+          "holder": "Holder:",
+          "bank": "Bank:",
+          "account": "Account:",
+          "rif": "ID:"
+        },
+        "holderPrefix": "Holder: ",
+        "referencePlaceholder": "Ex: 12345678"
+      },
+      "form": {
+        "originPhone": "Origin Phone",
+        "document": "Holder ID / Document",
+        "reference": "Reference Number (Last 4 digits)"
+      },
+      "warning": {
+        "verificationTitle": "Verification",
+        "verificationMessage": "Your payment will be manually validated by administration. Keep your digital receipt.",
+        "manualConfirmation": "Manual Confirmation",
+        "manualMessage": "Our administrative team will verify the transaction before activating your plan."
+      },
+      "toast": {
+        "selectMethod": "Please select a payment method.",
+        "orderCreated": "Order Created",
+        "goToReception": "Please go to reception to complete the payment.",
+        "errorProcessing": "Error processing direct payment",
+        "errorRegistering": "Could not register payment intention.",
+        "incompleteFields": "Please complete all fields.",
+        "invalidReference": "Enter at least the last 4 digits.",
+        "paymentReported": "Payment Reported",
+        "sentToVerification": "Your payment has been sent for verification.",
+        "errorPayment": "Payment Error"
+      }
+    },
+    "instructor": {
+      "profile": {
+        "defaultName": "Instructor",
+        "specialty": "Functional Strength",
+        "error": {
+          "fetchUser": "An unexpected error occurred while fetching user data."
+        },
+        "aboutMe": "About Me",
+        "aboutMeDescription": "Dr. Carly Angel is a specialist in strength and conditioning. She helps clients build a solid foundation and improve performance with personalized training programs.",
+        "scanQR": "Scan QR",
+        "stats": {
+          "experience": "Experience",
+          "completed": "Completed",
+          "activeClients": "Active Clients"
+        },
+        "settings": "Settings",
+        "personalInfo": "Personal Information",
+        "security": "Security",
+        "language": "Language",
+        "notifications": "Notifications",
+        "helpSupport": "Help and Support",
+        "termsConditions": "Terms and Conditions",
+        "logout": "Logout",
+        "logoutConfirm": {
+          "title": "Logout?",
+          "message": "Your current session will be closed and you will need to log in again.",
+          "cancel": "Cancel"
+        }
+      },
+      "dashboard": {
+        "defaultName": "Instructor",
+        "error": {
+          "fetchUser": "An unexpected error occurred while fetching user data."
+        },
+        "todayClasses": "Today's Classes",
+        "clientMessages": "Client Messages"
+      },
+      "classes": {
+        "title": "Class Calendar",
+        "calendar": "CALENDAR",
+        "week": "Week",
+        "month": "Month",
+        "classesOfDay": "CLASSES OF THE DAY",
+        "noClasses": "No classes scheduled for this date."
+      },
+      "clients": {
+        "title": "My Clients",
+        "assignRoutine": "Assign New Routine",
+        "viewProgress": "View Progress"
       }
     }
   }

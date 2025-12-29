@@ -2,10 +2,12 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BackHandler, Image, Modal, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function PersonalInfoScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
@@ -58,23 +60,23 @@ export default function PersonalInfoScreen() {
           />
           <View style={styles.headerInfo}>
             <ThemedText style={styles.nameText}>Laura Torres</ThemedText>
-            <ThemedText style={styles.roleText}>Recepcionista</ThemedText>
+            <ThemedText style={styles.roleText}>{t('dashboard.recepcionistDefault')}</ThemedText>
           </View>
         </View>
 
         {/* Botón editar */}
         {!isEditing && (
           <TouchableOpacity style={styles.editButton} activeOpacity={0.8} onPress={handleEdit}>
-            <ThemedText style={styles.editButtonText}>Editar Información</ThemedText>
+            <ThemedText style={styles.editButtonText}>{t('personalInfo.editButton')}</ThemedText>
           </TouchableOpacity>
         )}
 
         {/* Información Personal */}
         <View style={styles.card}>
-          <ThemedText style={styles.cardTitle}>Información Personal</ThemedText>
+          <ThemedText style={styles.cardTitle}>{t('personalInfo.sections.personal')}</ThemedText>
 
           <View style={styles.fieldGroup}>
-            <ThemedText style={styles.fieldLabel}>Nombre</ThemedText>
+            <ThemedText style={styles.fieldLabel}>{t('personalInfo.fields.firstName')}</ThemedText>
             <TextInput
               style={styles.input}
               value='Alani'
@@ -84,7 +86,7 @@ export default function PersonalInfoScreen() {
           </View>
 
           <View style={styles.fieldGroup}>
-            <ThemedText style={styles.fieldLabel}>Apellido</ThemedText>
+            <ThemedText style={styles.fieldLabel}>{t('personalInfo.fields.lastName')}</ThemedText>
             <TextInput
               style={styles.input}
               value='Barragán'
@@ -94,7 +96,7 @@ export default function PersonalInfoScreen() {
           </View>
 
           <View style={styles.fieldGroup}>
-            <ThemedText style={styles.fieldLabel}>Documento de identidad</ThemedText>
+            <ThemedText style={styles.fieldLabel}>{t('personalInfo.fields.id')}</ThemedText>
             <TextInput
               style={styles.input}
               value='12345688'
@@ -105,7 +107,7 @@ export default function PersonalInfoScreen() {
           </View>
 
           <View style={styles.fieldGroup}>
-            <ThemedText style={styles.fieldLabel}>Fecha de nacimiento</ThemedText>
+            <ThemedText style={styles.fieldLabel}>{t('personalInfo.fields.birthDate')}</ThemedText>
             <TextInput
               style={styles.input}
               value='01/01/1995'
@@ -117,10 +119,10 @@ export default function PersonalInfoScreen() {
 
         {/* Información de contacto */}
         <View style={styles.card}>
-          <ThemedText style={styles.cardTitle}>Información de contacto</ThemedText>
+          <ThemedText style={styles.cardTitle}>{t('personalInfo.sections.contact')}</ThemedText>
 
           <View style={styles.fieldGroup}>
-            <ThemedText style={styles.fieldLabel}>Correo electrónico</ThemedText>
+            <ThemedText style={styles.fieldLabel}>{t('personalInfo.fields.email')}</ThemedText>
             <TextInput
               style={styles.input}
               value='correo@ejemplo.com'
@@ -131,7 +133,7 @@ export default function PersonalInfoScreen() {
           </View>
 
           <View style={styles.fieldGroup}>
-            <ThemedText style={styles.fieldLabel}>Teléfono</ThemedText>
+            <ThemedText style={styles.fieldLabel}>{t('personalInfo.fields.phone')}</ThemedText>
             <TextInput
               style={styles.input}
               value='+58 123 456 7891'
@@ -146,10 +148,10 @@ export default function PersonalInfoScreen() {
         {isEditing && (
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.cancelButton} activeOpacity={0.8} onPress={handleCancel}>
-              <ThemedText style={styles.cancelButtonText}>Cancelar</ThemedText>
+              <ThemedText style={styles.cancelButtonText}>{t('common.cancel')}</ThemedText>
             </TouchableOpacity>
             <TouchableOpacity style={styles.saveButton} activeOpacity={0.8} onPress={handleSave}>
-              <ThemedText style={styles.saveButtonText}>Guardar</ThemedText>
+              <ThemedText style={styles.saveButtonText}>{t('common.save')}</ThemedText>
             </TouchableOpacity>
           </View>
         )}
@@ -164,15 +166,15 @@ export default function PersonalInfoScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <ThemedText style={styles.modalTitle}>¡Éxito!</ThemedText>
+            <ThemedText style={styles.modalTitle}>{t('common.success')}</ThemedText>
             <ThemedText style={styles.modalMessage}>
-              Los cambios fueron guardados exitosamente
+              {t('personalInfo.success.message')}
             </ThemedText>
             <TouchableOpacity
               style={styles.modalButton}
               onPress={handleSuccessClose}
             >
-              <ThemedText style={styles.modalButtonText}>Aceptar</ThemedText>
+              <ThemedText style={styles.modalButtonText}>{t('common.accept')}</ThemedText>
             </TouchableOpacity>
           </View>
         </View>

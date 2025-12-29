@@ -6,6 +6,7 @@ import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, ScrollView, TouchableOpacity, View } from 'react-native';
 import { BanknotesIcon, BuildingLibraryIcon, CreditCardIcon, DevicePhoneMobileIcon } from 'react-native-heroicons/outline';
 import { CheckCircleIcon } from 'react-native-heroicons/solid';
@@ -21,6 +22,7 @@ interface BranchPaymentMethod {
 }
 
 export default function MembershipPaymentScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   
   const params = useLocalSearchParams<{
@@ -74,7 +76,7 @@ export default function MembershipPaymentScreen() {
 
   const handlePay = async () => {
     if (!selectedMethodId) {
-      showToast('warning', 'Atención', 'Por favor selecciona un método de pago.');
+      showToast('warning', t('common.attention'), t('payment.toast.selectMethod'));
       return;
     }
 
@@ -117,7 +119,7 @@ export default function MembershipPaymentScreen() {
             receipt_url: 'Pago reportado en sitio' 
         }, token || '');
 
-        showToast('success', 'Orden Creada', 'Por favor dirígete a recepción para completar el pago.');
+        showToast('success', t('payment.toast.orderCreated'), t('payment.toast.goToReception'));
 
         setTimeout(() => {
             router.replace('/(tabs)/dashboard');
@@ -125,7 +127,7 @@ export default function MembershipPaymentScreen() {
 
       } catch (error) {
           console.error('Error procesando pago directo:', error);
-          showToast('error', 'Error', 'No se pudo registrar la intención de pago.');
+          showToast('error', t('common.error.title'), t('payment.toast.errorRegistering'));
       } finally {
           setLoading(false);
       }
@@ -154,15 +156,15 @@ export default function MembershipPaymentScreen() {
       <ScrollView className="flex-1 px-6 pt-8 pb-10">
         <View className="items-center mb-8">
             <ThemedText className="text-3xl font-bold text-center mb-2" style={{ fontFamily: 'BebasNeue-Regular' }}>
-                MÉTODO DE PAGO
+                {t('payment.method.title')}
             </ThemedText>
             <ThemedText className="text-gray-500 text-center">
-                Selecciona cómo deseas pagar tu orden
+                {t('payment.method.subtitle')}
             </ThemedText>
         </View>
 
         <View className="rounded-2xl p-6 mb-8 shadow-lg">
-            <ThemedText className="text-gray-400 text-xs uppercase tracking-widest mb-1">TOTAL A PAGAR</ThemedText>
+            <ThemedText className="text-gray-400 text-xs uppercase tracking-widest mb-1">{t('payment.totalToPay')}</ThemedText>
             <View className="flex-row items-end mb-4">
                 <ThemedText className="text-4xl font-bold text-white mr-2">
                     ${parseFloat(params.totalAmount || '0').toFixed(2)}
@@ -173,14 +175,14 @@ export default function MembershipPaymentScreen() {
             </View>
             <View className="h-[1px] bg-neutral-700 w-full mb-4" />
             <View className="flex-row justify-between">
-                <ThemedText className="text-gray-300">Concepto:</ThemedText>
+                <ThemedText className="text-gray-300">{t('payment.concept')}</ThemedText>
                 <ThemedText className="text-white font-bold max-w-[60%] text-right" numberOfLines={1}>
                     {params.title || 'Membresía VitalFit'}
                 </ThemedText>
             </View>
         </View>
 
-        <ThemedText className="text-lg font-bold mb-4 text-neutral-800">Opciones disponibles</ThemedText>
+        <ThemedText className="text-lg font-bold mb-4 text-neutral-800">{t('payment.options.title')}</ThemedText>
 
         {loadingMethods ? (
             <ActivityIndicator size="large" color="#f97316" className="py-10" />
@@ -219,7 +221,7 @@ export default function MembershipPaymentScreen() {
                     );
                 })}
                 {methods.length === 0 && (
-                    <ThemedText className="text-center text-gray-500 py-4">No hay métodos disponibles para esta sucursal.</ThemedText>
+                    <ThemedText className="text-center text-gray-500 py-4">{t('payment.options.noMethods')}</ThemedText>
                 )}
             </View>
         )}
@@ -229,7 +231,7 @@ export default function MembershipPaymentScreen() {
                 <ActivityIndicator size="large" color="#f97316" />
             ) : (
                 <PrimaryButton 
-                    title={selectedMethodId ? "Continuar" : "Seleccione un método"}
+                    title={selectedMethodId ? t('common.continue') : t('payment.selectMethod')}
                     onPress={handlePay}
                 />
             )}

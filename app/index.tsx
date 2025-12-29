@@ -79,7 +79,7 @@ export default function HomeScreen() {
 					<TouchableOpacity className='mb-4 flex-row items-center justify-center py-2'>
 						<Global color='white' size={16} variant='Outline' />
 						<Text className='ml-2 font-montserrat-medium text-sm text-white'>
-							{t('language')}
+							{t('languageLabel')}
 						</Text>
 					</TouchableOpacity>
 				</Link>

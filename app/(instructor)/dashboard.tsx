@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, BackHandler, ScrollView, Text, View } from 'react-native';
 import { CalendarDaysIcon, ClockIcon } from 'react-native-heroicons/mini';
 import { ChatBubbleLeftRightIcon, ChevronRightIcon, UserIcon } from 'react-native-heroicons/outline';
@@ -16,6 +17,7 @@ import { ChatBubbleLeftRightIcon, ChevronRightIcon, UserIcon } from 'react-nativ
 type TabType = 'clientes' | 'clases' | 'mensajes';
 
 export default function DashboardInstructor() {
+	const { t } = useTranslation();
 	const [loading, setLoading] = useState(true);
 	const [firstName, setFirstName] = useState<string | null>(null);
 	const [activeTab, setActiveTab] = useState<TabType>('clientes');
@@ -30,9 +32,9 @@ export default function DashboardInstructor() {
 				}
 
 				const userData = await vitalFitApi.user.WhoAmI(token);
-				setFirstName(userData?.user?.first_name || 'Instructor');
+				setFirstName(userData?.user?.first_name || t('instructor.dashboard.defaultName'));
 			} catch (error: unknown) {
-				let errorMessage = 'Ocurrió un error inesperado al obtener los datos del usuario.';
+				let errorMessage = t('instructor.dashboard.error.fetchUser');
 				if (isAPIError(error)) {
 					errorMessage = error.messages.join(', ');
 				} else if (error instanceof Error) {
@@ -45,7 +47,7 @@ export default function DashboardInstructor() {
 		};
 
 		fetchUser();
-	}, []);
+	}, [t]);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -107,7 +109,7 @@ export default function DashboardInstructor() {
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: 96 }}>
 				<UserHeader
-					name={firstName ?? 'Instructor'}
+					name={firstName ?? t('instructor.dashboard.defaultName')}
 					avatarUrl='https://randomuser.me/api/portraits/men/31.jpg'
 				/>
 
@@ -123,7 +125,7 @@ export default function DashboardInstructor() {
 						<View className='flex-row items-center mb-3'>
 							<CalendarDaysIcon width={18} height={18} color='#f97316' />
 							<Text className='ml-2 text-[14px] font-medium text-[#111827]'>
-								Clases de hoy
+								{t('instructor.dashboard.todayClasses')}
 							</Text>
 						</View>
 
@@ -160,7 +162,7 @@ export default function DashboardInstructor() {
 						<View className='flex-row items-center mb-3'>
 							<ChatBubbleLeftRightIcon width={18} height={18} color='#f97316' />
 							<Text className='ml-2 text-[14px] font-medium text-[#111827]'>
-								Mensajes de Clientes
+								{t('instructor.dashboard.clientMessages')}
 							</Text>
 						</View>
 

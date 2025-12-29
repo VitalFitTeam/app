@@ -1,5 +1,6 @@
 import { Award, Bell } from 'lucide-react-native';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Notification {
@@ -20,12 +21,15 @@ export const UserHeader: React.FC<Props> = ({
 	name,
 	avatarUrl,
 	gender,
-	notifications = [
-		{ id: '1', title: 'Tu clase comienza en 10 minutos', time: 'Hace 5 min' },
-		{ id: '2', title: 'Pago de membresía recibido', time: 'Hace 1 hora' },
-	],
+	notifications,
 	onBadgesPress,
 }) => {
+	const { t } = useTranslation();
+	const defaultNotifications = [
+		{ id: '1', title: t('dashboard.notifications.mock.classStarting'), time: 'Hace 5 min' },
+		{ id: '2', title: t('dashboard.notifications.mock.paymentReceived'), time: 'Hace 1 hora' },
+	];
+	const activeNotifications = notifications || defaultNotifications;
 	const [showNotifications, setShowNotifications] = useState(false);
 	const firstName = name.split(' ')[0];
 
@@ -65,7 +69,7 @@ export const UserHeader: React.FC<Props> = ({
 								fontSize: 31,
 								color: '#000',
 							}}>
-							Hola, {firstName}
+							{t('dashboard.hello')}{firstName}
 						</Text>
 					</View>
 				</View>
@@ -80,7 +84,7 @@ export const UserHeader: React.FC<Props> = ({
 						className='relative'
 						activeOpacity={0.7}>
 						<Bell size={24} color='#333' />
-						{notifications.length > 0 && (
+						{activeNotifications.length > 0 && (
 							<View className='absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full' />
 						)}
 					</TouchableOpacity>
@@ -96,10 +100,10 @@ export const UserHeader: React.FC<Props> = ({
 						activeOpacity={1}
 						onPress={(e) => e.stopPropagation()}
 						style={styles.notificationModal}>
-						<Text className='text-base font-semibold mb-2'>Notificaciones</Text>
-						{notifications.length > 0 ? (
+						<Text className='text-base font-semibold mb-2'>{t('dashboard.notifications.title')}</Text>
+						{activeNotifications.length > 0 ? (
 							<FlatList
-								data={notifications}
+								data={activeNotifications}
 								keyExtractor={(item) => item.id}
 								renderItem={({ item }) => (
 									<View className='mb-2'>
@@ -112,7 +116,7 @@ export const UserHeader: React.FC<Props> = ({
 							/>
 						) : (
 							<Text className='text-gray-400 text-sm'>
-								No tienes notificaciones nuevas
+								{t('dashboard.notifications.empty')}
 							</Text>
 						)}
 					</TouchableOpacity>
