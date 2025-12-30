@@ -1,67 +1,91 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { StyledTextInput } from '@/components/StyledTextInput';
+import { ToastNotification } from '@/components/ToastNotification';
 import { ThemedView } from '@/components/themed-view';
+import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services/vitalfitSdk';
+import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Controller, useForm } from 'react-hook-form';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon, ShieldCheckIcon } from 'react-native-heroicons/solid';
+import { z } from 'zod';
+
+const ChangePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Ingresa tu contraseña actual.'),
+    newPassword: z
+      .string()
+      .min(8, 'La contraseña debe tener al menos 8 caracteres.')
+      .regex(/[A-Z]/, 'Debe contener al menos una mayúscula.')
+      .regex(/[a-z]/, 'Debe contener al menos una minúscula.')
+      .regex(/[0-9]/, 'Debe contener al menos un número.')
+      .regex(/[^a-zA-Z0-9]/, 'Debe contener al menos un caracter especial.'),
+    confirmPassword: z.string(),
+  })
+ 
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Las contraseñas no coinciden.',
+    path: ['confirmPassword'],
+  })
+  
+  .refine((data) => data.newPassword !== data.currentPassword, {
+    message: 'La nueva contraseña no puede ser igual a la actual.',
+    path: ['newPassword'],
+  });
+
+type FormData = z.infer<typeof ChangePasswordSchema>;
 
 export default function InstructorChangePasswordScreen() {
   const router = useRouter();
-  const [step, setStep] = useState<1 | 2>(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { toastState, showToast, hideToast } = useToast();
 
-  const handleValidateCurrent = async () => {
-    if (!currentPassword) {
-      setErrorMessage('Ingresa tu contraseña actual.');
-      return;
-    }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(ChangePasswordSchema),
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+    mode: 'onChange',
+  });
 
-    setIsLoading(true);
-    setErrorMessage(null);
-    try {
-      setStep(2);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleChangePassword = async () => {
-    if (!newPassword || !confirmPassword) {
-      setErrorMessage('Completa todos los campos.');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setErrorMessage('Las contraseñas no coinciden.');
-      return;
-    }
-
+  const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     setErrorMessage(null);
     try {
       const token = await AsyncStorage.getItem('token');
-      if (!token) throw new Error('No se encontró sesión activa');
+      if (!token) {
+        setErrorMessage('No se encontró sesión activa');
+        return;
+      }
 
       await vitalFitApi.user.UpgradePassword(
         token,
-        currentPassword,
-        newPassword,
-        confirmPassword
+        data.currentPassword,
+        data.newPassword,
+        data.confirmPassword
       );
 
-      Alert.alert('Éxito', 'Contraseña actualizada correctamente', [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
-    } catch (error: unknown) {
-      let message = 'Ocurrió un error al cambiar la contraseña.';
+      showToast('success', 'Contraseña actualizada', 'La contraseña se guardó correctamente');
       
+      setTimeout(() => {
+        router.back();
+      }, 2000);
+    } catch (error: unknown) {
+      console.log('Error al cambiar password:', error);
+
+      let message = 'Ocurrió un error al cambiar la contraseña.';
+
       if (isAPIError(error)) {
         if (error.status === 401) {
           message = 'La contraseña actual es incorrecta.';
@@ -69,11 +93,15 @@ export default function InstructorChangePasswordScreen() {
           message = error.messages.join(', ');
         } else if (error.message && error.message !== 'Ocurrió un error inesperado') {
           message = error.message;
+        } else {
+          message = 'Verifique su contraseña actual e intente nuevamente.';
         }
       } else if (error instanceof Error) {
         message = error.message;
       }
+
       setErrorMessage(message);
+      showToast('error', 'Error', message);
     } finally {
       setIsLoading(false);
     }
@@ -81,6 +109,13 @@ export default function InstructorChangePasswordScreen() {
 
   return (
     <ThemedView className='flex-1 bg-white pt-10'>
+      <ToastNotification
+        visible={toastState.visible}
+        type={toastState.type}
+        title={toastState.title}
+        message={toastState.message}
+        onClose={hideToast}
+      />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -93,16 +128,13 @@ export default function InstructorChangePasswordScreen() {
             style={{ position: 'relative' }}>
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => {
-                if (step === 2) setStep(1);
-                else router.back();
-              }}
+              onPress={() => router.back()}
               style={{ position: 'absolute', left: 12, top: 8, bottom: 8, justifyContent: 'center' }}>
               <ChevronLeftIcon width={20} height={20} color='#f97316' />
             </TouchableOpacity>
 
             <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>
-              {step === 1 ? 'Verificar identidad' : 'Cambiar contraseña'}
+              Cambiar contraseña
             </Text>
           </View>
 
@@ -129,48 +161,62 @@ export default function InstructorChangePasswordScreen() {
             </View>
           )}
 
-          {step === 1 && (
-            <View>
-              <StyledTextInput
-                label='Contraseña actual'
-                isPasswordInput
-                value={currentPassword}
-                onChangeText={setCurrentPassword}
-                placeholder='Ingresa tu contraseña actual'
-              />
-              <PrimaryButton
-                title={isLoading ? 'Validando...' : 'Continuar'}
-                onPress={handleValidateCurrent}
-                disabled={isLoading}
-                style={{ marginTop: 12 }}
-              />
-            </View>
-          )}
+          <View>
+            <Controller
+              control={control}
+              name='currentPassword'
+              render={({ field: { onChange, onBlur, value } }) => (
+                <StyledTextInput
+                  label='Contraseña actual'
+                  isPasswordInput
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder='Ingresa tu contraseña actual'
+                  error={errors.currentPassword?.message}
+                />
+              )}
+            />
 
-          {step === 2 && (
-            <View>
-              <StyledTextInput
-                label='Nueva contraseña'
-                isPasswordInput
-                value={newPassword}
-                onChangeText={setNewPassword}
-                placeholder='Ingresa tu nueva contraseña'
-              />
-              <StyledTextInput
-                label='Confirmar contraseña'
-                isPasswordInput
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                placeholder='Repite tu nueva contraseña'
-              />
-              <PrimaryButton
-                title={isLoading ? 'Guardando...' : 'Guardar cambios'}
-                onPress={handleChangePassword}
-                disabled={isLoading}
-                style={{ marginTop: 12 }}
-              />
-            </View>
-          )}
+            <Controller
+              control={control}
+              name='newPassword'
+              render={({ field: { onChange, onBlur, value } }) => (
+                <StyledTextInput
+                  label='Nueva contraseña'
+                  isPasswordInput
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder='Ingresa tu nueva contraseña'
+                  error={errors.newPassword?.message}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name='confirmPassword'
+              render={({ field: { onChange, onBlur, value } }) => (
+                <StyledTextInput
+                  label='Confirmar contraseña'
+                  isPasswordInput
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder='Repite tu nueva contraseña'
+                  error={errors.confirmPassword?.message}
+                />
+              )}
+            />
+
+            <PrimaryButton
+              title={isLoading ? 'Guardando...' : 'Guardar cambios'}
+              onPress={handleSubmit(onSubmit)}
+              disabled={isLoading}
+              style={{ marginTop: 12 }}
+            />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </ThemedView>
