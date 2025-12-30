@@ -1,5 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useUser } from '@/contexts/UserContext';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { Alert, BackHandler, Image, Modal, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
@@ -7,6 +8,7 @@ import { EyeIcon, EyeSlashIcon } from 'react-native-heroicons/outline';
 
 export default function SecurityScreen() {
   const router = useRouter();
+  const { user } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -16,6 +18,9 @@ export default function SecurityScreen() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // Local state for user deleted in favor of context
+
 
   const handleBackPress = useCallback(() => {
     if (isEditing) {
@@ -85,12 +90,20 @@ export default function SecurityScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerRow}>
           <Image
-            source={{ uri: 'https://randomuser.me/api/portraits/women/32.jpg' }}
+            source={
+              user?.profilePicture
+                ? { uri: user.profilePicture }
+                : user?.gender === 'F'
+                ? require('@/assets/images/Female.svg')
+                : require('@/assets/images/Man.svg')
+            }
             style={styles.avatar}
           />
           <View style={styles.headerInfo}>
-            <ThemedText style={styles.nameText}>Laura Torres</ThemedText>
-            <ThemedText style={styles.roleText}>Recepcionista</ThemedText>
+            <ThemedText style={styles.nameText}>
+              {user ? (user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName) : 'Recepcionista'}
+            </ThemedText>
+            <ThemedText style={styles.roleText}>{user?.roleName || 'Recepcionista'}</ThemedText>
           </View>
         </View>
 

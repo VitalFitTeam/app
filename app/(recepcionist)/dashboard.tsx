@@ -8,23 +8,25 @@ import { BranchSelector } from '@/components/recepcionista/BranchSelector';
 import { CheckInResultModal } from '@/components/recepcionista/CheckInResultModal';
 import { ThemedView } from '@/components/themed-view';
 import { useBranch } from '@/contexts/BranchContext';
+import { useUser } from '@/contexts/UserContext';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
 
 export default function DashboardRecepcionist() {
 	const { t } = useTranslation();
-	const [loading, setLoading] = useState(true);
-	const [firstName, setFirstName] = useState<string | null>(null);
+	const { user, loading: userLoading } = useUser();
 	const [scannerVisible, setScannerVisible] = useState(false);
 	const { selectedBranchId } = useBranch();
 	const [resultModalVisible, setResultModalVisible] = useState(false);
 	const [checkInSuccess, setCheckInSuccess] = useState(false);
 	const [checkInUserName, setCheckInUserName] = useState('');
 	const [checkInMessage, setCheckInMessage] = useState('');
+
+	const displayName = user?.firstName || t('dashboard.recepcionistDefault');
 
 	const handleValidateMembership = async (qrJwtLong: string) => {
 		try {
@@ -91,27 +93,7 @@ export default function DashboardRecepcionist() {
 		}
 	};
 
-	useEffect(() => {
-		const fetchUser = async () => {
-			try {
-				const token = await AsyncStorage.getItem('token');
-				if (!token) return;
-				const userData = await vitalFitApi.user.WhoAmI(token);
-				setFirstName(userData?.user?.first_name || t('dashboard.recepcionistDefault'));
-			} catch (error: unknown) {
-				let errorMessage = t('common.error.unexpected');
-				if (isAPIError(error)) errorMessage = error.messages.join(', ');
-				else if (error instanceof Error) errorMessage = error.message;
-				console.error('Error whoami (Recepcionista):', errorMessage);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchUser();
-	}, [t]);
-
-	if (loading) {
+	if (userLoading && !user) {
 		return (
 			<ThemedView className='flex-1 justify-center items-center bg-white dark:bg-neutral-950'>
 				<ActivityIndicator size='large' color='#F27F2A' />
@@ -126,8 +108,9 @@ export default function DashboardRecepcionist() {
 				contentContainerStyle={{ paddingBottom: 100 }}
 			>
 				<UserHeader
-					name={firstName ?? t('dashboard.recepcionistDefault')}
-					avatarUrl='https://randomuser.me/api/portraits/women/44.jpg'
+					name={displayName}
+					avatarUrl={user?.profilePicture || undefined} 
+                    gender={user?.gender}
 				/>
 
 				<View style={{ alignItems: 'flex-end', paddingHorizontal: 20, marginBottom: 10, marginTop: -15 }}>
