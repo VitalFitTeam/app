@@ -76,15 +76,24 @@ export default function ProfileScreen() {
             />
           </View>
           <Text className="text-[20px] font-semibold text-[#111827]">{displayName}</Text>
-          <View className="flex-row items-center mt-1">
-            <Text className="text-[13px] text-[#6b7280] mr-1">Nivel 24</Text>
-            <Image
-              source={require('@/assets/images/medal2.png')}
-              style={{ width: 14, height: 14 }}
-              contentFit="contain"
-            />
-          </View>
-          <Text className="text-[13px] text-[#f97316] mt-0.5">Premium</Text>
+          {(user?.roleName === 'Instructor' || user?.roleName === 'Staff') ? (
+            <>
+              <Text className="text-[13px] text-[#6b7280] mt-1">{user?.specialty || 'Entrenador Personal'}</Text>
+              <Text className="text-[13px] text-[#f97316] mt-0.5">{user?.roleName}</Text>
+            </>
+          ) : (
+            <>
+              <View className="flex-row items-center mt-1">
+                <Text className="text-[13px] text-[#6b7280] mr-1">Nivel 24</Text>
+                <Image
+                  source={require('@/assets/images/medal2.png')}
+                  style={{ width: 14, height: 14 }}
+                  contentFit="contain"
+                />
+              </View>
+              <Text className="text-[13px] text-[#f97316] mt-0.5">Premium</Text>
+            </>
+          )}
         </View>
 
         <View className="mb-4">

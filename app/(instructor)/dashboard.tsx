@@ -1,14 +1,13 @@
+import { useUser } from '@/contexts/UserContext';
+
 import { InstructorStatsCardGroup } from '@/components/auth/dashboard/InstructorStatsCardGroup';
 import { InstructorTabs } from '@/components/auth/dashboard/InstructorTabs';
 import { MyClientsCardGroup } from '@/components/auth/dashboard/MyClientsCardGroup';
 import { TodayClassCard } from '@/components/auth/dashboard/TodayClassCard';
 import { UserHeader } from '@/components/auth/dashboard/userheader';
 import { ThemedView } from '@/components/themed-view';
-import vitalFitApi from '@/services/vitalfitSdk';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isAPIError } from '@vitalfit/sdk';
 import { useFocusEffect } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, BackHandler, ScrollView, Text, View } from 'react-native';
 import { CalendarDaysIcon, ClockIcon } from 'react-native-heroicons/mini';
@@ -20,36 +19,8 @@ type TabType = 'clientes' | 'clases' | 'mensajes';
 export default function DashboardInstructor() {
 	const { t } = useTranslation();
 	const insets = useSafeAreaInsets();
-	const [loading, setLoading] = useState(true);
-	const [firstName, setFirstName] = useState<string | null>(null);
+	const { user, loading: userLoading } = useUser();
 	const [activeTab, setActiveTab] = useState<TabType>('clientes');
-
-	useEffect(() => {
-		const fetchUser = async () => {
-			try {
-				const token = await AsyncStorage.getItem('token');
-				if (!token) {
-					console.error('No se encontró token en AsyncStorage');
-					return;
-				}
-
-				const userData = await vitalFitApi.user.WhoAmI(token);
-				setFirstName(userData?.user?.first_name || t('instructor.dashboard.defaultName'));
-			} catch (error: unknown) {
-				let errorMessage = t('instructor.dashboard.error.fetchUser');
-				if (isAPIError(error)) {
-					errorMessage = error.messages.join(', ');
-				} else if (error instanceof Error) {
-					errorMessage = error.message;
-				}
-				console.error('Error en la solicitud whoami (Instructor):', errorMessage);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchUser();
-	}, [t]);
 
 	useFocusEffect(
 		useCallback(() => {
@@ -64,13 +35,18 @@ export default function DashboardInstructor() {
 		}, []),
 	);
 
-	if (loading) {
+	if (userLoading) {
 		return (
 			<ThemedView className='flex-1 justify-center items-center bg-white'>
 				<ActivityIndicator size='large' color='#F27F2A' />
 			</ThemedView>
 		);
 	}
+
+  const firstName = user?.firstName || t('instructor.dashboard.defaultName');
+  const avatarUrl = user?.profilePicture;
+  const gender = user?.gender;
+
 
 	const messages = [
 		{
@@ -111,8 +87,9 @@ export default function DashboardInstructor() {
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: Math.max(insets.bottom + 80, 96) }}>
 				<UserHeader
-					name={firstName ?? t('instructor.dashboard.defaultName')}
-					avatarUrl='https://randomuser.me/api/portraits/men/31.jpg'
+					name={firstName}
+					avatarUrl={avatarUrl}
+          gender={gender}
 				/>
 
 				<InstructorStatsCardGroup />
