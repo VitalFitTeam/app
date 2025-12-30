@@ -39,7 +39,6 @@ export default function ClientList({
 
   return (
     <View style={styles.container}>
-      {/* Campo de búsqueda */}
       {showSearch && (
         <View style={styles.searchWrapper}>
           <TextInput
@@ -50,7 +49,6 @@ export default function ClientList({
         </View>
       )}
 
-      {/* Header de lista de clientes */}
       <View style={styles.clientsHeader}>
         <View style={styles.clientsTitleRow}>
           <CalendarDaysIcon size={20} color='#6B7280' />
@@ -60,7 +58,6 @@ export default function ClientList({
         </View>
       </View>
 
-      {/* Lista de clientes */}
       <View style={styles.clientsList}>
         {clients.map(client => (
           <TouchableOpacity 
@@ -80,7 +77,6 @@ export default function ClientList({
         ))}
       </View>
 
-      {/* Botón Ver todos */}
       {onViewAllPress && showViewAllButton && (
         <TouchableOpacity style={styles.viewAllButton} activeOpacity={0.8} onPress={onViewAllPress}>
           <ThemedText style={styles.viewAllButtonText}>{t('common.viewAllRegistered')}</ThemedText>

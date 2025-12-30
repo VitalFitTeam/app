@@ -8,7 +8,7 @@ import { ActivityIndicator, Alert, Modal, StyleSheet, Text, TouchableOpacity, Vi
 interface Props {
     visible: boolean;
     onClose: () => void;
-    onScan: (data: string) => Promise<void>; // Función asíncrona para validar
+    onScan: (data: string) => Promise<void>;
 }
 
 export const QRScannerModal: React.FC<Props> = ({ visible, onClose, onScan }) => {
@@ -18,7 +18,6 @@ export const QRScannerModal: React.FC<Props> = ({ visible, onClose, onScan }) =>
     const [processing, setProcessing] = useState(false);
 
     if (!permission) {
-        // Permisos cargando
         return <View />;
     }
 
@@ -45,12 +44,10 @@ export const QRScannerModal: React.FC<Props> = ({ visible, onClose, onScan }) =>
         setProcessing(true);
 
         try {
-            // Llamamos a la función de validación que nos pasan desde el padre
             await onScan(data);
         } catch {
             Alert.alert(t('common.error.title'), t('scanner.error.cameraAccess'));
         } finally {
-            // Damos un tiempo antes de permitir escanear de nuevo
             setTimeout(() => {
                 setProcessing(false);
                 setScanned(false);
@@ -70,7 +67,6 @@ export const QRScannerModal: React.FC<Props> = ({ visible, onClose, onScan }) =>
                     }}
                 />
 
-                {/* Overlay Oscuro con ventana transparente */}
                 <View style={styles.overlay}>
                     <View style={styles.unfocusedContainer}></View>
                     <View style={styles.middleContainer}>
@@ -84,7 +80,6 @@ export const QRScannerModal: React.FC<Props> = ({ visible, onClose, onScan }) =>
                     <View style={styles.unfocusedContainer}></View>
                 </View>
 
-                {/* Botón Cerrar */}
                 <TouchableOpacity style={styles.closeIcon} onPress={onClose}>
                     <Ionicons name="close-circle" size={50} color="white" />
                 </TouchableOpacity>
@@ -100,13 +95,11 @@ export const QRScannerModal: React.FC<Props> = ({ visible, onClose, onScan }) =>
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' }, // Added justifyContent and alignItems for permission view
+    container: { flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' }, 
     message: { textAlign: 'center', paddingBottom: 10, color: 'white', marginHorizontal: 20 },
     button: { backgroundColor: '#F27F2A', padding: 15, borderRadius: 10, alignItems: 'center', marginHorizontal: 20 },
     buttonText: { color: 'white', fontWeight: 'bold' },
     closeButtonText: { alignItems: 'center' },
-
-    // Overlay Styles
     overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
     unfocusedContainer: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)' },
     middleContainer: { flexDirection: 'row', flex: 1.5 },

@@ -37,7 +37,6 @@ export default function NotificationsScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
-        {/* Franja superior */}
         <View
           className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'
           style={{ position: 'relative' }}>
@@ -58,7 +57,6 @@ export default function NotificationsScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Sección "Hoy" */}
         <Text style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 8 }}>Hoy</Text>
         {mockNotifications.slice(0, 2).map((n) => (
           <View
@@ -110,7 +108,6 @@ export default function NotificationsScreen() {
           </View>
         ))}
 
-        {/* Sección "Ayer" */}
         <Text style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 16 }}>Ayer</Text>
         {mockNotifications.slice(2).map((n) => (
           <View

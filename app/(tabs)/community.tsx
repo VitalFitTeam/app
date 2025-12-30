@@ -18,7 +18,6 @@ export default function ComunidadScreen() {
 						paddingTop: 24,
 						paddingBottom: 120,
 					}}>
-					{/* Logo */}
 					<View className='items-center mb-6'>
 						<Image
 							source={require('@/assets/images/Frame.png')}
@@ -26,21 +25,18 @@ export default function ComunidadScreen() {
 						/>
 					</View>
 
-					{/* Weekly Challenge Banner reutilizado */}
 					<View className='mb-6'>
 						<WeeklyChallengeBanner
 							onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
 						/>
 					</View>
 
-					{/* Sección de desafíos (grid) */}
 					<ChallengeGrid
 						onPlankPress={() => console.log('Abrir challenge: plank')}
 						onSprintPress={() => console.log('Abrir challenge: sprint')}
 						onSquatPress={() => console.log('Abrir challenge: squat')}
 					/>
 
-					{/* Heading inferior */}
 					<View className='mt-6'>
 						<Text
 							style={{

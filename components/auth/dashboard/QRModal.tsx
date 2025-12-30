@@ -8,7 +8,7 @@ import QRCode from 'react-native-qrcode-svg';
 interface Props {
 	visible: boolean;
 	onClose: () => void;
-	token: string; // Token de sesión del usuario (Auth JWT)
+	token: string; 
 	userName: string;
 }
 
@@ -19,11 +19,8 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 	const fetchQrToken = React.useCallback(async () => {
 		try {
 			setLoading(true);
-			// Llamamos al endpoint específico para generar el token de acceso QR
 			console.log('Solicitando Token QR con Auth Token length:', token?.length);
-
 			const response = await vitalFitApi.user.QrToken(token);
-
 			if (response?.token) {
 				console.log('Token QR Recibido:', response.token);
 				console.log('Longitud del Token QR:', response.token.length);
@@ -39,8 +36,6 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 			setLoading(false);
 		}
 	}, [token]);
-
-	// Cada vez que el modal se hace visible, pedimos un nuevo token QR
 	useEffect(() => {
 		if (visible && token) {
 			fetchQrToken();
@@ -57,7 +52,6 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
 
-					{/* Header del Modal */}
 					<View style={styles.header}>
 						<Text style={styles.modalTitle}>Tu Código de Acceso</Text>
 						<TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -70,7 +64,6 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 						Muestra este código en recepción para ingresar
 					</Text>
 
-					{/* Área del Código QR */}
 					<View style={styles.qrContainer}>
 						{loading ? (
 							<ActivityIndicator size="large" color="#F27F2A" />
@@ -86,7 +79,6 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 						)}
 					</View>
 
-					{/* Botón para regenerar si es necesario */}
 					{!loading && (
 						<TouchableOpacity onPress={fetchQrToken} style={styles.refreshButton}>
 							<Ionicons name="refresh" size={20} color="#F27F2A" />
@@ -105,7 +97,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		backgroundColor: 'rgba(0,0,0,0.5)', // Fondo oscuro semitransparente
+		backgroundColor: 'rgba(0,0,0,0.5)', 
 	},
 	modalView: {
 		width: '85%',
@@ -137,7 +129,7 @@ const styles = StyleSheet.create({
 	userName: {
 		fontSize: 20,
 		fontWeight: '600',
-		color: '#F27F2A', // Color naranja de tu marca
+		color: '#F27F2A', 
 		marginBottom: 8,
 	},
 	instruction: {
@@ -150,7 +142,6 @@ const styles = StyleSheet.create({
 		padding: 16,
 		backgroundColor: 'white',
 		borderRadius: 16,
-		// Sombra suave para el cuadro del QR
 		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.1,

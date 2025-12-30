@@ -32,15 +32,12 @@ export default function InstructorClientProgressScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: 8, paddingHorizontal: 16, paddingBottom: 96 }}
       >
-        {/* Logo */}
         <View style={{ alignItems: 'center', marginBottom: 16 }}>
           <Image
             source={require('@/assets/images/Frame.png')}
             style={{ width: 150, height: 50, resizeMode: 'contain' }}
           />
         </View>
-
-        {/* Franja gris con título y flecha atrás */}
         <View
           style={{
             width: '100%',
@@ -68,8 +65,6 @@ export default function InstructorClientProgressScreen() {
             Progreso
           </ThemedText>
         </View>
-
-        {/* Avatar, nombre y nivel del cliente (columna, modo claro) */}
         <View style={{ alignItems: 'flex-start', marginBottom: 16 }}>
           <View
             style={{
@@ -90,8 +85,6 @@ export default function InstructorClientProgressScreen() {
           </Text>
           <Text style={{ color: '#6b7280', fontSize: 14 }}>{clientLevel}</Text>
         </View>
-
-        {/* Métricas del cliente en contenedor único (modo claro) */}
         <View style={{ marginBottom: 16 }}>
           <View
             style={{
@@ -124,8 +117,6 @@ export default function InstructorClientProgressScreen() {
             </View>
           </View>
         </View>
-
-        {/* Rutina actual - tarjeta clara inspirada en mock */}
         <View style={{ marginBottom: 16 }}>
           <View
             style={{
@@ -150,8 +141,6 @@ export default function InstructorClientProgressScreen() {
             </Text>
           </View>
         </View>
-
-        {/* Detalle de ejercicios con estado */}
         <View style={{ marginBottom: 16 }}>
           <Text style={{ color: '#111827', fontWeight: '700', fontSize: 16, marginBottom: 8 }}>Detalle de ejercicios</Text>
 
@@ -207,8 +196,6 @@ export default function InstructorClientProgressScreen() {
             </LinearGradient>
           ))}
         </View>
-
-        {/* Notas de la rutina */}
         <View style={{ marginBottom: 20 }}>
           <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }}>Notas de la rutina</Text>
           <View style={{ borderRadius: 16, borderWidth: 1, borderColor: '#e5e7eb', paddingHorizontal: 12, paddingVertical: 10, backgroundColor: '#F9FAFB' }}>
@@ -217,8 +204,6 @@ export default function InstructorClientProgressScreen() {
             </Text>
           </View>
         </View>
-
-        {/* Volver a Mis clientes */}
         <TouchableOpacity
           activeOpacity={0.85}
           style={{ width: '100%', paddingVertical: 14, borderRadius: 16, backgroundColor: '#4b5563', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}

@@ -7,7 +7,7 @@ export type TrainingCardProps = {
   id: string;
   title: string;
   subtitle: string;
-  progressPercent: number; // 0-100
+  progressPercent: number; 
   instructor?: string;
   onPress?: () => void;
 };
@@ -24,23 +24,19 @@ export default function TrainingCard({ id, title, subtitle, progressPercent, ins
       className="w-full rounded-2xl overflow-hidden bg-white mb-4"
       style={{ shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 5 }}
     >
-      {/* Background image */}
       <View style={{ height: 180 }}>
         <Image
           source={require('@/assets/images/rutin.png')}
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '100%' }}
           resizeMode="cover"
         />
-        {/* No overlay over the image as requested */}
 
-        {/* Content over image */}
         <View style={{ position: 'absolute', left: 12, right: 12, bottom: 12 }}>
           <Text style={{ color: '#fff', fontWeight: '800', fontSize: 18 }}>
             {title}
           </Text>
         </View>
 
-        {/* Circular progress */}
         <View style={{ position: 'absolute', right: 12, bottom: 12, width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: '#0F172A' }}>
           {(() => {
             const size = 40;
@@ -78,18 +74,15 @@ export default function TrainingCard({ id, title, subtitle, progressPercent, ins
         </View>
       </View>
 
-      {/* Footer info */}
       <View className="px-4 py-3" style={{ backgroundColor: '#111827' }}>
         <View className="flex-row items-start justify-between">
-          {/* Left column: subtitle and instructor */}
           <View style={{ flexShrink: 1, paddingRight: 12 }}>
             <Text style={{ color: '#D1D5DB', fontSize: 12, marginBottom: 2 }}>{subtitle}</Text>
             <Text style={{ color: '#9CA3AF', fontSize: 12 }}>{instructor}</Text>
           </View>
-          {/* Right column: days in the same row */}
           <View className="flex-row items-center" style={{ flexShrink: 0 }}>
             {days.map((d, i) => {
-              const activeIndices = [1, 3, 5, 6]; // Ma, Ju, Sa, Do
+              const activeIndices = [1, 3, 5, 6]; 
               const active = activeIndices.includes(i);
               return (
                 <View key={`${d}-${i}`} style={{ alignItems: 'center', marginLeft: 10 }}>

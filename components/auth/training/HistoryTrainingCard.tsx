@@ -6,7 +6,7 @@ export type HistoryTrainingCardProps = {
   id: string;
   title: string;
   subtitle: string;
-  progressPercent: number; // 0-100
+  progressPercent: number; 
   instructor?: string;
   duration?: string;
   onPress?: () => void;
@@ -21,7 +21,7 @@ export default function HistoryTrainingCard({ title, subtitle, progressPercent, 
       className="w-full rounded-2xl overflow-hidden bg-white mb-4"
       style={{ shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 4 }}
     >
-      {/* Background image only */}
+
       <View style={{ height: 160 }}>
         <Image
           source={imageSource ?? require('@/assets/images/rutin.png')}
@@ -29,7 +29,6 @@ export default function HistoryTrainingCard({ title, subtitle, progressPercent, 
           resizeMode="cover"
         />
 
-        {/* Text directly over the image (no footer), placed at top-left */}
         <View style={{ position: 'absolute', left: 12, right: 72, top: 12 }}>
           <Text style={{ color: '#fff', fontWeight: '800', fontSize: 18 }}>
             {title}
@@ -39,7 +38,6 @@ export default function HistoryTrainingCard({ title, subtitle, progressPercent, 
           <Text style={{ color: '#E5E7EB', fontSize: 12, marginTop: 2 }}>Duración: {duration}</Text>
         </View>
 
-        {/* Circular progress aligned with title row */}
         <View style={{ position: 'absolute', right: 12, top: 12, width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(17,24,39,0.6)' }}>
           {(() => {
             const size = 40;

@@ -46,8 +46,6 @@ export default function EnrollClientScreen() {
       alert(t('enrollClient.error.completeFields'));
       return;
     }
-
-    // Aquí iría la lógica para inscribir al cliente
     setShowSuccessModal(true);
   };
 
@@ -76,7 +74,6 @@ export default function EnrollClientScreen() {
   
   return (
     <ThemedView style={styles.container}>
-      {/* Header con logo */}
       <View style={styles.header}>
         <Image 
           source={require('@/assets/images/Frame.png')} 
@@ -85,12 +82,9 @@ export default function EnrollClientScreen() {
         />
       </View>
 
-      
-      {/* Contenido principal */}
       <View style={styles.content}>
         <ThemedText style={styles.title}>{t('enrollClient.title')}</ThemedText>
         
-        {/* Información de la clase */}
         <View style={styles.classInfoCard}>
           <ThemedText style={styles.classTitle}>{className}</ThemedText>
           <ThemedText style={styles.classDetails}>
@@ -98,7 +92,6 @@ export default function EnrollClientScreen() {
           </ThemedText>
         </View>
 
-        {/* Formulario de inscripción */}
         <View style={styles.form}>
           <View style={styles.inputGroup}>
             <ThemedText style={styles.label}>{t('enrollClient.form.clientId')}</ThemedText>
@@ -122,7 +115,6 @@ export default function EnrollClientScreen() {
             />
           </View>
 
-          {/* Botón de inscribir */}
           <TouchableOpacity 
             style={styles.enrollButton} 
             onPress={handleEnroll}
@@ -133,7 +125,6 @@ export default function EnrollClientScreen() {
         </View>
       </View>
 
-      {/* Modal de éxito */}
       <Modal
         animationType="fade"
         transparent={true}

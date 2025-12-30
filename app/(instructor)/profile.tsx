@@ -9,14 +9,14 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
-    ArrowRightOnRectangleIcon,
-    BellIcon,
-    ChevronRightIcon,
-    GlobeAltIcon,
-    QrCodeIcon,
-    QuestionMarkCircleIcon,
-    ShieldCheckIcon,
-    UserCircleIcon,
+	ArrowRightOnRectangleIcon,
+	BellIcon,
+	ChevronRightIcon,
+	GlobeAltIcon,
+	QrCodeIcon,
+	QuestionMarkCircleIcon,
+	ShieldCheckIcon,
+	UserCircleIcon,
 } from 'react-native-heroicons/outline';
 
 export default function InstructorProfileScreen() {
@@ -95,7 +95,6 @@ export default function InstructorProfileScreen() {
 					<Text className='text-[13px] text-[#f97316] mt-0.5'>{t('instructor.profile.specialty')}</Text>
 				</View>
 
-				{/* About Me */}
 				<View className='mb-4'>
 					<Text className='text-[14px] font-semibold text-[#111827] mb-1'>{t('instructor.profile.aboutMe')}</Text>
 					<Text className='text-[13px] text-[#4b5563] leading-5'>
@@ -103,7 +102,6 @@ export default function InstructorProfileScreen() {
 					</Text>
 				</View>
 
-				{/* Botón Escanear QR */}
 				<TouchableOpacity
 					activeOpacity={0.85}
 					className='w-full rounded-2xl border border-[#d1d5db] py-3 px-4 mb-4 flex-row items-center justify-center bg-white'
@@ -112,7 +110,6 @@ export default function InstructorProfileScreen() {
 					<Text className='ml-2 text-[13px] font-medium text-[#111827]'>{t('instructor.profile.scanQR')}</Text>
 				</TouchableOpacity>
 
-				{/* Estadísticas */}
 				<View className='w-full bg-[#F3F4F6] rounded-2xl py-3 px-3 mb-6 flex-row justify-between'>
 					<View className='flex-1 items-center'>
 						<Text className='text-[18px] font-semibold text-[#111827]'>6</Text>
@@ -130,12 +127,10 @@ export default function InstructorProfileScreen() {
 					</View>
 				</View>
 
-				{/* Configuración */}
 				<View className='mb-2'>
 					<Text className='text-[14px] font-semibold text-[#111827] mb-2'>{t('instructor.profile.settings')}</Text>
 				</View>
 
-				{/* Opción: Información personal */}
 				<TouchableOpacity
 					activeOpacity={0.8}
 					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -151,7 +146,6 @@ export default function InstructorProfileScreen() {
 					<ChevronRightIcon width={16} height={16} color='#9ca3af' />
 				</TouchableOpacity>
 
-				{/* Opción: Seguridad */}
 				<TouchableOpacity
 					activeOpacity={0.8}
 					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -167,7 +161,6 @@ export default function InstructorProfileScreen() {
 					<ChevronRightIcon width={16} height={16} color='#9ca3af' />
 				</TouchableOpacity>
 
-				{/* Opción: Idioma */}
 				<TouchableOpacity
 					activeOpacity={0.8}
 					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -183,7 +176,6 @@ export default function InstructorProfileScreen() {
 					<ChevronRightIcon width={16} height={16} color='#9ca3af' />
 				</TouchableOpacity>
 
-				{/* Opción: Notificaciones */}
 				<TouchableOpacity
 					activeOpacity={0.8}
 					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -199,7 +191,6 @@ export default function InstructorProfileScreen() {
 					<ChevronRightIcon width={16} height={16} color='#9ca3af' />
 				</TouchableOpacity>
 
-				{/* Opción: Ayuda y soporte */}
 				<TouchableOpacity
 					activeOpacity={0.8}
 					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -215,7 +206,6 @@ export default function InstructorProfileScreen() {
 					<ChevronRightIcon width={16} height={16} color='#9ca3af' />
 				</TouchableOpacity>
 
-				{/* Opción: Términos y condiciones */}
 				<TouchableOpacity
 					activeOpacity={0.8}
 					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -231,7 +221,6 @@ export default function InstructorProfileScreen() {
 					<ChevronRightIcon width={16} height={16} color='#9ca3af' />
 				</TouchableOpacity>
 
-				{/* Opción: Cerrar sesión */}
 				<TouchableOpacity
 					activeOpacity={0.8}
 					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-6'

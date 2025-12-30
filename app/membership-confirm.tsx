@@ -33,7 +33,7 @@ const CURRENCIES = mainCurrencies
 const FALLBACK_RATES: Record<string, number> = {
   'USD': 1,
   'EUR': 0.95,
-  'VES': 60.00,
+  'VES': 60.00, 
 };
 
 export default function MembershipConfirmScreen() {
@@ -95,7 +95,7 @@ export default function MembershipConfirmScreen() {
     };
     init();
   }, [params.branchId]);
-  
+
   useEffect(() => {
     const fetchRate = async () => {
       if (currency === 'USD') {
@@ -107,12 +107,14 @@ export default function MembershipConfirmScreen() {
       try {
         const token = await AsyncStorage.getItem('token');
         
+        console.log(`[Debug] Solicitando tasa para ${currency}...`);
         const response = await vitalFitApi.client.get({
           url: `/billing/rates/${currency}`,
           jwt: token || '',
         });
 
         let fetchedRate = 1;
+        //Wilder puta
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const anyResponse = response as any;
 
@@ -254,7 +256,6 @@ export default function MembershipConfirmScreen() {
         user_id: params.userId || null,
         items: invoiceItems,
       }, token);
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const responseData = invoiceResponse as any;
       const invoiceId = responseData.invoice_id || responseData.id || responseData.data?.invoice_id;
@@ -322,7 +323,6 @@ export default function MembershipConfirmScreen() {
 
         <ThemedText className="text-xl font-bold mb-4">{t('confirm.paymentConfig')}</ThemedText>
 
-        {/* Selección de Sucursal */}
         <View className="mb-4">
           <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.branch')}</ThemedText>
           {loadingBranches ? (
@@ -383,8 +383,7 @@ export default function MembershipConfirmScreen() {
             </>
           )}
         </View>
-        
-        {/* Selección de Moneda */}
+
         <View className="mb-6">
             <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.currency')}</ThemedText>
             <TouchableOpacity 
@@ -437,7 +436,6 @@ export default function MembershipConfirmScreen() {
             </Modal>
         </View>
 
-        {/* Detalle de Costos */}
         <View className="bg-neutral-50 p-5 rounded-2xl border border-neutral-200 mb-6">
           <ThemedText className="text-xs text-orange-500 font-bold tracking-widest uppercase mb-3">
              {t('confirm.detailUSD')}
@@ -477,7 +475,6 @@ export default function MembershipConfirmScreen() {
           </View>
         </View>
 
-        {/* Total Final Convertido */}
         <View className="mt-2 border-t border-neutral-100 pt-4 mb-8">
           <View className="flex-row justify-between items-end">
             <View>

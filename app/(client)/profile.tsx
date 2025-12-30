@@ -10,14 +10,14 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
-    ArrowRightOnRectangleIcon,
-    BellIcon,
-    ChevronRightIcon,
-    GlobeAltIcon,
-    QrCodeIcon,
-    QuestionMarkCircleIcon,
-    ShieldCheckIcon,
-    UserCircleIcon,
+  ArrowRightOnRectangleIcon,
+  BellIcon,
+  ChevronRightIcon,
+  GlobeAltIcon,
+  QrCodeIcon,
+  QuestionMarkCircleIcon,
+  ShieldCheckIcon,
+  UserCircleIcon,
 } from 'react-native-heroicons/outline';
 
 export default function ClientProfileScreen() {
@@ -71,12 +71,9 @@ export default function ClientProfileScreen() {
   const handleConfirmLogout = async () => {
     try {
       console.log('Cerrando sesión...');
-      
-      // 1. Limpiar AsyncStorage
       await AsyncStorage.multiRemove(['token', 'temp_email', 'temp_password', 'temp_gender']);
       console.log('AsyncStorage limpiado');
-      
-      // 2. Cerrar sesión de Clerk
+
       try {
         await signOut();
         console.log('Sesión de Clerk cerrada');
@@ -98,7 +95,6 @@ export default function ClientProfileScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
-        {/* Avatar e info básica */}
         <View className='mb-4 items-start'>
           <View className='w-24 h-24 rounded-full overflow-hidden mb-3 bg-[#FED7AA] items-center justify-center'>
             <Image
@@ -110,16 +106,12 @@ export default function ClientProfileScreen() {
           <Text className='text-[13px] text-[#6b7280] mt-1'>{t('clientProfile.member')}</Text>
           <Text className='text-[13px] text-[#f97316] mt-0.5'>{t('clientProfile.activeMembership')}</Text>
         </View>
-
-        {/* About Me */}
         <View className='mb-4'>
           <Text className='text-[14px] font-semibold text-[#111827] mb-1'>{t('profile.aboutMe')}</Text>
           <Text className='text-[13px] text-[#4b5563] leading-5'>
             {t('clientProfile.description')}
           </Text>
         </View>
-
-        {/* Botón Código QR */}
         <TouchableOpacity
           activeOpacity={0.85}
           className='w-full rounded-2xl border border-[#d1d5db] py-3 px-4 mb-4 flex-row items-center justify-center bg-white'
@@ -127,13 +119,9 @@ export default function ClientProfileScreen() {
           <QrCodeIcon width={18} height={18} color='#111827' />
           <Text className='ml-2 text-[13px] font-medium text-[#111827]'>{t('clientProfile.myQr')}</Text>
         </TouchableOpacity>
-
-        {/* Configuración principal */}
         <View className='mb-2'>
           <Text className='text-[14px] font-semibold text-[#111827] mb-2'>{t('profile.settings')}</Text>
         </View>
-
-        {/* Opción: Información personal */}
         <TouchableOpacity
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -148,8 +136,6 @@ export default function ClientProfileScreen() {
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
-
-        {/* Opción: Membresía */}
         <TouchableOpacity
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -164,8 +150,6 @@ export default function ClientProfileScreen() {
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
-
-        {/* Opción: Notificaciones */}
         <TouchableOpacity
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -180,8 +164,6 @@ export default function ClientProfileScreen() {
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
-
-        {/* Opción: Configuración */}
         <TouchableOpacity
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -196,8 +178,6 @@ export default function ClientProfileScreen() {
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
-
-        {/* Opción: Ayuda y soporte */}
         <TouchableOpacity
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -212,8 +192,6 @@ export default function ClientProfileScreen() {
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
-
-        {/* Opción: Cerrar sesión */}
         <TouchableOpacity
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-6'
@@ -229,11 +207,7 @@ export default function ClientProfileScreen() {
           <ChevronRightIcon width={16} height={16} color='#b91c1c' />
         </TouchableOpacity>
       </ScrollView>
-
-      {/* Modal de Código QR */}
       <ClientQRModal visible={qrModalVisible} onClose={() => setQrModalVisible(false)} />
-
-      {/* Modal de cierre de sesión */}
       <Modal
         visible={logoutModalVisible}
         transparent

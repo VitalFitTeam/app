@@ -8,13 +8,13 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
-    ArrowRightOnRectangleIcon,
-    BellIcon,
-    ChevronRightIcon,
-    QrCodeIcon,
-    QuestionMarkCircleIcon,
-    ShieldCheckIcon,
-    UserCircleIcon
+  ArrowRightOnRectangleIcon,
+  BellIcon,
+  ChevronRightIcon,
+  QrCodeIcon,
+  QuestionMarkCircleIcon,
+  ShieldCheckIcon,
+  UserCircleIcon
 } from 'react-native-heroicons/outline';
 
 export default function RecepcionistProfileComponent() {
@@ -80,8 +80,6 @@ export default function RecepcionistProfileComponent() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
-        
-        {/* Avatar e info básica */}
         <View className='mb-4 items-start'>
           <View className='w-24 h-24 rounded-full overflow-hidden mb-3 bg-[#FED7AA] items-center justify-center'>
             <Image
@@ -93,8 +91,6 @@ export default function RecepcionistProfileComponent() {
           <Text className='text-[13px] text-[#6b7280] mt-1'>{t('dashboard.recepcionistDefault')}</Text>
           <Text className='text-[13px] text-[#f97316] mt-0.5'>{t('profile.staffViralFit')}</Text>
         </View>
-
-        {/* About Me */}
         <View className='mb-4'>
           <Text className='text-[14px] font-semibold text-[#111827] mb-1'>{t('profile.aboutMe')}</Text>
           <Text className='text-[13px] text-[#4b5563] leading-5'>
@@ -102,7 +98,6 @@ export default function RecepcionistProfileComponent() {
           </Text>
         </View>
 
-        {/* Botón Escanear QR */}
         <TouchableOpacity
           activeOpacity={0.85}
           className='w-full rounded-2xl border border-[#d1d5db] py-3 px-4 mb-4 flex-row items-center justify-center bg-white'
@@ -111,7 +106,6 @@ export default function RecepcionistProfileComponent() {
           <Text className='ml-2 text-[13px] font-medium text-[#111827]'>{t('dashboard.validateCheckIn.scanQr')}</Text>
         </TouchableOpacity>
 
-        {/* Métricas */}
         <View className='flex-row justify-between mb-6'>
           <View className='flex-1 bg-white rounded-xl border border-[#e5e7eb] py-3 px-2 mx-1 items-center'>
             <Text className='text-[16px] font-bold text-[#f97316] mb-1'>6</Text>
@@ -127,12 +121,10 @@ export default function RecepcionistProfileComponent() {
           </View>
         </View>
 
-        {/* Configuración principal */}
         <View className='mb-2'>
           <Text className='text-[14px] font-semibold text-[#111827] mb-2'>{t('profile.settings')}</Text>
         </View>
 
-        {/* Opción: Información personal */}
         <TouchableOpacity
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -148,7 +140,6 @@ export default function RecepcionistProfileComponent() {
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
 
-        {/* Opción: Seguridad */}
         <TouchableOpacity
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -164,7 +155,6 @@ export default function RecepcionistProfileComponent() {
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
 
-        {/* Opción: Notificaciones */}
         <TouchableOpacity
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -180,7 +170,6 @@ export default function RecepcionistProfileComponent() {
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
 
-        {/* Opción: Ayuda y soporte */}
         <TouchableOpacity
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
@@ -196,7 +185,6 @@ export default function RecepcionistProfileComponent() {
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
 
-        {/* Opción: Cerrar sesión */}
         <TouchableOpacity
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-6'
@@ -213,7 +201,6 @@ export default function RecepcionistProfileComponent() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Modal de Escanear QR */}
       <Modal
         animationType='fade'
         transparent
@@ -289,7 +276,6 @@ export default function RecepcionistProfileComponent() {
         </TouchableOpacity>
       </Modal>
 
-      {/* Modal de cierre de sesión */}
       <Modal
         visible={logoutModalVisible}
         transparent

@@ -2,7 +2,6 @@ import React from 'react';
 import { Dimensions, FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { ClockIcon, FireIcon } from 'react-native-heroicons/solid';
 
-// Nota: Reemplazada la ruta de Windows por una genérica para compatibilidad
 const ClassImage = require('@/assets/images/Rectangle.png');
 
 interface ClassItem {
@@ -65,7 +64,6 @@ export const UpcomingClassesCarousel: React.FC<Props> = ({ classes }) => {
 
 	return (
 		<View style={styles.container}>
-			{/* NUEVO: Título centrado */}
 			<Text style={styles.carouselTitle}>Próximas clases</Text>
 
 			<FlatList
@@ -89,7 +87,6 @@ const styles = StyleSheet.create({
 	container: {
 		backgroundColor: 'transparent',
 	},
-	// NUEVO: Estilo para el título centrado
 	carouselTitle: {
 		fontFamily: 'BebasNeue-Regular',
 		fontSize: 28,

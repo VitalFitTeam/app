@@ -53,8 +53,6 @@ export default function ClientsScreen() {
 						style={{ width: 150, height: 50, resizeMode: 'contain' }}
 					/>
 				</View>
-
-				{/* Franja gris superior como calendario de clases */}
 				<View className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'>
 					<ThemedText
 						lightColor='#111827'

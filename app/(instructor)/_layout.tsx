@@ -4,8 +4,11 @@ import React from 'react';
 import { HapticTab } from '@/components/haptic-tab';
 import { View } from 'react-native';
 import { CalendarIcon, HomeIcon, UserIcon, UsersIcon } from 'react-native-heroicons/solid';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function InstructorLayout() {
+	const insets = useSafeAreaInsets();
+
 	return (
 		<Tabs
 			screenOptions={{
@@ -18,7 +21,7 @@ export default function InstructorLayout() {
 					borderTopWidth: 0,
 					borderRadius: 0,
 					marginHorizontal: 0,
-					height: 60,
+					height: 60 + insets.bottom,
 					position: 'absolute',
 					left: 0,
 					right: 0,
@@ -26,7 +29,7 @@ export default function InstructorLayout() {
 					paddingHorizontal: 8,
 					overflow: 'hidden',
 					elevation: 0,
-					paddingBottom: 6,
+					paddingBottom: Math.max(insets.bottom, 6),
 					paddingTop: 0,
 				},
 				tabBarItemStyle: {
@@ -43,7 +46,6 @@ export default function InstructorLayout() {
 					marginBottom: 0,
 				},
 				tabBarShowLabel: false,
-				// aunque no mostramos labels, se usa para accesibilidad
 				tabBarLabel: () => null,
 			}}>
 			<Tabs.Screen

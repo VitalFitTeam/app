@@ -28,7 +28,7 @@ export default function MembershipExtraScreen() {
     startDate?: string;
     userId?: string;
     branchId?: string;
-  }>(); // Eliminado currency
+  }>(); 
 
   const [loading, setLoading] = useState(true);
   const [packages, setPackages] = useState<PackageItem[]>([]);
@@ -38,8 +38,7 @@ export default function MembershipExtraScreen() {
     const loadPackages = async () => {
       try {
         await AsyncStorage.getItem('token');
-        
-        // Forzamos USD al cargar paquetes
+
         const response = await vitalFitApi.public.getPackages({
           page: 1, 
           limit: 50, 
@@ -121,7 +120,7 @@ export default function MembershipExtraScreen() {
                darkColor="#f97316" 
                className="font-extrabold text-xl"
              >
-               ${item.price} {/* Siempre es USD */}
+               ${item.price} 
              </ThemedText>
              {isSelected ? (
                 <View className="flex-row items-center mt-1">
@@ -145,7 +144,6 @@ export default function MembershipExtraScreen() {
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-1 px-6 pt-8 pb-4">
         
-        {/* Header de Pasos */}
         <View className='mb-6'>
           <ThemedText
             lightColor='#f97316'
@@ -155,7 +153,7 @@ export default function MembershipExtraScreen() {
             EXTRAS
           </ThemedText>
           <View className='flex-row justify-between items-center mb-4'>
-            {/* Paso 1 */}
+
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
                 <ThemedText className='text-[10px] font-semibold text-gray-800'>1</ThemedText>
@@ -163,15 +161,13 @@ export default function MembershipExtraScreen() {
               <ThemedText className='text-[11px] text-center text-gray-800'>Opciones</ThemedText>
             </View>
             
-            {/* Paso 2 (Activo) */}
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-orange-500 border-orange-500'>
                 <ThemedText className='text-[10px] font-semibold text-white'>2</ThemedText>
               </View>
               <ThemedText className='text-[11px] text-center text-orange-600 font-bold'>Extras</ThemedText>
             </View>
-            
-            {/* Paso 3 */}
+
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
                 <ThemedText className='text-[10px] font-semibold text-gray-800'>3</ThemedText>

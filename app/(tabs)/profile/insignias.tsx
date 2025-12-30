@@ -42,7 +42,6 @@ export default function InsigniasScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 40, paddingBottom: 96 }}
       >
-        {/* Franja superior */}
         <View
           className="w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center"
           style={{ position: 'relative' }}
@@ -58,7 +57,6 @@ export default function InsigniasScreen() {
           <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Mis insignias</Text>
         </View>
 
-        {/* Nivel actual */}
         <LinearGradient
           colors={['#FBBF24', '#F97316']}
           start={{ x: 0, y: 0.5 }}
@@ -88,7 +86,6 @@ export default function InsigniasScreen() {
           </View>
         </LinearGradient>
 
-        {/* Stats resumen: tres tarjetas separadas */}
         <View className="flex-row mb-4">
           <View
             className="flex-1 items-center py-3 rounded-2xl"
@@ -116,7 +113,6 @@ export default function InsigniasScreen() {
           </View>
         </View>
 
-        {/* Progreso badges */}
         <View
           className="rounded-2xl mb-4 flex-row items-center justify-between px-4 py-3"
           style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1 }}
@@ -131,7 +127,6 @@ export default function InsigniasScreen() {
           </View>
         </View>
 
-        {/* Grid de insignias */}
         <View className="mb-4">
           <View className="flex-row flex-wrap justify-between">
             {badges.map(badge => (

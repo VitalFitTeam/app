@@ -21,7 +21,6 @@ type ClassType = {
   instructor: string;
 };
 
-// Datos de ejemplo para las clases
 const sampleClasses: ClassType[] = [
   {
     id: '1',
@@ -95,7 +94,6 @@ export default function ScheduleScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [filteredDate, setFilteredDate] = useState('');
 
-  // Manejar el botón de atrás para ir al inicio
   useFocusEffect(
     useCallback(() => {
       const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -152,12 +150,10 @@ export default function ScheduleScreen() {
     }, {} as Record<string, ClassType[]>);
   };
 
-  // En semana: solo clases del día seleccionado.
   const weekClasses = filteredDate 
     ? sampleClasses.filter(item => item.date === filteredDate)
     : sampleClasses;
 
-  // En mes: mostrar todas las clases disponibles del mes (jueves, viernes, etc.).
   const monthClasses = [
     ...sampleClasses,
     ...monthExtraClasses,
@@ -202,7 +198,6 @@ export default function ScheduleScreen() {
           </View>
         </View>
 
-        {/* Calendario */}
         <View style={styles.calendarContainer}>
           <ThemedText style={styles.sectionTitle}>{t('schedule.calendar')}</ThemedText>
           <View style={styles.calendarWrapper}>
@@ -214,7 +209,6 @@ export default function ScheduleScreen() {
           </View>
         </View>
 
-        {/* Sección de Reservas */}
         <View style={styles.reservationsSection}>
           <View style={styles.reservationsHeader}>
             <ThemedText style={styles.sectionTitle}>{t('schedule.reservations')}</ThemedText>
@@ -224,14 +218,12 @@ export default function ScheduleScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Fecha actual */}
           <View style={styles.dateHeader}>
             <CalendarDaysIcon size={20} color='#6B7280' />
             <ThemedText style={styles.dateHeaderText}>
               {formatHeaderDate(selectedDate).charAt(0).toUpperCase() + formatHeaderDate(selectedDate).slice(1)}
             </ThemedText>
           </View>
-
        
           <View style={styles.classesList}>
             {Object.entries(groupedClasses).map(([date, classes], index) => (

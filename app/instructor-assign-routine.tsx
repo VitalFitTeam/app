@@ -32,15 +32,12 @@ export default function InstructorAssignRoutineScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: 8, paddingHorizontal: 16, paddingBottom: 96 }}
       >
-        {/* Logo */}
         <View style={{ alignItems: 'center', marginBottom: 16 }}>
           <Image
             source={require('@/assets/images/Frame.png')}
             style={{ width: 150, height: 50, resizeMode: 'contain' }}
           />
         </View>
-
-        {/* Franja gris con título y flecha atrás */}
         <View
           style={{
             width: '100%',
@@ -68,8 +65,6 @@ export default function InstructorAssignRoutineScreen() {
             Asignar rutina
           </ThemedText>
         </View>
-
-        {/* Avatar, nombre y nivel del cliente (columna, modo claro) */}
         <View style={{ alignItems: 'flex-start', marginBottom: 16 }}>
           <View
             style={{
@@ -90,8 +85,6 @@ export default function InstructorAssignRoutineScreen() {
           </Text>
           <Text style={{ color: '#6b7280', fontSize: 14 }}>{clientLevel}</Text>
         </View>
-
-        {/* Selección de rutina */}
         <View style={{ marginBottom: 16 }}>
           <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }}>Seleccionar rutina</Text>
           <TouchableOpacity
@@ -102,8 +95,6 @@ export default function InstructorAssignRoutineScreen() {
             <Text style={{ color: '#6b7280', fontSize: 12, marginTop: 2 }}>{currentProgram}</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Métricas del cliente en contenedor único (modo claro) */}
         <View style={{ marginBottom: 16 }}>
           <View
             style={{
@@ -136,8 +127,6 @@ export default function InstructorAssignRoutineScreen() {
             </View>
           </View>
         </View>
-
-        {/* Detalles de la rutina en contenedor claro */}
         <View style={{ marginBottom: 16 }}>
           <View
             style={{
@@ -183,8 +172,6 @@ export default function InstructorAssignRoutineScreen() {
             ))}
           </View>
         </View>
-
-        {/* Notas de la rutina */}
         <View style={{ marginBottom: 20 }}>
           <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }}>Notas de la rutina</Text>
           <TextInput
@@ -204,8 +191,6 @@ export default function InstructorAssignRoutineScreen() {
             }}
           />
         </View>
-
-        {/* Botón principal Asignar rutina */}
         <TouchableOpacity
           activeOpacity={0.85}
           style={{ width: '100%', paddingVertical: 14, borderRadius: 16, backgroundColor: '#f97316', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}
@@ -214,7 +199,6 @@ export default function InstructorAssignRoutineScreen() {
           <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>Asignar rutina</Text>
         </TouchableOpacity>
 
-        {/* Volver a Mis clientes (botón gris) */}
         <TouchableOpacity
           activeOpacity={0.85}
           style={{ width: '100%', paddingVertical: 14, borderRadius: 16, backgroundColor: '#4b5563', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}

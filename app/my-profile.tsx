@@ -15,12 +15,12 @@ import { Calendar } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    ActivityIndicator,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+	ActivityIndicator,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
 } from 'react-native';
 import { ChevronLeftIcon, PencilSquareIcon } from 'react-native-heroicons/solid';
 import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
@@ -45,7 +45,6 @@ export default function MyProfileScreen() {
 		message: '',
 	});
 
-	// Estados para los campos editables
 	const [firstName, setFirstName] = useState('');
 	const [lastName, setLastName] = useState('');
 	const [birthDate, setBirthDate] = useState('');
@@ -89,7 +88,6 @@ export default function MyProfileScreen() {
 				return;
 			}
 
-			// 👇 Definimos el tipo local (sin depender del SDK)
 			type UserUpdateRequest = {
 				first_name?: string;
 				last_name?: string;

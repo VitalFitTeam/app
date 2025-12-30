@@ -28,7 +28,6 @@ export function Step1Gender({ control, errors, onNextStep }: Props) {
                     <GenderSelector 
                         onSelect={async (selectedGender) => {
                             onChange(selectedGender);
-                            // Guardar el género en AsyncStorage
                             await AsyncStorage.setItem('temp_gender', selectedGender);
                             console.log('Género guardado:', selectedGender);
                         }} 

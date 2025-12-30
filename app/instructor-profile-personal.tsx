@@ -57,7 +57,6 @@ export default function InstructorProfilePersonalScreen() {
 
   const handleToggleEdit = () => {
     if (isEditing) {
-      // Aquí luego se podrían persistir los cambios
       setIsEditing(false);
     } else {
       setIsEditing(true);
@@ -80,7 +79,6 @@ export default function InstructorProfilePersonalScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
-        {/* Franja gris superior con flecha */}
         <View
           className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'
           style={{ position: 'relative' }}>
@@ -93,8 +91,6 @@ export default function InstructorProfilePersonalScreen() {
 
           <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Perfil</Text>
         </View>
-
-        {/* Avatar + nombre centrados */}
         <View className='mb-4 items-center'>
           <View style={{ position: 'relative', marginBottom: 12 }}>
             <View className='w-24 h-24 rounded-full overflow-hidden bg-[#FED7AA] items-center justify-center'>
@@ -127,7 +123,6 @@ export default function InstructorProfilePersonalScreen() {
           <Text style={{ color: '#f97316', fontSize: 13, marginTop: 2 }}>Functional Strength</Text>
         </View>
 
-        {/* Botón Editar / Guardar cambios */}
         <TouchableOpacity
           activeOpacity={0.85}
           className='w-full rounded-2xl py-3 mb-5 items-center justify-center'
@@ -137,8 +132,6 @@ export default function InstructorProfilePersonalScreen() {
             {isEditing ? 'Guardar cambios' : 'Editar'}
           </Text>
         </TouchableOpacity>
-
-        {/* Sección Información personal */}
         <View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
           <View className='flex-row items-center mb-3'>
             <UserCircleIcon width={18} height={18} color='#111827' />
@@ -147,7 +140,6 @@ export default function InstructorProfilePersonalScreen() {
             </Text>
           </View>
 
-          {/* Nombre */}
           <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Nombre</Text>
           <TextInput
             editable={isEditing}
@@ -166,7 +158,6 @@ export default function InstructorProfilePersonalScreen() {
             }}
           />
 
-          {/* Apellido */}
           <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Apellido</Text>
           <TextInput
             editable={isEditing}
@@ -185,7 +176,6 @@ export default function InstructorProfilePersonalScreen() {
             }}
           />
 
-          {/* Documento de identidad */}
           <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Documento de identidad</Text>
           <TextInput
             editable={isEditing}
@@ -205,7 +195,6 @@ export default function InstructorProfilePersonalScreen() {
             }}
           />
 
-          {/* Especialidad */}
           <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Especialidad</Text>
           <TextInput
             editable={isEditing}
@@ -224,7 +213,6 @@ export default function InstructorProfilePersonalScreen() {
             }}
           />
 
-          {/* Fecha de nacimiento */}
           <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Fecha de nacimiento</Text>
           <View style={{ position: 'relative' }}>
             <TextInput
@@ -254,7 +242,6 @@ export default function InstructorProfilePersonalScreen() {
           </View>
         </View>
 
-        {/* Sección Información de contacto */}
         <View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
           <View className='flex-row items-center mb-3'>
             <PhoneIcon width={18} height={18} color='#111827' />
@@ -263,7 +250,6 @@ export default function InstructorProfilePersonalScreen() {
             </Text>
           </View>
 
-          {/* Correo electrónico */}
           <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Correo electrónico</Text>
           <TextInput
             editable={false}
@@ -282,7 +268,6 @@ export default function InstructorProfilePersonalScreen() {
             }}
           />
 
-          {/* Teléfono */}
           <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Teléfono</Text>
           {isEditing ? (
             <PhoneInput

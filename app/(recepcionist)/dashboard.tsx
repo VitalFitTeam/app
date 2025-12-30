@@ -21,8 +21,6 @@ export default function DashboardRecepcionist() {
 	const [firstName, setFirstName] = useState<string | null>(null);
 	const [scannerVisible, setScannerVisible] = useState(false);
 	const { selectedBranchId } = useBranch();
-
-	// Estados para el modal de resultado
 	const [resultModalVisible, setResultModalVisible] = useState(false);
 	const [checkInSuccess, setCheckInSuccess] = useState(false);
 	const [checkInUserName, setCheckInUserName] = useState('');
@@ -32,18 +30,13 @@ export default function DashboardRecepcionist() {
 		try {
 			const token = await AsyncStorage.getItem('token');
 			if (!token) return;
-
-			// 1. OBTENER ID DE LA SEDE (BRANCH)
 			if (!selectedBranchId) {
-				Alert.alert(`⚠️ ${t('common.attention')}`, t('checkIn.error.selectBranch'));
+				Alert.alert(`${t('common.attention')}`, t('checkIn.error.selectBranch'));
 				return;
 			}
 			const branchId = selectedBranchId;
 
 			console.log("Enviando Check-In...", { qrJwtLong: qrJwtLong.substring(0, 20) + '...', branchId });
-
-			// 2. LLAMAR AL ENDPOINT DE CHECK-IN USANDO EL SDK
-			// Nota: vitalFitApi.access debe estar disponible según indicaciones del usuario
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const response = await (vitalFitApi as any).access.checkIn(
 				token,
@@ -53,12 +46,10 @@ export default function DashboardRecepcionist() {
 				}
 			);
 
-			const data = response.data || response; // Ajuste por si el SDK devuelve axios response o data directa
+			const data = response.data || response; 
 
-			console.log('✅ [Check-In] Respuesta completa:', JSON.stringify(data, null, 2));
+			console.log('[Check-In] Respuesta completa:', JSON.stringify(data, null, 2));
 
-			// 3. MOSTRAR RESULTADO BASADO EN LA RESPUESTA DEL BACKEND
-			// Manejar diferentes estructuras de respuesta
 			let userName = t('dashboard.defaultUser');
 			
 			if (data?.user?.first_name) {
@@ -69,17 +60,15 @@ export default function DashboardRecepcionist() {
 				userName = data.name;
 			}
 
-			// Mostrar modal de éxito
 			setCheckInSuccess(true);
 			setCheckInUserName(userName);
 			setResultModalVisible(true);
-			setScannerVisible(false); // Cerrar escáner si fue exitoso
+			setScannerVisible(false); 
 
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			console.error("Error en Check-In:", error);
 
-			// Manejo de errores específicos
 			let errorMessage = t('checkIn.error.default');
 			
 			if (isAPIError(error)) {
@@ -96,7 +85,6 @@ export default function DashboardRecepcionist() {
 				errorMessage = error.message || t('common.error.connection');
 			}
 
-			// Mostrar modal de error
 			setCheckInSuccess(false);
 			setCheckInMessage(errorMessage);
 			setResultModalVisible(true);
@@ -151,8 +139,6 @@ export default function DashboardRecepcionist() {
 				<GymCapacityCard />
 				<RecepcionistTodayClassCard />
 			</ScrollView>
-
-
 
 			<QRScannerModal
 				visible={scannerVisible}

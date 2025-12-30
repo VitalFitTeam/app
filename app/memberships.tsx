@@ -37,7 +37,6 @@ export default function MembershipsScreen() {
 				const token = await AsyncStorage.getItem('token');
 				const jwt = token || '';
 
-				// Forzamos USD como moneda base
 				const response = await vitalFitApi.membership.publicGetMemberships(
 					jwt,
 					{ page: 1, limit: 100, sort: 'asc' as const },
@@ -165,8 +164,6 @@ export default function MembershipsScreen() {
 														`&title=${encodeURIComponent(selectedPlan.name)}` +
 														`&price=${selectedPlan.price}` +
 														`&period=${encodeURIComponent(`${selectedPlan.duration_days} días`)}`;
-													
-													// Ya no pasamos currency aquí
 													router.push(href as never);
 												}}
 											/>

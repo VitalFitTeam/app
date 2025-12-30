@@ -16,8 +16,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function MembershipPaymentTransferScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  
-  // Recibimos los datos de la factura
   const params = useLocalSearchParams<{
     invoiceId: string;
     totalAmount: string;
@@ -26,18 +24,13 @@ export default function MembershipPaymentTransferScreen() {
     currency: string;
   }>();
 
-  // Estados del formulario
   const [loading, setLoading] = useState(false);
   const [reference, setReference] = useState('');
   const [senderName, setSenderName] = useState('');
-
-  // Hook de notificaciones
   const { toastState, showToast, hideToast } = useToast();
-
   const currencySymbol = params.currency === 'EUR' ? '€' : params.currency === 'VES' ? 'Bs' : '$';
-
   const handleProcessPayment = async () => {
-    // 1. Validaciones
+
     if (!reference || !senderName) {
       showToast('warning', t('common.attention'), t('payment.toast.incompleteFields'));
       return;
@@ -53,21 +46,17 @@ export default function MembershipPaymentTransferScreen() {
       const token = await AsyncStorage.getItem('token');
       if (!token) throw new Error('Sesión expirada');
 
-      // 2. Ejecutar pago en el backend
       await vitalFitApi.billing.AddPaymentToInvoice({
         invoice_id: params.invoiceId,
         payment_method_id: params.methodId,
         amount_paid: Number(params.totalAmount),
         currency_paid: params.currency || 'USD',
         transaction_id: reference,
-        // Guardamos el titular en el campo de recibo/notas
         receipt_url: `${t('payment.transfer.holderPrefix')}${senderName}` 
       }, token);
 
-      // 3. Éxito
       showToast('success', t('payment.toast.paymentReported'), t('payment.toast.sentToVerification'));
 
-      // 4. Redirigir
       setTimeout(() => {
         router.replace('/(tabs)/dashboard');
       }, 2500);
@@ -83,7 +72,6 @@ export default function MembershipPaymentTransferScreen() {
 
   return (
     <SafeAreaView className='flex-1 bg-white'>
-      {/* Componente de Notificación */}
       <ToastNotification
         visible={toastState.visible}
         type={toastState.type}
@@ -107,7 +95,6 @@ export default function MembershipPaymentTransferScreen() {
             {t('payment.transfer.subtitle')}
         </ThemedText>
 
-        {/* Datos Bancarios (Ejemplo dinámico según si es Zelle o Banco) */}
         <View className='mb-6 border border-gray-200 rounded-2xl px-4 py-4 bg-gray-50'>
           <ThemedText className='text-xs font-bold tracking-widest mb-3 text-gray-500 uppercase'>
             {t('payment.transfer.destinationAccount')}
@@ -142,7 +129,6 @@ export default function MembershipPaymentTransferScreen() {
           )}
         </View>
 
-        {/* Tarjeta de Monto */}
         <LinearGradient
           colors={['#4F3521', '#F27F2A']}
           locations={[0.2, 0.9]}
@@ -176,7 +162,6 @@ export default function MembershipPaymentTransferScreen() {
           </View>
         </LinearGradient>
 
-        {/* Formulario */}
         <View className='mb-8 space-y-4'>
           
           <StyledTextInput 
@@ -191,12 +176,11 @@ export default function MembershipPaymentTransferScreen() {
             placeholder={t('payment.transfer.referencePlaceholder')}
             value={reference}
             onChangeText={setReference}
-            keyboardType="numeric" // Numérico suele ser mejor para referencias
+            keyboardType="numeric" 
           />
 
         </View>
 
-        {/* Aviso Importante */}
         <View className='mb-8 border border-blue-100 rounded-xl px-4 py-3 bg-blue-50 flex-row items-center'>
           <ExclamationTriangleIcon size={24} color='#3b82f6' />
           <View className='ml-3 flex-1'>

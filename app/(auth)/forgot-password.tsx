@@ -50,9 +50,6 @@ export default function ForgotPasswordScreen() {
 		}
 	};
 
-	// NOTA: Hemos eliminado los arrays 'titles' y 'subtitles' de aquí.
-	// Ahora se llaman directamente en el JSX usando la variable 'step'.
-
 	const handleSendEmail = async (): Promise<void> => {
 		if (!email) {
 			showToast(
@@ -179,8 +176,6 @@ export default function ForgotPasswordScreen() {
 					<View style={styles.formContainer}>
 						<Logo />
 
-						{/* --- CORRECCIÓN AQUÍ --- */}
-						{/* Usamos claves dinámicas que coinciden con tu JSON: step1, step2, step3 */}
 						<ThemedText
 							type='title'
 							lightColor={Colors.light.tint}
@@ -190,7 +185,6 @@ export default function ForgotPasswordScreen() {
 						<Text className='mb-8 text-center text-lg text-gray-500'>
 							{t(`forgotPassword.subtitles.step${step}`)}
 						</Text>
-						{/* ----------------------- */}
 
 						<ProgressIndicator currentStep={step} />
 

@@ -27,7 +27,6 @@ export default function RoutineHistoryScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }} edges={['top', 'left', 'right']}>
-      {/* Topbar propio: flecha izquierda y título centrado */}
       <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
         <TouchableOpacity onPress={() => router.back()} activeOpacity={0.8} style={{ position: 'absolute', left: 16, width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' }}>
           <ArrowLeftIcon size={22} color={'#111827'} />

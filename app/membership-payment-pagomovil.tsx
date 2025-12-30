@@ -17,8 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function MembershipPaymentPagoMovilScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  
-  // Recibimos los datos finales de la factura
+
   const params = useLocalSearchParams<{
     invoiceId: string;
     totalAmount: string;
@@ -27,18 +26,15 @@ export default function MembershipPaymentPagoMovilScreen() {
     currency: string;
   }>();
 
-  // Estados del formulario
   const [loading, setLoading] = useState(false);
   const [reference, setReference] = useState('');
   const [documentNumber, setDocumentNumber] = useState('');
   const [phone, setPhone] = useState('');
   const phoneInputRef = useRef<IPhoneInputRef | null>(null);
 
-  // Hook de notificaciones
   const { toastState, showToast, hideToast } = useToast();
 
   const handleProcessPayment = async () => {
-    // Validaciones simples
     if (!reference || !documentNumber || !phone) {
       showToast('warning', t('common.attention'), t('payment.toast.incompleteFields'));
       return;
@@ -54,20 +50,17 @@ export default function MembershipPaymentPagoMovilScreen() {
       const token = await AsyncStorage.getItem('token');
       if (!token) throw new Error('Sesión expirada');
 
-      // Ejecutar pago en el backend
       await vitalFitApi.billing.AddPaymentToInvoice({
         invoice_id: params.invoiceId,
         payment_method_id: params.methodId,
         amount_paid: Number(params.totalAmount),
-        currency_paid: params.currency || 'VES', // Asumimos VES para pago móvil, o lo que venga
+        currency_paid: params.currency || 'VES', 
         transaction_id: reference,
-        // Guardamos cédula y teléfono en el campo de recibo/notas para referencia administrativa
         receipt_url: `CI: ${documentNumber} - Tlf: ${phone}` 
       }, token);
 
       showToast('success', t('payment.toast.paymentReported'), t('payment.toast.sentToVerification'));
 
-      // Redirigir después de mostrar el éxito
       setTimeout(() => {
         router.replace('/(tabs)/dashboard');
       }, 2500);
@@ -83,7 +76,6 @@ export default function MembershipPaymentPagoMovilScreen() {
 
   return (
     <SafeAreaView className='flex-1 bg-white'>
-      {/* Componente de Notificación */}
       <ToastNotification
         visible={toastState.visible}
         type={toastState.type}
@@ -103,7 +95,6 @@ export default function MembershipPaymentPagoMovilScreen() {
             {t('payment.mobile.title')}
         </ThemedText>
 
-        {/* Datos Bancarios del Comercio */}
         <View className='mb-6 border border-orange-500/80 rounded-2xl px-4 py-4 bg-orange-50'>
           <ThemedText className='text-xs font-bold tracking-widest mb-3 text-orange-800 uppercase'>
             {t('payment.mobile.bankDetailsTitle')}
@@ -129,7 +120,6 @@ export default function MembershipPaymentPagoMovilScreen() {
           </View>
         </View>
 
-        {/* Tarjeta de Monto */}
         <LinearGradient
           colors={['#4F3521', '#F27F2A']}
           locations={[0.2, 0.9]}
@@ -163,10 +153,8 @@ export default function MembershipPaymentPagoMovilScreen() {
           </View>
         </LinearGradient>
 
-        {/* Formulario */}
         <View className='mb-8 space-y-4'>
-          
-          {/* Teléfono */}
+
           <View>
             <ThemedText className='text-sm mb-2 text-gray-600 font-medium'>{t('payment.form.originPhone')}</ThemedText>
             <View className='border border-gray-300 rounded-xl bg-white overflow-hidden'>
@@ -186,7 +174,6 @@ export default function MembershipPaymentPagoMovilScreen() {
             </View>
           </View>
 
-          {/* Cédula */}
           <StyledTextInput 
             label={t('payment.form.document')}
             placeholder="V-12345678"
@@ -194,7 +181,6 @@ export default function MembershipPaymentPagoMovilScreen() {
             onChangeText={setDocumentNumber}
           />
 
-          {/* Referencia */}
           <StyledTextInput 
             label={t('payment.form.reference')}
             placeholder="Ej: 5678"
@@ -205,7 +191,6 @@ export default function MembershipPaymentPagoMovilScreen() {
 
         </View>
 
-        {/* Aviso Importante */}
         <View className='mb-8 border border-blue-100 rounded-xl px-4 py-3 bg-blue-50 flex-row items-center'>
           <ExclamationTriangleIcon size={24} color='#3b82f6' />
           <View className='ml-3 flex-1'>

@@ -37,8 +37,6 @@ export default function MembershipPaymentScreen() {
   const [loading, setLoading] = useState(false);
   const [methods, setMethods] = useState<BranchPaymentMethod[]>([]);
   const [selectedMethodId, setSelectedMethodId] = useState<string | null>(null);
-
-  // Hook de notificaciones
   const { toastState, showToast, hideToast } = useToast();
 
   useEffect(() => {
@@ -53,13 +51,7 @@ export default function MembershipPaymentScreen() {
         }
 
         const response = await vitalFitApi.paymentMethod.getBranchPaymentMethods(params.branchId, token);
-        
-         
-        
-         
         const responseData = response.data || response || [];
-        
-         
         const activeMethods = (responseData as BranchPaymentMethod[]).filter(m => m.is_active === true);
         setMethods(activeMethods);
 
@@ -92,7 +84,6 @@ export default function MembershipPaymentScreen() {
         methodName: methodName,
     };
 
-    // Lógica de enrutamiento
     if (nameLower.includes('pago movil') || nameLower.includes('pago móvil')) {
         router.push({ pathname: '/membership-payment-pagomovil', params: nextParams } as never);
     } 
@@ -100,7 +91,6 @@ export default function MembershipPaymentScreen() {
         router.push({ pathname: '/membership-payment-transfer', params: nextParams } as never);
     } 
     else {
-        // Procesar pago directo (Efectivo, Punto de venta, etc.)
         processDirectPayment(selectedMethodId);
     }
   };
@@ -144,7 +134,6 @@ export default function MembershipPaymentScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      {/* Componente Toast para notificaciones */}
       <ToastNotification
         visible={toastState.visible}
         type={toastState.type}

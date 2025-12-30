@@ -6,7 +6,7 @@ import { CheckCircleIcon, UsersIcon } from 'react-native-heroicons/outline';
 type InstructorStats = {
 	activeClients: number;
 	classesToday: number;
-	attendanceRate: number; // porcentaje 0-100
+	attendanceRate: number; 
 };
 
 type Props = {

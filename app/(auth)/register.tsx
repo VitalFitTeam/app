@@ -14,12 +14,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError, SignUpRequest, UserGender } from '@vitalfit/sdk';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { ArrowLeft } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { BackHandler, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft } from 'lucide-react-native';
 
 function generateSecurePassword() {
     const random = Math.random().toString(36).slice(-10);
@@ -66,8 +66,6 @@ export default function RegisterScreen() {
             if (user.imageUrl) {
                 setValue('profile_picture_url', user.imageUrl);
             }
-
-            // Generar contraseña automática
             const autoPassword = generateSecurePassword();
             setValue('password', autoPassword);
             setValue('confirmPassword', autoPassword);
@@ -150,7 +148,6 @@ export default function RegisterScreen() {
             }
         }
 
-        // Si está en step 1 y es OAuth, saltar directo a step 3
         if (step === 1 && isOAuthFlow) {
             setStep(3);
         } else {

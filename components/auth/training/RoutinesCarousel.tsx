@@ -5,7 +5,7 @@ import { Image, ImageSourcePropType, ScrollView, Text, View } from 'react-native
 export type RoutineChip = {
   id: string;
   label: string;
-  image: ImageSourcePropType; // require()
+  image: ImageSourcePropType; 
 };
 
 export type RoutinesCarouselProps = {

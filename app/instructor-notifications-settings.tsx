@@ -14,7 +14,6 @@ export default function InstructorNotificationsSettingsScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
-        {/* Franja superior */}
         <View
           className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'
           style={{ position: 'relative' }}>
@@ -28,7 +27,6 @@ export default function InstructorNotificationsSettingsScreen() {
           <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Configurar</Text>
         </View>
 
-        {/* Card de configuración */}
         <View
           style={{
             backgroundColor: '#F3F4F6',
@@ -46,7 +44,6 @@ export default function InstructorNotificationsSettingsScreen() {
             Gestiona cómo quieres recibir notificaciones
           </Text>
 
-          {/* Recordatorio de clases */}
           <View
             style={{
               flexDirection: 'row',
@@ -72,7 +69,6 @@ export default function InstructorNotificationsSettingsScreen() {
             />
           </View>
 
-          {/* Actualizaciones de rutina */}
           <View
             style={{
               flexDirection: 'row',
