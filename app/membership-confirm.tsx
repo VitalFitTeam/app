@@ -55,12 +55,25 @@ export default function MembershipConfirmScreen() {
   const [branches, setBranches] = useState<BranchItem[]>([]);
   const [selectedBranchId, setSelectedBranchId] = useState<string>(params.branchId || '');
   const [loadingBranches, setLoadingBranches] = useState(true);
+  const [branchModalVisible, setBranchModalVisible] = useState(false);
+
   const [currency, setCurrency] = useState('USD');
   const [rate, setRate] = useState(1);
   const [loadingRate, setLoadingRate] = useState(false);
   const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
 
+  // Estado para el impuesto (valor decimal directo del API, ej: 0.21)
+  const [taxRate, setTaxRate] = useState<number>(0);
+  const [loadingTax, setLoadingTax] = useState(false);
+
   const selectedCurrencySymbol = CURRENCIES.find(c => c.name === currency)?.symbol || '$';
+  const selectedBranchName = branches.find(b => b.branch_id === selectedBranchId)?.name || t('confirm.selectBranch');
+
+  // Convierte 0.21 -> "21%"
+  const formatTaxRate = (decimalRate: number): string => {
+    const percentage = Math.round(decimalRate * 100);
+    return `${percentage}%`;
+  };
 
   useEffect(() => {
     const init = async () => {
@@ -100,8 +113,6 @@ export default function MembershipConfirmScreen() {
           jwt: token || '',
         });
 
-        console.log('[Debug] Respuesta Tasa:', response);
-
         let fetchedRate = 1;
         //Wilder puta
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -121,17 +132,11 @@ export default function MembershipConfirmScreen() {
 
         setRate(fetchedRate);
 
-
       } catch (error) {
         console.error(`[Error] Falló obtención de tasa para ${currency}:`, error);
         const fallback = FALLBACK_RATES[currency] || 1;
-        console.log(`[Debug] Usando tasa fallback para ${currency}: ${fallback}`);
-        
-        if (fallback !== 1) {
-            setRate(fallback);
-        } else {
-            setRate(1);
-        }
+        if (fallback !== 1) setRate(fallback);
+        else setRate(1);
       } finally {
         setLoadingRate(false);
       }
@@ -140,6 +145,58 @@ export default function MembershipConfirmScreen() {
     fetchRate();
   }, [currency]);
 
+  useEffect(() => {
+    const fetchTax = async () => {
+      if (!selectedBranchId) return;
+
+      setLoadingTax(true);
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) return;
+
+        console.log('[DEBUG] Solicitando impuesto para Branch ID:', selectedBranchId);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const response = await (vitalFitApi.billing as any).getTaxRateByBranch(token, selectedBranchId);
+        
+        console.log('[DEBUG] Respuesta Impuesto RAW:', response);
+
+        let extractedRate = 0;
+
+        if (typeof response === 'number') {
+            extractedRate = response;
+        } else if (typeof response === 'string') {
+            extractedRate = parseFloat(response);
+        } else if (typeof response === 'object' && response !== null) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const r = response as any;
+            
+            // AQUI ESTABA EL ERROR: Ahora buscamos explícitamente 'tax_rate'
+            if (r.tax_rate !== undefined && r.tax_rate !== null) extractedRate = Number(r.tax_rate);
+            else if (r.rate !== undefined && r.rate !== null) extractedRate = Number(r.rate);
+            else if (r.value !== undefined && r.value !== null) extractedRate = Number(r.value);
+            else if (r.data?.tax_rate !== undefined) extractedRate = Number(r.data.tax_rate);
+            else if (r.data?.rate !== undefined) extractedRate = Number(r.data.rate);
+        }
+
+        console.log('[DEBUG] Tasa extraída (decimal):', extractedRate);
+        
+        if (!isNaN(extractedRate)) {
+            setTaxRate(extractedRate);
+        } else {
+            setTaxRate(0);
+        }
+        
+      } catch (error) {
+        console.error("Error fetching tax rate", error);
+        setTaxRate(0);
+      } finally {
+        setLoadingTax(false);
+      }
+    };
+
+    fetchTax();
+  }, [selectedBranchId]);
 
   const selectedPackages = useMemo(() => {
     try {
@@ -150,7 +207,13 @@ export default function MembershipConfirmScreen() {
   const mainPriceUSD = parseFloat(params.mainItemPrice || '0');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const packagesTotalUSD = selectedPackages.reduce((sum: number, pkg: any) => sum + (pkg.price || 0), 0);
-  const grandTotalUSD = mainPriceUSD + packagesTotalUSD;
+  
+  const subTotalUSD = mainPriceUSD + packagesTotalUSD;
+  
+  // Cálculo: 100 * 0.21 = 21
+  const taxAmountUSD = subTotalUSD * taxRate;
+  
+  const grandTotalUSD = subTotalUSD + taxAmountUSD;
 
   const grandTotalConverted = grandTotalUSD * rate;
 
@@ -204,7 +267,6 @@ export default function MembershipConfirmScreen() {
 
     } catch (error) {
       console.error(error);
-      console.error(error);
       const msg = error instanceof Error ? error.message : t('common.error.unknown');
       Alert.alert(t('common.error.title'), msg);
     } finally {
@@ -227,7 +289,11 @@ export default function MembershipConfirmScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="flex-1 px-6 pt-8 pb-32">
+      <ScrollView 
+        className="flex-1 px-6 pt-8" 
+        contentContainerStyle={{ paddingBottom: 120 }}
+        showsVerticalScrollIndicator={false}
+      >
 
         <View className='mb-8'>
           <ThemedText lightColor='#f97316' darkColor='#f97316' className='text-4xl mb-4 text-center' style={{ fontFamily: 'BebasNeue-Regular' }}>
@@ -262,25 +328,59 @@ export default function MembershipConfirmScreen() {
           {loadingBranches ? (
             <ActivityIndicator size="small" color="#f97316" />
           ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row py-1">
-              {branches.map((branch) => {
-                const bId = branch.branch_id;
-                const isSelected = selectedBranchId === bId;
-                return (
-                  <TouchableOpacity
-                    key={bId}
-                    onPress={() => setSelectedBranchId(bId)}
-                    className={`mr-3 px-4 py-2 rounded-lg border flex-row items-center ${isSelected ? 'bg-orange-50 border-orange-500' : 'bg-white border-neutral-200'
-                      }`}
-                  >
-                    <MapPinIcon size={14} color={isSelected ? '#f97316' : '#9ca3af'} />
-                    <ThemedText className={`ml-2 text-sm font-bold ${isSelected ? 'text-orange-800' : 'text-gray-600'}`}>
-                      {branch.name}
+            <>
+              <TouchableOpacity 
+                onPress={() => setBranchModalVisible(true)}
+                className="flex-row items-center justify-between border border-gray-300 rounded-xl p-4 bg-white"
+              >
+                <View className="flex-row items-center">
+                    <MapPinIcon size={20} color="#f97316" />
+                    <ThemedText className="ml-3 font-bold text-lg text-gray-800">
+                        {selectedBranchName}
                     </ThemedText>
-                  </TouchableOpacity>
-                )
-              })}
-            </ScrollView>
+                </View>
+                <ThemedText className="text-gray-400">▼</ThemedText>
+              </TouchableOpacity>
+
+              <Modal
+                transparent={true}
+                visible={branchModalVisible}
+                animationType="fade"
+                onRequestClose={() => setBranchModalVisible(false)}
+              >
+                <TouchableOpacity 
+                    className="flex-1 bg-black/50 justify-center items-center px-6"
+                    activeOpacity={1}
+                    onPress={() => setBranchModalVisible(false)}
+                >
+                    <View className="bg-white w-full rounded-2xl overflow-hidden p-4 max-h-[500px]">
+                        <ThemedText className="font-bold text-lg mb-4 text-center">{t('confirm.selectBranch')}</ThemedText>
+                        <ScrollView>
+                          {branches.map((branch) => {
+                            const isSelected = selectedBranchId === branch.branch_id;
+                            return (
+                              <TouchableOpacity
+                                key={branch.branch_id}
+                                onPress={() => {
+                                  setSelectedBranchId(branch.branch_id);
+                                  setBranchModalVisible(false);
+                                }}
+                                className={`p-4 border-b border-gray-100 flex-row justify-between items-center ${
+                                    isSelected ? 'bg-orange-50' : ''
+                                }`}
+                              >
+                                <ThemedText className="font-bold">{branch.name}</ThemedText>
+                                {isSelected && (
+                                    <ThemedText className="text-orange-500 font-bold">✓</ThemedText>
+                                )}
+                              </TouchableOpacity>
+                            );
+                          })}
+                        </ScrollView>
+                    </View>
+                </TouchableOpacity>
+              </Modal>
+            </>
           )}
         </View>
 
@@ -310,25 +410,27 @@ export default function MembershipConfirmScreen() {
                     activeOpacity={1}
                     onPress={() => setCurrencyModalVisible(false)}
                 >
-                    <View className="bg-white w-full rounded-2xl overflow-hidden p-4">
+                    <View className="bg-white w-full rounded-2xl overflow-hidden p-4 max-h-[500px]">
                         <ThemedText className="font-bold text-lg mb-4 text-center">{t('confirm.selectCurrency')}</ThemedText>
-                        {CURRENCIES.map((curr) => (
-                            <TouchableOpacity
-                                key={curr.name}
-                                onPress={() => {
-                                    setCurrency(curr.name);
-                                    setCurrencyModalVisible(false);
-                                }}
-                                className={`p-4 border-b border-gray-100 flex-row justify-between items-center ${
-                                    currency === curr.name ? 'bg-orange-50' : ''
-                                }`}
-                            >
-                                <ThemedText className="font-bold">{curr.label}</ThemedText>
-                                {currency === curr.name && (
-                                    <ThemedText className="text-orange-500 font-bold">✓</ThemedText>
-                                )}
-                            </TouchableOpacity>
-                        ))}
+                        <ScrollView>
+                          {CURRENCIES.map((curr) => (
+                              <TouchableOpacity
+                                  key={curr.name}
+                                  onPress={() => {
+                                      setCurrency(curr.name);
+                                      setCurrencyModalVisible(false);
+                                  }}
+                                  className={`p-4 border-b border-gray-100 flex-row justify-between items-center ${
+                                      currency === curr.name ? 'bg-orange-50' : ''
+                                  }`}
+                              >
+                                  <ThemedText className="font-bold">{curr.label}</ThemedText>
+                                  {currency === curr.name && (
+                                      <ThemedText className="text-orange-500 font-bold">✓</ThemedText>
+                                  )}
+                              </TouchableOpacity>
+                          ))}
+                        </ScrollView>
                     </View>
                 </TouchableOpacity>
             </Modal>
@@ -343,15 +445,29 @@ export default function MembershipConfirmScreen() {
             <ThemedText className="text-neutral-700">{params.mainItemTitle}</ThemedText>
             <ThemedText className="font-bold text-neutral-900">${mainPriceUSD.toFixed(2)}</ThemedText>
           </View>
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          {selectedPackages.map((pkg: any, index: number) => (
-            <View key={index} className="flex-row justify-between mb-2">
-              <ThemedText className="text-neutral-600 text-sm flex-1 mr-2">+ {pkg.name}</ThemedText>
-              <ThemedText className="font-bold text-neutral-800 text-sm">${pkg.price?.toFixed(2)}</ThemedText>
-            </View>
-          ))}
+
+          <ScrollView className="max-h-48" nestedScrollEnabled={true}>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {selectedPackages.map((pkg: any, index: number) => (
+              <View key={index} className="flex-row justify-between mb-2">
+                <ThemedText className="text-neutral-600 text-sm flex-1 mr-2">+ {pkg.name}</ThemedText>
+                <ThemedText className="font-bold text-neutral-800 text-sm">${pkg.price?.toFixed(2)}</ThemedText>
+              </View>
+            ))}
+          </ScrollView>
 
           <View className="h-[1px] bg-neutral-200 my-2" />
+
+          {/* Campo de Impuesto */}
+          {loadingTax ? (
+             <ActivityIndicator size="small" color="#f97316" className="my-2" />
+          ) : (
+            <View className="flex-row justify-between mb-2">
+                {/* Visualización: muestra el porcentaje entero (21%) */}
+                <ThemedText className="text-neutral-600 text-sm flex-1 mr-2">Impuesto ({formatTaxRate(taxRate)})</ThemedText>
+                <ThemedText className="font-bold text-neutral-800 text-sm">${taxAmountUSD.toFixed(2)}</ThemedText>
+            </View>
+          )}
 
           <View className="flex-row justify-between items-center">
             <ThemedText className="font-bold text-neutral-500">{t('confirm.totalUSD')}</ThemedText>
@@ -394,7 +510,7 @@ export default function MembershipConfirmScreen() {
           <PrimaryButton
             title={t('confirm.confirmWithPay')}
             onPress={handleConfirmOrder}
-            disabled={loadingRate}
+            disabled={loadingRate || loadingTax}
           />
         )}
 
