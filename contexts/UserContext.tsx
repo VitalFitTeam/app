@@ -14,8 +14,10 @@ export type UserData = {
 	birthDate: string;
 	identityDocument: string;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	membership?: { status: string; end_date: string;[key: string]: any };
+	membership?: { status: string; end_date: string; [key: string]: any };
 	profilePicture?: string;
+	specialty?: string;
+	roleName?: string;
 };
 
 type UserContextType = {
@@ -24,7 +26,7 @@ type UserContextType = {
 	error: string | null;
 	fetchUser: () => Promise<void>;
 	updateLocalUser: (partial: Partial<UserData>) => void;
-	clearUser: () => void; 
+	clearUser: () => void;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -55,7 +57,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				return;
 			}
 
-			const normalizedGender = apiUser.gender === 'male' ? 'M' : apiUser.gender === 'female' ? 'F' : '';
+			const normalizedGender =
+				apiUser.gender === 'male' ? 'M' : apiUser.gender === 'female' ? 'F' : '';
 
 			setUser({
 				userId: apiUser.user_id || '',
@@ -68,6 +71,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				identityDocument: apiUser.identity_document || '',
 				profilePicture: apiUser.profile_picture_url || undefined,
 				membership: apiUser.client_membership,
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				specialty: (apiUser as any).instructor_profile?.specialty || (apiUser as any).specialty || '',
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				roleName: (apiUser as any).role?.name || 'Instructor',
 			});
 		} catch (err: unknown) {
 			let message = 'Ocurrió un error inesperado al obtener los datos del usuario.';
@@ -83,7 +90,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 	}, []);
 
 	const updateLocalUser = useCallback((partial: Partial<UserData>) => {
-		setUser(prev => (prev ? { ...prev, ...partial } : prev));
+		setUser((prev) => (prev ? { ...prev, ...partial } : prev));
 	}, []);
 
 	const clearUser = useCallback(() => {
@@ -97,7 +104,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 	const value = useMemo<UserContextType>(
 		() => ({ user, loading, error, fetchUser, updateLocalUser, clearUser }),
-		[user, loading, error, fetchUser, updateLocalUser, clearUser]
+		[user, loading, error, fetchUser, updateLocalUser, clearUser],
 	);
 
 	return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

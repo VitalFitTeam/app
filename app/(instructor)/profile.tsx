@@ -1,11 +1,10 @@
 import { InstructorQRModal } from '@/components/instructor/InstructorQRModal';
 import { ThemedView } from '@/components/themed-view';
-import vitalFitApi from '@/services/vitalfitSdk';
+import { useUser } from '@/contexts/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isAPIError } from '@vitalfit/sdk';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
@@ -22,39 +21,9 @@ import {
 export default function InstructorProfileScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
-	const [loading, setLoading] = useState(true);
-	const [firstName, setFirstName] = useState<string | null>(null);
-	const [lastName, setLastName] = useState<string | null>(null);
+	const { user, loading, clearUser } = useUser();
 	const [qrModalVisible, setQrModalVisible] = useState(false);
 	const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-
-	useEffect(() => {
-		const fetchUser = async () => {
-			try {
-				const token = await AsyncStorage.getItem('token');
-				if (!token) {
-					console.error('No se encontró token en AsyncStorage');
-					return;
-				}
-
-				const userData = await vitalFitApi.user.WhoAmI(token);
-				setFirstName(userData?.user?.first_name || 'Instructor');
-				setLastName(userData?.user?.last_name || '');
-			} catch (error: unknown) {
-				let errorMessage = t('instructor.profile.error.fetchUser');
-				if (isAPIError(error)) {
-					errorMessage = error.messages.join(', ');
-				} else if (error instanceof Error) {
-					errorMessage = error.message;
-				}
-				console.error('Error en la solicitud whoami (Perfil instructor):', errorMessage);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchUser();
-	}, [t]);
 
 	if (loading) {
 		return (
@@ -64,11 +33,16 @@ export default function InstructorProfileScreen() {
 		);
 	}
 
-	const displayName = lastName ? `${firstName ?? t('instructor.profile.defaultName')} ${lastName}` : firstName ?? t('instructor.profile.defaultName');
+	const displayName = user
+		? user.lastName
+			? `${user.firstName || t('instructor.profile.defaultName')} ${user.lastName}`
+			: user.firstName || t('instructor.profile.defaultName')
+		: t('instructor.profile.defaultName');
 
 	const handleConfirmLogout = async () => {
 		try {
 			await AsyncStorage.removeItem('token');
+			clearUser();
 		} catch (error) {
 			console.error('Error al eliminar el token en logout:', error);
 		} finally {
@@ -76,6 +50,12 @@ export default function InstructorProfileScreen() {
 			router.replace('/(auth)/login');
 		}
 	};
+
+	const defaultImage = user?.gender === 'F' 
+		? require('@/assets/images/Female.svg') 
+		: require('@/assets/images/Man.svg');
+
+	const profileImageSource = user?.profilePicture ? { uri: user.profilePicture } : defaultImage;
 
 	return (
 		<ThemedView className='flex-1 bg-white pt-10'>
@@ -86,13 +66,13 @@ export default function InstructorProfileScreen() {
 				<View className='mb-4 items-start'>
 					<View className='w-24 h-24 rounded-full overflow-hidden mb-3 bg-[#FED7AA] items-center justify-center'>
 						<Image
-							source={{ uri: 'https://randomuser.me/api/portraits/men/31.jpg' }}
+							source={profileImageSource}
 							style={{ width: '100%', height: '100%' }}
 						/>
 					</View>
 					<Text className='text-[20px] font-semibold text-[#111827]'>{displayName}</Text>
-					<Text className='text-[13px] text-[#6b7280] mt-1'>{t('instructor.profile.defaultName')}</Text>
-					<Text className='text-[13px] text-[#f97316] mt-0.5'>{t('instructor.profile.specialty')}</Text>
+					<Text className='text-[13px] text-[#6b7280] mt-1'>{user?.specialty || t('instructor.profile.specialty')}</Text>
+					<Text className='text-[13px] text-[#f97316] mt-0.5'>{user?.roleName || 'Instructor'}</Text>
 				</View>
 
 				<View className='mb-4'>
