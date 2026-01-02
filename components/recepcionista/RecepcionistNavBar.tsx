@@ -83,6 +83,13 @@ export default function RecepcionistNavBar() {
         }}
       />
       <Tabs.Screen
+        name='change-password'
+        options={{
+          href: null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+      <Tabs.Screen
         name='enroll-client'
         options={{
           href: null,

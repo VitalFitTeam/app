@@ -1,10 +1,9 @@
 import { ThemedView } from '@/components/themed-view';
-import vitalFitApi from '@/services/vitalfitSdk';
+import { useUser } from '@/contexts/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isAPIError } from '@vitalfit/sdk';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
@@ -20,41 +19,11 @@ import {
 export default function RecepcionistProfileComponent() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [firstName, setFirstName] = useState<string | null>(null);
-  const [lastName, setLastName] = useState<string | null>(null);
+  const { user, loading: userLoading, clearUser } = useUser();
   const [qrModalVisible, setQrModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        if (!token) {
-          console.error('No se encontró token en AsyncStorage');
-          return;
-        }
-
-        const userData = await vitalFitApi.user.WhoAmI(token);
-        setFirstName(userData?.user?.first_name || 'Laura');
-        setLastName(userData?.user?.last_name || 'Torres');
-      } catch (error: unknown) {
-        let errorMessage = t('common.error.unexpected');
-        if (isAPIError(error)) {
-          errorMessage = error.messages.join(', ');
-        } else if (error instanceof Error) {
-          errorMessage = error.message;
-        }
-        console.error('Error en la solicitud whoami (Perfil recepcionista):', errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [t]);
-
-  if (loading) {
+  if (userLoading && !user) {
     return (
       <ThemedView className='flex-1 justify-center items-center bg-white'>
         <ActivityIndicator size='large' color='#F27F2A' />
@@ -62,11 +31,22 @@ export default function RecepcionistProfileComponent() {
     );
   }
 
-  const displayName = lastName ? `${firstName ?? 'Laura'} ${lastName}` : firstName ?? 'Laura Torres';
+  const displayName = user
+    ? user.lastName
+      ? `${user.firstName} ${user.lastName}`
+      : user.firstName
+    : 'Recepcionista';
+
+  const avatarSource = user?.profilePicture
+    ? { uri: user.profilePicture }
+    : user?.gender === 'F'
+    ? require('@/assets/images/Female.svg')
+    : require('@/assets/images/Man.svg');
 
   const handleConfirmLogout = async () => {
     try {
       await AsyncStorage.removeItem('token');
+      clearUser();
     } catch (error) {
       console.error('Error al eliminar el token en logout:', error);
     } finally {
@@ -83,12 +63,13 @@ export default function RecepcionistProfileComponent() {
         <View className='mb-4 items-start'>
           <View className='w-24 h-24 rounded-full overflow-hidden mb-3 bg-[#FED7AA] items-center justify-center'>
             <Image
-              source={{ uri: 'https://randomuser.me/api/portraits/women/32.jpg' }}
+              source={avatarSource}
               style={{ width: '100%', height: '100%' }}
+              contentFit='cover'
             />
           </View>
           <Text className='text-[20px] font-semibold text-[#111827]'>{displayName}</Text>
-          <Text className='text-[13px] text-[#6b7280] mt-1'>{t('dashboard.recepcionistDefault')}</Text>
+          <Text className='text-[13px] text-[#6b7280] mt-1'>{user?.roleName || t('dashboard.recepcionistDefault')}</Text>
           <Text className='text-[13px] text-[#f97316] mt-0.5'>{t('profile.staffViralFit')}</Text>
         </View>
         <View className='mb-4'>
