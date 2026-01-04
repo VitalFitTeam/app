@@ -1,45 +1,40 @@
+import { KPICard } from '@/types/reports';
 import { Dumbbell } from 'lucide-react-native';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { CheckCircleIcon, UsersIcon } from 'react-native-heroicons/outline';
 
-type InstructorStats = {
-	activeClients: number;
-	classesToday: number;
-	attendanceRate: number; 
-};
-
 type Props = {
-	stats?: InstructorStats;
+	monthlyClasses?: KPICard | null;
+	studentCount?: KPICard | null;
+	attendanceRate?: number;
 };
 
-export function InstructorStatsCardGroup({ stats }: Props) {
-	const data: InstructorStats =
-		stats ?? ({ activeClients: 24, classesToday: 2, attendanceRate: 89 } as InstructorStats);
-
+export function InstructorStatsCardGroup({ monthlyClasses, studentCount, attendanceRate }: Props) {
+	console.log('InstructorStatsCardGroup Props:', { monthlyClasses, studentCount, attendanceRate });
 	const cards = [
 		{
-			label: 'Clientes Activos',
-			value: `${data.activeClients}`,
-			icon: <UsersIcon size={16} color='#f97316' />,
-		},
-		{
-			label: 'Clases Hoy',
-			value: `${data.classesToday}`,
+			label: monthlyClasses?.trend ? `Clases Mes ${monthlyClasses.trend}` : 'Clases Mes',
+			value: monthlyClasses ? `${monthlyClasses.value}` : '--',
 			icon: <Dumbbell size={16} color='#f97316' strokeWidth={1.8} />,
 		},
 		{
+			label: studentCount?.trend ? `Alumnos Hoy ${studentCount.trend}` : 'Alumnos Hoy',
+			value: studentCount ? `${studentCount.value}` : '--',
+			icon: <UsersIcon size={16} color='#f97316' />,
+		},
+		{
 			label: 'Tasa Asistencia',
-			value: `${data.attendanceRate}%`,
+			value: attendanceRate !== undefined ? `${attendanceRate}%` : '--%',
 			icon: <CheckCircleIcon size={16} color='#f97316' />,
 		},
 	];
 
 	return (
 		<View className='flex-row justify-between mt-6 px-2'>
-			{cards.map((card) => (
+			{cards.map((card, index) => (
 				<View
-					key={card.label}
+					key={index}
 					className='w-[30%] bg-white rounded-2xl px-2 py-3 border border-[#f97316] shadow-sm'>
 					<View className='items-center mb-1'>{card.icon}</View>
 					<Text className='text-center text-[18px] font-semibold text-[#111827]'>
