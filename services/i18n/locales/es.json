@@ -139,16 +139,23 @@
       "confirmPasswordLabel": "Confirmar contraseña",
       "confirmPasswordPlaceholder": "Confirma tu contraseña",
       "continueButton": "Continuar",
-      "googleSignInButton": "Iniciar sesión con Google"
+      "googleSignInButton": "Iniciar sesión con Google",
+      "emailRequired": "El correo es requerido.",
+      "passwordRequired": "La contraseña es requerida.",
+      "confirmPasswordRequired": "Debes confirmar tu contraseña."
     },
     "step3PersonalDetails": {
       "nameLabel": "Nombre",
       "namePlaceholder": "Ingresa tu nombre",
+      "nameRequired": "El nombre es requerido.",
       "lastNameLabel": "Apellido",
       "lastNamePlaceholder": "Ingresa tu apellido",
+      "lastNameRequired": "El apellido es requerido.",
       "documentIdLabel": "Documento de identidad",
       "documentIdPlaceholder": "Ingresa tu documento de identidad",
+      "documentIdRequired": "El documento es requerido.",
       "birthDateLabel": "Fecha de nacimiento",
+      "birthDateRequired": "La fecha de nacimiento es requerida.",
       "phoneLabel": "Teléfono",
       "phonePlaceholder": "Número de teléfono",
       "acceptTerms": "Acepto los ",
@@ -687,6 +694,35 @@
         "assignRoutine": "Asignar nueva rutina",
         "viewProgress": "Ver progreso"
       }
+    },
+    "validations": {
+      "genderRequired": "Por favor, selecciona un género.",
+      "password": {
+        "min": "La contraseña debe tener al menos {{min}} caracteres.",
+        "uppercase": "Debe contener al menos una mayúscula.",
+        "lowercase": "Debe contener al menos una minúscula.",
+        "number": "Debe contener al menos un número.",
+        "special": "Debe contener al menos un caracter especial.",
+        "mismatch": "Las contraseñas no coinciden."
+      },
+      "name": {
+        "letters": "El nombre solo puede contener letras."
+      },
+      "lastName": {
+        "letters": "El apellido solo puede contener letras."
+      },
+      "documentId": {
+        "min": "El documento debe tener al menos {{min}} dígitos.",
+        "numeric": "El documento solo puede contener números."
+      },
+      "birthDate": {
+        "adult": "Debes ser mayor de 18 años."
+      },
+      "phoneRequired": "El teléfono es requerido.",
+      "phone": {
+        "length": "El número de teléfono debe tener entre 10 y 15 dígitos."
+      },
+      "acceptTerms": "Debes aceptar los términos y condiciones."
     }
   }
 }
