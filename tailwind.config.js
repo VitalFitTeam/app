@@ -5,6 +5,8 @@ module.exports = {
 	theme: {
 		extend: {
 			fontFamily: {
+				body: ['var(--font-body)', 'sans-serif'],
+				heading: ['var(--font-heading)', 'sans-serif'],
 				'montserrat-medium': ['Montserrat_500Medium', 'sans-serif'],
 				'montserrat-bold': ['Montserrat_700Bold', 'sans-serif'],
 			},
