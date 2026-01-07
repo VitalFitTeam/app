@@ -24,8 +24,9 @@ export function Step1Gender({ control, errors, onNextStep }: Props) {
             <Controller
                 control={control}
                 name='gender'
-                render={({ field: { onChange} }) => (
+                render={({ field: { onChange, value } }) => (
                     <GenderSelector 
+                        selected={value}
                         onSelect={async (selectedGender) => {
                             onChange(selectedGender);
                             await AsyncStorage.setItem('temp_gender', selectedGender);

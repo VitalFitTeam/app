@@ -7,7 +7,7 @@ import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
 import { Colors, Fonts } from '@/constants/theme';
 import { useToast } from '@/hooks/useToast';
-import { RegisterData, RegisterSchema, Step1Schema, Step2Schema } from '@/schemas/register';
+import { createRegisterSchema, createStep1Schema, createStep2Schema, RegisterData } from '@/schemas/register';
 import vitalFitApi from '@/services/vitalfitSdk';
 import { useUser } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,7 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError, SignUpRequest, UserGender } from '@vitalfit/sdk';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { BackHandler, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -37,6 +37,10 @@ export default function RegisterScreen() {
     const [step, setStep] = useState(1);
     const { toastState, showToast, hideToast } = useToast();
 
+    const RegisterSchema = useMemo(() => createRegisterSchema(t), [t]);
+    const Step1Schema = useMemo(() => createStep1Schema(t), [t]);
+    const Step2Schema = useMemo(() => createStep2Schema(t), [t]);
+
     const {
         control,
         handleSubmit,
@@ -46,7 +50,7 @@ export default function RegisterScreen() {
         setValue,
         setError,
     } = useForm<RegisterData>({
-        resolver: zodResolver(RegisterSchema),
+        resolver: (values, context, options) => zodResolver(RegisterSchema)(values, context, options),
         defaultValues: {
             acceptTerms: false,
         },

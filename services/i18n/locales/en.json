@@ -139,16 +139,23 @@
       "confirmPasswordLabel": "Confirm password",
       "confirmPasswordPlaceholder": "Confirm your password",
       "continueButton": "Continue",
-      "googleSignInButton": "Sign in with Google"
+      "googleSignInButton": "Sign in with Google",
+      "emailRequired": "Email is required.",
+      "passwordRequired": "Password is required.",
+      "confirmPasswordRequired": "You must confirm your password."
     },
     "step3PersonalDetails": {
       "nameLabel": "Name",
       "namePlaceholder": "Enter your name",
+      "nameRequired": "Name is required.",
       "lastNameLabel": "Last Name",
       "lastNamePlaceholder": "Enter your last name",
+      "lastNameRequired": "Last name is required.",
       "documentIdLabel": "Identity Document",
       "documentIdPlaceholder": "Enter your identity document",
+      "documentIdRequired": "Document ID is required.",
       "birthDateLabel": "Date of Birth",
+      "birthDateRequired": "Birth date is required.",
       "phoneLabel": "Phone",
       "phonePlaceholder": "Phone number",
       "acceptTerms": "I accept the ",
@@ -671,6 +678,35 @@
         "assignRoutine": "Assign New Routine",
         "viewProgress": "View Progress"
       }
+    },
+    "validations": {
+      "genderRequired": "Please select a gender.",
+      "password": {
+        "min": "Password must be at least {{min}} characters.",
+        "uppercase": "Must contain at least one uppercase letter.",
+        "lowercase": "Must contain at least one lowercase letter.",
+        "number": "Must contain at least one number.",
+        "special": "Must contain at least one special character.",
+        "mismatch": "Passwords do not match."
+      },
+      "name": {
+        "letters": "Name can only contain letters."
+      },
+      "lastName": {
+        "letters": "Last name can only contain letters."
+      },
+      "documentId": {
+        "min": "Document ID must be at least {{min}} digits.",
+        "numeric": "Document ID must only contain numbers."
+      },
+      "birthDate": {
+        "adult": "You must be over 18 years old."
+      },
+      "phoneRequired": "Phone number is required.",
+      "phone": {
+        "length": "Phone number must be between 10 and 15 digits."
+      },
+      "acceptTerms": "You must accept terms and conditions."
     }
   }
 }
