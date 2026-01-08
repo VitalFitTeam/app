@@ -18,6 +18,14 @@
       "classDetails": "Class Details",
       "qr": "QR"
     },
+    "qr": {
+      "title": "Your Access Code",
+      "instruction": "Show this code at reception to enter",
+      "errorGenerating": "Error generating code",
+      "loadFailed": "Unable to load the QR",
+      "refresh": "Refresh code",
+      "expiresIn": "Expires in {{time}}"
+    },
     "checkIn": {
       "error": {
         "selectBranch": "Please select a branch before scanning.",
@@ -689,6 +697,20 @@
       "periodDays": "/{{days}} days",
       "error": {
         "loadPlans": "Could not load membership plans."
+      },
+      "plans": {
+        "TRIMESTRAL FIT": {
+          "name": "QUARTERLY FIT",
+          "description": "3-month commitment with full access to all facilities and group classes."
+        },
+        "ANUAL BLACK VIP": {
+          "name": "ANNUAL BLACK VIP",
+          "description": "Annual all-inclusive membership with exclusive benefits and unlimited services."
+        },
+        "MENSUAL BÁSICO": {
+          "name": "MONTHLY BASIC",
+          "description": "Unlimited access to weights area, cardio, and basic facilities."
+        }
       }
     },
     "checkout": {
@@ -733,13 +755,42 @@
         "branchNotFound": "No available branch found to assign invoice."
       }
     },
+    "extras": {
+      "title": "EXTRAS",
+      "additionalPackages": "Additional Packages",
+      "subtitle": "Select extra classes or complementary services for your membership.",
+      "added": "ADDED",
+      "clickToAdd": "Click to add",
+      "continueWithExtras": "Continue ({{count}} extras)",
+      "skipExtras": "Skip and continue without extras",
+      "noPackagesAvailable": "No additional packages available at this time.",
+      "error": {
+        "loadPackages": "Could not load additional packages."
+      },
+      "packages": {
+        "PACK INICIO RÁPIDO": {
+          "name": "Quick Start Pack",
+          "description": "The perfect combination of services to begin your fitness transformation."
+        },
+        "PACK SALUD INTEGRAL": {
+          "name": "Holistic Health Pack",
+          "description": "A holistic approach combining training, nutrition, and wellness."
+        },
+        "PACK INTENSIVO PRO": {
+          "name": "Intensive Pro Pack",
+          "description": "A selection of advanced workouts for experienced athletes."
+        }
+      }
+    },
     "confirm": {
       "title": "ORDER SUMMARY",
       "paymentConfig": "Payment Configuration",
       "branch": "BRANCH",
       "currency": "PAYMENT CURRENCY",
       "selectCurrency": "Select Currency",
+      "selectBranch": "Select a branch",
       "detailUSD": "DETAIL (USD)",
+      "tax": "Tax",
       "totalUSD": "Total USD",
       "totalToPay": "Total to Pay",
       "approxRate": "Approx rate:",
@@ -752,6 +803,12 @@
         "invalidSession": "Invalid session",
         "invoiceIdMissing": "Invoice ID reference not received"
       }
+    },
+    "methods": {
+      "title": "PAYMENT METHOD",
+      "selectPaymentMethod": "Select Payment Method",
+      "subtitle": "Choose how you want to complete your transaction",
+      "noMethodsAvailable": "No payment methods available at this branch."
     },
     "payment": {
       "method": {
@@ -783,6 +840,7 @@
         "subtitle": "Report your transaction details",
         "destinationAccount": "DESTINATION ACCOUNT",
         "total": "TOTAL TO TRANSFER",
+        "order": "Order",
         "senderName": "Account Holder Name",
         "senderNamePlaceholder": "Who made the transfer",
         "reference": "Reference Number / Confirmation",

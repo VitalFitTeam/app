@@ -1,10 +1,10 @@
-import { ClientQRModal } from '@/components/client/ClientQRModal';
+import { QRModal } from '@/components/auth/dashboard/QRModal';
 import { useUser } from '@/contexts/UserContext';
 import { useReservations } from '@/contexts/reservations';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
@@ -12,14 +12,12 @@ import {
   BellIcon,
   ChevronRightIcon,
   CreditCardIcon,
-  GlobeAltIcon,
   LanguageIcon,
   QrCodeIcon,
-  QuestionMarkCircleIcon,
   ShieldCheckIcon,
   TicketIcon,
   TrophyIcon,
-  UserCircleIcon,
+  UserCircleIcon
 } from 'react-native-heroicons/outline';
 
 export default function ProfileScreen() {
@@ -29,6 +27,17 @@ export default function ProfileScreen() {
   const { clearReservations } = useReservations();
   const [qrModalVisible, setQrModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [userToken, setUserToken] = useState<string>('');
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        setUserToken(token);
+      }
+    };
+    fetchToken();
+  }, []);
 
   if (loading) {
     return (
@@ -99,7 +108,6 @@ export default function ProfileScreen() {
         </View>
 
         <View className="mb-4">
-          <Text className="text-[14px] font-semibold text-[#111827] mb-1">{t('client.profile.aboutMe')}</Text>
           <Text className="text-[13px] text-[#4b5563] leading-5">
             {t('client.profile.aboutMeDescription')}
           </Text>
@@ -129,36 +137,6 @@ export default function ProfileScreen() {
         >
           <QrCodeIcon width={18} height={18} color="#111827" />
           <Text className="ml-2 text-[13px] font-medium text-[#111827]">{t('client.profile.checkIn')}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.85}
-          className="w-full rounded-2xl mb-6 flex-row items-center justify-between"
-          style={{ backgroundColor: '#F3F4F6', paddingVertical: 14, paddingHorizontal: 16 }}
-          onPress={() => router.push('/profile/referrals')}
-        >
-          <View>
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: '600',
-                color: '#f97316',
-                marginBottom: 4,
-              }}
-            >
-              {t('client.profile.referralCode')}
-            </Text>
-            <Text
-              style={{
-                fontSize: 12,
-                letterSpacing: 1,
-                color: '#6B7280',
-              }}
-            >
-              LUCASSCOTT2026
-            </Text>
-          </View>
-          <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
 
         <View className="mb-2">
@@ -265,38 +243,6 @@ export default function ProfileScreen() {
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
           onPress={() => {
-            console.log('Ayuda y soporte');
-          }}
-        >
-          <View className="flex-row items-center">
-            <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
-              <QuestionMarkCircleIcon width={18} height={18} color="#111827" />
-            </View>
-            <Text className="text-[13px] text-[#111827]">{t('client.profile.helpSupport')}</Text>
-          </View>
-          <ChevronRightIcon width={16} height={16} color="#9ca3af" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
-          onPress={() => {
-            console.log('Términos y condiciones');
-          }}
-        >
-          <View className="flex-row items-center">
-            <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
-              <GlobeAltIcon width={18} height={18} color="#111827" />
-            </View>
-            <Text className="text-[13px] text-[#111827]">{t('client.profile.termsConditions')}</Text>
-          </View>
-          <ChevronRightIcon width={16} height={16} color="#9ca3af" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
-          onPress={() => {
             router.push('/profile/payment-history');
           }}
         >
@@ -326,7 +272,12 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </ScrollView>
 
-      <ClientQRModal visible={qrModalVisible} onClose={() => setQrModalVisible(false)} />
+      <QRModal
+        visible={qrModalVisible}
+        onClose={() => setQrModalVisible(false)}
+        token={userToken}
+        userName={displayName}
+      />
 
       <Modal
         visible={logoutModalVisible}

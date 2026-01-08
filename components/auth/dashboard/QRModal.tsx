@@ -1,7 +1,8 @@
 
 import vitalFitApi from '@/services/vitalfitSdk';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -13,8 +14,18 @@ interface Props {
 }
 
 export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) => {
-	const [qrValue, setQrValue] = useState<string>('');
+	const { t } = useTranslation();
+	const [qrValue, setQrValue] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+	const intervalRef = useRef<any>(null);
+	const [remainingSeconds, setRemainingSeconds] = useState<number>(120);
+
+	const formatTime = (secs: number) => {
+		const m = Math.floor(secs / 60);
+		const s = secs % 60;
+		return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+	};
 
 	const fetchQrToken = React.useCallback(async () => {
 		try {
@@ -25,22 +36,56 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 				console.log('Token QR Recibido:', response.token);
 				console.log('Longitud del Token QR:', response.token.length);
 				setQrValue(response.token);
+				setError(null);
+				setRemainingSeconds(120);
 			} else {
 				console.warn('Respuesta QrToken sin token:', response);
-				setQrValue('Error al generar código');
+				setQrValue(null);
+				setError(t('qr.errorGenerating'));
 			}
 		} catch (error) {
 			console.error("Error generando QR:", error);
-			setQrValue('Error al generar código');
+			setQrValue(null);
+			setError(t('qr.errorGenerating'));
 		} finally {
 			setLoading(false);
 		}
-	}, [token]);
+	}, [token, t]);
 	useEffect(() => {
 		if (visible && token) {
 			fetchQrToken();
 		}
 	}, [visible, token, fetchQrToken]);
+
+	useEffect(() => {
+		if (!visible) {
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current);
+				intervalRef.current = null;
+			}
+			return;
+		}
+
+		setRemainingSeconds(120);
+
+		// Tick every second to update UI countdown. When it hits 0, refresh the QR and reset.
+		intervalRef.current = setInterval(() => {
+			setRemainingSeconds((prev) => {
+				if (prev <= 1) {
+					fetchQrToken();
+					return 120;
+				}
+				return prev - 1;
+			});
+		}, 1000);
+
+		return () => {
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current);
+				intervalRef.current = null;
+			}
+		};
+	}, [visible, fetchQrToken]);
 
 	return (
 		<Modal
@@ -53,7 +98,7 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 				<View style={styles.modalView}>
 
 					<View style={styles.header}>
-						<Text className='font-heading' style={styles.modalTitle}>Tu Código de Acceso</Text>
+						<Text className='font-heading' style={styles.modalTitle}>{t('qr.title')}</Text>
 						<TouchableOpacity onPress={onClose} style={styles.closeButton}>
 							<Ionicons name="close" size={24} color="#6B7280" />
 						</TouchableOpacity>
@@ -61,13 +106,13 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 
 					<Text className='font-heading' style={styles.userName}>{userName}</Text>
 					<Text className='font-body' style={styles.instruction}>
-						Muestra este código en recepción para ingresar
+						{t('qr.instruction')}
 					</Text>
 
 					<View style={styles.qrContainer}>
 						{loading ? (
 							<ActivityIndicator size="large" color="#F27F2A" />
-						) : qrValue && qrValue !== 'Error al generar código' ? (
+						) : qrValue ? (
 							<QRCode
 								value={qrValue}
 								size={200}
@@ -75,14 +120,18 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 								backgroundColor="white"
 							/>
 						) : (
-							<Text className='font-body' style={{ color: 'red' }}>No se pudo cargar el QR</Text>
+							<Text className='font-body' style={{ color: 'red' }}>{error ?? t('qr.loadFailed')}</Text>
 						)}
 					</View>
 
 					{!loading && (
-						<TouchableOpacity onPress={fetchQrToken} style={styles.refreshButton}>
+						<Text className='font-body' style={styles.timerText}>{t('qr.expiresIn', { time: formatTime(remainingSeconds) })}</Text>
+					)}
+
+					{!loading && (
+						<TouchableOpacity onPress={() => { fetchQrToken(); setRemainingSeconds(120); }} style={styles.refreshButton}>
 							<Ionicons name="refresh" size={20} color="#F27F2A" />
-							<Text className='font-body' style={styles.refreshText}>Actualizar código</Text>
+							<Text className='font-body' style={styles.refreshText}>{t('qr.refresh')}</Text>
 						</TouchableOpacity>
 					)}
 
@@ -158,5 +207,10 @@ const styles = StyleSheet.create({
 		color: '#F27F2A',
 		fontWeight: '600',
 		marginLeft: 8,
+	},
+	timerText: {
+		fontSize: 12,
+		color: '#6B7280',
+		marginBottom: 8,
 	},
 });

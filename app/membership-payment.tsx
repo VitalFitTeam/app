@@ -152,20 +152,22 @@ export default function MembershipPaymentScreen() {
             </ThemedText>
         </View>
 
-        <View className="rounded-2xl p-6 mb-8 shadow-lg">
-            <ThemedText className="font-body text-gray-400 text-xs uppercase tracking-widest mb-1">{t('payment.totalToPay')}</ThemedText>
+        <View className="bg-neutral-50 p-5 rounded-2xl border border-neutral-200 mb-8">
+            <ThemedText className="font-body text-xs text-orange-500 font-bold tracking-widest uppercase mb-3">
+                {t('payment.totalToPay')}
+            </ThemedText>
             <View className="flex-row items-end mb-4">
-                <ThemedText className="font-heading text-4xl font-bold text-white mr-2">
+                <ThemedText className="font-heading text-4xl font-bold text-neutral-900 mr-2">
                     ${parseFloat(params.totalAmount || '0').toFixed(2)}
                 </ThemedText>
                 <ThemedText className="font-body text-lg text-orange-500 font-bold mb-1">
                     {params.currency || 'USD'}
                 </ThemedText>
             </View>
-            <View className="h-[1px] bg-neutral-700 w-full mb-4" />
+            <View className="h-[1px] bg-neutral-200 w-full mb-3" />
             <View className="flex-row justify-between">
-                <ThemedText className="font-body text-gray-300">{t('payment.concept')}</ThemedText>
-                <ThemedText className="font-body text-white font-bold max-w-[60%] text-right" numberOfLines={1}>
+                <ThemedText className="font-body text-neutral-600">{t('payment.concept')}</ThemedText>
+                <ThemedText className="font-body text-neutral-900 font-bold max-w-[60%] text-right" numberOfLines={1}>
                     {params.title || 'Membresía VitalFit'}
                 </ThemedText>
             </View>
@@ -219,8 +221,8 @@ export default function MembershipPaymentScreen() {
             {loading ? (
                 <ActivityIndicator size="large" color="#f97316" />
             ) : (
-                <PrimaryButton 
-                    title={selectedMethodId ? t('common.continue') : t('payment.selectMethod')}
+                <PrimaryButton
+                    title={selectedMethodId ? t('payment.continue') : t('payment.selectMethod')}
                     onPress={handlePay}
                 />
             )}

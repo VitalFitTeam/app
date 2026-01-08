@@ -18,6 +18,14 @@
       "classDetails": "Detalles de la Clase",
       "qr": "QR"
     },
+    "qr": {
+      "title": "Tu Código de Acceso",
+      "instruction": "Muestra este código en recepción para ingresar",
+      "errorGenerating": "Error al generar código",
+      "loadFailed": "No se pudo cargar el QR",
+      "refresh": "Actualizar código",
+      "expiresIn": "Expira en {{time}}"
+    },
     "checkIn": {
       "error": {
         "selectBranch": "Por favor selecciona una sede antes de escanear.",
@@ -705,6 +713,20 @@
       "periodDays": "/{{days}} días",
       "error": {
         "loadPlans": "No se pudieron cargar los planes de membresía."
+      },
+      "plans": {
+        "TRIMESTRAL FIT": {
+          "name": "TRIMESTRAL FIT",
+          "description": "Compromiso de 3 meses con acceso completo a todas las instalaciones y clases grupales."
+        },
+        "ANUAL BLACK VIP": {
+          "name": "ANUAL BLACK VIP",
+          "description": "Membresía anual todo incluido con beneficios exclusivos y servicios ilimitados."
+        },
+        "MENSUAL BÁSICO": {
+          "name": "MENSUAL BÁSICO",
+          "description": "Acceso ilimitado al área de pesas, cardio e instalaciones básicas."
+        }
       }
     },
     "checkout": {
@@ -749,13 +771,42 @@
         "branchNotFound": "No se encontró una sucursal disponible para asignar la factura."
       }
     },
+    "extras": {
+      "title": "EXTRAS",
+      "additionalPackages": "Paquetes Adicionales",
+      "subtitle": "Selecciona clases extra o servicios complementarios para tu membresía.",
+      "added": "AGREGADO",
+      "clickToAdd": "Clic para agregar",
+      "continueWithExtras": "Continuar ({{count}} extras)",
+      "skipExtras": "Saltar y continuar sin extras",
+      "noPackagesAvailable": "No hay paquetes adicionales disponibles en este momento.",
+      "error": {
+        "loadPackages": "No se pudieron cargar los paquetes adicionales."
+      },
+      "packages": {
+        "PACK INICIO RÁPIDO": {
+          "name": "Pack Inicio Rápido",
+          "description": "La combinación perfecta de servicios para comenzar tu transformación fitness."
+        },
+        "PACK SALUD INTEGRAL": {
+          "name": "Pack Salud Integral",
+          "description": "Un enfoque holístico que combina entrenamiento, nutrición y bienestar."
+        },
+        "PACK INTENSIVO PRO": {
+          "name": "Pack Intensivo Pro",
+          "description": "Una selección de entrenamientos avanzados para atletas experimentados."
+        }
+      }
+    },
     "confirm": {
       "title": "RESUMEN DE ORDEN",
       "paymentConfig": "Configuración de Pago",
       "branch": "SUCURSAL",
       "currency": "MONEDA A PAGAR",
       "selectCurrency": "Selecciona Moneda",
+      "selectBranch": "Selecciona una sucursal",
       "detailUSD": "DETALLE (USD)",
+      "tax": "Impuesto",
       "totalUSD": "Total USD",
       "totalToPay": "Total a Pagar",
       "approxRate": "Tasa aprox:",
@@ -768,6 +819,12 @@
         "invalidSession": "Sesión no válida",
         "invoiceIdMissing": "No se recibió ID de factura"
       }
+    },
+    "methods": {
+      "title": "MÉTODO DE PAGO",
+      "selectPaymentMethod": "Selecciona Método de Pago",
+      "subtitle": "Elige cómo quieres completar tu transacción",
+      "noMethodsAvailable": "No hay métodos de pago disponibles en esta sucursal."
     },
     "payment": {
       "method": {
@@ -799,6 +856,7 @@
         "subtitle": "Reporta los detalles de tu transacción",
         "destinationAccount": "CUENTA DESTINO",
         "total": "TOTAL A TRANSFERIR",
+        "order": "Orden",
         "senderName": "Nombre del Titular de la Cuenta",
         "senderNamePlaceholder": "Quien realizó la transferencia",
         "reference": "Número de Referencia / Confirmación",

@@ -31,6 +31,28 @@ export default function MembershipsScreen() {
 
 	const selectedPlan = plans.find((plan) => plan.membership_type_id === selectedPlanId);
 
+	// Helper function to get translated membership name
+	const getMembershipName = (plan: PublicMembershipResponse): string => {
+		// Normalize the name by trimming and converting to uppercase for consistent lookup
+		const normalizedName = plan.name.trim().toUpperCase();
+		const translationKey = `memberships.plans.${normalizedName}.name`;
+		const translated = t(translationKey);
+
+		// If translation exists and is different from the key, use it
+		return translated !== translationKey ? translated : plan.name;
+	};
+
+	// Helper function to get translated membership description
+	const getMembershipDescription = (plan: PublicMembershipResponse): string => {
+		// Normalize the name by trimming and converting to uppercase for consistent lookup
+		const normalizedName = plan.name.trim().toUpperCase();
+		const translationKey = `memberships.plans.${normalizedName}.description`;
+		const translated = t(translationKey);
+
+		// If translation exists and is different from the key, use it
+		return translated !== translationKey ? translated : plan.description;
+	};
+
 	useEffect(() => {
 		const fetchMemberships = async () => {
 			try {
@@ -134,9 +156,9 @@ export default function MembershipsScreen() {
 										{plans.map((plan) => (
 											<MembershipPlanCard
 												key={plan.membership_type_id}
-												title={plan.name}
+												title={getMembershipName(plan)}
 												price={plan.price.toString()}
-												features={[plan.description]}
+												features={[getMembershipDescription(plan)]}
 												period={t('memberships.periodDays', { days: plan.duration_days })}
 												isFree={plan.price === 0}
 												badgeLabel={plan.price === 0 ? t('memberships.free') : undefined}
@@ -153,17 +175,19 @@ export default function MembershipsScreen() {
 											<PrimaryButton
 												title={
 													selectedPlan
-														? t('memberships.acquirePlan', { name: selectedPlan.name })
+														? t('memberships.acquirePlan', { name: getMembershipName(selectedPlan) })
 														: t('memberships.acquire')
 												}
 												onPress={() => {
 													if (!selectedPlan) return;
+													const translatedName = getMembershipName(selectedPlan);
+													const translatedPeriod = t('memberships.periodDays', { days: selectedPlan.duration_days });
 													const href =
 														`/membership-checkout` +
 														`?id=${selectedPlan.membership_type_id}` +
-														`&title=${encodeURIComponent(selectedPlan.name)}` +
+														`&title=${encodeURIComponent(translatedName)}` +
 														`&price=${selectedPlan.price}` +
-														`&period=${encodeURIComponent(`${selectedPlan.duration_days} días`)}`;
+														`&period=${encodeURIComponent(translatedPeriod)}`;
 													router.push(href as never);
 												}}
 											/>
