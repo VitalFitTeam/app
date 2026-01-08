@@ -61,12 +61,12 @@ export default function MyMembershipScreen() {
             <ChevronLeftIcon width={20} height={20} color="#f97316" />
           </TouchableOpacity>
 
-          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('myMembership.title')}</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('myMembership.title')}</Text>
         </View>
 
         <View className="mb-4">
           <Text
-            className="text-[14px] font-semibold text-[#111827] mb-8">
+            className="font-heading text-[14px] font-semibold text-[#111827] mb-8">
             {t('myMembership.currentPlan')}
           </Text>
 
@@ -75,29 +75,29 @@ export default function MyMembershipScreen() {
             style={{ backgroundColor: '#FFFFFF', borderColor: '#F97316' }}>
             <View className="flex-row items-center justify-between mb-2">
               <View>
-                <Text className="text-xs text-[#6B7280] mb-1">{t('myMembership.currentSubscription')}</Text>
-                <Text className="text-lg font-semibold" style={{ color: '#F97316' }}>
+                <Text className="font-body text-xs text-[#6B7280] mb-1">{t('myMembership.currentSubscription')}</Text>
+                <Text className="font-heading text-lg font-semibold" style={{ color: '#F97316' }}>
                   {currentPlan.title}
                 </Text>
               </View>
 
               <View className="px-3 py-1 rounded-full" style={{ backgroundColor: '#FEF3C7' }}>
-                <Text className="text-[10px] font-semibold" style={{ color: '#F97316' }}>
+                <Text className="font-body text-[10px] font-semibold" style={{ color: '#F97316' }}>
                   {t('myMembership.active')}
                 </Text>
               </View>
             </View>
 
-            <Text className="text-xs mb-4" style={{ color: '#4B5563' }}>
+            <Text className="font-body text-xs mb-4" style={{ color: '#4B5563' }}>
               {currentPlan.description}
             </Text>
 
             <View className="flex-row justify-between items-center">
               <View>
-                <Text className="text-xs mb-1" style={{ color: '#6B7280' }}>
+                <Text className="font-body text-xs mb-1" style={{ color: '#6B7280' }}>
                   {t('myMembership.expirationDate')}
                 </Text>
-                <Text className="text-xs" style={{ color: '#111827' }}>
+                <Text className="font-body text-xs" style={{ color: '#111827' }}>
                   {t('myMembership.mockDate')}
                 </Text>
               </View>
@@ -107,7 +107,7 @@ export default function MyMembershipScreen() {
                 className="px-3 py-2 rounded-full"
                 style={{ borderColor: '#D1D5DB', borderWidth: 1 }}
                 onPress={() => router.push('/profile/membership-details')}>
-                <Text className="text-[11px]" style={{ color: '#111827' }}>
+                <Text className="font-body text-[11px]" style={{ color: '#111827' }}>
                   {t('myMembership.viewDetails')}
                 </Text>
               </TouchableOpacity>
@@ -117,7 +117,7 @@ export default function MyMembershipScreen() {
 
         <View className="mb-3">
           <Text
-            className="text-[14px] font-semibold text-[#111827] mb-8">
+            className="font-heading text-[14px] font-semibold text-[#111827] mb-8">
             {t('myMembership.allPlans')}
           </Text>
 
@@ -134,18 +134,18 @@ export default function MyMembershipScreen() {
                 }}>
                 <View className="flex-row items-center justify-between mb-1">
                   <View>
-                    <Text className="text-xs mb-1" style={{ color: '#6B7280' }}>
+                    <Text className="font-body text-xs mb-1" style={{ color: '#6B7280' }}>
                       {plan.description}
                     </Text>
-                    <Text className="text-base font-semibold" style={{ color: '#F97316' }}>
+                    <Text className="font-heading text-base font-semibold" style={{ color: '#F97316' }}>
                       {plan.title}
                     </Text>
                   </View>
 
                   <View className="items-end">
-                    <Text className="text-lg font-semibold" style={{ color: '#111827' }}>
+                    <Text className="font-heading text-lg font-semibold" style={{ color: '#111827' }}>
                       ${plan.price}
-                      <Text className="text-xs" style={{ color: '#6B7280' }}>
+                      <Text className="font-body text-xs" style={{ color: '#6B7280' }}>
                         {plan.period}
                       </Text>
                     </Text>
@@ -154,7 +154,7 @@ export default function MyMembershipScreen() {
                       <View className="mt-1 flex-row items-center px-2 py-1 rounded-full"
                         style={{ backgroundColor: '#FFF7ED', borderColor: '#FDBA74', borderWidth: 1 }}>
                         <CheckCircleIcon size={14} color="#F97316" />
-                        <Text className="ml-1 text-[10px]" style={{ color: '#F97316' }}>
+                        <Text className="font-body ml-1 text-[10px]" style={{ color: '#F97316' }}>
                           {t('myMembership.currentPlan')}
                         </Text>
                       </View>

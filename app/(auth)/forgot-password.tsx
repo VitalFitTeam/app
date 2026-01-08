@@ -182,7 +182,7 @@ export default function ForgotPasswordScreen() {
 							style={styles.title}>
 							{t(`forgotPassword.titles.step${step}`)}
 						</ThemedText>
-						<Text className='mb-8 text-center text-lg text-gray-500'>
+						<Text className='font-body mb-8 text-center text-lg text-gray-500'>
 							{t(`forgotPassword.subtitles.step${step}`)}
 						</Text>
 

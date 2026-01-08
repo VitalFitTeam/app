@@ -18,6 +18,14 @@
       "classDetails": "Class Details",
       "qr": "QR"
     },
+    "qr": {
+      "title": "Your Access Code",
+      "instruction": "Show this code at reception to enter",
+      "errorGenerating": "Error generating code",
+      "loadFailed": "Unable to load the QR",
+      "refresh": "Refresh code",
+      "expiresIn": "Expires in {{time}}"
+    },
     "checkIn": {
       "error": {
         "selectBranch": "Please select a branch before scanning.",
@@ -75,7 +83,9 @@
       "loading": "Loading...",
       "today": "Today",
       "category": "Category",
-      "reserved": "Reserved"
+      "reserved": "Reserved",
+      "viewMore": "View more",
+      "availability": "Availability"
     },
     "login": {
       "title": "Sign In",
@@ -299,7 +309,27 @@
         "packages": "Packages"
       },
       "banners": {
-        "crossfit4": "CrossFit - 4 sessions"
+        "crossfit4": "CrossFit - 4 sessions",
+        "weeklyChallenge": "Weekly Challenge",
+        "plankWithHipTwist": "Plank With Hip Twist"
+      },
+      "membershipCard": {
+        "welcomeTo": "Welcome to",
+        "daysRemaining": "days remaining",
+        "noActiveMembership": "No active membership",
+        "checkIn": "Check in",
+        "purchase": "Purchase"
+      },
+      "upcomingClasses": {
+        "title": "Upcoming Classes",
+        "time": "Time",
+        "burn": "Burn"
+      },
+      "upcomingRoutines": {
+        "title": "Upcoming Routines",
+        "services": "Services",
+        "start": "Start",
+        "purchase": "Purchase"
       }
     },
     "enrollClient": {
@@ -424,8 +454,74 @@
         "fetchUser": "An unexpected error occurred while fetching user data."
       }
     },
+    "insignias": {
+      "title": "My Badges",
+      "currentLevel": "YOUR CURRENT LEVEL",
+      "progressToLevel": "Progress to level {{level}}",
+      "stats": {
+        "points": "Points",
+        "badges": "Badges",
+        "referrals": "Referrals"
+      },
+      "badgesObtained": "Badges Obtained",
+      "progress": "Progress",
+      "rarity": {
+        "common": "Common",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary"
+      },
+      "badgeNames": {
+        "firstClass": "First Class",
+        "ironWarrior": "Iron Warrior",
+        "earlyBird": "Early Bird",
+        "champion": "Champion",
+        "devoted": "Devoted"
+      },
+      "requirements": {
+        "champion": "Win 6 extra challenges",
+        "devoted": "Train 30 days straight"
+      }
+    },
+    "profileSettings": {
+      "title": "Security",
+      "options": "Options",
+      "changePassword": "Change Password"
+    },
+    "changePassword": {
+      "title": "Change Password",
+      "accountSecurity": "Account Security",
+      "updatePassword": "Update your access password",
+      "currentPasswordLabel": "Current Password",
+      "currentPasswordPlaceholder": "Enter your current password",
+      "newPasswordLabel": "New Password",
+      "newPasswordPlaceholder": "Enter your new password",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Repeat your new password",
+      "saveButton": "Save Changes",
+      "savingButton": "Saving...",
+      "errors": {
+        "currentPasswordRequired": "Enter your current password.",
+        "newPasswordMin": "Password must be at least 8 characters.",
+        "uppercase": "Must contain at least one uppercase letter.",
+        "lowercase": "Must contain at least one lowercase letter.",
+        "number": "Must contain at least one number.",
+        "special": "Must contain at least one special character.",
+        "passwordMismatch": "Passwords do not match.",
+        "samePassword": "New password cannot be the same as current.",
+        "noSession": "No active session found",
+        "generic": "An error occurred while changing password.",
+        "incorrectPassword": "Current password is incorrect.",
+        "verifyPassword": "Please verify your current password and try again."
+      },
+      "toast": {
+        "successTitle": "Password Updated",
+        "successMessage": "Password was saved successfully",
+        "errorTitle": "Error"
+      }
+    },
     "myProfile": {
-      "title": "My Profile",
+      "title": "Profile",
       "personalAccount": "Personal Account",
       "firstName": "First Name",
       "lastName": "Last Name",
@@ -433,11 +529,76 @@
       "identityDoc": "Identity Document",
       "birthDate": "Date of Birth",
       "phone": "Phone",
+      "gender": "Gender",
       "edit": "Edit",
       "saveChanges": "Save Changes",
+      "cancel": "Cancel",
+      "level": "Level",
+      "premium": "Premium",
+      "personalInfo": "Personal Information",
+      "contactInfo": "Contact Information",
+      "male": "Male",
+      "female": "Female",
+      "placeholders": {
+        "name": "Name",
+        "lastName": "Last Name",
+        "identityDoc": "Identity Document",
+        "birthDate": "yyyy-mm-dd",
+        "email": "Email",
+        "phone": "Phone",
+        "gender": "Gender"
+      },
+      "errors": {
+        "nameRequired": "Name is required.",
+        "nameLetters": "Name can only contain letters.",
+        "lastNameRequired": "Last name is required.",
+        "lastNameLetters": "Last name can only contain letters.",
+        "documentRequired": "Document is required.",
+        "documentMin": "Document must be at least 6 digits.",
+        "documentNumeric": "Document can only contain numbers.",
+        "birthDateRequired": "Date of birth is required.",
+        "adult": "You must be over 18 years old.",
+        "phoneLength": "Phone number must be between 10 and 15 digits.",
+        "genderRequired": "Gender is required.",
+        "noToken": "Authentication token not found",
+        "noUserId": "User ID not found",
+        "uploadImageError": "Could not upload profile picture",
+        "updateError": "An unexpected error occurred while updating profile."
+      },
+      "permissions": {
+        "title": "Permissions Required",
+        "message": "We need access to your gallery to change profile picture."
+      },
+      "galleryError": "Could not open gallery.",
       "toast": {
         "successTitle": "Profile Updated!",
-        "successMessage": "Your changes were saved successfully"
+        "successMessage": "Your changes were saved successfully",
+        "errorTitle": "Error"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "configure": "Settings",
+      "timeLabels": {
+        "today": "Today",
+        "yesterday": "Yesterday"
+      },
+      "badges": {
+        "gym": "Gym"
+      },
+      "messages": {
+        "classReminder": {
+          "title": "Class Reminder",
+          "body": "You have a Functional Strength class today at 6:00 pm."
+        },
+        "membershipRenewal": {
+          "title": "Renew your membership",
+          "body": "Your membership expires in 3 days. Renew now and get 10% off."
+        },
+        "challengeComplete": {
+          "title": "Challenge complete!",
+          "body": "Congratulations, you completed the weekly challenge. You earned 150 points."
+        }
       }
     },
     "myMembership": {
@@ -455,6 +616,45 @@
       "title": "Language",
       "changeLanguage": "Change Language",
       "selectOption": "Select an option from the configuration options"
+    },
+    "paymentHistory": {
+      "title": "Payment History",
+      "invoice": "Invoice",
+      "searchPlaceholder": "Search...",
+      "filter": "Filter",
+      "filters": {
+        "all": "All",
+        "paid": "Paid",
+        "pending": "Pending",
+        "processing": "Processing",
+        "refunded": "Refunded"
+      },
+      "emptyState": "No payments found",
+      "status": {
+        "paid": "Paid",
+        "pending": "Pending",
+        "processing": "Processing",
+        "refunded": "Refunded"
+      },
+      "details": {
+        "branch": "Branch",
+        "issuedAt": "Issued at",
+        "itemsDetail": "Item details",
+        "reportedPayments": "Reported payments",
+        "quantity": "Qty",
+        "membershipType": "Membership Type",
+        "paymentMethod": "Payment Method",
+        "subtotal": "Subtotal",
+        "tax": "Tax",
+        "total": "Total",
+        "loadError": "Could not load details.",
+        "items": {
+          "billing": "Billing Item",
+          "subscription": "Premium Subscription",
+          "package": "Class Package",
+          "service": "General Service"
+        }
+      }
     },
     "notificationsSettings": {
       "title": "Settings",
@@ -497,6 +697,20 @@
       "periodDays": "/{{days}} days",
       "error": {
         "loadPlans": "Could not load membership plans."
+      },
+      "plans": {
+        "TRIMESTRAL FIT": {
+          "name": "QUARTERLY FIT",
+          "description": "3-month commitment with full access to all facilities and group classes."
+        },
+        "ANUAL BLACK VIP": {
+          "name": "ANNUAL BLACK VIP",
+          "description": "Annual all-inclusive membership with exclusive benefits and unlimited services."
+        },
+        "MENSUAL BÁSICO": {
+          "name": "MONTHLY BASIC",
+          "description": "Unlimited access to weights area, cardio, and basic facilities."
+        }
       }
     },
     "checkout": {
@@ -541,13 +755,42 @@
         "branchNotFound": "No available branch found to assign invoice."
       }
     },
+    "extras": {
+      "title": "EXTRAS",
+      "additionalPackages": "Additional Packages",
+      "subtitle": "Select extra classes or complementary services for your membership.",
+      "added": "ADDED",
+      "clickToAdd": "Click to add",
+      "continueWithExtras": "Continue ({{count}} extras)",
+      "skipExtras": "Skip and continue without extras",
+      "noPackagesAvailable": "No additional packages available at this time.",
+      "error": {
+        "loadPackages": "Could not load additional packages."
+      },
+      "packages": {
+        "PACK INICIO RÁPIDO": {
+          "name": "Quick Start Pack",
+          "description": "The perfect combination of services to begin your fitness transformation."
+        },
+        "PACK SALUD INTEGRAL": {
+          "name": "Holistic Health Pack",
+          "description": "A holistic approach combining training, nutrition, and wellness."
+        },
+        "PACK INTENSIVO PRO": {
+          "name": "Intensive Pro Pack",
+          "description": "A selection of advanced workouts for experienced athletes."
+        }
+      }
+    },
     "confirm": {
       "title": "ORDER SUMMARY",
       "paymentConfig": "Payment Configuration",
       "branch": "BRANCH",
       "currency": "PAYMENT CURRENCY",
       "selectCurrency": "Select Currency",
+      "selectBranch": "Select a branch",
       "detailUSD": "DETAIL (USD)",
+      "tax": "Tax",
       "totalUSD": "Total USD",
       "totalToPay": "Total to Pay",
       "approxRate": "Approx rate:",
@@ -560,6 +803,12 @@
         "invalidSession": "Invalid session",
         "invoiceIdMissing": "Invoice ID reference not received"
       }
+    },
+    "methods": {
+      "title": "PAYMENT METHOD",
+      "selectPaymentMethod": "Select Payment Method",
+      "subtitle": "Choose how you want to complete your transaction",
+      "noMethodsAvailable": "No payment methods available at this branch."
     },
     "payment": {
       "method": {
@@ -591,6 +840,7 @@
         "subtitle": "Report your transaction details",
         "destinationAccount": "DESTINATION ACCOUNT",
         "total": "TOTAL TO TRANSFER",
+        "order": "Order",
         "senderName": "Account Holder Name",
         "senderNamePlaceholder": "Who made the transfer",
         "reference": "Reference Number / Confirmation",
@@ -677,6 +927,39 @@
         "title": "My Clients",
         "assignRoutine": "Assign New Routine",
         "viewProgress": "View Progress"
+      }
+    },
+    "client": {
+      "profile": {
+        "defaultUser": "Client",
+        "personalTrainer": "Personal Trainer",
+        "level": "Level",
+        "premium": "Premium",
+        "aboutMe": "About me",
+        "aboutMeDescription": "From your profile you can manage your personal information, review your membership and configure your notifications and account preferences.",
+        "stats": {
+          "workouts": "Workouts",
+          "badges": "Badges",
+          "points": "Points"
+        },
+        "checkIn": "Check in",
+        "referralCode": "Referral code",
+        "settings": "Settings",
+        "personalInfo": "Personal information",
+        "security": "Security",
+        "myMembership": "My membership",
+        "badges": "Badges",
+        "language": "Language",
+        "notifications": "Notifications",
+        "helpSupport": "Help and support",
+        "termsConditions": "Terms and conditions",
+        "paymentHistory": "Payment history",
+        "logout": "Logout",
+        "logoutConfirm": {
+          "title": "Logout?",
+          "message": "Your current session will be closed and you will need to log in again.",
+          "cancel": "Cancel"
+        }
       }
     },
     "validations": {

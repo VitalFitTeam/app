@@ -269,7 +269,7 @@ export default function InstructorProfilePersonalScreen() {
                         <ChevronLeftIcon width={20} height={20} color='#f97316' />
                     </TouchableOpacity>
 
-                    <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Perfil Instructor</Text>
+                    <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Perfil Instructor</Text>
                 </View>
 
                 <View className='mb-4 items-center'>
@@ -292,11 +292,11 @@ export default function InstructorProfilePersonalScreen() {
                             </View>
                         )}
                     </TouchableOpacity>
-                    <Text style={{ color: '#111827', fontSize: 20, fontWeight: '600' }}>{displayName}</Text>
-                    
+                    <Text className='font-body' style={{ color: '#111827', fontSize: 20, fontWeight: '600' }}>{displayName}</Text>
+
                     {/* Instructor Specific: Specialty instead of Level/Medal */}
-                    <Text style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>{user?.specialty || 'Entrenador Personal'}</Text>
-                    <Text style={{ color: '#f97316', fontSize: 13, marginTop: 2 }}>{user?.roleName || 'Instructor'}</Text>
+                    <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>{user?.specialty || 'Entrenador Personal'}</Text>
+                    <Text className='font-body' style={{ color: '#f97316', fontSize: 13, marginTop: 2 }}>{user?.roleName || 'Instructor'}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', gap: 8, marginBottom: 20 }}>
@@ -309,7 +309,7 @@ export default function InstructorProfilePersonalScreen() {
                         {saving ? (
                             <ActivityIndicator size='small' color='#ffffff' />
                         ) : (
-                            <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>
+                            <Text className='font-body' style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>
                                 {isEditing ? 'Guardar cambios' : 'Editar'}
                             </Text>
                         )}
@@ -322,7 +322,7 @@ export default function InstructorProfilePersonalScreen() {
                             style={{ backgroundColor: '#9CA3AF' }}
                             onPress={handleCancelEdit}
                             disabled={saving}>
-                            <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>Cancelar</Text>
+                            <Text className='font-body' style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>Cancelar</Text>
                         </TouchableOpacity>
                     )}
                 </View>
@@ -330,10 +330,10 @@ export default function InstructorProfilePersonalScreen() {
                 <View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
                     <View className='flex-row items-center mb-3'>
                         <UserCircleIcon width={18} height={18} color='#111827' />
-                        <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>Información Personal</Text>
+                        <Text className='font-heading' style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>Información Personal</Text>
                     </View>
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Nombre</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Nombre</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -359,7 +359,7 @@ export default function InstructorProfilePersonalScreen() {
                         />
                     )}
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Apellido</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Apellido</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -385,7 +385,7 @@ export default function InstructorProfilePersonalScreen() {
                         />
                     )}
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Documento de identidad</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Documento de identidad</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -414,7 +414,7 @@ export default function InstructorProfilePersonalScreen() {
                     )}
 
                     {/* Specialty is displayed but NOT editable as it's not part of the form/API payload for now */}
-                     <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Especialidad</Text>
+                     <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Especialidad</Text>
                      <TextInput
                         editable={false}
                         value={user?.specialty}
@@ -423,7 +423,7 @@ export default function InstructorProfilePersonalScreen() {
                         style={styles.readOnlyInput}
                     />
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Fecha de nacimiento</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Fecha de nacimiento</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -479,7 +479,7 @@ export default function InstructorProfilePersonalScreen() {
                         </View>
                     )}
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Género</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Género</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -491,16 +491,16 @@ export default function InstructorProfilePersonalScreen() {
                                             activeOpacity={0.7}
                                             onPress={() => onChange('M')}
                                             style={[styles.genderButton, { backgroundColor: value === 'M' ? '#f97316' : '#E5E7EB' }]}>
-                                            <Text style={{ color: value === 'M' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>Masculino</Text>
+                                            <Text className='font-body' style={{ color: value === 'M' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>Masculino</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity
                                             activeOpacity={0.7}
                                             onPress={() => onChange('F')}
                                             style={[styles.genderButton, { backgroundColor: value === 'F' ? '#f97316' : '#E5E7EB' }]}>
-                                            <Text style={{ color: value === 'F' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>Femenino</Text>
+                                            <Text className='font-body' style={{ color: value === 'F' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>Femenino</Text>
                                         </TouchableOpacity>
                                     </View>
-                                    {errors.gender && <Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{errors.gender.message}</Text>}
+                                    {errors.gender && <Text className='font-body' style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{errors.gender.message}</Text>}
                                 </View>
                             )}
                         />
@@ -518,10 +518,10 @@ export default function InstructorProfilePersonalScreen() {
                 <View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
                     <View className='flex-row items-center mb-3'>
                         <PhoneIcon width={18} height={18} color='#111827' />
-                        <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>Información de contacto</Text>
+                        <Text className='font-heading' style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>Información de contacto</Text>
                     </View>
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Correo electrónico</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Correo electrónico</Text>
                     <TextInput
                         editable={false}
                         value={user?.email}
@@ -531,7 +531,7 @@ export default function InstructorProfilePersonalScreen() {
                         style={styles.readOnlyInput}
                     />
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Teléfono</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Teléfono</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -554,7 +554,7 @@ export default function InstructorProfilePersonalScreen() {
                                             input: styles.phoneInput,
                                         }}
                                     />
-                                    {errors.phone && <Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{errors.phone.message}</Text>}
+                                    {errors.phone && <Text className='font-body' style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{errors.phone.message}</Text>}
                                 </View>
                             )}
                         />

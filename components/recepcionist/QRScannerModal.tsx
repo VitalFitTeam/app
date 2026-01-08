@@ -25,12 +25,12 @@ export const QRScannerModal: React.FC<Props> = ({ visible, onClose, onScan }) =>
         return (
             <Modal visible={visible} animationType="slide" transparent>
                 <ThemedView style={styles.container}>
-                    <Text style={styles.message}>{t('scanner.permission.message')}</Text>
+                    <Text className='font-body' style={styles.message}>{t('scanner.permission.message')}</Text>
                     <TouchableOpacity onPress={requestPermission} style={styles.button}>
-                        <Text style={styles.buttonText}>{t('scanner.permission.button')}</Text>
+                        <Text className='font-body' style={styles.buttonText}>{t('scanner.permission.button')}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={onClose} style={styles.closeButtonText}>
-                        <Text style={{ color: 'white', marginTop: 20 }}>{t('common.cancel')}</Text>
+                        <Text className='font-body' style={{ color: 'white', marginTop: 20 }}>{t('common.cancel')}</Text>
                     </TouchableOpacity>
                 </ThemedView>
             </Modal>
@@ -85,7 +85,7 @@ export const QRScannerModal: React.FC<Props> = ({ visible, onClose, onScan }) =>
                 </TouchableOpacity>
 
                 <View style={styles.instructionContainer}>
-                    <Text style={styles.instructionText}>
+                    <Text className='font-body' style={styles.instructionText}>
                         {processing ? t('scanner.validating') : t('scanner.instruction')}
                     </Text>
                 </View>

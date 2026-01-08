@@ -35,7 +35,7 @@ export default {
 			[
 				'expo-splash-screen',
 				{
-					image: './assets/images/isotipo.svg',
+					image: './assets/images/isotipo.png',
 					imageWidth: 200,
 					resizeMode: 'contain',
 					backgroundColor: '#ffffff',
@@ -51,6 +51,8 @@ export default {
 				},
 			],
 			'expo-font',
+			'expo-localization',
+			'expo-web-browser',
 		],
 		experiments: {
 			typedRoutes: true,
@@ -58,7 +60,7 @@ export default {
 		extra: {
 			router: {},
 			eas: {
-				projectId: '9082188e-00ad-4870-a784-a22d7a9af57a',
+				projectId: "3d30457b-07b3-4a1a-9700-dc7fc3df59f2"
 			},
 			EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL,
 		},

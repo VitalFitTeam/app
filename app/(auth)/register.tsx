@@ -5,7 +5,7 @@ import { Step3PersonalDetails } from '@/components/auth/register/Step3PersonalDe
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { useToast } from '@/hooks/useToast';
 import { createRegisterSchema, createStep1Schema, createStep2Schema, RegisterData } from '@/schemas/register';
 import vitalFitApi from '@/services/vitalfitSdk';
@@ -215,24 +215,24 @@ export default function RegisterScreen() {
                         <Logo />
 
                         {step === 1 && (
-                            <ThemedText style={[styles.mainTitle, { fontFamily: Fonts.title }]}>
+                            <ThemedText className='font-heading' style={styles.mainTitle}>
                                 {t('register.step1Title')}
                             </ThemedText>
                         )}
 
                         {step === 2 && (
                             <>
-                                <ThemedText style={[styles.mainTitle, { fontFamily: Fonts.title }]}>
+                                <ThemedText className='font-heading' style={styles.mainTitle}>
                                     {t('register.step2Title')}
                                 </ThemedText>
-                                <Text className='text-gray-500 text-center mb-8 text-lg'>
+                                <Text className='font-body text-gray-500 text-center mb-8 text-lg'>
                                     {t('register.step2Subtitle')}
                                 </Text>
                             </>
                         )}
 
                         {step === 3 && (
-                            <Text className='text-gray-500 text-center mb-8 text-lg'>
+                            <Text className='font-body text-gray-500 text-center mb-8 text-lg'>
                                 {t('register.step3Subtitle')}
                             </Text>
                         )}

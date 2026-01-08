@@ -25,6 +25,7 @@ export default function RoutinesCarousel({
     <View style={{ marginBottom: 16 }}>
       {showTitle && (
         <Text
+          className='font-heading'
           style={{
             fontFamily: 'BebasNeue-Regular',
             fontSize: 28,
@@ -55,7 +56,7 @@ export default function RoutinesCarousel({
           >
             <View style={{ alignItems: 'center' }}>
               <Image source={it.image} style={{ width: 48, height: 48, tintColor: '#F27F2A', marginBottom: 10 }} resizeMode="contain" />
-              <Text style={{ color: '#FFFFFF', fontWeight: '700', textAlign: 'center' }}>{it.label}</Text>
+              <Text className='font-body' style={{ color: '#FFFFFF', fontWeight: '700', textAlign: 'center' }}>{it.label}</Text>
             </View>
           </LinearGradient>
         ))}

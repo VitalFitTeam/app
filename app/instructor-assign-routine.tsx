@@ -80,19 +80,19 @@ export default function InstructorAssignRoutineScreen() {
             <UserIcon width={40} height={40} color='#f97316' />
           </View>
 
-          <Text style={{ color: '#111827', fontSize: 20, fontWeight: '700', marginBottom: 2 }}>
+          <Text style={{ color: '#111827', fontSize: 20, fontWeight: '700', marginBottom: 2 }} className="font-body">
             {clientName}
           </Text>
-          <Text style={{ color: '#6b7280', fontSize: 14 }}>{clientLevel}</Text>
+          <Text style={{ color: '#6b7280', fontSize: 14 }} className="font-body">{clientLevel}</Text>
         </View>
         <View style={{ marginBottom: 16 }}>
-          <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }}>Seleccionar rutina</Text>
+          <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }} className="font-body">Seleccionar rutina</Text>
           <TouchableOpacity
             activeOpacity={0.8}
             style={{ borderRadius: 16, borderWidth: 1, borderColor: '#e5e7eb', paddingHorizontal: 12, paddingVertical: 10, backgroundColor: '#FFFFFF' }}
           >
-            <Text style={{ color: '#111827', fontSize: 14, fontWeight: '500' }}>Rutina fuerza - Semana 1</Text>
-            <Text style={{ color: '#6b7280', fontSize: 12, marginTop: 2 }}>{currentProgram}</Text>
+            <Text style={{ color: '#111827', fontSize: 14, fontWeight: '500' }} className="font-body">Rutina fuerza - Semana 1</Text>
+            <Text style={{ color: '#6b7280', fontSize: 12, marginTop: 2 }} className="font-body">{currentProgram}</Text>
           </TouchableOpacity>
         </View>
         <View style={{ marginBottom: 16 }}>
@@ -108,22 +108,22 @@ export default function InstructorAssignRoutineScreen() {
             }}
           >
             <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }}>{clientLevel.replace('Nivel ', '') || '1'}</Text>
-              <Text style={{ color: '#4B5563', fontSize: 12 }}>Nivel</Text>
+              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">{clientLevel.replace('Nivel ', '') || '1'}</Text>
+              <Text style={{ color: '#4B5563', fontSize: 12 }} className="font-body">Nivel</Text>
             </View>
 
             <View style={{ width: 1, height: 32, backgroundColor: '#D1D5DB' }} />
 
             <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }}>4/5</Text>
-              <Text style={{ color: '#4B5563', fontSize: 12 }}>progreso</Text>
+              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">4/5</Text>
+              <Text style={{ color: '#4B5563', fontSize: 12 }} className="font-body">progreso</Text>
             </View>
 
             <View style={{ width: 1, height: 32, backgroundColor: '#D1D5DB' }} />
 
             <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }}>3/4</Text>
-              <Text style={{ color: '#4B5563', fontSize: 12, textAlign: 'center' }}>Entrenamientos</Text>
+              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">3/4</Text>
+              <Text style={{ color: '#4B5563', fontSize: 12, textAlign: 'center' }} className="font-body">Entrenamientos</Text>
             </View>
           </View>
         </View>
@@ -145,7 +145,7 @@ export default function InstructorAssignRoutineScreen() {
               }}
             >
               <UserGroupIcon width={18} height={18} color='#f97316' />
-              <Text style={{ color: '#111827', fontSize: 14, fontWeight: '600', marginLeft: 6 }}>
+              <Text style={{ color: '#111827', fontSize: 14, fontWeight: '600', marginLeft: 6 }} className="font-body">
                 Detalles de la rutina seleccionada
               </Text>
             </View>
@@ -159,13 +159,13 @@ export default function InstructorAssignRoutineScreen() {
                 end={{ x: 1, y: 0.5 }}
                 style={{ borderRadius: 16, padding: 14, marginBottom: 12 }}
               >
-                <Text style={{ color: '#FFFFFF', fontWeight: '500', fontSize: 16, marginBottom: 10 }}>
+                <Text style={{ color: '#FFFFFF', fontWeight: '500', fontSize: 16, marginBottom: 10 }} className="font-body">
                   {ex.title}
                 </Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <View>
-                    <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }}>Tiempo</Text>
-                    <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.time}</Text>
+                    <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">Tiempo</Text>
+                    <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.time}</Text>
                   </View>
                 </View>
               </LinearGradient>
@@ -173,7 +173,7 @@ export default function InstructorAssignRoutineScreen() {
           </View>
         </View>
         <View style={{ marginBottom: 20 }}>
-          <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }}>Notas de la rutina</Text>
+          <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }} className="font-body">Notas de la rutina</Text>
           <TextInput
             placeholder='Instrucciones personalizadas para el cliente'
             placeholderTextColor='#9CA3AF'
@@ -196,7 +196,7 @@ export default function InstructorAssignRoutineScreen() {
           style={{ width: '100%', paddingVertical: 14, borderRadius: 16, backgroundColor: '#f97316', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}
           onPress={() => router.back()}
         >
-          <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>Asignar rutina</Text>
+          <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }} className="font-body">Asignar rutina</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -204,7 +204,7 @@ export default function InstructorAssignRoutineScreen() {
           style={{ width: '100%', paddingVertical: 14, borderRadius: 16, backgroundColor: '#4b5563', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}
           onPress={() => router.back()}
         >
-          <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>Volver a Mis clientes</Text>
+          <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }} className="font-body">Volver a Mis clientes</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

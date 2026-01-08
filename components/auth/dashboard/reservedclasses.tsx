@@ -11,8 +11,8 @@ export const ReservedClassesCard: React.FC<Props> = ({ reserved }) => {
 
 	return (
 		<View style={[styles.card, { width: cardWidth }]}>
-			<Text style={styles.title}>CLASES RESERVADAS</Text>
-			<Text style={styles.value}>{reserved}</Text>
+			<Text className='font-body' style={styles.title}>CLASES RESERVADAS</Text>
+			<Text className='font-body' style={styles.value}>{reserved}</Text>
 		</View>
 	);
 };

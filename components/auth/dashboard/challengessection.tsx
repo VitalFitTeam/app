@@ -35,10 +35,10 @@ export const ChallengesSection: React.FC<Props> = ({ challenges }) => {
 				{challenges.map((challenge) => (
 					<View key={challenge.id} style={styles.card}>
 						<View style={styles.iconContainer}>{renderIcon(challenge.iconType)}</View>
-						<Text style={styles.value}>
+						<Text className='font-heading' style={styles.value}>
 							{challenge.current}/{challenge.total}
 						</Text>
-						<Text style={styles.label} numberOfLines={2}>
+						<Text className='font-body' style={styles.label} numberOfLines={2}>
 							{challenge.title.replace(' ', '\n')}
 						</Text>
 					</View>

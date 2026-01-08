@@ -133,7 +133,7 @@ export default function InstructorChangePasswordScreen() {
               <ChevronLeftIcon width={20} height={20} color='#f97316' />
             </TouchableOpacity>
 
-            <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>
+            <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }} className="font-heading">
               Cambiar contraseña
             </Text>
           </View>
@@ -143,8 +143,8 @@ export default function InstructorChangePasswordScreen() {
               <ShieldCheckIcon width={20} height={20} color='#111827' />
             </View>
             <View className='flex-1'>
-              <Text className='text-[15px] font-semibold text-[#111827]'>Seguridad de la cuenta</Text>
-              <Text className='text-[12px] text-[#6b7280]'>Actualiza tu contraseña de acceso</Text>
+              <Text className='text-[15px] font-semibold text-[#111827] font-heading'>Seguridad de la cuenta</Text>
+              <Text className='text-[12px] text-[#6b7280] font-body'>Actualiza tu contraseña de acceso</Text>
             </View>
           </View>
 
@@ -157,7 +157,7 @@ export default function InstructorChangePasswordScreen() {
                 paddingHorizontal: 10,
                 marginBottom: 12,
               }}>
-              <Text style={{ color: '#B91C1C', fontSize: 12 }}>{errorMessage}</Text>
+              <Text style={{ color: '#B91C1C', fontSize: 12 }} className="font-body">{errorMessage}</Text>
             </View>
           )}
 

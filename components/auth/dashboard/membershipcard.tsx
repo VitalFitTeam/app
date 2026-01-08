@@ -10,6 +10,7 @@ import {
 	View,
 } from 'react-native';
 import { QrCodeIcon } from 'react-native-heroicons/outline';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
 	hasMembership: boolean;
@@ -30,12 +31,13 @@ export const MembershipCard: React.FC<Props> = ({
 	membershipStatus = 'Membresía activa',
 	gymImage = require('@/assets/images/Mask group.png'),
 }) => {
+	const { t } = useTranslation();
 	const { width } = Dimensions.get('window');
 	const cardWidth = Math.min(width - 32, 600);
 
 	const effectiveStatusText = hasMembership
-		? `${membershipStatus}: ${daysRemaining} días restantes`
-		: 'No tiene membresía activa';
+		? `${membershipStatus}: ${daysRemaining} ${t('dashboard.membershipCard.daysRemaining')}`
+		: t('dashboard.membershipCard.noActiveMembership');
 
 	const handlePress = () => {
 		if (hasMembership) {
@@ -52,9 +54,9 @@ export const MembershipCard: React.FC<Props> = ({
 			start={{ x: 0, y: 0.5 }}
 			end={{ x: 1, y: 0.5 }}
 			style={[styles.card, { width: cardWidth }]}>
-			<Text style={styles.welcomeText}>Bienvenido a {hasMembership ? gymName : 'VitalFit'}</Text>
+			<Text className='font-heading' style={styles.welcomeText}>{t('dashboard.membershipCard.welcomeTo')} {hasMembership ? gymName : 'VitalFit'}</Text>
 
-			<Text style={styles.membershipText}>{effectiveStatusText}</Text>
+			<Text className='font-body' style={styles.membershipText}>{effectiveStatusText}</Text>
 
 			<View style={styles.bottomContainer}>
 				{hasMembership && (
@@ -68,7 +70,7 @@ export const MembershipCard: React.FC<Props> = ({
 					{hasMembership && (
 						<QrCodeIcon size={24} color='#FFFFFF' style={styles.qrIcon} />
 					)}
-					<Text style={styles.checkInText}>{hasMembership ? 'Check in' : 'Comprar'}</Text>
+					<Text className='font-body' style={styles.checkInText}>{hasMembership ? t('dashboard.membershipCard.checkIn') : t('dashboard.membershipCard.purchase')}</Text>
 				</TouchableOpacity>
 			</View>
 		</LinearGradient>

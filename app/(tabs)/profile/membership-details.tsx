@@ -33,37 +33,37 @@ export default function MembershipDetailsScreen() {
             <ChevronLeftIcon width={20} height={20} color="#f97316" />
           </TouchableOpacity>
 
-          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Detalles de membresía</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Detalles de membresía</Text>
         </View>
 
         <View className="mb-4">
-          <Text className="text-[14px] font-semibold text-[#111827] mb-2">Plan actual</Text>
+          <Text className="font-heading text-[14px] font-semibold text-[#111827] mb-2">Plan actual</Text>
 
           <View
             className="rounded-2xl px-4 py-4 border"
             style={{ backgroundColor: '#FFFFFF', borderColor: '#F97316' }}>
             <View className="flex-row items-center justify-between mb-2">
               <View>
-                <Text className="text-xs mb-1" style={{ color: '#6B7280' }}>
+                <Text className="font-body text-xs mb-1" style={{ color: '#6B7280' }}>
                   SUSCRIPCIÓN AVANZADA
                 </Text>
-                <Text className="text-lg font-semibold" style={{ color: '#F97316' }}>
+                <Text className="font-heading text-lg font-semibold" style={{ color: '#F97316' }}>
                   Más beneficios para tu vida fitness
                 </Text>
               </View>
 
               <View className="px-3 py-1 rounded-full" style={{ backgroundColor: '#FEF3C7' }}>
-                <Text className="text-[10px] font-semibold" style={{ color: '#F97316' }}>
+                <Text className="font-body text-[10px] font-semibold" style={{ color: '#F97316' }}>
                   Activo
                 </Text>
               </View>
             </View>
 
             <View className="mb-4">
-              <Text className="text-xs mb-1" style={{ color: '#6B7280' }}>
+              <Text className="font-body text-xs mb-1" style={{ color: '#6B7280' }}>
                 Fecha de vencimiento
               </Text>
-              <Text className="text-xs" style={{ color: '#111827' }}>
+              <Text className="font-body text-xs" style={{ color: '#111827' }}>
                 11 de Diciembre del 2025
               </Text>
             </View>
@@ -72,7 +72,7 @@ export default function MembershipDetailsScreen() {
               {benefits.map(item => (
                 <View key={item} className="flex-row items-start mb-1">
                   <View className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#F97316' }} />
-                  <Text className="text-xs ml-2" style={{ color: '#111827' }}>
+                  <Text className="font-body text-xs ml-2" style={{ color: '#111827' }}>
                     {item}
                   </Text>
                 </View>
@@ -82,7 +82,7 @@ export default function MembershipDetailsScreen() {
         </View>
 
         <View className="mb-4">
-          <Text className="text-[14px] font-semibold text-[#111827] mb-2">Servicios incluidos</Text>
+          <Text className="font-heading text-[14px] font-semibold text-[#111827] mb-2">Servicios incluidos</Text>
 
           <View
             className="rounded-2xl px-4 py-4 border"
@@ -90,7 +90,7 @@ export default function MembershipDetailsScreen() {
             {includedServices.map(service => (
               <View key={service} className="flex-row items-start mb-1">
                 <View className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#F97316' }} />
-                <Text className="text-xs ml-2" style={{ color: '#111827' }}>
+                <Text className="font-body text-xs ml-2" style={{ color: '#111827' }}>
                   {service}
                 </Text>
               </View>
@@ -99,12 +99,12 @@ export default function MembershipDetailsScreen() {
         </View>
 
         <View className="mb-4">
-          <Text className="text-[14px] font-semibold text-[#111827] mb-2">Restricciones</Text>
+          <Text className="font-heading text-[14px] font-semibold text-[#111827] mb-2">Restricciones</Text>
 
           <View
             className="rounded-2xl px-4 py-4 border"
             style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' }}>
-            <Text className="text-xs" style={{ color: '#111827' }}>
+            <Text className="font-body text-xs" style={{ color: '#111827' }}>
               Cancelaciones requieren notificación 30 días antes de la fecha de renovación.
             </Text>
           </View>
@@ -115,11 +115,11 @@ export default function MembershipDetailsScreen() {
             className="rounded-2xl border px-4 py-4"
             style={{ borderColor: '#DC2626', backgroundColor: '#FFFFFF' }}>
             <Text
-              className="text-[12px] font-semibold mb-1"
+              className="font-heading text-[12px] font-semibold mb-1"
               style={{ color: '#B91C1C' }}>
               CANCELAR MEMBRESÍA
             </Text>
-            <Text className="text-xs mb-4" style={{ color: '#B91C1C' }}>
+            <Text className="font-body text-xs mb-4" style={{ color: '#B91C1C' }}>
               Tu membresía permanecerá activa hasta el 31 de Dic 2024.
             </Text>
 
@@ -130,7 +130,7 @@ export default function MembershipDetailsScreen() {
               onPress={() => {
                 router.push('/profile/cancel-membership');
               }}>
-              <Text className="text-sm font-semibold" style={{ color: '#FFFFFF' }}>
+              <Text className="font-body text-sm font-semibold" style={{ color: '#FFFFFF' }}>
                 Cancelar renovación
               </Text>
             </TouchableOpacity>

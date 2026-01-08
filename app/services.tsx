@@ -43,17 +43,17 @@ function ServiceCardComponent({
 
         <View className='flex-1 justify-between'>
           <View>
-            <ThemedText className='mb-1 text-lg font-bold text-neutral-900' numberOfLines={1}>
+            <ThemedText className='font-body mb-1 text-lg font-bold text-neutral-900' numberOfLines={1}>
               {item.name}
             </ThemedText>
 
-            <ThemedText className='mt-1 text-xs text-neutral-500' numberOfLines={2}>
+            <ThemedText className='font-body mt-1 text-xs text-neutral-500' numberOfLines={2}>
               {item.description || 'Servicio exclusivo VitalFit.'}
             </ThemedText>
           </View>
 
           <View className='mt-2 flex-row items-center justify-between'>
-            <ThemedText className='text-xl font-bold text-orange-500'>
+            <ThemedText className='font-heading text-xl font-bold text-orange-500'>
               ${item.price}
             </ThemedText>
 
@@ -61,7 +61,7 @@ function ServiceCardComponent({
               onPress={() => onBuy(item)}
               className='rounded-full px-4 py-2'
               style={{ backgroundColor: '#F27F2A' }}>
-              <ThemedText className='text-xs font-bold text-white'>
+              <ThemedText className='font-body text-xs font-bold text-white'>
                 Comprar
               </ThemedText>
             </TouchableOpacity>
@@ -159,12 +159,12 @@ export default function ServicesScreen() {
     <SafeAreaView className='flex-1 bg-neutral-50'>
       <View className='px-6 pb-2 pt-4'>
         <ThemedText
-          className='mb-1 text-3xl font-extrabold text-neutral-900'
+          className='font-heading mb-1 text-3xl font-extrabold text-neutral-900'
           style={{ fontFamily: 'BebasNeue-Regular' }}>
           SERVICIOS
         </ThemedText>
 
-        <ThemedText className='mb-4 text-sm text-neutral-500'>
+        <ThemedText className='font-body mb-4 text-sm text-neutral-500'>
           Personaliza tu experiencia con extras.
         </ThemedText>
       </View>

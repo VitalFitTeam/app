@@ -39,7 +39,7 @@ export default function RoutineDetailsScreen() {
         </View>
 
         <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
-          <Text style={{ color: '#111827', fontWeight: '700', fontSize: 16, marginBottom: 8 }}>LISTA DE EJERCICIOS</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontWeight: '700', fontSize: 16, marginBottom: 8 }}>LISTA DE EJERCICIOS</Text>
           <View style={{ height: 8, backgroundColor: '#E5E7EB', borderRadius: 4, overflow: 'hidden', marginBottom: 16 }}>
             <View style={{ width: '40%', height: '100%', backgroundColor: '#F27F2A' }} />
           </View>
@@ -57,28 +57,28 @@ export default function RoutineDetailsScreen() {
                   <CheckCircleIcon size={20} color="#F27F2A" />
                 </View>
 
-                <Text style={{ color: '#FFFFFF', fontWeight: '500', fontSize: 16, marginBottom: 10 }}>{ex.title}</Text>
+                <Text className='font-body' style={{ color: '#FFFFFF', fontWeight: '500', fontSize: 16, marginBottom: 10 }}>{ex.title}</Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
                   <View>
-                    <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: '400' }}>Day</Text>
-                    <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.day}</Text>
+                    <Text className='font-body' style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: '400' }}>Day</Text>
+                    <Text className='font-body' style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.day}</Text>
                   </View>
                   <View>
-                    <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: '400' }}>Series</Text>
-                    <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.series}</Text>
+                    <Text className='font-body' style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: '400' }}>Series</Text>
+                    <Text className='font-body' style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.series}</Text>
                   </View>
                   <View>
-                    <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: '400' }}>Repeticiones</Text>
-                    <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.reps}</Text>
+                    <Text className='font-body' style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: '400' }}>Repeticiones</Text>
+                    <Text className='font-body' style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.reps}</Text>
                   </View>
                   <View>
-                    <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: '400' }}>Tiempo</Text>
-                    <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.time}</Text>
+                    <Text className='font-body' style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: '400' }}>Tiempo</Text>
+                    <Text className='font-body' style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.time}</Text>
                   </View>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
                   <TouchableOpacity activeOpacity={0.8} style={{ backgroundColor: '#F27F2A', borderRadius: 16, paddingHorizontal: 16, paddingVertical: 8 }}>
-                    <Text style={{ color: '#111827', fontWeight: '800' }}>Comenzar</Text>
+                    <Text className='font-body' style={{ color: '#111827', fontWeight: '800' }}>Comenzar</Text>
                   </TouchableOpacity>
                 </View>
               </LinearGradient>

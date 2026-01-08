@@ -25,7 +25,7 @@ const SettingItem = ({ label }: { label: string }) => {
 				<BellIcon size={24} color='#f97316' />
 			</View>
 			<View className='flex-1'>
-				<Text style={{ fontSize: 14, fontWeight: '600', color: '#000000' }}>{label}</Text>
+				<Text className='font-body' style={{ fontSize: 14, fontWeight: '600', color: '#000000' }}>{label}</Text>
 			</View>
 			<Switch
 				trackColor={{ false: '#767577', true: '#f97316' }}

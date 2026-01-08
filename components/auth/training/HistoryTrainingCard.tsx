@@ -30,12 +30,12 @@ export default function HistoryTrainingCard({ title, subtitle, progressPercent, 
         />
 
         <View style={{ position: 'absolute', left: 12, right: 72, top: 12 }}>
-          <Text style={{ color: '#fff', fontWeight: '800', fontSize: 18 }}>
+          <Text className='font-body' style={{ color: '#fff', fontWeight: '800', fontSize: 18 }}>
             {title}
           </Text>
-          <Text style={{ color: '#E5E7EB', fontWeight: '600', fontSize: 12, marginTop: 2 }}>{subtitle}</Text>
-          <Text style={{ color: '#E5E7EB', fontSize: 12, marginTop: 2 }}>Instructor: {instructor}</Text>
-          <Text style={{ color: '#E5E7EB', fontSize: 12, marginTop: 2 }}>Duración: {duration}</Text>
+          <Text className='font-body' style={{ color: '#E5E7EB', fontWeight: '600', fontSize: 12, marginTop: 2 }}>{subtitle}</Text>
+          <Text className='font-body' style={{ color: '#E5E7EB', fontSize: 12, marginTop: 2 }}>Instructor: {instructor}</Text>
+          <Text className='font-body' style={{ color: '#E5E7EB', fontSize: 12, marginTop: 2 }}>Duración: {duration}</Text>
         </View>
 
         <View style={{ position: 'absolute', right: 12, top: 12, width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(17,24,39,0.6)' }}>
@@ -54,7 +54,7 @@ export default function HistoryTrainingCard({ title, subtitle, progressPercent, 
               </Svg>
             );
           })()}
-          <Text style={{ position: 'absolute', color: '#F27F2A', fontWeight: '700', fontSize: 11 }}>{Math.round(progressPercent)}%</Text>
+          <Text className='font-body' style={{ position: 'absolute', color: '#F27F2A', fontWeight: '700', fontSize: 11 }}>{Math.round(progressPercent)}%</Text>
         </View>
       </View>
     </TouchableOpacity>

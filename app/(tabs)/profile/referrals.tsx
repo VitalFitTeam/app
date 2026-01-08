@@ -94,7 +94,7 @@ export default function ReferralsScreen() {
             <ChevronLeftIcon width={20} height={20} color='#f97316' />
           </TouchableOpacity>
 
-          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Programa de referidos</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Programa de referidos</Text>
         </View>
 
         <View className='flex-row mb-4'>
@@ -102,28 +102,28 @@ export default function ReferralsScreen() {
             className='flex-1 items-center py-3 rounded-2xl mr-2'
             style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1 }}>
             <UserGroupIcon width={20} height={20} color='#F97316' />
-            <Text style={{ color: '#111827', fontSize: 18, fontWeight: '600', marginTop: 4 }}>5</Text>
-            <Text style={{ color: '#6B7280', fontSize: 11 }}>Referidos activos</Text>
+            <Text className='font-heading' style={{ color: '#111827', fontSize: 18, fontWeight: '600', marginTop: 4 }}>5</Text>
+            <Text className='font-body' style={{ color: '#6B7280', fontSize: 11 }}>Referidos activos</Text>
           </View>
 
           <View
             className='flex-1 items-center py-3 rounded-2xl ml-2'
             style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1 }}>
             <GiftIcon width={20} height={20} color='#F97316' />
-            <Text style={{ color: '#111827', fontSize: 18, fontWeight: '600', marginTop: 4 }}>2,500</Text>
-            <Text style={{ color: '#6B7280', fontSize: 11 }}>Puntos ganados</Text>
+            <Text className='font-heading' style={{ color: '#111827', fontSize: 18, fontWeight: '600', marginTop: 4 }}>2,500</Text>
+            <Text className='font-body' style={{ color: '#6B7280', fontSize: 11 }}>Puntos ganados</Text>
           </View>
         </View>
 
         <View className='items-center mb-4'>
-          <Text style={{ color: '#6B7280', fontSize: 12, letterSpacing: 1 }}>TU CÓDIGO DE REFERIDO</Text>
+          <Text className='font-body' style={{ color: '#6B7280', fontSize: 12, letterSpacing: 1 }}>TU CÓDIGO DE REFERIDO</Text>
 
           <View className='items-center justify-center mt-6 mb-4'>
             <QrCodeIcon width={80} height={80} color='#111827' />
           </View>
 
           <View className='flex-row items-center justify-center mb-2'>
-            <Text style={{ color: '#111827', fontSize: 14, fontWeight: '600', marginRight: 8 }}>
+            <Text className='font-body' style={{ color: '#111827', fontSize: 14, fontWeight: '600', marginRight: 8 }}>
               {displayName}
             </Text>
             <TouchableOpacity activeOpacity={0.8} onPress={handleCopyCode}>
@@ -132,6 +132,7 @@ export default function ReferralsScreen() {
           </View>
 
           <Text
+            className='font-body'
             style={{
               color: '#4B5563',
               fontSize: 12,
@@ -148,7 +149,7 @@ export default function ReferralsScreen() {
             className='flex-1 items-center py-2 rounded-2xl mr-2'
             style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1 }}>
             <ShareIcon width={18} height={18} color='#111827' />
-            <Text style={{ color: '#111827', fontSize: 11, marginTop: 4 }}>Compartir</Text>
+            <Text className='font-body' style={{ color: '#111827', fontSize: 11, marginTop: 4 }}>Compartir</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -156,7 +157,7 @@ export default function ReferralsScreen() {
             className='flex-1 items-center py-2 rounded-2xl mx-1'
             style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1 }}>
             <ChatBubbleBottomCenterTextIcon width={18} height={18} color='#22C55E' />
-            <Text style={{ color: '#111827', fontSize: 11, marginTop: 4 }}>WhatsApp</Text>
+            <Text className='font-body' style={{ color: '#111827', fontSize: 11, marginTop: 4 }}>WhatsApp</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -164,14 +165,14 @@ export default function ReferralsScreen() {
             className='flex-1 items-center py-2 rounded-2xl ml-2'
             style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1 }}>
             <EnvelopeIcon width={18} height={18} color='#111827' />
-            <Text style={{ color: '#111827', fontSize: 11, marginTop: 4 }}>Email</Text>
+            <Text className='font-body' style={{ color: '#111827', fontSize: 11, marginTop: 4 }}>Email</Text>
           </TouchableOpacity>
         </View>
 
         <View
           className='rounded-2xl mb-4 px-4 py-3'
           style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1 }}>
-          <Text style={{ color: '#111827', fontSize: 14, fontWeight: '600', marginBottom: 8 }}>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 14, fontWeight: '600', marginBottom: 8 }}>
             Beneficios
           </Text>
 
@@ -189,8 +190,8 @@ export default function ReferralsScreen() {
               <UserCircleIcon width={18} height={18} color='#F97316' />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ color: '#111827', fontSize: 13, fontWeight: '600' }}>Tu amigo recibe</Text>
-              <Text style={{ color: '#6B7280', fontSize: 12 }}>1 semana gratis + 500 puntos</Text>
+              <Text className='font-heading' style={{ color: '#111827', fontSize: 13, fontWeight: '600' }}>Tu amigo recibe</Text>
+              <Text className='font-body' style={{ color: '#6B7280', fontSize: 12 }}>1 semana gratis + 500 puntos</Text>
             </View>
           </View>
 
@@ -208,14 +209,14 @@ export default function ReferralsScreen() {
               <GiftIcon width={18} height={18} color='#F97316' />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ color: '#111827', fontSize: 13, fontWeight: '600' }}>Tú recibes</Text>
-              <Text style={{ color: '#6B7280', fontSize: 12 }}>500 puntos por cada amigo que se una</Text>
+              <Text className='font-heading' style={{ color: '#111827', fontSize: 13, fontWeight: '600' }}>Tú recibes</Text>
+              <Text className='font-body' style={{ color: '#6B7280', fontSize: 12 }}>500 puntos por cada amigo que se una</Text>
             </View>
           </View>
         </View>
 
         <View className='mb-2'>
-          <Text className='text-[14px] font-semibold text-[#111827] mb-2'>Historial de referidos</Text>
+          <Text className='font-heading text-[14px] font-semibold text-[#111827] mb-2'>Historial de referidos</Text>
         </View>
 
         <View>
@@ -228,9 +229,9 @@ export default function ReferralsScreen() {
                 <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
                   <UserCircleIcon width={18} height={18} color='#F97316' />
                 </View>
-                <Text className='text-[13px] text-[#111827]'>{item.name}</Text>
+                <Text className='font-body text-[13px] text-[#111827]'>{item.name}</Text>
               </View>
-              <Text style={{ color: '#22C55E', fontSize: 13, fontWeight: '600' }}>+{item.points} PTS</Text>
+              <Text className='font-body' style={{ color: '#22C55E', fontSize: 13, fontWeight: '600' }}>+{item.points} PTS</Text>
             </View>
           ))}
         </View>

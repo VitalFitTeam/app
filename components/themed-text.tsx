@@ -53,6 +53,10 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 42,
 		lineHeight: 42,
+		textTransform: 'uppercase',
+		fontStyle: 'italic',
+		fontWeight: '900',
+		letterSpacing: -0.84,
 	},
 	subtitle: {
 		fontSize: 20,

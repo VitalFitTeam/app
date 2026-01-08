@@ -83,18 +83,18 @@ export default function EnrollClientScreen() {
       </View>
 
       <View style={styles.content}>
-        <ThemedText style={styles.title}>{t('enrollClient.title')}</ThemedText>
-        
+        <ThemedText className='font-heading' style={styles.title}>{t('enrollClient.title')}</ThemedText>
+
         <View style={styles.classInfoCard}>
-          <ThemedText style={styles.classTitle}>{className}</ThemedText>
-          <ThemedText style={styles.classDetails}>
+          <ThemedText className='font-heading' style={styles.classTitle}>{className}</ThemedText>
+          <ThemedText className='font-body' style={styles.classDetails}>
             {params.date || t('enrollClient.placeholders.date')} • {params.time || t('enrollClient.placeholders.time')}
           </ThemedText>
         </View>
 
         <View style={styles.form}>
           <View style={styles.inputGroup}>
-            <ThemedText style={styles.label}>{t('enrollClient.form.clientId')}</ThemedText>
+            <ThemedText className='font-body' style={styles.label}>{t('enrollClient.form.clientId')}</ThemedText>
             <TextInput
               style={styles.input}
               value={clientId}
@@ -105,7 +105,7 @@ export default function EnrollClientScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={styles.label}>{t('enrollClient.form.clientName')}</ThemedText>
+            <ThemedText className='font-body' style={styles.label}>{t('enrollClient.form.clientName')}</ThemedText>
             <TextInput
               style={styles.input}
               value={clientName}
@@ -115,12 +115,12 @@ export default function EnrollClientScreen() {
             />
           </View>
 
-          <TouchableOpacity 
-            style={styles.enrollButton} 
+          <TouchableOpacity
+            style={styles.enrollButton}
             onPress={handleEnroll}
             activeOpacity={0.8}
           >
-            <ThemedText style={styles.enrollButtonText}>{t('enrollClient.button')}</ThemedText>
+            <ThemedText className='font-body' style={styles.enrollButtonText}>{t('enrollClient.button')}</ThemedText>
           </TouchableOpacity>
         </View>
       </View>
@@ -140,21 +140,21 @@ export default function EnrollClientScreen() {
             <View style={styles.successIcon}>
               <CheckCircleIcon size={60} color="#10B981" />
             </View>
-            
-            <ThemedText style={styles.successTitle}>{t('enrollClient.success.title') || t('common.success')}</ThemedText>
-            <ThemedText style={styles.successMessage}>
+
+            <ThemedText className='font-heading' style={styles.successTitle}>{t('enrollClient.success.title') || t('common.success')}</ThemedText>
+            <ThemedText className='font-body' style={styles.successMessage}>
               {t('enrollClient.success.message')}
             </ThemedText>
-            <ThemedText style={styles.className}>
+            <ThemedText className='font-body' style={styles.className}>
               {className}
             </ThemedText>
-            
+
             <TouchableOpacity
               style={styles.successButton}
               onPress={handleSuccessClose}
               activeOpacity={0.8}
             >
-              <ThemedText style={styles.successButtonText}>{t('enrollClient.success.button') || t('common.accept')}</ThemedText>
+              <ThemedText className='font-body' style={styles.successButtonText}>{t('enrollClient.success.button') || t('common.accept')}</ThemedText>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>

@@ -80,10 +80,10 @@ export default function InstructorClientProgressScreen() {
             <UserIcon width={40} height={40} color='#f97316' />
           </View>
 
-          <Text style={{ color: '#111827', fontSize: 20, fontWeight: '700', marginBottom: 2 }}>
+          <Text style={{ color: '#111827', fontSize: 20, fontWeight: '700', marginBottom: 2 }} className="font-body">
             {clientName}
           </Text>
-          <Text style={{ color: '#6b7280', fontSize: 14 }}>{clientLevel}</Text>
+          <Text style={{ color: '#6b7280', fontSize: 14 }} className="font-body">{clientLevel}</Text>
         </View>
         <View style={{ marginBottom: 16 }}>
           <View
@@ -98,22 +98,22 @@ export default function InstructorClientProgressScreen() {
             }}
           >
             <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }}>{clientLevel.replace('Nivel ', '') || '1'}</Text>
-              <Text style={{ color: '#4B5563', fontSize: 12 }}>Nivel</Text>
+              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">{clientLevel.replace('Nivel ', '') || '1'}</Text>
+              <Text style={{ color: '#4B5563', fontSize: 12 }} className="font-body">Nivel</Text>
             </View>
 
             <View style={{ width: 1, height: 32, backgroundColor: '#D1D5DB' }} />
 
             <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }}>4/5</Text>
-              <Text style={{ color: '#4B5563', fontSize: 12 }}>progreso</Text>
+              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">4/5</Text>
+              <Text style={{ color: '#4B5563', fontSize: 12 }} className="font-body">progreso</Text>
             </View>
 
             <View style={{ width: 1, height: 32, backgroundColor: '#D1D5DB' }} />
 
             <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }}>8</Text>
-              <Text style={{ color: '#4B5563', fontSize: 12, textAlign: 'center' }}>Entrenamientos esta semana</Text>
+              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">8</Text>
+              <Text style={{ color: '#4B5563', fontSize: 12, textAlign: 'center' }} className="font-body">Entrenamientos esta semana</Text>
             </View>
           </View>
         </View>
@@ -126,15 +126,15 @@ export default function InstructorClientProgressScreen() {
               paddingVertical: 16,
             }}
           >
-            <Text style={{ color: '#111827', fontSize: 18, fontWeight: '800', marginBottom: 8 }}>
+            <Text style={{ color: '#111827', fontSize: 18, fontWeight: '800', marginBottom: 8 }} className="font-heading">
               RUTINA ACTUAL
             </Text>
-            <Text style={{ color: '#111827', fontSize: 15, fontWeight: '600', marginBottom: 2 }}>
+            <Text style={{ color: '#111827', fontSize: 15, fontWeight: '600', marginBottom: 2 }} className="font-body">
               {currentProgram}
             </Text>
-            <Text style={{ color: '#6B7280', fontSize: 13, marginBottom: 10 }}>Principiante</Text>
+            <Text style={{ color: '#6B7280', fontSize: 13, marginBottom: 10 }} className="font-body">Principiante</Text>
 
-            <Text style={{ color: '#4B5563', fontSize: 13, lineHeight: 18 }}>
+            <Text style={{ color: '#4B5563', fontSize: 13, lineHeight: 18 }} className="font-body">
               Want your body to be healthy. Join our program with guidance adapted to your goals.
               Increasing physical strength is the main objective of strength training. Maintain
               body fitness by doing physical exercise at least 2-3 times a week.
@@ -142,7 +142,7 @@ export default function InstructorClientProgressScreen() {
           </View>
         </View>
         <View style={{ marginBottom: 16 }}>
-          <Text style={{ color: '#111827', fontWeight: '700', fontSize: 16, marginBottom: 8 }}>Detalle de ejercicios</Text>
+          <Text style={{ color: '#111827', fontWeight: '700', fontSize: 16, marginBottom: 8 }} className="font-heading">Detalle de ejercicios</Text>
 
           <View style={{ height: 8, backgroundColor: '#E5E7EB', borderRadius: 4, overflow: 'hidden', marginBottom: 16 }}>
             <View style={{ width: '60%', height: '100%', backgroundColor: '#F27F2A' }} />
@@ -158,7 +158,7 @@ export default function InstructorClientProgressScreen() {
               style={{ borderRadius: 16, padding: 14, marginBottom: 12 }}
             >
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
-                <Text style={{ color: '#FFFFFF', fontWeight: '500', fontSize: 16, flex: 1 }}>{ex.title}</Text>
+                <Text style={{ color: '#FFFFFF', fontWeight: '500', fontSize: 16, flex: 1 }} className="font-body">{ex.title}</Text>
                 <View
                   style={{
                     paddingHorizontal: 10,
@@ -169,7 +169,7 @@ export default function InstructorClientProgressScreen() {
                     alignSelf: 'flex-start',
                   }}
                 >
-                  <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '600' }}>
+                  <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '600' }} className="font-body">
                     {ex.done ? 'Completado' : 'Pendiente'}
                   </Text>
                 </View>
@@ -177,29 +177,29 @@ export default function InstructorClientProgressScreen() {
 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <View>
-                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }}>Día</Text>
-                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.day}</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">Día</Text>
+                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.day}</Text>
                 </View>
                 <View>
-                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }}>Series</Text>
-                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.series}</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">Series</Text>
+                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.series}</Text>
                 </View>
                 <View>
-                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }}>Repeticiones</Text>
-                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.reps}</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">Repeticiones</Text>
+                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.reps}</Text>
                 </View>
                 <View>
-                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }}>Tiempo</Text>
-                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{ex.time}</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">Tiempo</Text>
+                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.time}</Text>
                 </View>
               </View>
             </LinearGradient>
           ))}
         </View>
         <View style={{ marginBottom: 20 }}>
-          <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }}>Notas de la rutina</Text>
+          <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }} className="font-body">Notas de la rutina</Text>
           <View style={{ borderRadius: 16, borderWidth: 1, borderColor: '#e5e7eb', paddingHorizontal: 12, paddingVertical: 10, backgroundColor: '#F9FAFB' }}>
-            <Text style={{ color: '#4b5563', fontSize: 13 }}>
+            <Text style={{ color: '#4b5563', fontSize: 13 }} className="font-body">
               Cliente reporta buena técnica en sentadillas, pero fatiga en la última serie. Recomendar foco en descanso y respiración.
             </Text>
           </View>
@@ -209,7 +209,7 @@ export default function InstructorClientProgressScreen() {
           style={{ width: '100%', paddingVertical: 14, borderRadius: 16, backgroundColor: '#4b5563', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}
           onPress={() => router.back()}
         >
-          <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>Volver a Mis clientes</Text>
+          <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }} className="font-body">Volver a Mis clientes</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

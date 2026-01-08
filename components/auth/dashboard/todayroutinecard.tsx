@@ -15,8 +15,8 @@ export const TodayRoutineCard: React.FC<Props> = ({ title, time, date }) => {
 	return (
 		<View style={[styles.container, { width: cardWidth }]}>
 			<View style={styles.header}>
-				<Text style={styles.title}>Mi rutina de hoy</Text>
-				<Text style={styles.date}>{date}</Text>
+				<Text className='font-body' style={styles.title}>Mi rutina de hoy</Text>
+				<Text className='font-body' style={styles.date}>{date}</Text>
 			</View>
 
 			<ImageBackground
@@ -31,8 +31,8 @@ export const TodayRoutineCard: React.FC<Props> = ({ title, time, date }) => {
 				/>
 
 				<View style={styles.textContainer}>
-					<Text style={styles.imageTitle}>{title}</Text>
-					<Text style={styles.imageSubtitle}>{time}</Text>
+					<Text className='font-body' style={styles.imageTitle}>{title}</Text>
+					<Text className='font-body' style={styles.imageSubtitle}>{time}</Text>
 				</View>
 			</ImageBackground>
 		</View>

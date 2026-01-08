@@ -54,6 +54,7 @@ export default function ClassCard({
 					<View className='absolute inset-0 p-4 justify-between'>
 						<View>
 							<ThemedText
+								className='font-heading'
 								lightColor='#ffffff'
 								darkColor='#ffffff'
 								style={{ fontFamily: 'BebasNeue-Regular', fontSize: 24 }}
@@ -61,6 +62,7 @@ export default function ClassCard({
 								{title}
 							</ThemedText>
 							<ThemedText
+								className='font-body'
 								lightColor='#E0E0E0'
 								darkColor='#E0E0E0'
 								style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14, marginTop: 2 }}
@@ -68,6 +70,7 @@ export default function ClassCard({
 								{t('common.today')}, {time}
 							</ThemedText>
 							<ThemedText
+								className='font-body'
 								lightColor='#E5E7EB'
 								darkColor='#E5E7EB'
 								style={{ fontFamily: 'Montserrat_400Regular', fontSize: 11, marginTop: 4 }}
@@ -77,6 +80,7 @@ export default function ClassCard({
 						</View>
 						<View className='flex-row items-center justify-between mt-2'>
 							<ThemedText
+								className='font-body'
 								lightColor='#E5E7EB'
 								darkColor='#E5E7EB'
 								style={{ fontFamily: 'Montserrat_400Regular', fontSize: 12 }}
@@ -87,6 +91,7 @@ export default function ClassCard({
 								<View className='px-3 py-1 rounded-full'
 									style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}>
 									<ThemedText
+										className='font-body'
 										lightColor='#ffffff'
 										darkColor='#ffffff'
 										style={{ fontFamily: 'Montserrat_600SemiBold', fontSize: 11 }}
@@ -100,9 +105,10 @@ export default function ClassCard({
 					{reserved ? (
 						<View className='absolute top-3 right-3 bg-orange-500 rounded-full px-2 py-1'>
 							<ThemedText
+								className='font-body'
 								lightColor='#ffffff'
 								darkColor='#ffffff'
-								className='text-xs font-bold'>
+								style={{ fontSize: 12, fontWeight: 'bold' }}>
 								{t('common.reserved')}
 							</ThemedText>
 						</View>
@@ -117,15 +123,15 @@ export default function ClassCard({
 			onPress={() => onPress(classData)}
 			className='bg-white dark:bg-neutral-900 rounded-2xl p-4 mb-4 flex-row items-center'>
 			<View className='flex-1'>
-				<ThemedText className='text-sm text-neutral-500'>{time}</ThemedText>
-				<ThemedText className='text-xl font-bold mt-1'>{title}</ThemedText>
-				<ThemedText className='text-sm text-neutral-500 mt-1'>
+				<ThemedText className='font-body text-sm text-neutral-500'>{time}</ThemedText>
+				<ThemedText className='font-heading text-xl font-bold mt-1'>{title}</ThemedText>
+				<ThemedText className='font-body text-sm text-neutral-500 mt-1'>
 					{instructor} · {branch}
 				</ThemedText>
 				<TouchableOpacity
 					onPress={() => onPress(classData)}
 					className='bg-neutral-100 dark:bg-neutral-800 rounded-full py-2 px-4 mt-4 self-start'>
-					<ThemedText className='font-semibold'>{t('common.viewDetails')}</ThemedText>
+					<ThemedText className='font-body font-semibold'>{t('common.viewDetails')}</ThemedText>
 				</TouchableOpacity>
 			</View>
 			<View style={{ width: 112, height: 84 }} className='rounded-xl overflow-hidden'>

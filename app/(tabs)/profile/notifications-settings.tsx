@@ -26,7 +26,7 @@ export default function ClientNotificationsSettingsScreen() {
             <ChevronLeftIcon width={20} height={20} color='#f97316' />
           </TouchableOpacity>
 
-          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('notificationsSettings.title')}</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('notificationsSettings.title')}</Text>
         </View>
         <View
           style={{
@@ -37,11 +37,11 @@ export default function ClientNotificationsSettingsScreen() {
           }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
             <BellIcon width={20} height={20} color='#111827' />
-            <Text style={{ marginLeft: 8, fontSize: 15, fontWeight: '700', color: '#111827' }}>
+            <Text className='font-heading' style={{ marginLeft: 8, fontSize: 15, fontWeight: '700', color: '#111827' }}>
               {t('notificationsSettings.notifications')}
             </Text>
           </View>
-          <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 16 }}>
+          <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 16 }}>
             {t('notificationsSettings.description')}
           </Text>
           <View
@@ -54,10 +54,10 @@ export default function ClientNotificationsSettingsScreen() {
               borderTopColor: '#E5E7EB',
             }}>
             <View style={{ flex: 1, paddingRight: 12 }}>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#111827', marginBottom: 2 }}>
+              <Text className='font-heading' style={{ fontSize: 13, fontWeight: '600', color: '#111827', marginBottom: 2 }}>
                 {t('notificationsSettings.classReminders.title')}
               </Text>
-              <Text style={{ fontSize: 12, color: '#6b7280' }}>
+              <Text className='font-body' style={{ fontSize: 12, color: '#6b7280' }}>
                 {t('notificationsSettings.classReminders.description')}
               </Text>
             </View>
@@ -79,10 +79,10 @@ export default function ClientNotificationsSettingsScreen() {
               borderTopColor: '#E5E7EB',
             }}>
             <View style={{ flex: 1, paddingRight: 12 }}>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#111827', marginBottom: 2 }}>
+              <Text className='font-heading' style={{ fontSize: 13, fontWeight: '600', color: '#111827', marginBottom: 2 }}>
                 {t('notificationsSettings.routineUpdates.title')}
               </Text>
-              <Text style={{ fontSize: 12, color: '#6b7280' }}>
+              <Text className='font-body' style={{ fontSize: 12, color: '#6b7280' }}>
                 {t('notificationsSettings.routineUpdates.description')}
               </Text>
             </View>

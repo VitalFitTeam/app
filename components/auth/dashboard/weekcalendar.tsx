@@ -99,10 +99,11 @@ export const WeekCalendar: React.FC<WeekCalendarProps> = ({
 						onPress={() => handleDayPress(day)}
 						activeOpacity={0.8}
 						style={[styles.dayButton, selected && styles.selectedDay]}>
-						<Text style={[styles.dayLabel, selected && styles.selectedText]}>
+						<Text className='font-body' style={[styles.dayLabel, selected && styles.selectedText]}>
 							{day.label}
 						</Text>
 						<Text
+							className='font-body'
 							style={[
 								styles.dateNumber,
 								selected && styles.selectedText,

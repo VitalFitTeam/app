@@ -63,9 +63,10 @@ export const UserHeader: React.FC<Props> = ({
 					/>
 					<View>
 						<Text
+							className='font-heading'
 							style={{
 								fontFamily: 'BebasNeue-Regular',
-								fontWeight: '400',
+								fontWeight: '700',
 								fontSize: 31,
 								color: '#000',
 							}}>
@@ -100,22 +101,22 @@ export const UserHeader: React.FC<Props> = ({
 						activeOpacity={1}
 						onPress={(e) => e.stopPropagation()}
 						style={styles.notificationModal}>
-						<Text className='text-base font-semibold mb-2'>{t('dashboard.notifications.title')}</Text>
+						<Text className='font-heading text-base font-semibold mb-2'>{t('dashboard.notifications.title')}</Text>
 						{activeNotifications.length > 0 ? (
 							<FlatList
 								data={activeNotifications}
 								keyExtractor={(item) => item.id}
 								renderItem={({ item }) => (
 									<View className='mb-2'>
-										<Text className='text-gray-800 dark:text-gray-200 font-medium text-sm'>
+										<Text className='font-body text-gray-800 dark:text-gray-200 font-medium text-sm'>
 											{item.title}
 										</Text>
-										<Text className='text-gray-400 text-xs'>{item.time}</Text>
+										<Text className='font-body text-gray-400 text-xs'>{item.time}</Text>
 									</View>
 								)}
 							/>
 						) : (
-							<Text className='text-gray-400 text-sm'>
+							<Text className='font-body text-gray-400 text-sm'>
 								{t('dashboard.notifications.empty')}
 							</Text>
 						)}

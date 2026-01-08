@@ -22,11 +22,11 @@ export default function InstructorSecurityScreen() {
             <ChevronLeftIcon width={20} height={20} color='#f97316' />
           </TouchableOpacity>
 
-          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Seguridad</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Seguridad</Text>
         </View>
 
         <View className='mb-2'>
-          <Text className='text-[14px] font-semibold text-[#111827] mb-2'>Opciones</Text>
+          <Text className='font-body text-[14px] font-semibold text-[#111827] mb-2'>Opciones</Text>
         </View>
 
         <TouchableOpacity
@@ -39,7 +39,7 @@ export default function InstructorSecurityScreen() {
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
               <ShieldCheckIcon width={18} height={18} color='#111827' />
             </View>
-            <Text className='text-[13px] text-[#111827]'>Cambiar contraseña</Text>
+            <Text className='font-body text-[13px] text-[#111827]'>Cambiar contraseña</Text>
           </View>
           <ChevronLeftIcon
             width={16}

@@ -4,7 +4,7 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { ThemedText } from '@/components/themed-text';
 import { ToastNotification } from '@/components/ToastNotification';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -142,17 +142,15 @@ export default function ConfirmEmailScreen() {
                     <ThemedText
                         type='title'
                         lightColor={Colors.light.tint}
+                        className='font-heading text-center text-3xl'
                         style={{
-                            fontFamily: Fonts.title,
-                            fontSize: 32,
-                            textAlign: 'center',
                             lineHeight: 32,
                         }}>
                         {t('confirmEmail.title')}
                     </ThemedText>
                 </View>
 
-                <Text className='text-gray-500 text-center mb-8 text-lg'>
+                <Text className='font-body text-gray-500 text-center mb-8 text-lg'>
                     {t('confirmEmail.subtitle')}
                 </Text>
 

@@ -296,50 +296,50 @@ export default function MembershipConfirmScreen() {
       >
 
         <View className='mb-8'>
-          <ThemedText lightColor='#f97316' darkColor='#f97316' className='text-4xl mb-4 text-center' style={{ fontFamily: 'BebasNeue-Regular' }}>
+          <ThemedText lightColor='#f97316' darkColor='#f97316' className='font-heading text-4xl mb-4 text-center' style={{ fontFamily: 'BebasNeue-Regular' }}>
             {t('confirm.title')}
           </ThemedText>
           <View className='flex-row justify-between items-center mb-4'>
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
-                <ThemedText className='text-[10px] font-semibold text-gray-800'>1</ThemedText>
+                <ThemedText className='font-body text-[10px] font-semibold text-gray-800'>1</ThemedText>
               </View>
-              <ThemedText className='text-[11px] text-center text-gray-800'>{t('checkout.steps.options')}</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-gray-800'>{t('checkout.steps.options')}</ThemedText>
             </View>
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
-                <ThemedText className='text-[10px] font-semibold text-gray-800'>2</ThemedText>
+                <ThemedText className='font-body text-[10px] font-semibold text-gray-800'>2</ThemedText>
               </View>
-              <ThemedText className='text-[11px] text-center text-gray-800'>{t('checkout.steps.extras')}</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-gray-800'>{t('checkout.steps.extras')}</ThemedText>
             </View>
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-orange-500 border-orange-500'>
-                <ThemedText className='text-[10px] font-semibold text-white'>3</ThemedText>
+                <ThemedText className='font-body text-[10px] font-semibold text-white'>3</ThemedText>
               </View>
-              <ThemedText className='text-[11px] text-center text-orange-600 font-bold'>{t('checkout.steps.confirmation')}</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-orange-600 font-bold'>{t('checkout.steps.confirmation')}</ThemedText>
             </View>
           </View>
         </View>
 
-        <ThemedText className="text-xl font-bold mb-4">{t('confirm.paymentConfig')}</ThemedText>
+        <ThemedText className="font-heading text-xl font-bold mb-4">{t('confirm.paymentConfig')}</ThemedText>
 
         <View className="mb-4">
-          <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.branch')}</ThemedText>
+          <ThemedText className="font-body text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.branch')}</ThemedText>
           {loadingBranches ? (
             <ActivityIndicator size="small" color="#f97316" />
           ) : (
             <>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => setBranchModalVisible(true)}
                 className="flex-row items-center justify-between border border-gray-300 rounded-xl p-4 bg-white"
               >
                 <View className="flex-row items-center">
                     <MapPinIcon size={20} color="#f97316" />
-                    <ThemedText className="ml-3 font-bold text-lg text-gray-800">
+                    <ThemedText className="font-body ml-3 font-bold text-lg text-gray-800">
                         {selectedBranchName}
                     </ThemedText>
                 </View>
-                <ThemedText className="text-gray-400">▼</ThemedText>
+                <ThemedText className="font-body text-gray-400">▼</ThemedText>
               </TouchableOpacity>
 
               <Modal
@@ -354,7 +354,7 @@ export default function MembershipConfirmScreen() {
                     onPress={() => setBranchModalVisible(false)}
                 >
                     <View className="bg-white w-full rounded-2xl overflow-hidden p-4 max-h-[500px]">
-                        <ThemedText className="font-bold text-lg mb-4 text-center">{t('confirm.selectBranch')}</ThemedText>
+                        <ThemedText className="font-heading font-bold text-lg mb-4 text-center">{t('confirm.selectBranch')}</ThemedText>
                         <ScrollView>
                           {branches.map((branch) => {
                             const isSelected = selectedBranchId === branch.branch_id;
@@ -369,9 +369,9 @@ export default function MembershipConfirmScreen() {
                                     isSelected ? 'bg-orange-50' : ''
                                 }`}
                               >
-                                <ThemedText className="font-bold">{branch.name}</ThemedText>
+                                <ThemedText className="font-body font-bold">{branch.name}</ThemedText>
                                 {isSelected && (
-                                    <ThemedText className="text-orange-500 font-bold">✓</ThemedText>
+                                    <ThemedText className="font-body text-orange-500 font-bold">✓</ThemedText>
                                 )}
                               </TouchableOpacity>
                             );
@@ -385,18 +385,18 @@ export default function MembershipConfirmScreen() {
         </View>
 
         <View className="mb-6">
-            <ThemedText className="text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.currency')}</ThemedText>
-            <TouchableOpacity 
+            <ThemedText className="font-body text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.currency')}</ThemedText>
+            <TouchableOpacity
                 onPress={() => setCurrencyModalVisible(true)}
                 className="flex-row items-center justify-between border border-gray-300 rounded-xl p-4 bg-white"
             >
                 <View className="flex-row items-center">
                     <CurrencyDollarIcon size={20} color="#f97316" />
-                    <ThemedText className="ml-3 font-bold text-lg text-gray-800">
+                    <ThemedText className="font-body ml-3 font-bold text-lg text-gray-800">
                         {currency} ({selectedCurrencySymbol})
                     </ThemedText>
                 </View>
-                <ThemedText className="text-gray-400">▼</ThemedText>
+                <ThemedText className="font-body text-gray-400">▼</ThemedText>
             </TouchableOpacity>
 
             <Modal
@@ -411,7 +411,7 @@ export default function MembershipConfirmScreen() {
                     onPress={() => setCurrencyModalVisible(false)}
                 >
                     <View className="bg-white w-full rounded-2xl overflow-hidden p-4 max-h-[500px]">
-                        <ThemedText className="font-bold text-lg mb-4 text-center">{t('confirm.selectCurrency')}</ThemedText>
+                        <ThemedText className="font-heading font-bold text-lg mb-4 text-center">{t('confirm.selectCurrency')}</ThemedText>
                         <ScrollView>
                           {CURRENCIES.map((curr) => (
                               <TouchableOpacity
@@ -424,9 +424,9 @@ export default function MembershipConfirmScreen() {
                                       currency === curr.name ? 'bg-orange-50' : ''
                                   }`}
                               >
-                                  <ThemedText className="font-bold">{curr.label}</ThemedText>
+                                  <ThemedText className="font-body font-bold">{curr.label}</ThemedText>
                                   {currency === curr.name && (
-                                      <ThemedText className="text-orange-500 font-bold">✓</ThemedText>
+                                      <ThemedText className="font-body text-orange-500 font-bold">✓</ThemedText>
                                   )}
                               </TouchableOpacity>
                           ))}
@@ -437,21 +437,21 @@ export default function MembershipConfirmScreen() {
         </View>
 
         <View className="bg-neutral-50 p-5 rounded-2xl border border-neutral-200 mb-6">
-          <ThemedText className="text-xs text-orange-500 font-bold tracking-widest uppercase mb-3">
+          <ThemedText className="font-body text-xs text-orange-500 font-bold tracking-widest uppercase mb-3">
              {t('confirm.detailUSD')}
           </ThemedText>
 
           <View className="flex-row justify-between mb-2">
-            <ThemedText className="text-neutral-700">{params.mainItemTitle}</ThemedText>
-            <ThemedText className="font-bold text-neutral-900">${mainPriceUSD.toFixed(2)}</ThemedText>
+            <ThemedText className="font-body text-neutral-700">{params.mainItemTitle}</ThemedText>
+            <ThemedText className="font-body font-bold text-neutral-900">${mainPriceUSD.toFixed(2)}</ThemedText>
           </View>
 
           <ScrollView className="max-h-48" nestedScrollEnabled={true}>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {selectedPackages.map((pkg: any, index: number) => (
               <View key={index} className="flex-row justify-between mb-2">
-                <ThemedText className="text-neutral-600 text-sm flex-1 mr-2">+ {pkg.name}</ThemedText>
-                <ThemedText className="font-bold text-neutral-800 text-sm">${pkg.price?.toFixed(2)}</ThemedText>
+                <ThemedText className="font-body text-neutral-600 text-sm flex-1 mr-2">+ {pkg.name}</ThemedText>
+                <ThemedText className="font-body font-bold text-neutral-800 text-sm">${pkg.price?.toFixed(2)}</ThemedText>
               </View>
             ))}
           </ScrollView>
@@ -464,23 +464,23 @@ export default function MembershipConfirmScreen() {
           ) : (
             <View className="flex-row justify-between mb-2">
                 {/* Visualización: muestra el porcentaje entero (21%) */}
-                <ThemedText className="text-neutral-600 text-sm flex-1 mr-2">Impuesto ({formatTaxRate(taxRate)})</ThemedText>
-                <ThemedText className="font-bold text-neutral-800 text-sm">${taxAmountUSD.toFixed(2)}</ThemedText>
+                <ThemedText className="font-body text-neutral-600 text-sm flex-1 mr-2">{t('confirm.tax')} ({formatTaxRate(taxRate)})</ThemedText>
+                <ThemedText className="font-body font-bold text-neutral-800 text-sm">${taxAmountUSD.toFixed(2)}</ThemedText>
             </View>
           )}
 
           <View className="flex-row justify-between items-center">
-            <ThemedText className="font-bold text-neutral-500">{t('confirm.totalUSD')}</ThemedText>
-            <ThemedText className="font-bold text-lg text-neutral-900">${grandTotalUSD.toFixed(2)}</ThemedText>
+            <ThemedText className="font-body font-bold text-neutral-500">{t('confirm.totalUSD')}</ThemedText>
+            <ThemedText className="font-body font-bold text-lg text-neutral-900">${grandTotalUSD.toFixed(2)}</ThemedText>
           </View>
         </View>
 
         <View className="mt-2 border-t border-neutral-100 pt-4 mb-8">
           <View className="flex-row justify-between items-end">
-            <View>
-              <ThemedText className="text-xl text-neutral-500">{t('confirm.totalToPay')}</ThemedText>
+            <View className="flex-1 mr-4">
+              <ThemedText className="font-body text-xl text-neutral-500">{t('confirm.totalToPay')}</ThemedText>
               {currency !== 'USD' && (
-                  <ThemedText className="text-xs text-gray-400 mt-1">
+                  <ThemedText className="font-body text-xs text-gray-400 mt-1">
                       {t('confirm.approxRate')} {rate.toFixed(2)}
                   </ThemedText>
               )}
@@ -491,10 +491,10 @@ export default function MembershipConfirmScreen() {
                     <ActivityIndicator size="small" color="#f97316" />
                 ) : (
                     <>
-                        <ThemedText className="text-4xl font-extrabold text-orange-600" style={{ fontFamily: 'BebasNeue-Regular' }}>
+                        <ThemedText className="font-heading text-4xl font-extrabold text-orange-600" style={{ fontFamily: 'BebasNeue-Regular' }}>
                         {selectedCurrencySymbol}{grandTotalConverted.toFixed(2)}
                         </ThemedText>
-                        <ThemedText className="text-sm font-bold text-gray-500">{currency}</ThemedText>
+                        <ThemedText className="font-body text-sm font-bold text-gray-500">{currency}</ThemedText>
                     </>
                 )}
             </View>
@@ -504,7 +504,7 @@ export default function MembershipConfirmScreen() {
         {processing ? (
           <View className="items-center py-4">
             <ActivityIndicator size="large" color="#f97316" />
-            <ThemedText className="text-xs text-gray-400 mt-2">{t('confirm.generatingOrder')}</ThemedText>
+            <ThemedText className="font-body text-xs text-gray-400 mt-2">{t('confirm.generatingOrder')}</ThemedText>
           </View>
         ) : (
           <PrimaryButton

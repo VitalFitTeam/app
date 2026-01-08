@@ -15,7 +15,7 @@ export function PrimaryButton({ title, style, isLoading, ...props }: Props) {
 			{isLoading ? (
 				<ActivityIndicator color="white" />
 			) : (
-				<Text className='text-white text-base font-bold'>{title}</Text>
+				<Text className='font-body text-white text-base font-bold'>{title}</Text>
 			)}
 		</TouchableOpacity>
 	);

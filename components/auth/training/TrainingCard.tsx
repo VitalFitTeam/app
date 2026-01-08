@@ -32,7 +32,7 @@ export default function TrainingCard({ id, title, subtitle, progressPercent, ins
         />
 
         <View style={{ position: 'absolute', left: 12, right: 12, bottom: 12 }}>
-          <Text style={{ color: '#fff', fontWeight: '800', fontSize: 18 }}>
+          <Text className='font-heading' style={{ color: '#fff', fontWeight: '800', fontSize: 18 }}>
             {title}
           </Text>
         </View>
@@ -70,15 +70,15 @@ export default function TrainingCard({ id, title, subtitle, progressPercent, ins
               </Svg>
             );
           })()}
-          <Text style={{ position: 'absolute', color: '#F27F2A', fontWeight: '700', fontSize: 11 }}>{Math.round(progressPercent)}%</Text>
+          <Text className='font-body' style={{ position: 'absolute', color: '#F27F2A', fontWeight: '700', fontSize: 11 }}>{Math.round(progressPercent)}%</Text>
         </View>
       </View>
 
       <View className="px-4 py-3" style={{ backgroundColor: '#111827' }}>
         <View className="flex-row items-start justify-between">
           <View style={{ flexShrink: 1, paddingRight: 12 }}>
-            <Text style={{ color: '#D1D5DB', fontSize: 12, marginBottom: 2 }}>{subtitle}</Text>
-            <Text style={{ color: '#9CA3AF', fontSize: 12 }}>{instructor}</Text>
+            <Text className='font-body' style={{ color: '#D1D5DB', fontSize: 12, marginBottom: 2 }}>{subtitle}</Text>
+            <Text className='font-body' style={{ color: '#9CA3AF', fontSize: 12 }}>{instructor}</Text>
           </View>
           <View className="flex-row items-center" style={{ flexShrink: 0 }}>
             {days.map((d, i) => {
@@ -87,7 +87,7 @@ export default function TrainingCard({ id, title, subtitle, progressPercent, ins
               return (
                 <View key={`${d}-${i}`} style={{ alignItems: 'center', marginLeft: 10 }}>
                   <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: active ? '#F27F2A' : '#FFFFFF', marginBottom: 2 }} />
-                  <Text style={{ color: '#FFFFFF', fontSize: 10 }}>{d}</Text>
+                  <Text className='font-body' style={{ color: '#FFFFFF', fontSize: 10 }}>{d}</Text>
                 </View>
               );
             })}

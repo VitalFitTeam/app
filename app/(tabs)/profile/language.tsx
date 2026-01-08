@@ -40,14 +40,14 @@ export default function ProfileLanguageScreen() {
             <ChevronLeftIcon width={20} height={20} color="#f97316" />
           </TouchableOpacity>
 
-          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('language.title')}</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('language.title')}</Text>
         </View>
 
         <View style={{ marginBottom: 16 }}>
-          <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 4 }}>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 4 }}>
             {t('language.changeLanguage')}
           </Text>
-          <Text style={{ color: '#4B5563', fontSize: 13, lineHeight: 18 }}>
+          <Text className='font-body' style={{ color: '#4B5563', fontSize: 13, lineHeight: 18 }}>
             {t('language.selectOption')}
           </Text>
         </View>
@@ -72,6 +72,7 @@ export default function ProfileLanguageScreen() {
                     <CountryFlag isoCode={lang.countryCode} size={16} />
                   </View>
                   <Text
+                    className='font-body'
                     style={{
                       color: isSelected ? '#F9FAFB' : '#111827',
                       fontSize: 14,

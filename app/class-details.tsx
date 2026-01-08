@@ -366,7 +366,7 @@ export default function ClassDetailsScreen() {
               activeOpacity={0.7}
               onPress={() => setActiveTab('clientes')}>
               <Text
-                className={`font-semibold ${
+                className={`font-semibold font-body ${
                   activeTab === 'clientes' ? 'text-[#111827]' : 'text-[#6b7280]'
                 }`}>
                 Clientes
@@ -379,7 +379,7 @@ export default function ClassDetailsScreen() {
               activeOpacity={0.7}
               onPress={() => setActiveTab('pasar-lista')}>
               <Text
-                className={`font-semibold ${
+                className={`font-semibold font-body ${
                   activeTab === 'pasar-lista' ? 'text-[#111827]' : 'text-[#6b7280]'
                 }`}>
                 Pasar lista
@@ -405,7 +405,7 @@ export default function ClassDetailsScreen() {
               <View className='rounded-2xl bg-white px-4 py-3 border border-[#e5e7eb] shadow-sm'>
                 <View className='flex-row items-center mb-3'>
                   <UsersIcon size={18} color='#f97316' />
-                  <Text className='ml-2 text-[14px] font-medium text-[#111827]'>
+                  <Text className='ml-2 text-[14px] font-medium text-[#111827] font-body'>
                     Lista de clientes inscritos
                   </Text>
                 </View>
@@ -420,10 +420,10 @@ export default function ClassDetailsScreen() {
                         <UserIcon size={22} color='#f97316' />
                       </View>
                       <View className='flex-1'>
-                        <Text className='text-[14px] font-bold text-[#1F2024]'>
+                        <Text className='text-[14px] font-bold text-[#1F2024] font-body'>
                           {client.name}
                         </Text>
-                        <Text className='text-[12px] text-[#71727A]'>
+                        <Text className='text-[12px] text-[#71727A] font-body'>
                           {client.level}
                         </Text>
                       </View>
@@ -436,7 +436,7 @@ export default function ClassDetailsScreen() {
               <View className='rounded-2xl bg-white px-4 py-4 border border-[#e5e7eb] shadow-sm'>
                 <View className='flex-row items-center mb-4'>
                   <UsersIcon size={18} color='#f97316' />
-                  <Text className='ml-2 text-[14px] font-medium text-[#111827]'>
+                  <Text className='ml-2 text-[14px] font-medium text-[#111827] font-body'>
                     Clientes inscritos
                   </Text>
                 </View>
@@ -452,10 +452,10 @@ export default function ClassDetailsScreen() {
                           <UserIcon size={26} color='#f97316' />
                         </View>
                         <View className='flex-1'>
-                          <Text className='text-[16px] font-bold text-[#1F2024]'>
+                          <Text className='text-[16px] font-bold text-[#1F2024] font-body'>
                             {client.name}
                           </Text>
-                          <Text className='text-[12px] text-[#71727A] mb-1'>
+                          <Text className='text-[12px] text-[#71727A] mb-1 font-body'>
                             {client.level}
                           </Text>
                         </View>
@@ -484,7 +484,7 @@ export default function ClassDetailsScreen() {
                           }>
                           <CheckIcon size={16} color={status === 'present' ? '#ffffff' : '#f97316'} strokeWidth={3} />
                           <Text
-                            className={`ml-2 text-[13px] ${
+                            className={`ml-2 text-[13px] font-body ${
                               status === 'present' ? 'text-white' : 'text-[#f97316]'
                             }`}
                             style={{ fontFamily: 'Montserrat_600SemiBold' }}>
@@ -504,7 +504,7 @@ export default function ClassDetailsScreen() {
                           }>
                           <OutlineClockIcon size={16} color={status === 'late' ? '#374151' : '#9ca3af'} strokeWidth={2.5} />
                           <Text
-                            className={`ml-2 text-[13px] ${
+                            className={`ml-2 text-[13px] font-body ${
                               status === 'late' ? 'text-[#374151]' : 'text-[#9ca3af]'
                             }`}
                             style={{ fontFamily: 'Montserrat_600SemiBold' }}>
@@ -522,7 +522,7 @@ export default function ClassDetailsScreen() {
                           }>
                           <XMarkIcon size={16} color='#374151' strokeWidth={2.5} />
                           <Text
-                            className='ml-2 text-[13px] text-[#374151]'
+                            className='ml-2 text-[13px] text-[#374151] font-body'
                             style={{ fontFamily: 'Montserrat_600SemiBold' }}>
                             Ausente
                           </Text>

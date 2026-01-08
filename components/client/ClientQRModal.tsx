@@ -35,6 +35,7 @@ export function ClientQRModal({ visible, onClose }: ClientQRModalProps) {
             alignItems: 'center',
           }}>
           <Text
+            className='font-body'
             style={{
               color: '#F9FAFB',
               fontSize: 16,
@@ -44,6 +45,7 @@ export function ClientQRModal({ visible, onClose }: ClientQRModalProps) {
             Código QR
           </Text>
           <Text
+            className='font-body'
             style={{
               color: '#E5E7EB',
               fontSize: 13,

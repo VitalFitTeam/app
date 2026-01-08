@@ -1,65 +1,112 @@
 import { HapticTab } from '@/components/haptic-tab';
 import { Tabs } from 'expo-router';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { View } from 'react-native';
 import { CalendarIcon, HomeIcon, QrCodeIcon, UserIcon } from 'react-native-heroicons/solid';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function RecepcionistNavBar() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: '#f97316',
-          tabBarInactiveTintColor: '#9ca3af',
-          headerShown: false,
-          tabBarButton: HapticTab,
-          tabBarStyle: {
-            backgroundColor: '#fff',
-            borderTopWidth: 1,
-            borderTopColor: '#e5e7eb',
-            height: 55,
-            paddingBottom: 4,
-            paddingTop: 4,
-            paddingHorizontal: 16,
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            elevation: 8,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: -2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-          },
-          tabBarItemStyle: {
-            paddingVertical: 0,
-            height: '100%',
-          },
-          tabBarLabelStyle: {
-            fontSize: 12,
-            marginBottom: 2,
-          },
-        }}>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: '#f97316',
+        tabBarInactiveTintColor: '#a1a1aa',
+        headerShown: false,
+        tabBarButton: HapticTab,
+        tabBarStyle: {
+          backgroundColor: '#1f2937',
+          borderTopWidth: 0,
+          borderRadius: 0,
+          marginHorizontal: 0,
+          height: 60 + insets.bottom,
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          paddingHorizontal: 8,
+          overflow: 'hidden',
+          elevation: 0,
+          paddingBottom: Math.max(insets.bottom, 6),
+          paddingTop: 0,
+        },
+        tabBarItemStyle: {
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: 60,
+          paddingVertical: 0,
+          paddingTop: 0,
+          paddingBottom: 0,
+          margin: 0,
+        },
+        tabBarIconStyle: {
+          marginTop: 0,
+          marginBottom: 0,
+        },
+        tabBarShowLabel: false,
+        tabBarLabel: () => null,
+      }}>
       <Tabs.Screen
         name='dashboard'
         options={{
           title: t('nav.dashboard'),
-          tabBarIcon: ({ color }) => <HomeIcon color={color} size={24} />,
+          tabBarIcon: ({ focused }) => (
+            <View
+              style={{
+                backgroundColor: focused ? '#f97316' : 'transparent',
+                borderRadius: 12,
+                width: 44,
+                height: 44,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 16,
+              }}>
+              <HomeIcon color={focused ? '#fff' : '#a1a1aa'} size={24} />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
         name='check-in'
         options={{
           title: t('nav.qr'),
-          tabBarIcon: ({ color }) => <QrCodeIcon color={color} size={24} />,
+          tabBarIcon: ({ focused }) => (
+            <View
+              style={{
+                backgroundColor: focused ? '#f97316' : 'transparent',
+                borderRadius: 12,
+                width: 44,
+                height: 44,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 16,
+              }}>
+              <QrCodeIcon color={focused ? '#fff' : '#a1a1aa'} size={24} />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
         name='schedule'
         options={{
           title: t('nav.schedule'),
-          tabBarIcon: ({ color }) => <CalendarIcon color={color} size={24} />,
+          tabBarIcon: ({ focused }) => (
+            <View
+              style={{
+                backgroundColor: focused ? '#f97316' : 'transparent',
+                borderRadius: 12,
+                width: 44,
+                height: 44,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 16,
+              }}>
+              <CalendarIcon color={focused ? '#fff' : '#a1a1aa'} size={24} />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
@@ -106,10 +153,22 @@ export default function RecepcionistNavBar() {
         name='profile'
         options={{
           title: t('nav.profile'),
-          tabBarIcon: ({ color }) => <UserIcon color={color} size={24} />,
+          tabBarIcon: ({ focused }) => (
+            <View
+              style={{
+                backgroundColor: focused ? '#f97316' : 'transparent',
+                borderRadius: 12,
+                width: 44,
+                height: 44,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 16,
+              }}>
+              <UserIcon color={focused ? '#fff' : '#a1a1aa'} size={24} />
+            </View>
+          ),
         }}
       />
     </Tabs>
-    </SafeAreaView>
   );
 }

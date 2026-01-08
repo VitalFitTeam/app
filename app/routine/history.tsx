@@ -31,7 +31,7 @@ export default function RoutineHistoryScreen() {
         <TouchableOpacity onPress={() => router.back()} activeOpacity={0.8} style={{ position: 'absolute', left: 16, width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' }}>
           <ArrowLeftIcon size={22} color={'#111827'} />
         </TouchableOpacity>
-        <Text style={{ color: '#111827', fontWeight: '700', fontSize: 18 }}>Historial</Text>
+        <Text className='font-heading' style={{ color: '#111827', fontWeight: '700', fontSize: 18 }}>Historial</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={true} contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 120 }}>

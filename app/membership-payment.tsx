@@ -126,7 +126,7 @@ export default function MembershipPaymentScreen() {
   const renderMethodIcon = (methodName: string) => {
     const name = (methodName || '').toLowerCase();
     if (name.includes('pago movil')) return <DevicePhoneMobileIcon size={24} color="#f97316" />;
-    if (name.includes('zelle')) return <View className="w-6 h-6 border border-orange-500 rounded-full items-center justify-center"><ThemedText className="text-[10px] text-orange-500 font-bold">$</ThemedText></View>;
+    if (name.includes('zelle')) return <View className="w-6 h-6 border border-orange-500 rounded-full items-center justify-center"><ThemedText className="font-body text-[10px] text-orange-500 font-bold">$</ThemedText></View>;
     if (name.includes('transfer')) return <BuildingLibraryIcon size={24} color="#f97316" />;
     if (name.includes('efectivo') || name.includes('cash')) return <BanknotesIcon size={24} color="#f97316" />;
     return <CreditCardIcon size={24} color="#f97316" />;
@@ -144,34 +144,36 @@ export default function MembershipPaymentScreen() {
 
       <ScrollView className="flex-1 px-6 pt-8 pb-10">
         <View className="items-center mb-8">
-            <ThemedText className="text-3xl font-bold text-center mb-2" style={{ fontFamily: 'BebasNeue-Regular' }}>
+            <ThemedText className="font-heading text-3xl font-bold text-center mb-2" style={{ fontFamily: 'BebasNeue-Regular' }}>
                 {t('payment.method.title')}
             </ThemedText>
-            <ThemedText className="text-gray-500 text-center">
+            <ThemedText className="font-body text-gray-500 text-center">
                 {t('payment.method.subtitle')}
             </ThemedText>
         </View>
 
-        <View className="rounded-2xl p-6 mb-8 shadow-lg">
-            <ThemedText className="text-gray-400 text-xs uppercase tracking-widest mb-1">{t('payment.totalToPay')}</ThemedText>
+        <View className="bg-neutral-50 p-5 rounded-2xl border border-neutral-200 mb-8">
+            <ThemedText className="font-body text-xs text-orange-500 font-bold tracking-widest uppercase mb-3">
+                {t('payment.totalToPay')}
+            </ThemedText>
             <View className="flex-row items-end mb-4">
-                <ThemedText className="text-4xl font-bold text-white mr-2">
+                <ThemedText className="font-heading text-4xl font-bold text-neutral-900 mr-2">
                     ${parseFloat(params.totalAmount || '0').toFixed(2)}
                 </ThemedText>
-                <ThemedText className="text-lg text-orange-500 font-bold mb-1">
+                <ThemedText className="font-body text-lg text-orange-500 font-bold mb-1">
                     {params.currency || 'USD'}
                 </ThemedText>
             </View>
-            <View className="h-[1px] bg-neutral-700 w-full mb-4" />
+            <View className="h-[1px] bg-neutral-200 w-full mb-3" />
             <View className="flex-row justify-between">
-                <ThemedText className="text-gray-300">{t('payment.concept')}</ThemedText>
-                <ThemedText className="text-white font-bold max-w-[60%] text-right" numberOfLines={1}>
+                <ThemedText className="font-body text-neutral-600">{t('payment.concept')}</ThemedText>
+                <ThemedText className="font-body text-neutral-900 font-bold max-w-[60%] text-right" numberOfLines={1}>
                     {params.title || 'Membresía VitalFit'}
                 </ThemedText>
             </View>
         </View>
 
-        <ThemedText className="text-lg font-bold mb-4 text-neutral-800">{t('payment.options.title')}</ThemedText>
+        <ThemedText className="font-heading text-lg font-bold mb-4 text-neutral-800">{t('payment.options.title')}</ThemedText>
 
         {loadingMethods ? (
             <ActivityIndicator size="large" color="#f97316" className="py-10" />
@@ -194,11 +196,11 @@ export default function MembershipPaymentScreen() {
                                 {renderMethodIcon(method.name)}
                             </View>
                             <View className="flex-1">
-                                <ThemedText className={`font-bold text-base ${isSelected ? 'text-orange-900' : 'text-neutral-900'}`}>
+                                <ThemedText className={`font-body font-bold text-base ${isSelected ? 'text-orange-900' : 'text-neutral-900'}`}>
                                     {method.name}
                                 </ThemedText>
                                 {method.description ? (
-                                    <ThemedText className="text-xs text-gray-500 mt-0.5">
+                                    <ThemedText className="font-body text-xs text-gray-500 mt-0.5">
                                         {method.description}
                                     </ThemedText>
                                 ) : null}
@@ -210,7 +212,7 @@ export default function MembershipPaymentScreen() {
                     );
                 })}
                 {methods.length === 0 && (
-                    <ThemedText className="text-center text-gray-500 py-4">{t('payment.options.noMethods')}</ThemedText>
+                    <ThemedText className="font-body text-center text-gray-500 py-4">{t('payment.options.noMethods')}</ThemedText>
                 )}
             </View>
         )}
@@ -219,8 +221,8 @@ export default function MembershipPaymentScreen() {
             {loading ? (
                 <ActivityIndicator size="large" color="#f97316" />
             ) : (
-                <PrimaryButton 
-                    title={selectedMethodId ? t('common.continue') : t('payment.selectMethod')}
+                <PrimaryButton
+                    title={selectedMethodId ? t('payment.continue') : t('payment.selectMethod')}
                     onPress={handlePay}
                 />
             )}

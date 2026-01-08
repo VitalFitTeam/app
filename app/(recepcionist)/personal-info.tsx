@@ -262,7 +262,7 @@ export default function PersonalInfoScreen() {
                         <ChevronLeftIcon width={20} height={20} color='#f97316' />
                     </TouchableOpacity>
 
-                    <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Perfil Recepcionista</Text>
+                    <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Perfil Recepcionista</Text>
                 </View>
 
                 <View className='mb-4 items-center'>
@@ -285,10 +285,10 @@ export default function PersonalInfoScreen() {
                             </View>
                         )}
                     </TouchableOpacity>
-                    <Text style={{ color: '#111827', fontSize: 20, fontWeight: '600' }}>{displayName}</Text>
-                    
-                    <Text style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>{user?.specialty || 'Atención al Cliente'}</Text>
-                    <Text style={{ color: '#f97316', fontSize: 13, marginTop: 2 }}>{user?.roleName || 'Recepcionista'}</Text>
+                    <Text className='font-heading' style={{ color: '#111827', fontSize: 20, fontWeight: '600' }}>{displayName}</Text>
+
+                    <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>{user?.specialty || 'Atención al Cliente'}</Text>
+                    <Text className='font-body' style={{ color: '#f97316', fontSize: 13, marginTop: 2 }}>{user?.roleName || 'Recepcionista'}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', gap: 8, marginBottom: 20 }}>
@@ -301,7 +301,7 @@ export default function PersonalInfoScreen() {
                         {saving ? (
                             <ActivityIndicator size='small' color='#ffffff' />
                         ) : (
-                            <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>
+                            <Text className='font-body' style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>
                                 {isEditing ? 'Guardar cambios' : 'Editar'}
                             </Text>
                         )}
@@ -314,7 +314,7 @@ export default function PersonalInfoScreen() {
                             style={{ backgroundColor: '#9CA3AF' }}
                             onPress={handleCancelEdit}
                             disabled={saving}>
-                            <Text style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>Cancelar</Text>
+                            <Text className='font-body' style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>Cancelar</Text>
                         </TouchableOpacity>
                     )}
                 </View>
@@ -322,10 +322,10 @@ export default function PersonalInfoScreen() {
                 <View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
                     <View className='flex-row items-center mb-3'>
                         <UserCircleIcon width={18} height={18} color='#111827' />
-                        <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>Información Personal</Text>
+                        <Text className='font-body' style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>Información Personal</Text>
                     </View>
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Nombre</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Nombre</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -351,7 +351,7 @@ export default function PersonalInfoScreen() {
                         />
                     )}
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Apellido</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Apellido</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -377,7 +377,7 @@ export default function PersonalInfoScreen() {
                         />
                     )}
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Documento de identidad</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Documento de identidad</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -405,7 +405,7 @@ export default function PersonalInfoScreen() {
                         />
                     )}
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Fecha de nacimiento</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Fecha de nacimiento</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -461,7 +461,7 @@ export default function PersonalInfoScreen() {
                         </View>
                     )}
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Género</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Género</Text>
                     {isEditing ? (
                         <Controller
                             control={control}

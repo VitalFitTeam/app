@@ -9,6 +9,7 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 interface Routine {
 	id: string;
@@ -25,14 +26,15 @@ interface Props {
 }
 
 export const UpcomingRoutinesSection: React.FC<Props> = ({ routines, mode = 'member', onPrimaryActionPress }) => {
+	const { t } = useTranslation();
 	const { width } = Dimensions.get('window');
 	const cardWidth = Math.min(width - 32, 600);
-	const sectionTitle = mode === 'member' ? 'Próximas rutinas' : 'Servicios';
-	const buttonLabel = mode === 'member' ? 'Comenzar' : 'Comprar';
+	const sectionTitle = mode === 'member' ? t('dashboard.upcomingRoutines.title') : t('dashboard.upcomingRoutines.services');
+	const buttonLabel = mode === 'member' ? t('dashboard.upcomingRoutines.start') : t('dashboard.upcomingRoutines.purchase');
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.sectionTitle}>{sectionTitle}</Text>
+			<Text className='font-heading' style={styles.sectionTitle}>{sectionTitle}</Text>
 			{routines.map((routine) => (
 				<LinearGradient
 					key={routine.id}
@@ -49,15 +51,15 @@ export const UpcomingRoutinesSection: React.FC<Props> = ({ routines, mode = 'mem
 
 					<View style={styles.content}>
 						<View style={styles.textContainer}>
-							<Text style={styles.subtitle}>{routine.subtitle}</Text>
-							<Text style={styles.duration}>{routine.duration}</Text>
-							<Text style={styles.title}>{routine.title}</Text>
+							<Text className='font-body' style={styles.subtitle}>{routine.subtitle}</Text>
+							<Text className='font-body' style={styles.duration}>{routine.duration}</Text>
+							<Text className='font-heading' style={styles.title}>{routine.title}</Text>
 						</View>
 						<TouchableOpacity
 							style={styles.button}
 							activeOpacity={0.8}
 							onPress={() => onPrimaryActionPress && onPrimaryActionPress(routine.id)}>
-							<Text style={styles.buttonText}>{buttonLabel}</Text>
+							<Text className='font-body' style={styles.buttonText}>{buttonLabel}</Text>
 						</TouchableOpacity>
 					</View>
 				</LinearGradient>

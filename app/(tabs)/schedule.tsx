@@ -521,6 +521,7 @@ export default function HorariosScreen() {
                         <ThemedText
                             lightColor='#111827'
                             darkColor='#ffffff'
+                            className='font-heading'
                             style={{ fontFamily: 'BebasNeue-Regular', fontSize: 28, marginBottom: 8 }}
                         >
                             {t('schedule.calendar')}
@@ -562,7 +563,7 @@ export default function HorariosScreen() {
                             <ThemedText
                                 lightColor={activeTab === 'classes' ? '#ffffff' : '#9ca3af'}
                                 darkColor={activeTab === 'classes' ? '#ffffff' : '#6b7280'}
-                                className='text-base font-semibold'
+                                className='font-heading text-base font-semibold'
                             >
                                 {t('schedule.tabs.classes')}
                             </ThemedText>
@@ -577,7 +578,7 @@ export default function HorariosScreen() {
                             <ThemedText
                                 lightColor={activeTab === 'reservas' ? '#ffffff' : '#9ca3af'}
                                 darkColor={activeTab === 'reservas' ? '#ffffff' : '#6b7280'}
-                                className='text-base font-semibold text-center'
+                                className='font-heading text-base font-semibold text-center'
                             >
                                 {t('schedule.tabs.reservations')}
                             </ThemedText>
@@ -585,22 +586,22 @@ export default function HorariosScreen() {
                     </View>
 
                     <View className='mb-6 z-50'>
-                        <View className='flex-row items-center justify-between mt-2 z-50'>
-                            <ThemedText
-                                lightColor='#111827'
-                                darkColor='#ffffff'
-                                style={{ fontFamily: 'BebasNeue-Regular', fontSize: 28, marginBottom: 8 }}
-                            >
-                                {t('schedule.upcomingClasses')}
-                            </ThemedText>
+                        <ThemedText
+                            lightColor='#111827'
+                            darkColor='#ffffff'
+                            className='font-heading'
+                            style={{ fontFamily: 'BebasNeue-Regular', fontSize: 28, marginBottom: 8 }}
+                        >
+                            {t('schedule.upcomingClasses')}
+                        </ThemedText>
 
-                            <View style={{ width: 180, zIndex: 100 }}>
+                        <View style={{ width: '100%', maxWidth: 400, zIndex: 100 }}>
                                 <TouchableOpacity
                                     activeOpacity={0.7}
                                     onPress={() => setBranchMenuVisible(!branchMenuVisible)}
                                     className='flex-row items-center justify-between bg-neutral-100 rounded-xl px-4 py-2.5 border border-neutral-200'
                                 >
-                                    <ThemedText className='text-sm font-semibold text-neutral-800' numberOfLines={1}>
+                                    <ThemedText className='font-body text-sm font-semibold text-neutral-800' numberOfLines={1}>
                                         {loadingBranches
                                             ? 'Cargando...'
                                             : branches.find((b) => b.branch_id === selectedBranchId)?.name || t('common.selectBranch')}
@@ -626,6 +627,7 @@ export default function HorariosScreen() {
                                                     }}
                                                 >
                                                     <ThemedText
+                                                        className='font-body'
                                                         style={{
                                                             fontSize: isSelected ? 16 : 13,
                                                             fontWeight: isSelected ? '800' : '400',
@@ -640,13 +642,12 @@ export default function HorariosScreen() {
                                         })}
                                         {branches.length === 0 && (
                                             <View className='px-4 py-3'>
-                                                <ThemedText className='text-sm text-neutral-400'>{t('schedule.noClassesBranch')}</ThemedText>
+                                                <ThemedText className='font-body text-sm text-neutral-400'>{t('schedule.noClassesBranch')}</ThemedText>
                                             </View>
                                         )}
                                     </View>
                                 )}
                             </View>
-                        </View>
                     </View>
 
                     {activeTab === 'classes' && (
@@ -657,10 +658,10 @@ export default function HorariosScreen() {
                                 </View>
                             )}
                             {!loadingClasses && errorMessage && (
-                                <ThemedText className='text-center text-sm text-red-500 mb-4'>{errorMessage}</ThemedText>
+                                <ThemedText className='font-body text-center text-sm text-red-500 mb-4'>{errorMessage}</ThemedText>
                             )}
                             {!loadingClasses && !errorMessage && classes.length === 0 && selectedBranchId && (
-                                <ThemedText className='text-center text-sm text-neutral-500 mb-4'>
+                                <ThemedText className='font-body text-center text-sm text-neutral-500 mb-4'>
                                     {t('schedule.noClassesBranch')}
                                 </ThemedText>
                             )}
@@ -699,7 +700,7 @@ export default function HorariosScreen() {
 
                     {activeTab === 'reservas' && (
                         <View>
-                            <ThemedText className='text-xl font-bold mb-4'>{t('schedule.myBookings')}</ThemedText>
+                            <ThemedText className='font-heading text-xl font-bold mb-4'>{t('schedule.myBookings')}</ThemedText>
 
                             {loadingBookings && (
                                 <View className='items-center py-4'>
@@ -708,13 +709,13 @@ export default function HorariosScreen() {
                             )}
 
                             {!loadingBookings && bookingsError && (
-                                <ThemedText className='text-center text-sm text-red-500 mb-4'>
+                                <ThemedText className='font-body text-center text-sm text-red-500 mb-4'>
                                     {bookingsError}
                                 </ThemedText>
                             )}
 
                             {!loadingBookings && !bookingsError && bookings.length === 0 && (
-                                <ThemedText className='text-neutral-500'>
+                                <ThemedText className='font-body text-neutral-500'>
                                     {t('schedule.noBookings')}
                                 </ThemedText>
                             )}

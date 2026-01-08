@@ -33,13 +33,13 @@ export default function EntrenamientoScreen() {
                     <RoutinesCarousel items={routineChips} />
                     <View className='items-center mb-2'>
                         <View className='flex-row items-center bg-neutral-200 rounded-full px-8 py-4' style={{ minWidth: '80%', justifyContent: 'space-between' }}>
-                            <Text style={{ color: '#111827', fontWeight: '800', fontSize: 18 }}>{t('training.active')}</Text>
-                            <Text style={{ color: '#6B7280', fontWeight: '600', fontSize: 16 }}>{t('training.today')}</Text>
+                            <Text className='font-heading' style={{ color: '#111827', fontWeight: '800', fontSize: 18 }}>{t('training.active')}</Text>
+                            <Text className='font-body' style={{ color: '#6B7280', fontWeight: '600', fontSize: 16 }}>{t('training.today')}</Text>
                         </View>
                     </View>
                     <View className='items-end mb-4'>
                         <TouchableOpacity activeOpacity={0.7} onPress={() => router.push('/routine/history')}>
-                            <Text style={{ color: '#F27F2A', fontWeight: '800' }}>{t('training.viewHistory')}</Text>
+                            <Text className='font-body' style={{ color: '#F27F2A', fontWeight: '800' }}>{t('training.viewHistory')}</Text>
                         </TouchableOpacity>
                     </View>
                     <TrainingCard
