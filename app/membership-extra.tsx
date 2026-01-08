@@ -4,7 +4,7 @@ import { ThemedText } from '@/components/themed-text';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, FlatList, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon } from 'react-native-heroicons/solid';
@@ -59,7 +59,7 @@ export default function MembershipExtraScreen() {
     return translated !== translationKey ? translated : pkg.description;
   };
 
-  const loadPackages = async (page: number = 1, append: boolean = false) => {
+  const loadPackages = useCallback(async (page: number = 1, append: boolean = false) => {
     if (append) {
       setLoadingMore(true);
     }
@@ -92,7 +92,7 @@ export default function MembershipExtraScreen() {
       setLoading(false);
       setLoadingMore(false);
     }
-  };
+  }, [t]);
 
   const loadMorePackages = () => {
     if (!loadingMore && hasMore) {
@@ -102,7 +102,7 @@ export default function MembershipExtraScreen() {
 
   useEffect(() => {
     loadPackages(1, false);
-  }, []);
+  }, [loadPackages]);
 
   const togglePackage = (pkgId: string) => {
     if (selectedPackagesIds.includes(pkgId)) {

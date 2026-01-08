@@ -18,7 +18,7 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 	const [qrValue, setQrValue] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const intervalRef = useRef<any>(null);
+	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const [remainingSeconds, setRemainingSeconds] = useState<number>(120);
 
 	const formatTime = (secs: number) => {
@@ -66,8 +66,6 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 			return;
 		}
 
-		setRemainingSeconds(120);
-
 		// Tick every second to update UI countdown. When it hits 0, refresh the QR and reset.
 		intervalRef.current = setInterval(() => {
 			setRemainingSeconds((prev) => {
@@ -85,7 +83,7 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 				intervalRef.current = null;
 			}
 		};
-	}, [visible, fetchQrToken]);
+	}, [visible, fetchQrToken, t]);
 
 	return (
 		<Modal
