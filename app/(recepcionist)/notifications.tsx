@@ -41,8 +41,8 @@ const NotificationItem = ({ title, description }: { title: string; description: 
       <BellIcon size={24} color='#F97316' />
     </View>
     <View style={styles.notificationContent}>
-      <Text style={styles.notificationTitle}>{title}</Text>
-      <Text style={styles.notificationDescription}>{description}</Text>
+      <Text className='font-body' style={styles.notificationTitle}>{title}</Text>
+      <Text className='font-body' style={styles.notificationDescription}>{description}</Text>
     </View>
   </View>
 );
@@ -70,7 +70,7 @@ export default function RecepcionistNotificationsScreen() {
         <TouchableOpacity onPress={() => router.replace('/(recepcionist)/profile')} style={styles.backButton}>
           <ChevronLeftIcon size={28} color='#F97316' />
         </TouchableOpacity>
-        <ThemedText style={styles.headerTitle}>{t('dashboard.notifications.title')}</ThemedText>
+        <ThemedText className='font-heading' style={styles.headerTitle}>{t('dashboard.notifications.title')}</ThemedText>
         <TouchableOpacity
           onPress={() => router.push('/notification-settings')}
           style={styles.settingsButton}>

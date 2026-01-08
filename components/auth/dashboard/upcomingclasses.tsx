@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dimensions, FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { ClockIcon, FireIcon } from 'react-native-heroicons/solid';
+import { useTranslation } from 'react-i18next';
 
 const ClassImage = require('@/assets/images/Rectangle.png');
 
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export const UpcomingClassesCarousel: React.FC<Props> = ({ classes }) => {
+	const { t } = useTranslation();
 	const { width } = Dimensions.get('window');
 	const cardWidth = width * 0.75;
 
@@ -34,14 +36,14 @@ export const UpcomingClassesCarousel: React.FC<Props> = ({ classes }) => {
 							<ClockIcon size={16} color='#000000' />
 						</View>
 						<View style={styles.textGroup}>
-							<Text style={styles.detailTitle}>Hora</Text>
+							<Text className='font-body' style={styles.detailTitle}>{t('dashboard.upcomingClasses.time')}</Text>
 							{timeParts.length === 2 ? (
 								<>
-									<Text style={styles.timeValue}>{timeParts[0]} -</Text>
-									<Text style={styles.timeValue}>{timeParts[1]}</Text>
+									<Text className='font-body' style={styles.timeValue}>{timeParts[0]} -</Text>
+									<Text className='font-body' style={styles.timeValue}>{timeParts[1]}</Text>
 								</>
 							) : (
-								<Text style={styles.timeValue}>{item.time}</Text>
+								<Text className='font-body' style={styles.timeValue}>{item.time}</Text>
 							)}
 						</View>
 					</View>
@@ -53,8 +55,8 @@ export const UpcomingClassesCarousel: React.FC<Props> = ({ classes }) => {
 							<FireIcon size={16} color='#000000' />
 						</View>
 						<View style={styles.textGroup}>
-							<Text style={styles.detailTitle}>Burn</Text>
-							<Text style={styles.caloriesValue}>{item.calories}</Text>
+							<Text className='font-body' style={styles.detailTitle}>{t('dashboard.upcomingClasses.burn')}</Text>
+							<Text className='font-body' style={styles.caloriesValue}>{item.calories}</Text>
 						</View>
 					</View>
 				</View>
@@ -64,7 +66,7 @@ export const UpcomingClassesCarousel: React.FC<Props> = ({ classes }) => {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.carouselTitle}>Próximas clases</Text>
+			<Text className='font-heading' style={styles.carouselTitle}>{t('dashboard.upcomingClasses.title')}</Text>
 
 			<FlatList
 				data={classes}

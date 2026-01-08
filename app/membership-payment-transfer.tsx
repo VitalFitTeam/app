@@ -85,45 +85,45 @@ export default function MembershipPaymentTransferScreen() {
         <ThemedText
             lightColor='#f97316'
             darkColor='#f97316'
-            className='text-3xl mb-2 text-center uppercase'
+            className='font-heading text-3xl mb-2 text-center uppercase'
             style={{ fontFamily: 'BebasNeue-Regular' }}
         >
             {params.methodName || t('payment.transfer.title')}
         </ThemedText>
-        
-        <ThemedText className="text-center text-gray-500 mb-6">
+
+        <ThemedText className="font-body text-center text-gray-500 mb-6">
             {t('payment.transfer.subtitle')}
         </ThemedText>
 
         <View className='mb-6 border border-gray-200 rounded-2xl px-4 py-4 bg-gray-50'>
-          <ThemedText className='text-xs font-bold tracking-widest mb-3 text-gray-500 uppercase'>
+          <ThemedText className='font-body text-xs font-bold tracking-widest mb-3 text-gray-500 uppercase'>
             {t('payment.transfer.destinationAccount')}
           </ThemedText>
-          
+
           {params.methodName?.toLowerCase().includes('zelle') ? (
              <View className='space-y-2'>
                 <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>{t('payment.transfer.labels.email')}</ThemedText>
-                    <ThemedText className='font-bold text-gray-900'>pagos@vitalfit.com</ThemedText>
+                    <ThemedText className='font-body text-gray-600'>{t('payment.transfer.labels.email')}</ThemedText>
+                    <ThemedText className='font-body font-bold text-gray-900'>pagos@vitalfit.com</ThemedText>
                 </View>
                 <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>{t('payment.transfer.labels.holder')}</ThemedText>
-                    <ThemedText className='font-bold text-gray-900'>VitalFit LLC</ThemedText>
+                    <ThemedText className='font-body text-gray-600'>{t('payment.transfer.labels.holder')}</ThemedText>
+                    <ThemedText className='font-body font-bold text-gray-900'>VitalFit LLC</ThemedText>
                 </View>
              </View>
           ) : (
              <View className='space-y-2'>
                 <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>{t('payment.transfer.labels.bank')}</ThemedText>
-                    <ThemedText className='font-bold text-gray-900'>Banco Nacional</ThemedText>
+                    <ThemedText className='font-body text-gray-600'>{t('payment.transfer.labels.bank')}</ThemedText>
+                    <ThemedText className='font-body font-bold text-gray-900'>Banco Nacional</ThemedText>
                 </View>
                 <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>{t('payment.transfer.labels.account')}</ThemedText>
-                    <ThemedText className='font-bold text-gray-900'>0134-XXXX-XXXX-XXXX</ThemedText>
+                    <ThemedText className='font-body text-gray-600'>{t('payment.transfer.labels.account')}</ThemedText>
+                    <ThemedText className='font-body font-bold text-gray-900'>0134-XXXX-XXXX-XXXX</ThemedText>
                 </View>
                 <View className='flex-row justify-between'>
-                    <ThemedText className='text-gray-600'>{t('payment.transfer.labels.rif')}</ThemedText>
-                    <ThemedText className='font-bold text-gray-900'>J-12345678-9</ThemedText>
+                    <ThemedText className='font-body text-gray-600'>{t('payment.transfer.labels.rif')}</ThemedText>
+                    <ThemedText className='font-body font-bold text-gray-900'>J-12345678-9</ThemedText>
                 </View>
              </View>
           )}
@@ -145,18 +145,18 @@ export default function MembershipPaymentTransferScreen() {
           }}
         >
           <View>
-            <ThemedText className='text-xs text-white/80 tracking-widest mb-1'>
+            <ThemedText className='font-body text-xs text-white/80 tracking-widest mb-1'>
               {t('payment.transfer.total')}
             </ThemedText>
-            <ThemedText className='text-white font-bold text-xs'>
+            <ThemedText className='font-body text-white font-bold text-xs'>
                Orden #{params.invoiceId?.slice(0,8)}
             </ThemedText>
           </View>
           <View className='items-end'>
-            <ThemedText className='text-3xl font-bold text-white' style={{ fontFamily: 'BebasNeue-Regular' }}>
+            <ThemedText className='font-heading text-3xl font-bold text-white' style={{ fontFamily: 'BebasNeue-Regular' }}>
               {currencySymbol}{parseFloat(params.totalAmount).toFixed(2)}
             </ThemedText>
-            <ThemedText className='text-white/90 text-xs font-bold'>
+            <ThemedText className='font-body text-white/90 text-xs font-bold'>
               {params.currency || 'USD'}
             </ThemedText>
           </View>
@@ -184,10 +184,10 @@ export default function MembershipPaymentTransferScreen() {
         <View className='mb-8 border border-blue-100 rounded-xl px-4 py-3 bg-blue-50 flex-row items-center'>
           <ExclamationTriangleIcon size={24} color='#3b82f6' />
           <View className='ml-3 flex-1'>
-            <ThemedText className='text-xs text-blue-800 font-bold mb-1'>
+            <ThemedText className='font-body text-xs text-blue-800 font-bold mb-1'>
               {t('payment.warning.manualConfirmation')}
             </ThemedText>
-            <ThemedText className='text-xs text-blue-600'>
+            <ThemedText className='font-body text-xs text-blue-600'>
               {t('payment.warning.manualMessage')}
             </ThemedText>
           </View>

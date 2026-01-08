@@ -130,15 +130,15 @@ export default function ClassDetailsScreen() {
         </View>
 
         <View style={styles.content}>
-          <ThemedText style={styles.className}>{name}</ThemedText>
+          <ThemedText className='font-heading' style={styles.className}>{name}</ThemedText>
 
           <View style={styles.metaBlock}>
-            <ThemedText style={styles.dateText}>{formattedDate}</ThemedText>
-            <ThemedText style={styles.capacityText}>
+            <ThemedText className='font-body' style={styles.dateText}>{formattedDate}</ThemedText>
+            <ThemedText className='font-body' style={styles.capacityText}>
               {enrolled}/{capacity} {t('schedule.spotsOccupied')}
             </ThemedText>
-            <ThemedText style={styles.timeText}>{time}</ThemedText>
-            <ThemedText style={styles.durationText}>{t('classDetails.duration')}</ThemedText>
+            <ThemedText className='font-body' style={styles.timeText}>{time}</ThemedText>
+            <ThemedText className='font-body' style={styles.durationText}>{t('classDetails.duration')}</ThemedText>
           </View>
 
           <View style={styles.instructorCard}>
@@ -147,13 +147,13 @@ export default function ClassDetailsScreen() {
               style={styles.instructorPhoto}
             />
             <View style={styles.instructorInfo}>
-              <ThemedText style={styles.instructorName}>{instructorName}</ThemedText>
+              <ThemedText className='font-body' style={styles.instructorName}>{instructorName}</ThemedText>
             </View>
           </View>
 
           <View style={styles.section}>
-            <ThemedText style={styles.sectionTitle}>{t('classDetails.descriptionTitle')}</ThemedText>
-            <ThemedText style={styles.sectionBody}>
+            <ThemedText className='font-heading' style={styles.sectionTitle}>{t('classDetails.descriptionTitle')}</ThemedText>
+            <ThemedText className='font-body' style={styles.sectionBody}>
               {description}
             </ThemedText>
           </View>
@@ -169,7 +169,7 @@ export default function ClassDetailsScreen() {
           <View style={styles.clientsHeader}>
             <View style={styles.clientsTitleRow}>
               <CalendarDaysIcon size={20} color='#6B7280' />
-              <ThemedText style={styles.clientsTitle}>
+              <ThemedText className='font-body' style={styles.clientsTitle}>
                 {t('checkIn.clientList.title')} ({enrolled}/{capacity})
               </ThemedText>
             </View>
@@ -182,24 +182,24 @@ export default function ClassDetailsScreen() {
                   <UserIcon size={24} color='#F97316' />
                 </View>
                 <View style={styles.clientInfo}>
-                  <ThemedText style={styles.clientName}>{client.name}</ThemedText>
-                  <ThemedText style={styles.clientLevel}>{client.level}</ThemedText>
+                  <ThemedText className='font-body' style={styles.clientName}>{client.name}</ThemedText>
+                  <ThemedText className='font-body' style={styles.clientLevel}>{client.level}</ThemedText>
                 </View>
               </TouchableOpacity>
             ))}
           </View>
 
           <TouchableOpacity style={styles.viewAllButton} activeOpacity={0.8}>
-            <ThemedText style={styles.viewAllButtonText}>{t('common.viewAllRegistered')}</ThemedText>
+            <ThemedText className='font-body' style={styles.viewAllButtonText}>{t('common.viewAllRegistered')}</ThemedText>
           </TouchableOpacity>
 
           {isFull ? (
             <TouchableOpacity style={styles.fullButton} activeOpacity={0.8}>
-              <ThemedText style={styles.fullButtonText}>{t('classDetails.classFull')}</ThemedText>
+              <ThemedText className='font-body' style={styles.fullButtonText}>{t('classDetails.classFull')}</ThemedText>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity 
-              style={styles.primaryButton} 
+            <TouchableOpacity
+              style={styles.primaryButton}
               activeOpacity={0.8}
               onPress={() => {
                 const queryParams = new URLSearchParams({
@@ -215,7 +215,7 @@ export default function ClassDetailsScreen() {
                 router.push(`/(recepcionist)/enroll-client?${queryParams.toString()}`);
               }}
             >
-              <ThemedText style={styles.primaryButtonText}>{t('classDetails.enrollClient')}</ThemedText>
+              <ThemedText className='font-body' style={styles.primaryButtonText}>{t('classDetails.enrollClient')}</ThemedText>
             </TouchableOpacity>
           )}
         </View>

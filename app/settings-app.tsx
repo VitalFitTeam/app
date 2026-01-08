@@ -33,7 +33,7 @@ const SettingsMenuItem = ({
 		<TouchableOpacity
 			onPress={onPress}
 			className='flex-row justify-between items-center py-4 px-4 bg-neutral-100 dark:bg-neutral-800'>
-			<Text style={textStyle}>{title}</Text>
+			<Text className='font-body' style={textStyle}>{title}</Text>
 			{icon || (hasNav && <ChevronRightIcon size={20} color='#9ca3af' />)}
 		</TouchableOpacity>
 	);
@@ -47,7 +47,7 @@ type SettingsToggleItemProps = {
 
 const SettingsToggleItem = ({ title, value, onValueChange }: SettingsToggleItemProps) => (
 	<View className='flex-row justify-between items-center py-4 px-4 bg-neutral-100 dark:bg-neutral-800'>
-		<Text style={{ fontSize: 14, color: '#000000' }}>{title}</Text>
+		<Text className='font-body' style={{ fontSize: 14, color: '#000000' }}>{title}</Text>
 		<Switch
 			value={value}
 			onValueChange={onValueChange}
@@ -59,7 +59,7 @@ const SettingsToggleItem = ({ title, value, onValueChange }: SettingsToggleItemP
 
 const SectionHeader = ({ title }: { title: string }) => (
 	<View className='px-2 pt-6 pb-3'>
-		<Text className='text-sm text-gray-500 dark:text-gray-400'>{title}</Text>
+		<Text className='font-body text-sm text-gray-500 dark:text-gray-400'>{title}</Text>
 	</View>
 );
 

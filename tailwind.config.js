@@ -12,6 +12,22 @@ module.exports = {
 			},
 		},
 	},
-	plugins: [],
+	plugins: [
+		function ({ addUtilities }) {
+			const newUtilities = {
+				'.font-heading': {
+					fontFamily: 'BebasNeue-Regular',
+					textTransform: 'uppercase',
+					fontStyle: 'italic',
+					fontWeight: '900',
+					letterSpacing: '-0.02em',
+				},
+				'.font-body': {
+					fontFamily: 'Montserrat-ExtraBold',
+				},
+			};
+			addUtilities(newUtilities);
+		},
+	],
 	presets: [require('nativewind/preset')],
 };

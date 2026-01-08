@@ -56,7 +56,7 @@ export default function LanguageScreen() {
                 key={lang.code}
                 style={styles.option}
                 onPress={() => setSelectedLanguage(lang.code)}>
-                <Text style={styles.optionText}>{lang.name}</Text>
+                <Text className='font-body' style={styles.optionText}>{lang.name}</Text>
 
                 {selectedLanguage === lang.code && (
                   <Check color='#F27F2A' size={24} />

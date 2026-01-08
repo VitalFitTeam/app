@@ -47,16 +47,16 @@ export default function InstructorNotificationsScreen() {
             <ChevronLeftIcon width={20} height={20} color='#f97316' />
           </TouchableOpacity>
 
-          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Notificaciones</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Notificaciones</Text>
 
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={handleOpenSettings}
             style={{ position: 'absolute', right: 12, top: 8, bottom: 8, justifyContent: 'center' }}>
-            <Text style={{ color: '#f97316', fontSize: 13, fontWeight: '600' }}>Configurar</Text>
+            <Text className='font-body' style={{ color: '#f97316', fontSize: 13, fontWeight: '600' }}>Configurar</Text>
           </TouchableOpacity>
         </View>
-        <Text style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 8 }}>Hoy</Text>
+        <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 8 }}>Hoy</Text>
         {mockNotifications.slice(0, 2).map((n) => (
           <View
             key={n.id}
@@ -84,10 +84,11 @@ export default function InstructorNotificationsScreen() {
                 justifyContent: 'center',
                 marginRight: 10,
               }}>
-              <Text style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>Gym</Text>
+              <Text className='font-body' style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>Gym</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text
+                className='font-body'
                 style={{
                   color: '#111827',
                   fontSize: 13,
@@ -98,16 +99,17 @@ export default function InstructorNotificationsScreen() {
                 {n.title}
               </Text>
               <Text
+                className='font-body'
                 style={{ color: '#4b5563', fontSize: 12, marginBottom: 4 }}
                 numberOfLines={2}>
                 {n.body}
               </Text>
-              <Text style={{ color: '#9ca3af', fontSize: 11 }}>{n.dateLabel}</Text>
+              <Text className='font-body' style={{ color: '#9ca3af', fontSize: 11 }}>{n.dateLabel}</Text>
             </View>
           </View>
         ))}
 
-        <Text style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 16 }}>Ayer</Text>
+        <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 16 }}>Ayer</Text>
         {mockNotifications.slice(2).map((n) => (
           <View
             key={n.id}
@@ -135,10 +137,11 @@ export default function InstructorNotificationsScreen() {
                 justifyContent: 'center',
                 marginRight: 10,
               }}>
-              <Text style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>Gym</Text>
+              <Text className='font-body' style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>Gym</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text
+                className='font-body'
                 style={{
                   color: '#111827',
                   fontSize: 13,
@@ -149,11 +152,12 @@ export default function InstructorNotificationsScreen() {
                 {n.title}
               </Text>
               <Text
+                className='font-body'
                 style={{ color: '#4b5563', fontSize: 12, marginBottom: 4 }}
                 numberOfLines={2}>
                 {n.body}
               </Text>
-              <Text style={{ color: '#9ca3af', fontSize: 11 }}>{n.dateLabel}</Text>
+              <Text className='font-body' style={{ color: '#9ca3af', fontSize: 11 }}>{n.dateLabel}</Text>
             </View>
           </View>
         ))}

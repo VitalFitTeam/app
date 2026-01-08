@@ -22,7 +22,7 @@ export default function SecurityScreen() {
             <ChevronLeftIcon width={20} height={20} color='#f97316' />
           </TouchableOpacity>
 
-          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Seguridad</Text>
+          <Text className='font-body' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Seguridad</Text>
         </View>
 
         <View className='mb-2'>

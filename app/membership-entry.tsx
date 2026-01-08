@@ -44,7 +44,7 @@ export default function MembershipEntryScreen() {
 						<ThemedText
 							lightColor='#f97316'
 							darkColor='#f97316'
-							className='text-lg tracking-[0.18em] mt-1'
+							className='font-heading text-lg tracking-[0.18em] mt-1'
 							style={{ fontFamily: 'BebasNeue-Regular' }}>
 							{t('membershipEntry.title')}
 						</ThemedText>
@@ -72,14 +72,14 @@ export default function MembershipEntryScreen() {
 										<ThemedText
 											lightColor='#ffffff'
 											darkColor='#ffffff'
-											className='text-[13px] font-semibold'
+											className='font-heading text-[13px] font-semibold'
 											style={{ fontFamily: 'BebasNeue-Regular' }}>
 											{t('membershipEntry.buyMembership')}
 										</ThemedText>
 										<ThemedText
 											lightColor='#ffffff'
 											darkColor='#ffffff'
-											className='text-[10px] opacity-95'
+											className='font-body text-[10px] opacity-95'
 											style={{ fontFamily: 'Montserrat_400Regular' }}>
 											{t('membershipEntry.membershipDesc')}
 										</ThemedText>
@@ -89,21 +89,21 @@ export default function MembershipEntryScreen() {
 									<ThemedText
 										lightColor='#ffffff'
 										darkColor='#ffffff'
-										className='text-[9px] mb-1'
+										className='font-body text-[9px] mb-1'
 										style={{ fontFamily: 'Montserrat_400Regular' }}>
 										• {t('membershipEntry.membershipBullets.access')}
 									</ThemedText>
 									<ThemedText
 										lightColor='#ffffff'
 										darkColor='#ffffff'
-										className='text-[9px] mb-1'
+										className='font-body text-[9px] mb-1'
 										style={{ fontFamily: 'Montserrat_400Regular' }}>
 										• {t('membershipEntry.membershipBullets.benefits')}
 									</ThemedText>
 									<ThemedText
 										lightColor='#ffffff'
 										darkColor='#ffffff'
-										className='text-[9px]'
+										className='font-body text-[9px]'
 										style={{ fontFamily: 'Montserrat_400Regular' }}>
 										• {t('membershipEntry.membershipBullets.discounts')}
 									</ThemedText>
@@ -139,14 +139,14 @@ export default function MembershipEntryScreen() {
 										<ThemedText
 											lightColor='#ffffff'
 											darkColor='#ffffff'
-											className='text-[13px] font-semibold'
+											className='font-heading text-[13px] font-semibold'
 											style={{ fontFamily: 'BebasNeue-Regular' }}>
 											{t('membershipEntry.buyService')}
 										</ThemedText>
 										<ThemedText
 											lightColor='#ffffff'
 											darkColor='#ffffff'
-											className='text-[10px] opacity-95'
+											className='font-body text-[10px] opacity-95'
 											style={{ fontFamily: 'Montserrat_400Regular' }}>
 											{t('membershipEntry.serviceDesc')}
 										</ThemedText>
@@ -156,21 +156,21 @@ export default function MembershipEntryScreen() {
 									<ThemedText
 										lightColor='#ffffff'
 										darkColor='#ffffff'
-										className='text-[9px] mb-1'
+										className='font-body text-[9px] mb-1'
 										style={{ fontFamily: 'Montserrat_400Regular' }}>
 										• {t('membershipEntry.serviceBullets.classes')}
 									</ThemedText>
 									<ThemedText
 										lightColor='#ffffff'
 										darkColor='#ffffff'
-										className='text-[9px] mb-1'
+										className='font-body text-[9px] mb-1'
 										style={{ fontFamily: 'Montserrat_400Regular' }}>
 										• {t('membershipEntry.serviceBullets.personalTraining')}
 									</ThemedText>
 									<ThemedText
 										lightColor='#ffffff'
 										darkColor='#ffffff'
-										className='text-[9px]'
+										className='font-body text-[9px]'
 										style={{ fontFamily: 'Montserrat_400Regular' }}>
 										• {t('membershipEntry.serviceBullets.individualServices')}
 									</ThemedText>

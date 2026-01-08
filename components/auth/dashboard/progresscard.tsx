@@ -15,17 +15,17 @@ export const ProgressCard: React.FC<Props> = ({ weekProgress, calories, complete
 	return (
 		<View style={[styles.container, { width: cardWidth }]}>
 			<View style={styles.header}>
-				<Text style={styles.title}>TU PROGRESO</Text>
-				<Text style={styles.link}>VER MÁS</Text>
+				<Text className='font-body' style={styles.title}>TU PROGRESO</Text>
+				<Text className='font-body' style={styles.link}>VER MÁS</Text>
 			</View>
 
 			<View style={styles.cardsContainer}>
 				<View style={styles.card}>
 					<View style={styles.cardHeader}>
-						<Text style={styles.cardTitle}>ESTA SEMANA</Text>
+						<Text className='font-body' style={styles.cardTitle}>ESTA SEMANA</Text>
 						<CalendarDaysIcon size={19} color='#0F172A' />
 					</View>
-					<Text style={styles.cardValue}>{completed}</Text>
+					<Text className='font-body' style={styles.cardValue}>{completed}</Text>
 					<View style={styles.progressBarBackground}>
 						<View
 							style={[styles.progressBarFill, { width: `${weekProgress * 100}%` }]}
@@ -34,8 +34,8 @@ export const ProgressCard: React.FC<Props> = ({ weekProgress, calories, complete
 				</View>
 
 				<View style={styles.card}>
-					<Text style={styles.cardTitle}>CALORÍAS ESTIMADAS</Text>
-					<Text style={styles.cardValue}>{calories}</Text>
+					<Text className='font-body' style={styles.cardTitle}>CALORÍAS ESTIMADAS</Text>
+					<Text className='font-body' style={styles.cardValue}>{calories}</Text>
 					<View style={styles.progressBarBackground}>
 						<View style={[styles.progressBarFill, { width: '90%' }]} />
 					</View>

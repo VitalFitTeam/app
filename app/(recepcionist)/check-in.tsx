@@ -63,18 +63,18 @@ export default function CheckInScreen() {
         contentContainerStyle={{ paddingBottom: 100 }}
       >
         <View style={styles.header}>
-        <Image 
-          source={require('@/assets/images/Frame.png')} 
+        <Image
+          source={require('@/assets/images/Frame.png')}
           style={styles.logo}
           resizeMode="contain"
         />
-        <ThemedText style={styles.title}>{t('checkIn.title')}</ThemedText>
+        <ThemedText className='font-heading' style={styles.title}>{t('checkIn.title')}</ThemedText>
       </View>
 
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <CheckCircleIcon width={20} height={20} color="#1F2937" />
-          <ThemedText style={styles.cardTitle}>{t('dashboard.validateCheckIn.title')}</ThemedText>
+          <ThemedText className='font-body' style={styles.cardTitle}>{t('dashboard.validateCheckIn.title')}</ThemedText>
         </View>
 
         <View style={styles.searchContainer}>
@@ -86,16 +86,16 @@ export default function CheckInScreen() {
           />
         </View>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.qrButton}
           onPress={handleScanQR}
           disabled={isScanning}
         >
           <QrCodeIcon width={16} height={16} color="#FFFFFF" />
-          <ThemedText style={styles.qrButtonText}>{t('dashboard.validateCheckIn.scanQr')}</ThemedText>
+          <ThemedText className='font-body' style={styles.qrButtonText}>{t('dashboard.validateCheckIn.scanQr')}</ThemedText>
         </TouchableOpacity>
 
-        <ThemedText style={styles.previewMessage}>
+        <ThemedText className='font-body' style={styles.previewMessage}>
           {t('checkIn.cameraPreviewUnavailable')}
         </ThemedText>
       </View>

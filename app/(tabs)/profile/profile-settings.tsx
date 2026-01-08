@@ -1,11 +1,13 @@
 import { ThemedView } from '@/components/themed-view';
 import { useRouter } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon, ShieldCheckIcon } from 'react-native-heroicons/solid';
 
 export default function SettingsScreen() {
 	const router = useRouter();
+	const { t } = useTranslation();
 
 	return (
 		<ThemedView className='flex-1 bg-white pt-10'>
@@ -22,24 +24,24 @@ export default function SettingsScreen() {
 						<ChevronLeftIcon width={20} height={20} color='#f97316' />
 					</TouchableOpacity>
 
-					<Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Seguridad</Text>
+					<Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('profileSettings.title')}</Text>
 				</View>
 
 				<View className='mb-2'>
-					<Text className='text-[14px] font-semibold text-[#111827] mb-2'>Opciones</Text>
+					<Text className='font-heading text-[14px] font-semibold text-[#111827] mb-2'>{t('profileSettings.options')}</Text>
 				</View>
 
 				<TouchableOpacity
 					activeOpacity={0.8}
 					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
 					onPress={() => {
-						router.push('./change-password');
+						router.replace('./change-password');
 					}}>
 					<View className='flex-row items-center'>
 						<View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
 							<ShieldCheckIcon width={18} height={18} color='#111827' />
 						</View>
-						<Text className='text-[13px] text-[#111827]'>Cambiar contraseña</Text>
+						<Text className='font-body text-[13px] text-[#111827]'>{t('profileSettings.changePassword')}</Text>
 					</View>
 					<ChevronLeftIcon
 						width={16}

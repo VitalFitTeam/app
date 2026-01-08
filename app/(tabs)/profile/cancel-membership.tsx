@@ -16,7 +16,7 @@ export default function CancelMembershipScreen() {
 					<ChevronLeftIcon size={28} color='#F27F2A' />
 				</TouchableOpacity>
 			<View className='flex-1 justify-center items-center p-6'>
-				<ThemedText className='text-3xl font-bold text-center mb-12'>
+				<ThemedText className='font-heading text-3xl font-bold text-center mb-12'>
 					¿Estás seguro de que quieres cancelar?
 				</ThemedText>
 

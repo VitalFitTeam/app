@@ -60,7 +60,7 @@ export default function HomeScreen() {
 					paddingTop: 48,
 				}}>
 
-				<Text className='mb-6 text-center font-montserrat-bold text-[30px] leading-[36px] text-white'>
+				<Text className='mb-6 text-center font-heading text-[30px] leading-[36px] text-white'>
 					{slideTexts[index]}
 				</Text>
 
@@ -78,7 +78,7 @@ export default function HomeScreen() {
 				<Link href='/language' asChild>
 					<TouchableOpacity className='mb-4 flex-row items-center justify-center py-2'>
 						<Global color='white' size={16} variant='Outline' />
-						<Text className='ml-2 font-montserrat-medium text-sm text-white'>
+						<Text className='ml-2 font-body text-sm text-white'>
 							{t('languageLabel')}
 						</Text>
 					</TouchableOpacity>

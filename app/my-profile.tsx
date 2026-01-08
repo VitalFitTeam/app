@@ -72,7 +72,7 @@ export default function MyProfileScreen() {
 				} else if (error instanceof Error) {
 					errorMessage = error.message;
 				}
-				console.error('💥 Error al obtener datos del usuario:', errorMessage);
+				console.error('Error al obtener datos del usuario:', errorMessage);
 			} finally {
 				setLoading(false);
 			}
@@ -84,7 +84,7 @@ export default function MyProfileScreen() {
 		try {
 			const token = await AsyncStorage.getItem('token');
 			if (!token) {
-				console.error('❌ No se encontró token en AsyncStorage');
+				console.error('No se encontró token en AsyncStorage');
 				return;
 			}
 
@@ -261,7 +261,7 @@ export default function MyProfileScreen() {
 					<View className='mb-4' />
 
 					<View>
-						<Text style={styles.label}>{t('myProfile.phone')}</Text>
+						<Text className='font-body' style={styles.label}>{t('myProfile.phone')}</Text>
 						<PhoneInput
 							ref={phoneInputRef}
 							value={phone || ''}

@@ -53,14 +53,14 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 				<View style={styles.modalView}>
 
 					<View style={styles.header}>
-						<Text style={styles.modalTitle}>Tu Código de Acceso</Text>
+						<Text className='font-heading' style={styles.modalTitle}>Tu Código de Acceso</Text>
 						<TouchableOpacity onPress={onClose} style={styles.closeButton}>
 							<Ionicons name="close" size={24} color="#6B7280" />
 						</TouchableOpacity>
 					</View>
 
-					<Text style={styles.userName}>{userName}</Text>
-					<Text style={styles.instruction}>
+					<Text className='font-heading' style={styles.userName}>{userName}</Text>
+					<Text className='font-body' style={styles.instruction}>
 						Muestra este código en recepción para ingresar
 					</Text>
 
@@ -75,14 +75,14 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 								backgroundColor="white"
 							/>
 						) : (
-							<Text style={{ color: 'red' }}>No se pudo cargar el QR</Text>
+							<Text className='font-body' style={{ color: 'red' }}>No se pudo cargar el QR</Text>
 						)}
 					</View>
 
 					{!loading && (
 						<TouchableOpacity onPress={fetchQrToken} style={styles.refreshButton}>
 							<Ionicons name="refresh" size={20} color="#F27F2A" />
-							<Text style={styles.refreshText}>Actualizar código</Text>
+							<Text className='font-body' style={styles.refreshText}>Actualizar código</Text>
 						</TouchableOpacity>
 					)}
 

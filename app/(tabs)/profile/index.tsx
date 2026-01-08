@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
   ArrowRightOnRectangleIcon,
@@ -22,6 +23,7 @@ import {
 } from 'react-native-heroicons/outline';
 
 export default function ProfileScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { user, loading, clearUser } = useUser();
   const { clearReservations } = useReservations();
@@ -38,9 +40,9 @@ export default function ProfileScreen() {
 
   const displayName = user
     ? user.lastName
-      ? `${user.firstName || 'Cliente'} ${user.lastName}`
-      : user.firstName || 'Cliente'
-    : 'Cliente';
+      ? `${user.firstName || t('client.profile.defaultUser')} ${user.lastName}`
+      : user.firstName || t('client.profile.defaultUser')
+    : t('client.profile.defaultUser');
 
   const handleConfirmLogout = async () => {
     try {
@@ -78,46 +80,45 @@ export default function ProfileScreen() {
           <Text className="text-[20px] font-semibold text-[#111827]">{displayName}</Text>
           {(user?.roleName === 'Instructor' || user?.roleName === 'Staff') ? (
             <>
-              <Text className="text-[13px] text-[#6b7280] mt-1">{user?.specialty || 'Entrenador Personal'}</Text>
+              <Text className="text-[13px] text-[#6b7280] mt-1">{user?.specialty || t('client.profile.personalTrainer')}</Text>
               <Text className="text-[13px] text-[#f97316] mt-0.5">{user?.roleName}</Text>
             </>
           ) : (
             <>
               <View className="flex-row items-center mt-1">
-                <Text className="text-[13px] text-[#6b7280] mr-1">Nivel 24</Text>
+                <Text className="text-[13px] text-[#6b7280] mr-1">{t('client.profile.level')} 24</Text>
                 <Image
                   source={require('@/assets/images/medal2.png')}
                   style={{ width: 14, height: 14 }}
                   contentFit="contain"
                 />
               </View>
-              <Text className="text-[13px] text-[#f97316] mt-0.5">Premium</Text>
+              <Text className="text-[13px] text-[#f97316] mt-0.5">{t('client.profile.premium')}</Text>
             </>
           )}
         </View>
 
         <View className="mb-4">
-          <Text className="text-[14px] font-semibold text-[#111827] mb-1">Sobre mí</Text>
+          <Text className="text-[14px] font-semibold text-[#111827] mb-1">{t('client.profile.aboutMe')}</Text>
           <Text className="text-[13px] text-[#4b5563] leading-5">
-            Desde tu perfil puedes gestionar tu información personal, revisar tu membresía y configurar tus
-            notificaciones y preferencias de cuenta.
+            {t('client.profile.aboutMeDescription')}
           </Text>
         </View>
 
         <View className="w-full bg-[#F3F4F6] rounded-2xl py-3 px-3 mb-6 flex-row justify-between">
           <View className="flex-1 items-center">
             <Text className="text-[18px] font-semibold text-[#111827]">6</Text>
-            <Text className="text-[11px] text-[#4b5563] mt-1">Entrenamientos</Text>
+            <Text className="text-[11px] text-[#4b5563] mt-1">{t('client.profile.stats.workouts')}</Text>
           </View>
           <View className="w-px bg-[#d1d5db] mx-2" />
           <View className="flex-1 items-center">
             <Text className="text-[18px] font-semibold text-[#111827]">46</Text>
-            <Text className="text-[11px] text-[#4b5563] mt-1">Insignias</Text>
+            <Text className="text-[11px] text-[#4b5563] mt-1">{t('client.profile.stats.badges')}</Text>
           </View>
           <View className="w-px bg-[#d1d5db] mx-2" />
           <View className="flex-1 items-center">
             <Text className="text-[18px] font-semibold text-[#111827]">25</Text>
-            <Text className="text-[11px] text-[#4b5563] mt-1">Puntos</Text>
+            <Text className="text-[11px] text-[#4b5563] mt-1">{t('client.profile.stats.points')}</Text>
           </View>
         </View>
 
@@ -127,7 +128,7 @@ export default function ProfileScreen() {
           onPress={() => setQrModalVisible(true)}
         >
           <QrCodeIcon width={18} height={18} color="#111827" />
-          <Text className="ml-2 text-[13px] font-medium text-[#111827]">Check in</Text>
+          <Text className="ml-2 text-[13px] font-medium text-[#111827]">{t('client.profile.checkIn')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -145,7 +146,7 @@ export default function ProfileScreen() {
                 marginBottom: 4,
               }}
             >
-              Código de referidos
+              {t('client.profile.referralCode')}
             </Text>
             <Text
               style={{
@@ -161,7 +162,7 @@ export default function ProfileScreen() {
         </TouchableOpacity>
 
         <View className="mb-2">
-          <Text className="text-[14px] font-semibold text-[#111827] mb-2">Configuración</Text>
+          <Text className="text-[14px] font-semibold text-[#111827] mb-2">{t('client.profile.settings')}</Text>
         </View>
 
         <TouchableOpacity
@@ -175,7 +176,7 @@ export default function ProfileScreen() {
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
               <UserCircleIcon width={18} height={18} color="#111827" />
             </View>
-            <Text className="text-[13px] text-[#111827]">Información personal</Text>
+            <Text className="text-[13px] text-[#111827]">{t('client.profile.personalInfo')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
@@ -191,7 +192,7 @@ export default function ProfileScreen() {
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
               <ShieldCheckIcon width={18} height={18} color="#111827" />
             </View>
-            <Text className="text-[13px] text-[#111827]">Seguridad</Text>
+            <Text className="text-[13px] text-[#111827]">{t('client.profile.security')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
@@ -207,7 +208,7 @@ export default function ProfileScreen() {
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
               <TicketIcon width={18} height={18} color="#111827" />
             </View>
-            <Text className="text-[13px] text-[#111827]">Mi membresía</Text>
+            <Text className="text-[13px] text-[#111827]">{t('client.profile.myMembership')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
@@ -223,7 +224,7 @@ export default function ProfileScreen() {
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
               <TrophyIcon width={18} height={18} color="#111827" />
             </View>
-            <Text className="text-[13px] text-[#111827]">Insignias</Text>
+            <Text className="text-[13px] text-[#111827]">{t('client.profile.badges')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
@@ -239,7 +240,7 @@ export default function ProfileScreen() {
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
               <LanguageIcon width={18} height={18} color="#111827" />
             </View>
-            <Text className="text-[13px] text-[#111827]">Idioma</Text>
+            <Text className="text-[13px] text-[#111827]">{t('client.profile.language')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
@@ -255,7 +256,7 @@ export default function ProfileScreen() {
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
               <BellIcon width={18} height={18} color="#111827" />
             </View>
-            <Text className="text-[13px] text-[#111827]">Notificaciones</Text>
+            <Text className="text-[13px] text-[#111827]">{t('client.profile.notifications')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
@@ -271,7 +272,7 @@ export default function ProfileScreen() {
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
               <QuestionMarkCircleIcon width={18} height={18} color="#111827" />
             </View>
-            <Text className="text-[13px] text-[#111827]">Ayuda y soporte</Text>
+            <Text className="text-[13px] text-[#111827]">{t('client.profile.helpSupport')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
@@ -287,7 +288,7 @@ export default function ProfileScreen() {
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
               <GlobeAltIcon width={18} height={18} color="#111827" />
             </View>
-            <Text className="text-[13px] text-[#111827]">Términos y condiciones</Text>
+            <Text className="text-[13px] text-[#111827]">{t('client.profile.termsConditions')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
@@ -303,7 +304,7 @@ export default function ProfileScreen() {
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
               <CreditCardIcon width={18} height={18} color="#111827" />
             </View>
-            <Text className="text-[13px] text-[#111827]">Historial de pago</Text>
+            <Text className="text-[13px] text-[#111827]">{t('client.profile.paymentHistory')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color="#9ca3af" />
         </TouchableOpacity>
@@ -319,7 +320,7 @@ export default function ProfileScreen() {
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
               <ArrowRightOnRectangleIcon width={18} height={18} color="#b91c1c" />
             </View>
-            <Text className="text-[13px] text-[#b91c1c] font-semibold">Cerrar sesión</Text>
+            <Text className="text-[13px] text-[#b91c1c] font-semibold">{t('client.profile.logout')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color="#b91c1c" />
         </TouchableOpacity>
@@ -360,7 +361,7 @@ export default function ProfileScreen() {
                 marginBottom: 8,
               }}
             >
-              ¿Cerrar sesión?
+              {t('client.profile.logoutConfirm.title')}
             </Text>
             <Text
               style={{
@@ -369,7 +370,7 @@ export default function ProfileScreen() {
                 marginBottom: 16,
               }}
             >
-              Se cerrará tu sesión actual y deberás iniciar sesión nuevamente.
+              {t('client.profile.logoutConfirm.message')}
             </Text>
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
               <TouchableOpacity
@@ -377,7 +378,7 @@ export default function ProfileScreen() {
                 onPress={() => setLogoutModalVisible(false)}
                 style={{ paddingVertical: 8, paddingHorizontal: 12, marginRight: 8 }}
               >
-                <Text style={{ fontSize: 13, color: '#4b5563' }}>Cancelar</Text>
+                <Text style={{ fontSize: 13, color: '#4b5563' }}>{t('client.profile.logoutConfirm.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.9}
@@ -390,7 +391,7 @@ export default function ProfileScreen() {
                 }}
               >
                 <Text style={{ fontSize: 13, color: '#FFFFFF', fontWeight: '600' }}>
-                  Cerrar sesión
+                  {t('client.profile.logout')}
                 </Text>
               </TouchableOpacity>
             </View>

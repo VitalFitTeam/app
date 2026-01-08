@@ -26,12 +26,12 @@ export default function CrossFitBanner({ imageSource, title, onPress, ctaLabel =
 			/>
 			<View className='absolute inset-0 bg-black/40' />
 			<View className='flex-1 justify-end p-5'>
-				<Text className='text-white font-bold text-3xl mb-4'>{title}</Text>
+				<Text className='font-heading text-white font-bold text-3xl mb-4'>{title}</Text>
 				<TouchableOpacity
 					className='bg-orange-500 rounded-lg px-5 py-2.5 self-start'
 					onPress={onPress}
 					activeOpacity={0.8}>
-					<Text className='text-white font-bold text-sm'>{ctaLabel}</Text>
+					<Text className='font-body text-white font-bold text-sm'>{ctaLabel}</Text>
 				</TouchableOpacity>
 			</View>
 		</View>

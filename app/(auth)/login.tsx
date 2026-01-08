@@ -3,7 +3,7 @@ import { SocialButton } from '@/components/auth/SocialButton';
 import { LoadingModal } from '@/components/LoadingModal';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ToastNotification } from '@/components/ToastNotification';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services/vitalfitSdk';
@@ -270,13 +270,11 @@ export default function LoginScreen() {
                             <LogoSimple size={180} />
                         </View>
 
-                        <Text
-                            className='text-3xl text-black mb-1 uppercase text-center'
-                            style={{ fontFamily: Fonts.title }}>
+                        <Text className='font-heading text-3xl text-black mb-1 uppercase text-center'>
                             {t('login.title')}
                         </Text>
 
-                        <Text className='text-gray-500 text-center mb-4 text-base'>
+                        <Text className='font-body text-gray-500 text-center mb-4 text-base'>
                             {t('login.subtitle')}
                         </Text>
 

@@ -75,7 +75,9 @@
       "loading": "Cargando...",
       "today": "Hoy",
       "category": "Categoría",
-      "reserved": "Reservado"
+      "reserved": "Reservado",
+      "viewMore": "Ver más",
+      "availability": "Disponibilidad"
     },
     "login": {
       "title": "Iniciar Sesión",
@@ -299,7 +301,27 @@
         "packages": "Paquetes"
       },
       "banners": {
-        "crossfit4": "CrossFit - 4 sesiones"
+        "crossfit4": "CrossFit - 4 sesiones",
+        "weeklyChallenge": "Reto Semanal",
+        "plankWithHipTwist": "Plancha con Giro de Cadera"
+      },
+      "membershipCard": {
+        "welcomeTo": "Bienvenido a",
+        "daysRemaining": "días restantes",
+        "noActiveMembership": "No tiene membresía activa",
+        "checkIn": "Check in",
+        "purchase": "Comprar"
+      },
+      "upcomingClasses": {
+        "title": "Próximas clases",
+        "time": "Hora",
+        "burn": "Burn"
+      },
+      "upcomingRoutines": {
+        "title": "Próximas rutinas",
+        "services": "Servicios",
+        "start": "Comenzar",
+        "purchase": "Comprar"
       }
     },
     "enrollClient": {
@@ -440,8 +462,74 @@
         "fetchUser": "Ocurrió un error inesperado al obtener los datos del usuario."
       }
     },
+    "insignias": {
+      "title": "Mis insignias",
+      "currentLevel": "TU NIVEL ACTUAL",
+      "progressToLevel": "Progreso al nivel {{level}}",
+      "stats": {
+        "points": "Puntos",
+        "badges": "Insignias",
+        "referrals": "Referidos"
+      },
+      "badgesObtained": "Badges obtenidos",
+      "progress": "Progreso",
+      "rarity": {
+        "common": "Común",
+        "rare": "Raro",
+        "epic": "Épico",
+        "legendary": "Legendario"
+      },
+      "badgeNames": {
+        "firstClass": "Primera clase",
+        "ironWarrior": "Guerrero de Hierro",
+        "earlyBird": "Madrugador",
+        "champion": "Champion",
+        "devoted": "Devoted"
+      },
+      "requirements": {
+        "champion": "Gana 6 retos extra",
+        "devoted": "Entrena 30 días seguidos"
+      }
+    },
+    "profileSettings": {
+      "title": "Seguridad",
+      "options": "Opciones",
+      "changePassword": "Cambiar contraseña"
+    },
+    "changePassword": {
+      "title": "Cambiar contraseña",
+      "accountSecurity": "Seguridad de la cuenta",
+      "updatePassword": "Actualiza tu contraseña de acceso",
+      "currentPasswordLabel": "Contraseña actual",
+      "currentPasswordPlaceholder": "Ingresa tu contraseña actual",
+      "newPasswordLabel": "Nueva contraseña",
+      "newPasswordPlaceholder": "Ingresa tu nueva contraseña",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Repite tu nueva contraseña",
+      "saveButton": "Guardar cambios",
+      "savingButton": "Guardando...",
+      "errors": {
+        "currentPasswordRequired": "Ingresa tu contraseña actual.",
+        "newPasswordMin": "La contraseña debe tener al menos 8 caracteres.",
+        "uppercase": "Debe contener al menos una mayúscula.",
+        "lowercase": "Debe contener al menos una minúscula.",
+        "number": "Debe contener al menos un número.",
+        "special": "Debe contener al menos un caracter especial.",
+        "passwordMismatch": "Las contraseñas no coinciden.",
+        "samePassword": "La nueva contraseña no puede ser igual a la actual.",
+        "noSession": "No se encontró sesión activa",
+        "generic": "Ocurrió un error al cambiar la contraseña.",
+        "incorrectPassword": "La contraseña actual es incorrecta.",
+        "verifyPassword": "Verifique su contraseña actual e intente nuevamente."
+      },
+      "toast": {
+        "successTitle": "Contraseña actualizada",
+        "successMessage": "La contraseña se guardó correctamente",
+        "errorTitle": "Error"
+      }
+    },
     "myProfile": {
-      "title": "Mi perfil",
+      "title": "Perfil",
       "personalAccount": "Cuenta personal",
       "firstName": "Nombre",
       "lastName": "Apellido",
@@ -449,11 +537,76 @@
       "identityDoc": "Documento de identidad",
       "birthDate": "Fecha de nacimiento",
       "phone": "Teléfono",
+      "gender": "Género",
       "edit": "Editar",
       "saveChanges": "Guardar cambios",
+      "cancel": "Cancelar",
+      "level": "Nivel",
+      "premium": "Premium",
+      "personalInfo": "Información Personal",
+      "contactInfo": "Información de contacto",
+      "male": "Masculino",
+      "female": "Femenino",
+      "placeholders": {
+        "name": "Nombre",
+        "lastName": "Apellido",
+        "identityDoc": "Documento de identidad",
+        "birthDate": "yyyy-mm-dd",
+        "email": "Correo electrónico",
+        "phone": "Teléfono",
+        "gender": "Género"
+      },
+      "errors": {
+        "nameRequired": "El nombre es requerido.",
+        "nameLetters": "El nombre solo puede contener letras.",
+        "lastNameRequired": "El apellido es requerido.",
+        "lastNameLetters": "El apellido solo puede contener letras.",
+        "documentRequired": "El documento es requerido.",
+        "documentMin": "El documento debe tener al menos 6 dígitos.",
+        "documentNumeric": "El documento solo puede contener números.",
+        "birthDateRequired": "La fecha de nacimiento es requerida.",
+        "adult": "Debes ser mayor de 18 años.",
+        "phoneLength": "El número de teléfono debe tener entre 10 y 15 dígitos.",
+        "genderRequired": "El género es requerido.",
+        "noToken": "No se encontró token de autenticación",
+        "noUserId": "No se encontró el ID del usuario",
+        "uploadImageError": "No se pudo subir la imagen de perfil",
+        "updateError": "Ocurrió un error inesperado al actualizar el perfil."
+      },
+      "permissions": {
+        "title": "Permisos necesarios",
+        "message": "Necesitamos acceso a tu galería para cambiar la foto de perfil."
+      },
+      "galleryError": "No se pudo abrir la galería.",
       "toast": {
         "successTitle": "¡Perfil actualizado!",
-        "successMessage": "Tus cambios se guardaron correctamente"
+        "successMessage": "Tus cambios se guardaron correctamente",
+        "errorTitle": "Error"
+      }
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "configure": "Configurar",
+      "timeLabels": {
+        "today": "Hoy",
+        "yesterday": "Ayer"
+      },
+      "badges": {
+        "gym": "Gym"
+      },
+      "messages": {
+        "classReminder": {
+          "title": "Recordatorio de clase",
+          "body": "Tienes una clase de Functional Strength hoy a las 6:00 pm."
+        },
+        "membershipRenewal": {
+          "title": "Renueva tu membresía",
+          "body": "Tu membresía vence en 3 días. Renueva ahora y obtén 10% de descuento."
+        },
+        "challengeComplete": {
+          "title": "¡Reto completado!",
+          "body": "Felicidades, completaste el reto semanal. Obtuviste 150 puntos."
+        }
       }
     },
     "myMembership": {
@@ -471,6 +624,45 @@
       "title": "Idioma",
       "changeLanguage": "Cambiar idioma",
       "selectOption": "Selecciona una opción de las opciones de configuración"
+    },
+    "paymentHistory": {
+      "title": "Historial de pago",
+      "invoice": "Factura",
+      "searchPlaceholder": "Buscar...",
+      "filter": "Filtrar",
+      "filters": {
+        "all": "Todos",
+        "paid": "Pagado",
+        "pending": "Pendiente",
+        "processing": "Procesando",
+        "refunded": "Reembolsado"
+      },
+      "emptyState": "No se encontraron pagos",
+      "status": {
+        "paid": "Pagado",
+        "pending": "Pendiente",
+        "processing": "Procesando",
+        "refunded": "Reembolsado"
+      },
+      "details": {
+        "branch": "Sede",
+        "issuedAt": "Emitido en",
+        "itemsDetail": "Detalle de items",
+        "reportedPayments": "Pagos reportados",
+        "quantity": "Cant",
+        "membershipType": "Tipo de membresía",
+        "paymentMethod": "Método de pago",
+        "subtotal": "Subtotal",
+        "tax": "IVA",
+        "total": "Total",
+        "loadError": "No se pudo cargar el detalle.",
+        "items": {
+          "billing": "Ítem de facturación",
+          "subscription": "Suscripción Premium",
+          "package": "Paquete de Clases",
+          "service": "Servicio General"
+        }
+      }
     },
     "notificationsSettings": {
       "title": "Configurar",
@@ -693,6 +885,39 @@
         "title": "Mis clientes",
         "assignRoutine": "Asignar nueva rutina",
         "viewProgress": "Ver progreso"
+      }
+    },
+    "client": {
+      "profile": {
+        "defaultUser": "Cliente",
+        "personalTrainer": "Entrenador Personal",
+        "level": "Nivel",
+        "premium": "Premium",
+        "aboutMe": "Sobre mí",
+        "aboutMeDescription": "Desde tu perfil puedes gestionar tu información personal, revisar tu membresía y configurar tus notificaciones y preferencias de cuenta.",
+        "stats": {
+          "workouts": "Entrenamientos",
+          "badges": "Insignias",
+          "points": "Puntos"
+        },
+        "checkIn": "Check in",
+        "referralCode": "Código de referidos",
+        "settings": "Configuración",
+        "personalInfo": "Información personal",
+        "security": "Seguridad",
+        "myMembership": "Mi membresía",
+        "badges": "Insignias",
+        "language": "Idioma",
+        "notifications": "Notificaciones",
+        "helpSupport": "Ayuda y soporte",
+        "termsConditions": "Términos y condiciones",
+        "paymentHistory": "Historial de pago",
+        "logout": "Cerrar sesión",
+        "logoutConfirm": {
+          "title": "¿Cerrar sesión?",
+          "message": "Se cerrará tu sesión actual y deberás iniciar sesión nuevamente.",
+          "cancel": "Cancelar"
+        }
       }
     },
     "validations": {

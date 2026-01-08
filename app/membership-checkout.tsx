@@ -278,7 +278,7 @@ export default function MembershipCheckoutScreen() {
             {t('checkout.startDate')}
           </ThemedText>
           {errors.startDate?.message && (
-            <Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>
+            <Text className='font-body' style={{ color: 'red', fontSize: 12, marginTop: 4 }}>
               {errors.startDate.message}
             </Text>
           )}

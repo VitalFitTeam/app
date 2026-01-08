@@ -8,42 +8,45 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon, ShieldCheckIcon } from 'react-native-heroicons/solid';
 import { z } from 'zod';
 
-const ChangePasswordSchema = z
+const createChangePasswordSchema = (t: (key: string) => string) => z
   .object({
-    currentPassword: z.string().min(1, 'Ingresa tu contraseña actual.'),
+    currentPassword: z.string().min(1, t('changePassword.errors.currentPasswordRequired')),
     newPassword: z
       .string()
-      .min(8, 'La contraseña debe tener al menos 8 caracteres.')
-      .regex(/[A-Z]/, 'Debe contener al menos una mayúscula.')
-      .regex(/[a-z]/, 'Debe contener al menos una minúscula.')
-      .regex(/[0-9]/, 'Debe contener al menos un número.')
-      .regex(/[^a-zA-Z0-9]/, 'Debe contener al menos un caracter especial.'),
+      .min(8, t('changePassword.errors.newPasswordMin'))
+      .regex(/[A-Z]/, t('changePassword.errors.uppercase'))
+      .regex(/[a-z]/, t('changePassword.errors.lowercase'))
+      .regex(/[0-9]/, t('changePassword.errors.number'))
+      .regex(/[^a-zA-Z0-9]/, t('changePassword.errors.special')),
     confirmPassword: z.string(),
   })
- 
+
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: 'Las contraseñas no coinciden.',
+    message: t('changePassword.errors.passwordMismatch'),
     path: ['confirmPassword'],
   })
-  
+
   .refine((data) => data.newPassword !== data.currentPassword, {
-    message: 'La nueva contraseña no puede ser igual a la actual.',
+    message: t('changePassword.errors.samePassword'),
     path: ['newPassword'],
   });
 
-type FormData = z.infer<typeof ChangePasswordSchema>;
-
 export default function ChangePasswordScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toastState, showToast, hideToast } = useToast();
+
+  const ChangePasswordSchema = useMemo(() => createChangePasswordSchema(t), [t]);
+  type FormData = z.infer<typeof ChangePasswordSchema>;
 
   const {
     control,
@@ -65,7 +68,7 @@ export default function ChangePasswordScreen() {
     try {
       const token = await AsyncStorage.getItem('token');
       if (!token) {
-        setErrorMessage('No se encontró sesión activa');
+        setErrorMessage(t('changePassword.errors.noSession'));
         return;
       }
 
@@ -76,32 +79,32 @@ export default function ChangePasswordScreen() {
         data.confirmPassword
       );
 
-      showToast('success', 'Contraseña actualizada', 'La contraseña se guardó correctamente');
-      
+      showToast('success', t('changePassword.toast.successTitle'), t('changePassword.toast.successMessage'));
+
       setTimeout(() => {
         router.back();
       }, 2000);
     } catch (error: unknown) {
       console.log('Error al cambiar password:', error);
 
-      let message = 'Ocurrió un error al cambiar la contraseña.';
+      let message = t('changePassword.errors.generic');
 
       if (isAPIError(error)) {
         if (error.status === 401) {
-          message = 'La contraseña actual es incorrecta.';
+          message = t('changePassword.errors.incorrectPassword');
         } else if (error.messages && error.messages.length > 0) {
           message = error.messages.join(', ');
         } else if (error.message && error.message !== 'Ocurrió un error inesperado') {
           message = error.message;
         } else {
-          message = 'Verifique su contraseña actual e intente nuevamente.';
+          message = t('changePassword.errors.verifyPassword');
         }
       } else if (error instanceof Error) {
         message = error.message;
       }
 
       setErrorMessage(message);
-      showToast('error', 'Error', message);
+      showToast('error', t('changePassword.toast.errorTitle'), message);
     } finally {
       setIsLoading(false);
     }
@@ -133,8 +136,8 @@ export default function ChangePasswordScreen() {
               <ChevronLeftIcon width={20} height={20} color='#f97316' />
             </TouchableOpacity>
 
-            <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>
-              Cambiar contraseña
+            <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>
+              {t('changePassword.title')}
             </Text>
           </View>
 
@@ -143,8 +146,8 @@ export default function ChangePasswordScreen() {
               <ShieldCheckIcon width={20} height={20} color='#111827' />
             </View>
             <View className='flex-1'>
-              <Text className='text-[15px] font-semibold text-[#111827]'>Seguridad de la cuenta</Text>
-              <Text className='text-[12px] text-[#6b7280]'>Actualiza tu contraseña de acceso</Text>
+              <Text className='font-heading text-[15px] font-semibold text-[#111827]'>{t('changePassword.accountSecurity')}</Text>
+              <Text className='font-body text-[12px] text-[#6b7280]'>{t('changePassword.updatePassword')}</Text>
             </View>
           </View>
 
@@ -157,7 +160,7 @@ export default function ChangePasswordScreen() {
                 paddingHorizontal: 10,
                 marginBottom: 12,
               }}>
-              <Text style={{ color: '#B91C1C', fontSize: 12 }}>{errorMessage}</Text>
+              <Text className='font-body' style={{ color: '#B91C1C', fontSize: 12 }}>{errorMessage}</Text>
             </View>
           )}
 
@@ -167,12 +170,12 @@ export default function ChangePasswordScreen() {
               name='currentPassword'
               render={({ field: { onChange, onBlur, value } }) => (
                 <StyledTextInput
-                  label='Contraseña actual'
+                  label={t('changePassword.currentPasswordLabel')}
                   isPasswordInput
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  placeholder='Ingresa tu contraseña actual'
+                  placeholder={t('changePassword.currentPasswordPlaceholder')}
                   error={errors.currentPassword?.message}
                 />
               )}
@@ -183,12 +186,12 @@ export default function ChangePasswordScreen() {
               name='newPassword'
               render={({ field: { onChange, onBlur, value } }) => (
                 <StyledTextInput
-                  label='Nueva contraseña'
+                  label={t('changePassword.newPasswordLabel')}
                   isPasswordInput
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  placeholder='Ingresa tu nueva contraseña'
+                  placeholder={t('changePassword.newPasswordPlaceholder')}
                   error={errors.newPassword?.message}
                 />
               )}
@@ -199,19 +202,19 @@ export default function ChangePasswordScreen() {
               name='confirmPassword'
               render={({ field: { onChange, onBlur, value } }) => (
                 <StyledTextInput
-                  label='Confirmar contraseña'
+                  label={t('changePassword.confirmPasswordLabel')}
                   isPasswordInput
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  placeholder='Repite tu nueva contraseña'
+                  placeholder={t('changePassword.confirmPasswordPlaceholder')}
                   error={errors.confirmPassword?.message}
                 />
               )}
             />
 
             <PrimaryButton
-              title={isLoading ? 'Guardando...' : 'Guardar cambios'}
+              title={isLoading ? t('changePassword.savingButton') : t('changePassword.saveButton')}
               onPress={handleSubmit(onSubmit)}
               disabled={isLoading}
               style={{ marginTop: 12 }}

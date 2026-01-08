@@ -39,6 +39,7 @@ export default function ComunidadScreen() {
 
 					<View className='mt-6'>
 						<Text
+							className='font-heading'
 							style={{
 								color: '#111827',
 								fontWeight: '800',

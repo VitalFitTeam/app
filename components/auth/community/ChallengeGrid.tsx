@@ -34,7 +34,7 @@ export default function ChallengeGrid({
 						resizeMode='contain'
 					/>
 					<View style={{ position: 'absolute', left: 12, bottom: 12 }}>
-						<Text style={{ color: '#111827', fontWeight: '600', fontSize: 16 }}>
+						<Text className='font-body' style={{ color: '#111827', fontWeight: '600', fontSize: 16 }}>
 							Plank{'\n'}Challenge
 						</Text>
 					</View>
@@ -56,7 +56,7 @@ export default function ChallengeGrid({
 						resizeMode='contain'
 					/>
 					<View style={{ position: 'absolute', left: 12, bottom: 12 }}>
-						<Text style={{ color: '#e5e7eb', fontWeight: '600', fontSize: 16 }}>
+						<Text className='font-body' style={{ color: '#e5e7eb', fontWeight: '600', fontSize: 16 }}>
 							Sprint{'\n'}Challenge
 						</Text>
 					</View>
@@ -79,7 +79,7 @@ export default function ChallengeGrid({
 						resizeMode='contain'
 					/>
 					<View style={{ position: 'absolute', left: 12, bottom: 12 }}>
-						<Text style={{ color: '#111827', fontWeight: '600', fontSize: 16 }}>
+						<Text className='font-body' style={{ color: '#111827', fontWeight: '600', fontSize: 16 }}>
 							Squat{'\n'}Challenge
 						</Text>
 					</View>

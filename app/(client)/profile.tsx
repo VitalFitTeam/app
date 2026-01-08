@@ -102,13 +102,13 @@ export default function ClientProfileScreen() {
               style={{ width: '100%', height: '100%' }}
             />
           </View>
-          <Text className='text-[20px] font-semibold text-[#111827]'>{displayName}</Text>
-          <Text className='text-[13px] text-[#6b7280] mt-1'>{t('clientProfile.member')}</Text>
-          <Text className='text-[13px] text-[#f97316] mt-0.5'>{t('clientProfile.activeMembership')}</Text>
+          <Text className='font-body text-[20px] font-semibold text-[#111827]'>{displayName}</Text>
+          <Text className='font-body text-[13px] text-[#6b7280] mt-1'>{t('clientProfile.member')}</Text>
+          <Text className='font-body text-[13px] text-[#f97316] mt-0.5'>{t('clientProfile.activeMembership')}</Text>
         </View>
         <View className='mb-4'>
-          <Text className='text-[14px] font-semibold text-[#111827] mb-1'>{t('profile.aboutMe')}</Text>
-          <Text className='text-[13px] text-[#4b5563] leading-5'>
+          <Text className='font-body text-[14px] font-semibold text-[#111827] mb-1'>{t('profile.aboutMe')}</Text>
+          <Text className='font-body text-[13px] text-[#4b5563] leading-5'>
             {t('clientProfile.description')}
           </Text>
         </View>
@@ -117,10 +117,10 @@ export default function ClientProfileScreen() {
           className='w-full rounded-2xl border border-[#d1d5db] py-3 px-4 mb-4 flex-row items-center justify-center bg-white'
           onPress={() => setQrModalVisible(true)}>
           <QrCodeIcon width={18} height={18} color='#111827' />
-          <Text className='ml-2 text-[13px] font-medium text-[#111827]'>{t('clientProfile.myQr')}</Text>
+          <Text className='font-body ml-2 text-[13px] font-medium text-[#111827]'>{t('clientProfile.myQr')}</Text>
         </TouchableOpacity>
         <View className='mb-2'>
-          <Text className='text-[14px] font-semibold text-[#111827] mb-2'>{t('profile.settings')}</Text>
+          <Text className='font-body text-[14px] font-semibold text-[#111827] mb-2'>{t('profile.settings')}</Text>
         </View>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -132,7 +132,7 @@ export default function ClientProfileScreen() {
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
               <UserCircleIcon width={18} height={18} color='#111827' />
             </View>
-            <Text className='text-[13px] text-[#111827]'>{t('profile.personalInfo')}</Text>
+            <Text className='font-body text-[13px] text-[#111827]'>{t('profile.personalInfo')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
@@ -146,7 +146,7 @@ export default function ClientProfileScreen() {
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
               <GlobeAltIcon width={18} height={18} color='#111827' />
             </View>
-            <Text className='text-[13px] text-[#111827]'>{t('clientProfile.membership')}</Text>
+            <Text className='font-body text-[13px] text-[#111827]'>{t('clientProfile.membership')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
@@ -160,7 +160,7 @@ export default function ClientProfileScreen() {
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
               <BellIcon width={18} height={18} color='#111827' />
             </View>
-            <Text className='text-[13px] text-[#111827]'>{t('dashboard.notifications.title')}</Text>
+            <Text className='font-body text-[13px] text-[#111827]'>{t('dashboard.notifications.title')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
@@ -174,7 +174,7 @@ export default function ClientProfileScreen() {
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
               <ShieldCheckIcon width={18} height={18} color='#111827' />
             </View>
-            <Text className='text-[13px] text-[#111827]'>{t('profile.settings')}</Text>
+            <Text className='font-body text-[13px] text-[#111827]'>{t('profile.settings')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
@@ -188,7 +188,7 @@ export default function ClientProfileScreen() {
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
               <QuestionMarkCircleIcon width={18} height={18} color='#111827' />
             </View>
-            <Text className='text-[13px] text-[#111827]'>{t('profile.helpSupport')}</Text>
+            <Text className='font-body text-[13px] text-[#111827]'>{t('profile.helpSupport')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
@@ -202,7 +202,7 @@ export default function ClientProfileScreen() {
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
               <ArrowRightOnRectangleIcon width={18} height={18} color='#b91c1c' />
             </View>
-            <Text className='text-[13px] text-[#b91c1c] font-semibold'>{t('profile.logout')}</Text>
+            <Text className='font-body text-[13px] text-[#b91c1c] font-semibold'>{t('profile.logout')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color='#b91c1c' />
         </TouchableOpacity>
@@ -231,6 +231,7 @@ export default function ClientProfileScreen() {
               paddingVertical: 20,
             }}>
             <Text
+              className='font-body'
               style={{
                 fontSize: 16,
                 fontWeight: '600',
@@ -240,6 +241,7 @@ export default function ClientProfileScreen() {
               {t('profile.logoutConfirmTitle')}
             </Text>
             <Text
+              className='font-body'
               style={{
                 fontSize: 13,
                 color: '#4b5563',
@@ -252,7 +254,7 @@ export default function ClientProfileScreen() {
                 activeOpacity={0.8}
                 onPress={() => setLogoutModalVisible(false)}
                 style={{ paddingVertical: 8, paddingHorizontal: 12, marginRight: 8 }}>
-                <Text style={{ fontSize: 13, color: '#4b5563' }}>{t('common.cancel')}</Text>
+                <Text className='font-body' style={{ fontSize: 13, color: '#4b5563' }}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.9}
@@ -263,7 +265,7 @@ export default function ClientProfileScreen() {
                   borderRadius: 999,
                   backgroundColor: '#f97316',
                 }}>
-                <Text style={{ fontSize: 13, color: '#FFFFFF', fontWeight: '600' }}>
+                <Text className='font-body' style={{ fontSize: 13, color: '#FFFFFF', fontWeight: '600' }}>
                   {t('profile.logout')}
                 </Text>
               </TouchableOpacity>

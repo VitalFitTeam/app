@@ -72,7 +72,7 @@ export default function MembershipsScreen() {
 										<ThemedText
 											lightColor="#f97316"
 											darkColor="#f97316"
-											className="mb-1 text-center tracking-[0.25em]"
+											className="font-heading mb-1 text-center tracking-[0.25em]"
 											style={{
 												fontFamily: 'BebasNeue-Regular',
 												fontSize: 28,
@@ -90,7 +90,7 @@ export default function MembershipsScreen() {
 										<ThemedText
 											lightColor='#f97316'
 											darkColor='#f97316'
-											className='mb-3 text-center text-6xl'
+											className='font-heading mb-3 text-center text-6xl'
 											style={{
 												fontFamily: 'BebasNeue-Regular',
 												fontSize: 28,
@@ -106,7 +106,7 @@ export default function MembershipsScreen() {
 										<ThemedText
 											lightColor="#f97316"
 											darkColor="#e5e7eb"
-											className="px-2 text-center text-sm"
+											className="font-body px-2 text-center text-sm"
 											style={{
 												fontFamily: 'Montserrat_400Regular',
 												fontSize: 18,

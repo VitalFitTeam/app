@@ -111,9 +111,9 @@ export default function DashboardScreen() {
 	const mockRoutines = [
 		{
 			id: '1',
-			title: 'DÍA 01',
-			subtitle: 'Comienza a trotar',
-			duration: '10 km, 4 semanas',
+			title: t('dashboard.mock.routineDay'),
+			subtitle: t('dashboard.mock.routineSubtitle'),
+			duration: t('dashboard.mock.routineDuration'),
 			image: require('@/assets/images/rutina.png'),
 		},
 	];
@@ -190,7 +190,7 @@ export default function DashboardScreen() {
 					<>
 						<BirthdayOfferBanner onPress={() => router.replace('/membership-entry')} />
 
-						<RNText style={{ color: '#111827', fontWeight: '700', fontSize: 18, marginTop: 16, marginBottom: 8 }}>
+						<RNText className='font-heading' style={{ color: '#111827', fontWeight: '700', fontSize: 18, marginTop: 16, marginBottom: 8 }}>
 							{t('dashboard.member.packages')}
 						</RNText>
 						<View className='gap-3 mb-4'>

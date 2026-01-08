@@ -42,7 +42,7 @@ export default function MembershipMethodsScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white">
         <View className="flex-1 justify-center items-center">
-            {loading ? <ActivityIndicator color="#f97316" /> : <ThemedText>Métodos cargados: {methods.length}</ThemedText>}
+            {loading ? <ActivityIndicator color="#f97316" /> : <ThemedText className="font-body">Métodos cargados: {methods.length}</ThemedText>}
         </View>
     </SafeAreaView>
   );

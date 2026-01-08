@@ -1,32 +1,34 @@
 import { ThemedView } from '@/components/themed-view';
 import { useRouter } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon } from 'react-native-heroicons/solid';
 
-const mockNotifications = [
-  {
-    id: '1',
-    title: 'Recordatorio de clase',
-    body: 'Tienes una clase de Functional Strength hoy a las 6:00 pm.',
-    dateLabel: 'Sep 9, 2024',
-  },
-  {
-    id: '2',
-    title: 'Nuevo mensaje',
-    body: 'Tienes nuevas recomendaciones en tu plan de entrenamiento.',
-    dateLabel: 'Sep 9, 2024',
-  },
-  {
-    id: '3',
-    title: 'Actualización de membresía',
-    body: 'Tu membresía Premium se ha renovado correctamente.',
-    dateLabel: 'Sep 8, 2024',
-  },
-];
-
 export default function NotificationsScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+
+  const mockNotifications = [
+    {
+      id: '1',
+      titleKey: 'classReminder',
+      dateLabel: 'Sep 9, 2024',
+      section: 'today',
+    },
+    {
+      id: '2',
+      titleKey: 'membershipRenewal',
+      dateLabel: 'Sep 9, 2024',
+      section: 'today',
+    },
+    {
+      id: '3',
+      titleKey: 'challengeComplete',
+      dateLabel: 'Sep 8, 2024',
+      section: 'yesterday',
+    },
+  ];
 
   const handleOpenSettings = () => {
     router.push('/profile/notifications-settings');
@@ -47,18 +49,18 @@ export default function NotificationsScreen() {
             <ChevronLeftIcon width={20} height={20} color='#f97316' />
           </TouchableOpacity>
 
-          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Notificaciones</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('notifications.title')}</Text>
 
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={handleOpenSettings}
             style={{ position: 'absolute', right: 12, top: 8, bottom: 8, justifyContent: 'center' }}>
-            <Text style={{ color: '#f97316', fontSize: 13, fontWeight: '600' }}>Configurar</Text>
+            <Text className='font-body' style={{ color: '#f97316', fontSize: 13, fontWeight: '600' }}>{t('notifications.configure')}</Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 8 }}>Hoy</Text>
-        {mockNotifications.slice(0, 2).map((n) => (
+        <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 8 }}>{t('notifications.timeLabels.today')}</Text>
+        {mockNotifications.filter(n => n.section === 'today').map((n) => (
           <View
             key={n.id}
             style={{
@@ -85,10 +87,11 @@ export default function NotificationsScreen() {
                 justifyContent: 'center',
                 marginRight: 10,
               }}>
-              <Text style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>Gym</Text>
+              <Text className='font-body' style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>{t('notifications.badges.gym')}</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text
+                className='font-heading'
                 style={{
                   color: '#111827',
                   fontSize: 13,
@@ -96,20 +99,21 @@ export default function NotificationsScreen() {
                   marginBottom: 2,
                 }}
                 numberOfLines={1}>
-                {n.title}
+                {t(`notifications.messages.${n.titleKey}.title`)}
               </Text>
               <Text
+                className='font-body'
                 style={{ color: '#4b5563', fontSize: 12, marginBottom: 4 }}
                 numberOfLines={2}>
-                {n.body}
+                {t(`notifications.messages.${n.titleKey}.body`)}
               </Text>
-              <Text style={{ color: '#9ca3af', fontSize: 11 }}>{n.dateLabel}</Text>
+              <Text className='font-body' style={{ color: '#9ca3af', fontSize: 11 }}>{n.dateLabel}</Text>
             </View>
           </View>
         ))}
 
-        <Text style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 16 }}>Ayer</Text>
-        {mockNotifications.slice(2).map((n) => (
+        <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 16 }}>{t('notifications.timeLabels.yesterday')}</Text>
+        {mockNotifications.filter(n => n.section === 'yesterday').map((n) => (
           <View
             key={n.id}
             style={{
@@ -136,10 +140,11 @@ export default function NotificationsScreen() {
                 justifyContent: 'center',
                 marginRight: 10,
               }}>
-              <Text style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>Gym</Text>
+              <Text className='font-body' style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>{t('notifications.badges.gym')}</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text
+                className='font-heading'
                 style={{
                   color: '#111827',
                   fontSize: 13,
@@ -147,14 +152,15 @@ export default function NotificationsScreen() {
                   marginBottom: 2,
                 }}
                 numberOfLines={1}>
-                {n.title}
+                {t(`notifications.messages.${n.titleKey}.title`)}
               </Text>
               <Text
+                className='font-body'
                 style={{ color: '#4b5563', fontSize: 12, marginBottom: 4 }}
                 numberOfLines={2}>
-                {n.body}
+                {t(`notifications.messages.${n.titleKey}.body`)}
               </Text>
-              <Text style={{ color: '#9ca3af', fontSize: 11 }}>{n.dateLabel}</Text>
+              <Text className='font-body' style={{ color: '#9ca3af', fontSize: 11 }}>{n.dateLabel}</Text>
             </View>
           </View>
         ))}

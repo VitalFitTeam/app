@@ -97,40 +97,40 @@ export default function MembershipExtraScreen() {
       >
         <View className="flex-row justify-between items-center">
           <View className="flex-1 pr-4">
-            <ThemedText 
-              lightColor="#111827" 
-              darkColor="#111827" 
-              className="font-bold text-lg mb-1"
+            <ThemedText
+              lightColor="#111827"
+              darkColor="#111827"
+              className="font-body font-bold text-lg mb-1"
             >
               {item.name}
             </ThemedText>
-            <ThemedText 
-              lightColor="#6b7280" 
-              darkColor="#6b7280" 
-              className="text-xs"
+            <ThemedText
+              lightColor="#6b7280"
+              darkColor="#6b7280"
+              className="font-body text-xs"
               numberOfLines={2}
             >
               {item.description}
             </ThemedText>
           </View>
-          
+
           <View className="items-end">
-             <ThemedText 
-               lightColor="#f97316" 
-               darkColor="#f97316" 
-               className="font-extrabold text-xl"
+             <ThemedText
+               lightColor="#f97316"
+               darkColor="#f97316"
+               className="font-heading font-extrabold text-xl"
              >
-               ${item.price} 
+               ${item.price}
              </ThemedText>
              {isSelected ? (
                 <View className="flex-row items-center mt-1">
                     <CheckCircleIcon size={16} color="#f97316" />
-                    <ThemedText className="text-xs text-orange-600 font-bold ml-1">
+                    <ThemedText className="font-body text-xs text-orange-600 font-bold ml-1">
                         AGREGADO
                     </ThemedText>
                 </View>
              ) : (
-                <ThemedText className="text-xs text-gray-400 mt-1">
+                <ThemedText className="font-body text-xs text-gray-400 mt-1">
                     Clic para agregar
                 </ThemedText>
              )}
@@ -148,7 +148,7 @@ export default function MembershipExtraScreen() {
           <ThemedText
             lightColor='#f97316'
             darkColor='#f97316'
-            className='text-4xl mb-4 text-center'
+            className='font-heading text-4xl mb-4 text-center'
             style={{ fontFamily: 'BebasNeue-Regular' }}>
             EXTRAS
           </ThemedText>
@@ -156,32 +156,32 @@ export default function MembershipExtraScreen() {
 
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
-                <ThemedText className='text-[10px] font-semibold text-gray-800'>1</ThemedText>
+                <ThemedText className='font-body text-[10px] font-semibold text-gray-800'>1</ThemedText>
               </View>
-              <ThemedText className='text-[11px] text-center text-gray-800'>Opciones</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-gray-800'>Opciones</ThemedText>
             </View>
-            
+
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-orange-500 border-orange-500'>
-                <ThemedText className='text-[10px] font-semibold text-white'>2</ThemedText>
+                <ThemedText className='font-body text-[10px] font-semibold text-white'>2</ThemedText>
               </View>
-              <ThemedText className='text-[11px] text-center text-orange-600 font-bold'>Extras</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-orange-600 font-bold'>Extras</ThemedText>
             </View>
 
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
-                <ThemedText className='text-[10px] font-semibold text-gray-800'>3</ThemedText>
+                <ThemedText className='font-body text-[10px] font-semibold text-gray-800'>3</ThemedText>
               </View>
-              <ThemedText className='text-[11px] text-center text-gray-800'>Confirmación</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-gray-800'>Confirmación</ThemedText>
             </View>
           </View>
         </View>
 
         <View className="mb-4">
-            <ThemedText className="text-xl font-bold mb-1">
+            <ThemedText className="font-heading text-xl font-bold mb-1">
                 Paquetes Adicionales
             </ThemedText>
-            <ThemedText className="text-sm text-gray-500">
+            <ThemedText className="font-body text-sm text-gray-500">
                 Selecciona clases extra o servicios complementarios para tu membresía.
             </ThemedText>
         </View>
@@ -200,7 +200,7 @@ export default function MembershipExtraScreen() {
             contentContainerStyle={{ paddingBottom: 20 }}
             ListEmptyComponent={
                 <View className="py-10 items-center">
-                    <ThemedText className="text-gray-400 text-center">
+                    <ThemedText className="font-body text-gray-400 text-center">
                         No hay paquetes adicionales disponibles en este momento.
                     </ThemedText>
                 </View>
@@ -209,12 +209,12 @@ export default function MembershipExtraScreen() {
         )}
 
         <View className="pt-4 border-t border-gray-100">
-            <PrimaryButton 
-                title={`Continuar (${selectedPackagesIds.length} extras)`} 
-                onPress={onContinue} 
+            <PrimaryButton
+                title={`Continuar (${selectedPackagesIds.length} extras)`}
+                onPress={onContinue}
             />
             <TouchableOpacity onPress={onContinue} className="mt-3 items-center">
-                <ThemedText className="text-gray-500 text-sm underline">
+                <ThemedText className="font-body text-gray-500 text-sm underline">
                     Saltar y continuar sin extras
                 </ThemedText>
             </TouchableOpacity>

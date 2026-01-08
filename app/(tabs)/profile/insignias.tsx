@@ -3,38 +3,40 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { TrophyIcon as TrophyOutlineIcon } from 'react-native-heroicons/outline';
 import { ChevronLeftIcon, GiftIcon, LockClosedIcon, StarIcon } from 'react-native-heroicons/solid';
 
-const badges = [
-  { id: 'b1', title: 'Primera clase', rarity: 'Común', medal: require('@/assets/images/medal1.png'), locked: false },
-  { id: 'b2', title: 'Guerrero de Hierro', rarity: 'Épico', medal: require('@/assets/images/medal2.png'), locked: false },
-  { id: 'b3', title: 'Madrugador', rarity: 'Raro', medal: require('@/assets/images/medal3.png'), locked: false },
-  { id: 'b4', title: 'Primera clase', rarity: 'Común', medal: require('@/assets/images/medal1.png'), locked: false },
-  { id: 'b5', title: 'Guerrero de Hierro', rarity: 'Épico', medal: require('@/assets/images/medal2.png'), locked: false },
-  { id: 'b6', title: 'Madrugador', rarity: 'Raro', medal: require('@/assets/images/medal3.png'), locked: false },
-  { id: 'b7', title: 'Primera clase', rarity: 'Común', medal: require('@/assets/images/medal1.png'), locked: false },
-  {
-    id: 'b8',
-    title: 'Champion',
-    rarity: 'Legendario',
-    medal: require('@/assets/images/medal4.png'),
-    locked: true,
-    requirement: 'Gana 6 retos extra',
-  },
-  {
-    id: 'b9',
-    title: 'Devoted',
-    rarity: 'Legendario',
-    medal: require('@/assets/images/medal4.png'),
-    locked: true,
-    requirement: 'Entrena 30 días seguidos',
-  },
-];
-
 export default function InsigniasScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+
+  const badges = [
+    { id: 'b1', titleKey: 'firstClass', rarityKey: 'common', medal: require('@/assets/images/medal1.png'), locked: false },
+    { id: 'b2', titleKey: 'ironWarrior', rarityKey: 'epic', medal: require('@/assets/images/medal2.png'), locked: false },
+    { id: 'b3', titleKey: 'earlyBird', rarityKey: 'rare', medal: require('@/assets/images/medal3.png'), locked: false },
+    { id: 'b4', titleKey: 'firstClass', rarityKey: 'common', medal: require('@/assets/images/medal1.png'), locked: false },
+    { id: 'b5', titleKey: 'ironWarrior', rarityKey: 'epic', medal: require('@/assets/images/medal2.png'), locked: false },
+    { id: 'b6', titleKey: 'earlyBird', rarityKey: 'rare', medal: require('@/assets/images/medal3.png'), locked: false },
+    { id: 'b7', titleKey: 'firstClass', rarityKey: 'common', medal: require('@/assets/images/medal1.png'), locked: false },
+    {
+      id: 'b8',
+      titleKey: 'champion',
+      rarityKey: 'legendary',
+      medal: require('@/assets/images/medal4.png'),
+      locked: true,
+      requirementKey: 'champion',
+    },
+    {
+      id: 'b9',
+      titleKey: 'devoted',
+      rarityKey: 'legendary',
+      medal: require('@/assets/images/medal4.png'),
+      locked: true,
+      requirementKey: 'devoted',
+    },
+  ];
 
   return (
     <ThemedView className="flex-1 bg-white">
@@ -54,7 +56,7 @@ export default function InsigniasScreen() {
             <ChevronLeftIcon width={20} height={20} color="#f97316" />
           </TouchableOpacity>
 
-          <Text style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Mis insignias</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('insignias.title')}</Text>
         </View>
 
         <LinearGradient
@@ -65,9 +67,9 @@ export default function InsigniasScreen() {
         >
           <View className="flex-row justify-between items-center mb-3">
             <View>
-              <Text style={{ color: '#FFFFFF', fontSize: 12 }}>TU NIVEL ACTUAL</Text>
-              <Text style={{ color: '#FFFFFF', fontSize: 20, fontWeight: '700', marginTop: 4 }}>24 / 100</Text>
-              <Text style={{ color: '#FDE68A', fontSize: 11, marginTop: 2 }}>Progreso al nivel 25</Text>
+              <Text className='font-body' style={{ color: '#FFFFFF', fontSize: 12 }}>{t('insignias.currentLevel')}</Text>
+              <Text className='font-heading' style={{ color: '#FFFFFF', fontSize: 20, fontWeight: '700', marginTop: 4 }}>24 / 100</Text>
+              <Text className='font-body' style={{ color: '#FDE68A', fontSize: 11, marginTop: 2 }}>{t('insignias.progressToLevel', { level: 25 })}</Text>
             </View>
             <View className="items-center justify-center">
               <Image
@@ -92,24 +94,24 @@ export default function InsigniasScreen() {
             style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1, marginRight: 6 }}
           >
             <GiftIcon width={20} height={20} color="#F97316" />
-            <Text style={{ color: '#111827', fontSize: 18, fontWeight: '600', marginTop: 4 }}>4850</Text>
-            <Text style={{ color: '#6B7280', fontSize: 11 }}>Puntos</Text>
+            <Text className='font-heading' style={{ color: '#111827', fontSize: 18, fontWeight: '600', marginTop: 4 }}>4850</Text>
+            <Text className='font-body' style={{ color: '#6B7280', fontSize: 11 }}>{t('insignias.stats.points')}</Text>
           </View>
           <View
             className="flex-1 items-center py-3 rounded-2xl"
             style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1, marginHorizontal: 3 }}
           >
             <StarIcon width={20} height={20} color="#FACC15" />
-            <Text style={{ color: '#111827', fontSize: 18, fontWeight: '600', marginTop: 4 }}>4</Text>
-            <Text style={{ color: '#6B7280', fontSize: 11 }}>Insignias</Text>
+            <Text className='font-heading' style={{ color: '#111827', fontSize: 18, fontWeight: '600', marginTop: 4 }}>4</Text>
+            <Text className='font-body' style={{ color: '#6B7280', fontSize: 11 }}>{t('insignias.stats.badges')}</Text>
           </View>
           <View
             className="flex-1 items-center py-3 rounded-2xl"
             style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1, marginLeft: 6 }}
           >
             <TrophyOutlineIcon width={20} height={20} color="#22C55E" />
-            <Text style={{ color: '#111827', fontSize: 18, fontWeight: '600', marginTop: 4 }}>5</Text>
-            <Text style={{ color: '#6B7280', fontSize: 11 }}>Referidos</Text>
+            <Text className='font-heading' style={{ color: '#111827', fontSize: 18, fontWeight: '600', marginTop: 4 }}>5</Text>
+            <Text className='font-body' style={{ color: '#6B7280', fontSize: 11 }}>{t('insignias.stats.referrals')}</Text>
           </View>
         </View>
 
@@ -118,12 +120,12 @@ export default function InsigniasScreen() {
           style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1 }}
         >
           <View>
-            <Text style={{ color: '#F97316', fontSize: 12, fontWeight: '600' }}>Badges obtenidos</Text>
-            <Text style={{ color: '#6B7280', fontSize: 11 }}>4 / 12</Text>
+            <Text className='font-heading' style={{ color: '#F97316', fontSize: 12, fontWeight: '600' }}>{t('insignias.badgesObtained')}</Text>
+            <Text className='font-body' style={{ color: '#6B7280', fontSize: 11 }}>4 / 12</Text>
           </View>
           <View className="items-end">
-            <Text style={{ color: '#6B7280', fontSize: 11 }}>Progreso</Text>
-            <Text style={{ color: '#22C55E', fontSize: 13, fontWeight: '600' }}>33%</Text>
+            <Text className='font-body' style={{ color: '#6B7280', fontSize: 11 }}>{t('insignias.progress')}</Text>
+            <Text className='font-heading' style={{ color: '#22C55E', fontSize: 13, fontWeight: '600' }}>33%</Text>
           </View>
         </View>
 
@@ -153,21 +155,23 @@ export default function InsigniasScreen() {
                   )}
                 </View>
                 <Text
+                  className='font-heading'
                   style={{ color: '#111827', fontSize: 11, fontWeight: '600', textAlign: 'center', marginBottom: 6 }}
                   numberOfLines={2}
                 >
-                  {badge.title}
+                  {t(`insignias.badgeNames.${badge.titleKey}`)}
                 </Text>
 
                 <View
                   className="rounded-full px-2 py-1"
                   style={{ backgroundColor: '#F9FAFB', borderColor: '#E5E7EB', borderWidth: 1 }}
                 >
-                  <Text style={{ color: '#6B7280', fontSize: 9, textAlign: 'center' }}>{badge.rarity}</Text>
+                  <Text className='font-body' style={{ color: '#6B7280', fontSize: 9, textAlign: 'center' }}>{t(`insignias.rarity.${badge.rarityKey}`)}</Text>
                 </View>
 
-                {badge.locked && badge.requirement ? (
+                {badge.locked && badge.requirementKey ? (
                   <Text
+                    className='font-body'
                     style={{
                       marginTop: 4,
                       color: '#9CA3AF',
@@ -176,7 +180,7 @@ export default function InsigniasScreen() {
                     }}
                     numberOfLines={2}
                   >
-                    {badge.requirement}
+                    {t(`insignias.requirements.${badge.requirementKey}`)}
                   </Text>
                 ) : null}
               </View>
