@@ -464,7 +464,7 @@ export default function MembershipConfirmScreen() {
           ) : (
             <View className="flex-row justify-between mb-2">
                 {/* Visualización: muestra el porcentaje entero (21%) */}
-                <ThemedText className="font-body text-neutral-600 text-sm flex-1 mr-2">Impuesto ({formatTaxRate(taxRate)})</ThemedText>
+                <ThemedText className="font-body text-neutral-600 text-sm flex-1 mr-2">{t('confirm.tax')} ({formatTaxRate(taxRate)})</ThemedText>
                 <ThemedText className="font-body font-bold text-neutral-800 text-sm">${taxAmountUSD.toFixed(2)}</ThemedText>
             </View>
           )}
@@ -477,7 +477,7 @@ export default function MembershipConfirmScreen() {
 
         <View className="mt-2 border-t border-neutral-100 pt-4 mb-8">
           <View className="flex-row justify-between items-end">
-            <View>
+            <View className="flex-1 mr-4">
               <ThemedText className="font-body text-xl text-neutral-500">{t('confirm.totalToPay')}</ThemedText>
               {currency !== 'USD' && (
                   <ThemedText className="font-body text-xs text-gray-400 mt-1">

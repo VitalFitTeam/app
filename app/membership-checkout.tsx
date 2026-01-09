@@ -323,7 +323,7 @@ export default function MembershipCheckoutScreen() {
           {loading ? (
             <ActivityIndicator size='large' color='#f97316' />
           ) : (
-            <PrimaryButton title={t('common.continue')} onPress={onContinue} />
+            <PrimaryButton title={t('payment.continue')} onPress={onContinue} />
           )}
         </View>
       </ScrollView>

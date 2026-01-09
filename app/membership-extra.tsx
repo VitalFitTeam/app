@@ -4,7 +4,8 @@ import { ThemedText } from '@/components/themed-text';
 import vitalFitApi from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, FlatList, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,8 +19,9 @@ interface PackageItem {
 }
 
 export default function MembershipExtraScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
-  
+
   const params = useLocalSearchParams<{
     mainItemId?: string;
     mainItemTitle?: string;
@@ -28,35 +30,79 @@ export default function MembershipExtraScreen() {
     startDate?: string;
     userId?: string;
     branchId?: string;
-  }>(); 
+  }>();
 
   const [loading, setLoading] = useState(true);
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [selectedPackagesIds, setSelectedPackagesIds] = useState<string[]>([]);
-  
-  useEffect(() => {
-    const loadPackages = async () => {
-      try {
-        await AsyncStorage.getItem('token');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
-        const response = await vitalFitApi.public.getPackages({
-          page: 1, 
-          limit: 50, 
-          currency: 'USD' 
-        });
-        
-        // @ts-expect-error: Manejo flexible de respuesta
-        const data = response.data || response.results || response.items || [];
+  // Helper function to get translated package name
+  const getPackageName = (pkg: PackageItem): string => {
+    const normalizedName = pkg.name.trim().toUpperCase();
+    const translationKey = `extras.packages.${normalizedName}.name`;
+    const translated = t(translationKey);
+
+    // If translation exists and is different from the key, use it
+    return translated !== translationKey ? translated : pkg.name;
+  };
+
+  // Helper function to get translated package description
+  const getPackageDescription = (pkg: PackageItem): string => {
+    const normalizedName = pkg.name.trim().toUpperCase();
+    const translationKey = `extras.packages.${normalizedName}.description`;
+    const translated = t(translationKey);
+
+    // If translation exists and is different from the key, use it
+    return translated !== translationKey ? translated : pkg.description;
+  };
+
+  const loadPackages = useCallback(async (page: number = 1, append: boolean = false) => {
+    if (append) {
+      setLoadingMore(true);
+    }
+
+    try {
+      await AsyncStorage.getItem('token');
+
+      const response = await vitalFitApi.public.getPackages({
+        page,
+        limit: 8,
+        currency: 'USD'
+      });
+
+      // @ts-expect-error: Manejo flexible de respuesta
+      const data = response.data || response.results || response.items || [];
+
+      if (append) {
+        setPackages(prev => [...prev, ...data]);
+      } else {
         setPackages(data);
-      } catch (e) {
-        console.error('Error cargando paquetes:', e);
-        Alert.alert('Aviso', 'No se pudieron cargar los paquetes adicionales.');
-      } finally {
-        setLoading(false);
       }
-    };
-    loadPackages();
-  }, []);
+
+      // Check if there are more items to load
+      setHasMore(data.length === 8);
+      setCurrentPage(page);
+    } catch (e) {
+      console.error('Error cargando paquetes:', e);
+      Alert.alert(t('common.attention'), t('extras.error.loadPackages'));
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [t]);
+
+  const loadMorePackages = () => {
+    if (!loadingMore && hasMore) {
+      loadPackages(currentPage + 1, true);
+    }
+  };
+
+  useEffect(() => {
+    loadPackages(1, false);
+  }, [loadPackages]);
 
   const togglePackage = (pkgId: string) => {
     if (selectedPackagesIds.includes(pkgId)) {
@@ -102,7 +148,7 @@ export default function MembershipExtraScreen() {
               darkColor="#111827"
               className="font-body font-bold text-lg mb-1"
             >
-              {item.name}
+              {getPackageName(item)}
             </ThemedText>
             <ThemedText
               lightColor="#6b7280"
@@ -110,7 +156,7 @@ export default function MembershipExtraScreen() {
               className="font-body text-xs"
               numberOfLines={2}
             >
-              {item.description}
+              {getPackageDescription(item)}
             </ThemedText>
           </View>
 
@@ -126,12 +172,12 @@ export default function MembershipExtraScreen() {
                 <View className="flex-row items-center mt-1">
                     <CheckCircleIcon size={16} color="#f97316" />
                     <ThemedText className="font-body text-xs text-orange-600 font-bold ml-1">
-                        AGREGADO
+                        {t('extras.added')}
                     </ThemedText>
                 </View>
              ) : (
                 <ThemedText className="font-body text-xs text-gray-400 mt-1">
-                    Clic para agregar
+                    {t('extras.clickToAdd')}
                 </ThemedText>
              )}
           </View>
@@ -150,7 +196,7 @@ export default function MembershipExtraScreen() {
             darkColor='#f97316'
             className='font-heading text-4xl mb-4 text-center'
             style={{ fontFamily: 'BebasNeue-Regular' }}>
-            EXTRAS
+            {t('extras.title')}
           </ThemedText>
           <View className='flex-row justify-between items-center mb-4'>
 
@@ -158,31 +204,31 @@ export default function MembershipExtraScreen() {
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
                 <ThemedText className='font-body text-[10px] font-semibold text-gray-800'>1</ThemedText>
               </View>
-              <ThemedText className='font-body text-[11px] text-center text-gray-800'>Opciones</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-gray-800'>{t('checkout.steps.options')}</ThemedText>
             </View>
 
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-orange-500 border-orange-500'>
                 <ThemedText className='font-body text-[10px] font-semibold text-white'>2</ThemedText>
               </View>
-              <ThemedText className='font-body text-[11px] text-center text-orange-600 font-bold'>Extras</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-orange-600 font-bold'>{t('checkout.steps.extras')}</ThemedText>
             </View>
 
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
                 <ThemedText className='font-body text-[10px] font-semibold text-gray-800'>3</ThemedText>
               </View>
-              <ThemedText className='font-body text-[11px] text-center text-gray-800'>Confirmación</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-gray-800'>{t('checkout.steps.confirmation')}</ThemedText>
             </View>
           </View>
         </View>
 
         <View className="mb-4">
             <ThemedText className="font-heading text-xl font-bold mb-1">
-                Paquetes Adicionales
+                {t('extras.additionalPackages')}
             </ThemedText>
             <ThemedText className="font-body text-sm text-gray-500">
-                Selecciona clases extra o servicios complementarios para tu membresía.
+                {t('extras.subtitle')}
             </ThemedText>
         </View>
 
@@ -198,24 +244,33 @@ export default function MembershipExtraScreen() {
             className="flex-1"
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 20 }}
+            onEndReached={loadMorePackages}
+            onEndReachedThreshold={0.5}
             ListEmptyComponent={
                 <View className="py-10 items-center">
                     <ThemedText className="font-body text-gray-400 text-center">
-                        No hay paquetes adicionales disponibles en este momento.
+                        {t('extras.noPackagesAvailable')}
                     </ThemedText>
                 </View>
+            }
+            ListFooterComponent={
+                loadingMore ? (
+                    <View className="py-4 items-center">
+                        <ActivityIndicator size="small" color="#f97316" />
+                    </View>
+                ) : null
             }
           />
         )}
 
         <View className="pt-4 border-t border-gray-100">
             <PrimaryButton
-                title={`Continuar (${selectedPackagesIds.length} extras)`}
+                title={t('extras.continueWithExtras', { count: selectedPackagesIds.length })}
                 onPress={onContinue}
             />
             <TouchableOpacity onPress={onContinue} className="mt-3 items-center">
                 <ThemedText className="font-body text-gray-500 text-sm underline">
-                    Saltar y continuar sin extras
+                    {t('extras.skipExtras')}
                 </ThemedText>
             </TouchableOpacity>
         </View>

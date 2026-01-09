@@ -136,18 +136,33 @@ export default function MembershipPaymentPagoMovilScreen() {
           }}
         >
           <View>
-            <ThemedText className='font-body text-xs text-white/80 tracking-widest mb-1'>
+            <ThemedText
+              lightColor='#ffffff'
+              darkColor='#ffffff'
+              className='font-body text-xs tracking-widest mb-1'
+              style={{ opacity: 0.8 }}>
               {t('payment.totalToPay')}
             </ThemedText>
-            <ThemedText className='font-body text-white font-bold text-xs'>
-               Orden #{params.invoiceId?.slice(0,8)}
+            <ThemedText
+              lightColor='#ffffff'
+              darkColor='#ffffff'
+              className='font-body font-bold text-xs'>
+               {t('payment.transfer.order')} #{params.invoiceId?.slice(0,8)}
             </ThemedText>
           </View>
           <View className='items-end'>
-            <ThemedText className='font-heading text-3xl font-bold text-white' style={{ fontFamily: 'BebasNeue-Regular' }}>
+            <ThemedText
+              lightColor='#ffffff'
+              darkColor='#ffffff'
+              className='font-heading text-3xl font-bold'
+              style={{ fontFamily: 'BebasNeue-Regular' }}>
               ${parseFloat(params.totalAmount).toFixed(2)}
             </ThemedText>
-            <ThemedText className='font-body text-white/90 text-xs font-bold'>
+            <ThemedText
+              lightColor='#ffffff'
+              darkColor='#ffffff'
+              className='font-body text-xs font-bold'
+              style={{ opacity: 0.9 }}>
               {params.currency}
             </ThemedText>
           </View>
