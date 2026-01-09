@@ -246,6 +246,10 @@
         "errorMessage": "Código inválido o error de conexión.",
         "enterCode": "Por favor, ingresa el código.",
         "tempPasswordNotFound": "No se encontró la contraseña temporal."
+      },
+      "modal": {
+        "title": "¡Verificación Exitosa!",
+        "message": "Iniciando sesión..."
       }
     },
     "dashboard": {

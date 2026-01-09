@@ -8,7 +8,7 @@ import { ToastNotification } from '@/components/ToastNotification';
 import { Colors } from '@/constants/theme';
 import { useToast } from '@/hooks/useToast';
 import { createRegisterSchema, createStep1Schema, createStep2Schema, RegisterData } from '@/schemas/register';
-import vitalFitApi from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services';
 import { useUser } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';

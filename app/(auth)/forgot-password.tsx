@@ -10,7 +10,7 @@ import { ToastNotification } from '@/components/ToastNotification';
 import { Colors } from '@/constants/theme';
 import { useToast } from '@/hooks/useToast';
 import { ForgotPasswordSchema, type ForgotPasswordData } from '@/schemas/forgot-password';
-import vitalFitApi from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isAPIError } from '@vitalfit/sdk';
 import { useLocalSearchParams, useRouter } from 'expo-router';

@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import vitalFitApi from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services';
 
 export type UserData = {
 	userId: string;

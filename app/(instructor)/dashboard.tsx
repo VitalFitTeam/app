@@ -5,7 +5,7 @@ import { TodayClassCard } from '@/components/auth/dashboard/TodayClassCard';
 import { UserHeader } from '@/components/auth/dashboard/userheader';
 import { ThemedView } from '@/components/themed-view';
 import { useUser } from '@/contexts/UserContext';
-import vitalFitApi from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services';
 import { ClassScheduleItem, KPICard } from '@/types/reports';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';

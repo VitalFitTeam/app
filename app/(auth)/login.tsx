@@ -4,10 +4,11 @@ import { LoadingModal } from '@/components/LoadingModal';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ToastNotification } from '@/components/ToastNotification';
 import { Colors } from '@/constants/theme';
+import { useAuth as useAuthContext } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/useToast';
-import vitalFitApi from '@/services/vitalfitSdk';
-import { useAuth, useClerk, useOAuth } from '@clerk/clerk-expo';
+import vitalFitApi from '@/services';
+import { useAuth as useClerkAuth, useClerk, useOAuth } from '@clerk/clerk-expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import Checkbox from 'expo-checkbox';
@@ -51,7 +52,8 @@ export default function LoginScreen() {
     const { t } = useTranslation();
     const { signOut } = useClerk();
     const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
-    const { getToken } = useAuth();
+    const { getToken } = useClerkAuth();
+    const { login: authLogin } = useAuthContext();
     const [isChecked, setChecked] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -78,12 +80,15 @@ export default function LoginScreen() {
             console.log('Login exitoso:', response);
 
             const token = response.token;
-            if (token) {
-                await AsyncStorage.setItem('token', token);
-                console.log('Token guardado en AsyncStorage');
+            const refreshToken = response.refresh_token;
+
+            if (token && refreshToken) {
+                // Use AuthContext to store tokens
+                await authLogin(token, refreshToken);
+                console.log('Tokens guardados en AsyncStorage');
 
                 await fetchUser();
-                
+
                 await new Promise(resolve => setTimeout(resolve, 300));
                 console.log('Delay completado, token debe estar disponible');
 
@@ -160,9 +165,11 @@ export default function LoginScreen() {
                         console.log('Respuesta exitosa del backend');
 
                         const backendToken = response.token;
+                        const backendRefreshToken = (response as { refresh_token?: string }).refresh_token;
 
                         if (backendToken) {
-                            await AsyncStorage.setItem('token', backendToken);
+                            // Use AuthContext to store tokens
+                            await authLogin(backendToken, backendRefreshToken);
                             console.log('Token de backend guardado');
 
                             await fetchUser();
@@ -230,7 +237,7 @@ export default function LoginScreen() {
         } finally {
             setIsGoogleLoading(false);
         }
-    }, [startOAuthFlow, getToken, signOut, router, showToast, fetchUser]);
+    }, [startOAuthFlow, getToken, signOut, router, showToast, fetchUser, authLogin]);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>

@@ -3,7 +3,7 @@ import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedText } from '@/components/themed-text';
 import { ToastNotification } from '@/components/ToastNotification';
 import { useToast } from '@/hooks/useToast';
-import vitalFitApi from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';

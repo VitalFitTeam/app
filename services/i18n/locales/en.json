@@ -246,6 +246,10 @@
         "errorMessage": "Invalid code or connection error.",
         "enterCode": "Please enter the code.",
         "tempPasswordNotFound": "Temporary password not found."
+      },
+      "modal": {
+        "title": "Verification Successful!",
+        "message": "Logging you in..."
       }
     },
     "dashboard": {

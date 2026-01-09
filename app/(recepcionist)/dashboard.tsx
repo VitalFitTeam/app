@@ -9,7 +9,7 @@ import { CheckInResultModal } from '@/components/recepcionista/CheckInResultModa
 import { ThemedView } from '@/components/themed-view';
 import { useBranch } from '@/contexts/BranchContext';
 import { useUser } from '@/contexts/UserContext';
-import vitalFitApi from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import React, { useState } from 'react';

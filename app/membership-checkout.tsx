@@ -2,7 +2,7 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedText } from '@/components/themed-text';
 import { MembershipCheckoutData, MembershipCheckoutSchema } from '@/schemas/membership';
-import vitalFitApi from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';

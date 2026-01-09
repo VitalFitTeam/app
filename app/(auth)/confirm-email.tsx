@@ -5,8 +5,10 @@ import { SecondaryButton } from '@/components/SecondaryButton';
 import { ThemedText } from '@/components/themed-text';
 import { ToastNotification } from '@/components/ToastNotification';
 import { Colors } from '@/constants/theme';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/useToast';
-import vitalFitApi from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import { useRouter } from 'expo-router';
@@ -14,6 +16,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     KeyboardAvoidingView,
+    Modal,
     Platform,
     ScrollView,
     Text,
@@ -25,9 +28,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function ConfirmEmailScreen() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
-    const { t } = useTranslation(); 
+    const { t } = useTranslation();
+    const { fetchUser } = useUser();
+    const { login: authLogin } = useAuth();
     const [code, setCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const { toastState, showToast, hideToast } = useToast();
 
     const handleConfirmCode = async () => {
@@ -65,40 +71,81 @@ export default function ConfirmEmailScreen() {
                 t('confirmEmail.toast.successMessage')
             );
 
+            // Show success modal
+            setShowSuccessModal(true);
+
+            // Wait 3 seconds before logging in
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
             const email = await AsyncStorage.getItem('temp_email');
             const password = await AsyncStorage.getItem('temp_password');
 
             if (!email || !password) {
+                setShowSuccessModal(false);
                 setTimeout(() => router.replace('/(auth)/login'), 2000);
                 return;
             }
 
             try {
                 const loginResponse = await vitalFitApi.auth.login({ email, password });
-                const token = loginResponse.token || null;
+                const token = loginResponse.token;
+                const refreshToken = loginResponse.refresh_token;
 
-                if (!token) {
+                if (!token || !refreshToken) {
                     console.error('No se recibió token después del login automático');
+                    setShowSuccessModal(false);
                     setTimeout(() => router.replace('/(auth)/login'), 2000);
                     return;
                 }
 
-                await AsyncStorage.setItem('token', token);
+                // Use AuthContext to store both tokens
+                await authLogin(token, refreshToken);
+
+                // Fetch user data to populate context
+                await fetchUser();
+
+                // Add a small delay to ensure user data is loaded
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                // Clean up temporary storage
                 await AsyncStorage.multiRemove(['temp_email', 'temp_password']);
 
-                router.replace('/(tabs)/dashboard');
+                // Get user role to navigate to correct dashboard
+                const whoamiResponse = await vitalFitApi.user.WhoAmI(token);
+                const role = whoamiResponse.user?.role?.name?.toLowerCase();
+
+                setShowSuccessModal(false);
+
+                if (role === 'instructor') {
+                    router.replace('/(instructor)/dashboard');
+                } else if (role === 'recepcionist' || role === 'receptionist') {
+                    router.replace('/(recepcionist)/dashboard');
+                } else {
+                    router.replace('/(tabs)/dashboard');
+                }
             } catch (loginErr: unknown) {
                 console.error('Error en login automático:', loginErr);
+                setShowSuccessModal(false);
                 setTimeout(() => router.replace('/(auth)/login'), 2000);
             }
         } catch (error: unknown) {
             let errorMessage = t('confirmEmail.toast.errorMessage');
+            let errorDetails = '';
+
             if (isAPIError(error)) {
                 errorMessage = error.messages.join(', ');
+                errorDetails = `Status: ${error.status}, Messages: ${error.messages.join(', ')}`;
             } else if (error instanceof Error) {
                 errorMessage = error.message;
+                errorDetails = `Error: ${error.message}`;
             }
+
             console.error('Error al confirmar o iniciar sesión:', error);
+            console.error('Error details:', errorDetails);
+
+            // Hide modal if it's showing
+            setShowSuccessModal(false);
+
             showToast('error', t('confirmEmail.toast.errorTitle'), errorMessage);
         } finally {
             setIsLoading(false);
@@ -182,6 +229,28 @@ export default function ConfirmEmailScreen() {
                     />
                 </View>
             </ScrollView>
+
+            <Modal
+                visible={showSuccessModal}
+                transparent={true}
+                animationType='fade'>
+                <View className='flex-1 justify-center items-center bg-black/50'>
+                    <View className='bg-white rounded-2xl p-8 mx-6 items-center shadow-lg'>
+                        <View className='mb-4'>
+                            <Text className='text-6xl'>✓</Text>
+                        </View>
+                        <ThemedText
+                            type='subtitle'
+                            lightColor={Colors.light.tint}
+                            className='font-heading text-center text-xl mb-2'>
+                            {t('confirmEmail.modal.title')}
+                        </ThemedText>
+                        <Text className='font-body text-gray-600 text-center'>
+                            {t('confirmEmail.modal.message')}
+                        </Text>
+                    </View>
+                </View>
+            </Modal>
         </KeyboardAvoidingView>
     );
 }
