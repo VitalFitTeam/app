@@ -1,5 +1,5 @@
 import { ThemedView } from '@/components/themed-view';
-import vitalFitApi from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import * as Clipboard from 'expo-clipboard';

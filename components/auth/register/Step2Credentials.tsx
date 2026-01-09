@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/theme';
 import { useToast } from '@/hooks/useToast';
 import { RegisterData } from '@/schemas/register';
-import vitalFitApi from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services';
 import { useAuth, useClerk, useOAuth } from '@clerk/clerk-expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';

@@ -1,4 +1,4 @@
-import vitalFitApi from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';

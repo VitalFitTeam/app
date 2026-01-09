@@ -2,7 +2,7 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
 import { ToastNotification } from '@/components/ToastNotification';
 import { useToast } from '@/hooks/useToast';
-import vitalFitApi from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
