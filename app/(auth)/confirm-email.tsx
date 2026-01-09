@@ -89,7 +89,7 @@ export default function ConfirmEmailScreen() {
             try {
                 const loginResponse = await vitalFitApi.auth.login({ email, password });
                 const token = loginResponse.token || null;
-                const refreshToken = (loginResponse as any).refresh_token || null;
+                const refreshToken = (loginResponse as { refresh_token?: string }).refresh_token || null;
 
                 if (!token) {
                     console.error('No se recibió token después del login automático');
@@ -99,7 +99,7 @@ export default function ConfirmEmailScreen() {
                 }
 
                 // Use AuthContext to store both tokens
-                await authLogin(token, refreshToken);
+                await authLogin(token, refreshToken ?? undefined);
 
                 // Fetch user data to populate context
                 await fetchUser();

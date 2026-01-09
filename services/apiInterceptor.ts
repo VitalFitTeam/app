@@ -3,13 +3,6 @@ import { isAPIError } from '@vitalfit/sdk';
 
 import vitalFitApi from './vitalfitSdk';
 
-type RequestConfig = {
-	url: string;
-	method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-	data?: any;
-	headers?: Record<string, string>;
-};
-
 type InterceptorCallbacks = {
 	onTokenRefresh?: () => Promise<void>;
 	onLogout?: () => Promise<void>;
@@ -44,7 +37,7 @@ async function refreshAccessToken(): Promise<string | null> {
 		});
 
 		const newToken = response.token;
-		const newRefreshToken = (response as any).refresh_token;
+		const newRefreshToken = (response as { refresh_token?: string }).refresh_token;
 
 		if (newToken) {
 			await AsyncStorage.setItem('token', newToken);
@@ -88,7 +81,7 @@ export async function apiRequestWithInterceptor<T>(
 		// If already refreshing, wait for the refresh to complete
 		if (isRefreshing) {
 			return new Promise((resolve, reject) => {
-				subscribeTokenRefresh(async (newToken) => {
+				subscribeTokenRefresh(async () => {
 					try {
 						// Retry the original request with new token
 						const result = await requestFn();

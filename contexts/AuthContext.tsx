@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			});
 
 			const newToken = response.token;
-			const newRefreshToken = (response as any).refresh_token;
+			const newRefreshToken = (response as { refresh_token?: string }).refresh_token;
 
 			if (newToken) {
 				await login(newToken, newRefreshToken || storedRefreshToken);

@@ -80,7 +80,7 @@ export default function LoginScreen() {
             console.log('Login exitoso:', response);
 
             const token = response.token;
-            const refreshToken = (response as any).refresh_token;
+            const refreshToken = (response as { refresh_token?: string }).refresh_token;
 
             if (token) {
                 // Use AuthContext to store tokens
@@ -165,7 +165,7 @@ export default function LoginScreen() {
                         console.log('Respuesta exitosa del backend');
 
                         const backendToken = response.token;
-                        const backendRefreshToken = (response as any).refresh_token;
+                        const backendRefreshToken = (response as { refresh_token?: string }).refresh_token;
 
                         if (backendToken) {
                             // Use AuthContext to store tokens
@@ -237,7 +237,7 @@ export default function LoginScreen() {
         } finally {
             setIsGoogleLoading(false);
         }
-    }, [startOAuthFlow, getToken, signOut, router, showToast, fetchUser]);
+    }, [startOAuthFlow, getToken, signOut, router, showToast, fetchUser, authLogin]);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>

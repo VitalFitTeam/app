@@ -35,7 +35,7 @@ async function refreshAccessToken(): Promise<string | null> {
 		});
 
 		const newToken = response.token;
-		const newRefreshToken = (response as any).refresh_token;
+		const newRefreshToken = (response as { refresh_token?: string }).refresh_token;
 
 		if (newToken) {
 			await AsyncStorage.setItem('token', newToken);
@@ -105,7 +105,7 @@ async function interceptApiCall<T>(apiCall: () => Promise<T>): Promise<T> {
 				await AsyncStorage.multiRemove(['token', 'refresh_token']);
 				throw new Error('Session expired. Please login again.');
 			}
-		} catch (refreshError) {
+		} catch {
 			isRefreshing = false;
 			await AsyncStorage.multiRemove(['token', 'refresh_token']);
 			throw new Error('Session expired. Please login again.');
@@ -114,13 +114,15 @@ async function interceptApiCall<T>(apiCall: () => Promise<T>): Promise<T> {
 }
 
 // Create a Proxy wrapper for any object
-function createProxy<T extends object>(target: T, path: string[] = []): T {
+function createProxy<T extends object>(target: T, _path: string[] = []): T {
 	return new Proxy(target, {
 		get(obj, prop: string | symbol) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const value = (obj as any)[prop];
 
 			// If it's a function, wrap it with the interceptor
 			if (typeof value === 'function') {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				return function (this: any, ...args: any[]) {
 					const result = value.apply(this, args);
 
@@ -135,7 +137,7 @@ function createProxy<T extends object>(target: T, path: string[] = []): T {
 
 			// If it's an object (like auth, user, etc.), recursively proxy it
 			if (typeof value === 'object' && value !== null) {
-				return createProxy(value, [...path, prop.toString()]);
+				return createProxy(value, [..._path, prop.toString()]);
 			}
 
 			return value;

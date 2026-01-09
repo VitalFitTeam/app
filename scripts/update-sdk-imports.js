@@ -39,7 +39,7 @@ const hasOldImport = (filePath) => {
     const content = fs.readFileSync(filePath, 'utf-8');
     return content.includes("from '@/services/vitalfitSdk'") ||
            content.includes('from "@/services/vitalfitSdk"');
-  } catch (error) {
+  } catch {
     return false;
   }
 };
