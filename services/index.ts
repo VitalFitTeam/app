@@ -1,5 +1,2 @@
-// Export the SDK with automatic token refresh middleware
-export { default } from './sdkMiddleware';
-
-// Also export the raw SDK for special cases
-export { rawVitalFitApi } from './vitalfitSdk';
+// Export the SDK directly - it now has built-in token refresh via setCallbacks()
+export { default } from './vitalfitSdk';

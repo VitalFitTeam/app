@@ -80,12 +80,12 @@ export default function LoginScreen() {
             console.log('Login exitoso:', response);
 
             const token = response.token;
-            const refreshToken = (response as { refresh_token?: string }).refresh_token;
+            const refreshToken = response.refresh_token;
 
-            if (token) {
+            if (token && refreshToken) {
                 // Use AuthContext to store tokens
                 await authLogin(token, refreshToken);
-                console.log('Token guardado en AsyncStorage');
+                console.log('Tokens guardados en AsyncStorage');
 
                 await fetchUser();
 
