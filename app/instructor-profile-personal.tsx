@@ -2,8 +2,8 @@ import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
 import { useUser } from '@/contexts/UserContext';
-import { uploadProfilePicture } from '@/services/imageUpload';
 import vitalFitApi from '@/services';
+import { uploadProfilePicture } from '@/services/imageUpload';
 import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -93,9 +93,6 @@ export default function InstructorProfilePersonalScreen() {
             gender: user.gender || '',
         });
 
-        // Ensure specialty is not managed by form since it's read-only/managed separately if needed
-        // but here we focus on the ProfileFormData fields.
-
         setLoading(false);
     }, [user, reset]);
 
@@ -108,8 +105,9 @@ export default function InstructorProfilePersonalScreen() {
                 return;
             }
 
+            // --- CAMBIO AQUÍ: Usamos ['images'] igual que en my-profile.tsx ---
             const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                mediaTypes: ['images'], 
                 allowsEditing: true,
                 aspect: [1, 1],
                 quality: 0.5,
@@ -166,7 +164,6 @@ export default function InstructorProfilePersonalScreen() {
                 identity_document: data.documentId,
                 profile_picture_url: finalProfilePictureUrl || '',
                 role_name: user.roleName || 'Instructor',
-                // specialty is explicitly excluded as per requirements
             };
 
             await vitalFitApi.client.put({
@@ -175,7 +172,7 @@ export default function InstructorProfilePersonalScreen() {
                 data: payload,
             });
 
-            await fetchUser(); // Sync Global Context
+            await fetchUser(); 
 
             setIsEditing(false);
             setToast({
@@ -233,9 +230,6 @@ export default function InstructorProfilePersonalScreen() {
 
     const profileImageSource = useMemo(() => {
         if (selectedImage) return { uri: selectedImage };
-        // Fallback using context user gender if available, or default to Man if unknown, but better to use state or user prop
-        // Here we use the user prop from context for the default, or the *current form value*? 
-        // Client profile uses `user?.gender`.
         return user?.gender === 'F' ? require('@/assets/images/Female.svg') : require('@/assets/images/Man.svg');
     }, [selectedImage, user?.gender]);
 
@@ -294,7 +288,6 @@ export default function InstructorProfilePersonalScreen() {
                     </TouchableOpacity>
                     <Text className='font-body' style={{ color: '#111827', fontSize: 20, fontWeight: '600' }}>{displayName}</Text>
 
-                    {/* Instructor Specific: Specialty instead of Level/Medal */}
                     <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>{user?.specialty || 'Entrenador Personal'}</Text>
                     <Text className='font-body' style={{ color: '#f97316', fontSize: 13, marginTop: 2 }}>{user?.roleName || 'Instructor'}</Text>
                 </View>
@@ -413,7 +406,6 @@ export default function InstructorProfilePersonalScreen() {
                         />
                     )}
 
-                    {/* Specialty is displayed but NOT editable as it's not part of the form/API payload for now */}
                      <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Especialidad</Text>
                      <TextInput
                         editable={false}
