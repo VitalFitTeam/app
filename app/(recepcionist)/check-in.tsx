@@ -1,27 +1,39 @@
 import type { Client } from '@/components/recepcionista/ClientList';
+import { ValidateCheckInCard } from '@/components/auth/dashboard/ValidateCheckInCard';
+import { QRScannerModal } from '@/components/recepcionist/QRScannerModal';
+import { CheckInResultModal } from '@/components/recepcionista/CheckInResultModal';
 import ClientList from '@/components/recepcionista/ClientList';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useBranch } from '@/contexts/BranchContext';
+import vitalFitApi from '@/services';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isAPIError } from '@vitalfit/sdk';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, BackHandler, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { CheckCircleIcon, MagnifyingGlassIcon, QrCodeIcon } from 'react-native-heroicons/outline';
+import { Alert, BackHandler, Image, ScrollView, StyleSheet, View } from 'react-native';
 
 export default function CheckInScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [isScanning, setIsScanning] = useState(false);
+  const [scannerVisible, setScannerVisible] = useState(false);
   const [showAllClients, setShowAllClients] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
+  const { selectedBranchId } = useBranch();
+  const [resultModalVisible, setResultModalVisible] = useState(false);
+  const [checkInSuccess, setCheckInSuccess] = useState(false);
+  const [checkInUserName, setCheckInUserName] = useState('');
+  const [checkInMessage, setCheckInMessage] = useState('');
 
   const clients = Array.from({ length: 45 }).map((_, index) => ({
     id: (index + 1).toString(),
-    name: `Cliente ${index + 1}`,
-    level: `Nivel ${Math.floor(Math.random() * 10) + 1}`,
+    name: `${t('checkIn.mock.client')} ${index + 1}`,
+    level: `${t('checkIn.mock.level')} ${Math.floor(Math.random() * 10) + 1}`,
     time: `${15 + Math.floor(Math.random() * 4)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
   }));
   const displayedClients = showAllClients ? clients : clients.slice(0, 7);
+
   useFocusEffect(
     useCallback(() => {
       setShowAllClients(false);
@@ -37,82 +49,117 @@ export default function CheckInScreen() {
     }, [router])
   );
 
-  const handleScanQR = () => {
-    setIsScanning(true);
-    setTimeout(() => {
-      setIsScanning(false);
-      Alert.alert(
-        t('checkIn.scan.successTitle'),
-        `Datos del QR: VITALFIT-MEMBER-12345\n\n${t('checkIn.scan.confirmMessage')}`,
-        [
-          { text: t('common.cancel'), style: 'cancel' },
-          { text: t('common.process'), onPress: () => processCheckIn() }
-        ]
-      );
-    }, 2000);
-  };
+  const handleValidateMembership = async (qrJwtLong: string) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) return;
+      if (!selectedBranchId) {
+        Alert.alert(`${t('common.attention')}`, t('checkIn.error.selectBranch'));
+        return;
+      }
+      const branchId = selectedBranchId;
 
-  const processCheckIn = () => {
-    Alert.alert(t('common.success'), t('checkIn.successMessage'));
+      console.log("Enviando Check-In...", { qrJwtLong: qrJwtLong.substring(0, 20) + '...', branchId });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response = await (vitalFitApi as any).access.checkIn(
+        token,
+        {
+          qr_jwt: qrJwtLong,
+          branch_id: branchId
+        }
+      );
+
+      const data = response.data || response;
+
+      console.log('[Check-In] Respuesta completa:', JSON.stringify(data, null, 2));
+
+      let userName = t('dashboard.defaultUser');
+
+      if (data?.user?.first_name) {
+        userName = `${data.user.first_name} ${data.user.last_name || ''}`.trim();
+      } else if (data?.first_name) {
+        userName = `${data.first_name} ${data.last_name || ''}`.trim();
+      } else if (data?.name) {
+        userName = data.name;
+      }
+
+      setCheckInSuccess(true);
+      setCheckInUserName(userName);
+      setResultModalVisible(true);
+      setScannerVisible(false);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Error en Check-In:", error);
+
+      let errorMessage = t('checkIn.error.default');
+
+      if (isAPIError(error)) {
+        if (error.status === 402) {
+          errorMessage = t('checkIn.error.paymentPending');
+        } else if (error.status === 403) {
+          errorMessage = t('checkIn.error.accessDenied');
+        } else if (error.status === 401) {
+          errorMessage = t('checkIn.error.qrExpired');
+        } else {
+          errorMessage = error.message || t('checkIn.error.default');
+        }
+      } else {
+        errorMessage = error.message || t('common.error.connection');
+      }
+
+      setCheckInSuccess(false);
+      setCheckInMessage(errorMessage);
+      setResultModalVisible(true);
+    }
   };
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView 
+      <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
         <View style={styles.header}>
-        <Image
-          source={require('@/assets/images/Frame.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <ThemedText className='font-heading' style={styles.title}>{t('checkIn.title')}</ThemedText>
-      </View>
-
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <CheckCircleIcon width={20} height={20} color="#1F2937" />
-          <ThemedText className='font-body' style={styles.cardTitle}>{t('dashboard.validateCheckIn.title')}</ThemedText>
-        </View>
-
-        <View style={styles.searchContainer}>
-          <MagnifyingGlassIcon width={18} height={18} color="#1F2937" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder={t('dashboard.validateCheckIn.searchPlaceholder')}
-            placeholderTextColor="#71727A"
+          <Image
+            source={require('@/assets/images/Frame.png')}
+            style={styles.logo}
+            resizeMode="contain"
           />
+          <ThemedText className='font-heading' style={styles.title}>{t('checkIn.title')}</ThemedText>
         </View>
 
-        <TouchableOpacity
-          style={styles.qrButton}
-          onPress={handleScanQR}
-          disabled={isScanning}
-        >
-          <QrCodeIcon width={16} height={16} color="#FFFFFF" />
-          <ThemedText className='font-body' style={styles.qrButtonText}>{t('dashboard.validateCheckIn.scanQr')}</ThemedText>
-        </TouchableOpacity>
+        <View style={styles.cardWrapper}>
+          <ValidateCheckInCard onScanPress={() => setScannerVisible(true)} />
+        </View>
 
-        <ThemedText className='font-body' style={styles.previewMessage}>
-          {t('checkIn.cameraPreviewUnavailable')}
-        </ThemedText>
-      </View>
-
-      <ClientList
-        clients={displayedClients}
-        totalCapacity={100}
-        onClientPress={(client: Client) => {
-          console.log('Cliente seleccionado:', client);
-          Alert.alert(t('common.client'), `${t('common.selected')}${client.name}`);
-        }}
-        onViewAllPress={() => {
-          setShowAllClients(!showAllClients);
-        }}
-        showViewAllButton={!showAllClients}
-      />
+        <ClientList
+          clients={displayedClients}
+          totalCapacity={100}
+          onClientPress={(client: Client) => {
+            console.log(t('checkIn.console.clientSelected'), client);
+            Alert.alert(t('common.client'), `${t('common.selected')}${client.name}`);
+          }}
+          onViewAllPress={() => {
+            setShowAllClients(!showAllClients);
+          }}
+          showViewAllButton={!showAllClients}
+        />
       </ScrollView>
+
+      <QRScannerModal
+        visible={scannerVisible}
+        onClose={() => setScannerVisible(false)}
+        onScan={handleValidateMembership}
+      />
+
+      <CheckInResultModal
+        visible={resultModalVisible}
+        onClose={() => setResultModalVisible(false)}
+        success={checkInSuccess}
+        userName={checkInUserName}
+        message={checkInMessage}
+      />
     </ThemedView>
   );
 }
@@ -137,150 +184,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1F2937',
   },
-  card: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 16,
-    marginHorizontal: 20,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginLeft: 8,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 15,
-    color: '#1F2937',
-    marginLeft: 8,
-  },
-  qrButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F97316',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 12,
-    shadowColor: '#F97316',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  qrButtonText: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#FFFFFF',
-    marginLeft: 8,
-  },
-  previewMessage: {
-    fontSize: 12,
-    color: '#6B7280',
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
-  searchWrapper: {
+  cardWrapper: {
     marginHorizontal: 20,
     marginBottom: 16,
-  },
-  searchInputClients: {
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    fontSize: 14,
-    backgroundColor: '#FFFFFF',
-  },
-  clientsHeader: {
-    marginHorizontal: 20,
-    marginBottom: 8,
-  },
-  clientsTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  clientsTitle: {
-    marginLeft: 8,
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  clientsList: {
-    marginHorizontal: 20,
-    marginBottom: 12,
-  },
-  clientCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  clientAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 999,
-    backgroundColor: '#FEF3C7',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  clientInfo: {
-    flex: 1,
-  },
-  clientName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  clientLevel: {
-    fontSize: 12,
-    color: '#6B7280',
-  },
-  viewAllButton: {
-    marginHorizontal: 20,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#F97316',
-    paddingVertical: 10,
-    alignItems: 'center',
-    marginTop: 4,
-    marginBottom: 12,
-  },
-  viewAllButtonText: {
-    fontSize: 14,
-    color: '#F97316',
-    fontWeight: '500',
   },
 });

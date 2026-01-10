@@ -51,11 +51,8 @@ export const BranchProvider: React.FC<BranchProviderProps> = ({ children }) => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const response: any = await vitalFitApi.public.getBranchMap(token);
-      
-      console.log('[BranchContext] Respuesta completa de getBranchMap:', JSON.stringify(response, null, 2));
+
       const branchList: Branch[] = Array.isArray(response) ? response : (response.data || []);
-      console.log('[BranchContext] Lista de sucursales procesada:', branchList);
-      console.log('[BranchContext] Cantidad de sucursales:', branchList.length);
 
       setBranches(branchList);
       const savedBranchId = await AsyncStorage.getItem('selected_branch_id');

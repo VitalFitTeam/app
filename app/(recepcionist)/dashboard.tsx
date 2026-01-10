@@ -109,11 +109,11 @@ export default function DashboardRecepcionist() {
 			>
 				<UserHeader
 					name={displayName}
-					avatarUrl={user?.profilePicture || undefined} 
+					avatarUrl={user?.profilePicture || undefined}
                     gender={user?.gender}
 				/>
 
-				<View style={{ alignItems: 'flex-end', paddingHorizontal: 20, marginBottom: 10, marginTop: -15 }}>
+				<View style={{ alignItems: 'center', paddingHorizontal: 20, marginBottom: 10, marginTop: -15 }}>
 					<BranchSelector />
 				</View>
 

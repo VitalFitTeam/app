@@ -44,6 +44,13 @@
       "clientList": {
         "title": "Lista de clientes inscritos",
         "searchPlaceholder": "Buscar cliente por nombre"
+      },
+      "mock": {
+        "client": "Cliente",
+        "level": "Nivel"
+      },
+      "console": {
+        "clientSelected": "Cliente seleccionado:"
       }
     },
     "common": {
@@ -296,7 +303,9 @@
         "registered": "INSCRITOS"
       },
       "classStatus": {
-        "inProgress": "EN CURSO"
+        "inProgress": "EN CURSO",
+        "powerlifting": "Powerlifting",
+        "advanced": "Avanzado"
       },
       "challenges": {
         "completed": "Retos completados",
@@ -436,6 +445,7 @@
       "settings": "Configuración",
       "personalInfo": "Información personal",
       "security": "Seguridad",
+      "language": "Idioma",
       "helpSupport": "Ayuda y soporte",
       "helpSupportDev": "Función de ayuda y soporte en desarrollo",
       "logout": "Cerrar sesión",
@@ -443,7 +453,10 @@
       "logoutConfirmMessage": "Se cerrará tu sesión actual y deberás iniciar sesión nuevamente.",
       "qrModalTitle": "Escanear Código QR",
       "qrModalDescription": "Escanea el código QR del cliente para registrar su entrada al gimnasio",
-      "startScan": "Iniciar escaneo"
+      "startScan": "Iniciar escaneo",
+      "error": {
+        "logoutToken": "Error al eliminar el token en logout"
+      }
     },
     "community": {
       "joinChallenges": "UNIRSE A DESAFÍOS"
