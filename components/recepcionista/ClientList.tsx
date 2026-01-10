@@ -89,6 +89,8 @@ export default function ClientList({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 16,
+    paddingBottom: 16,
   },
   searchWrapper: {
     marginHorizontal: 20,

@@ -44,6 +44,13 @@
       "clientList": {
         "title": "Registered Client List",
         "searchPlaceholder": "Search client by name"
+      },
+      "mock": {
+        "client": "Client",
+        "level": "Level"
+      },
+      "console": {
+        "clientSelected": "Client selected:"
       }
     },
     "common": {
@@ -296,7 +303,9 @@
         "registered": "REGISTERED"
       },
       "classStatus": {
-        "inProgress": "IN PROGRESS"
+        "inProgress": "IN PROGRESS",
+        "powerlifting": "Powerlifting",
+        "advanced": "Advanced"
       },
       "challenges": {
         "completed": "Completed Challenges",
@@ -427,6 +436,26 @@
         "crossfit": "High intensity functional training combining strength, endurance and power using varied movements with your own weight and equipment.",
         "pilates": "Session focused on core strengthening, posture and mobility, with controlled exercises that protect joints.",
         "default": "This workout focuses on muscle development and endurance. Includes exercises with weights, resistance bands and body weight. Ideal for all levels."
+      }
+    },
+    "profile": {
+      "staffViralFit": "VitalFit Staff",
+      "aboutMe": "About me",
+      "aboutMeDescription": "Dedicated receptionist with experience in schedule management, customer service and class coordination. Focused on providing a smooth and organized experience for all gym members.",
+      "settings": "Settings",
+      "personalInfo": "Personal information",
+      "security": "Security",
+      "language": "Language",
+      "helpSupport": "Help and support",
+      "helpSupportDev": "Help and support feature in development",
+      "logout": "Logout",
+      "logoutConfirmTitle": "Logout?",
+      "logoutConfirmMessage": "Your current session will be closed and you will need to log in again.",
+      "qrModalTitle": "Scan QR Code",
+      "qrModalDescription": "Scan the client's QR code to register their gym entry",
+      "startScan": "Start scan",
+      "error": {
+        "logoutToken": "Error removing token on logout"
       }
     },
     "community": {

@@ -22,11 +22,11 @@ export function RecepcionistTodayClassCard() {
 			{[1, 2].map((_, index) => (
 				<View
 					key={index}
-					className='border border-[#BBBBBB] rounded-xl mb-4 p-4 bg-white dark:bg-neutral-800'>
+					className='border border-[#BBBBBB] rounded-xl mb-4 p-3 bg-white dark:bg-neutral-800'>
 					<View className='flex-row justify-between items-start mb-3'>
 						<View className='flex-row items-center'>
-							<View className='bg-[#F2F4F5] rounded-md p-2 mr-2'>
-								<Dumbbell width={35} height={35} color='#F27F2A' />
+							<View className='bg-[#F2F4F5] rounded-md p-2 mr-3'>
+								<Dumbbell width={28} height={28} color='#F27F2A' />
 							</View>
 							<View>
 								<Text className='text-[16px] font-extrabold text-neutral-900 dark:text-white leading-tight'>
@@ -49,7 +49,7 @@ export function RecepcionistTodayClassCard() {
 						<View className='flex-row items-center'>
 							<UserIcon width={14} height={14} color='#0F172A' />
 							<Text className='ml-2 text-[14px] text-neutral-800 dark:text-neutral-300'>
-								{t('dashboard.mock.carlos')}
+								{t('Carlos')}
 							</Text>
 						</View>
 
