@@ -155,7 +155,7 @@ No wrapping, no callbacks needed in individual API calls. The SDK handles everyt
 If you're adding new API calls, follow this pattern:
 
 ```typescript
-// ✅ Correct - Just use the SDK directly
+// Correct - Just use the SDK directly
 import vitalFitApi from '@/services';
 
 async function fetchData() {
@@ -163,7 +163,7 @@ async function fetchData() {
   return response;
 }
 
-// ❌ Wrong - Don't import middleware or wrap calls
+// Wrong - Don't import middleware or wrap calls
 import { withTokenRefresh } from '@/services/apiInterceptor'; // DON'T
 ```
 
