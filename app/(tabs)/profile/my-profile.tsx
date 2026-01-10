@@ -2,8 +2,8 @@ import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
 import { useUser } from '@/contexts/UserContext';
-import { uploadProfilePicture } from '@/services/imageUpload';
 import vitalFitApi from '@/services';
+import { uploadProfilePicture } from '@/services/imageUpload';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -110,7 +110,7 @@ export default function MyProfileScreen() {
             }
 
             const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                mediaTypes: ['images'], // ✅ Corregido: uso de la nueva API
                 allowsEditing: true,
                 aspect: [1, 1],
                 quality: 0.5,
@@ -119,7 +119,8 @@ export default function MyProfileScreen() {
             if (!result.canceled && result.assets && result.assets.length > 0) {
                 setSelectedImage(result.assets[0].uri);
             }
-        } catch {
+        } catch (error) {
+            console.error('Error al seleccionar imagen:', error);
             Alert.alert(t('myProfile.toast.errorTitle'), t('myProfile.galleryError'));
         }
     }, [t]);
@@ -145,7 +146,8 @@ export default function MyProfileScreen() {
             if (selectedImage && selectedImage !== user.profilePicture) {
                 try {
                     finalProfilePictureUrl = await uploadProfilePicture(selectedImage);
-                } catch {
+                } catch (uploadError) {
+                    console.error('Error al subir imagen:', uploadError);
                     setToast({
                         visible: true,
                         type: 'error',
@@ -188,6 +190,7 @@ export default function MyProfileScreen() {
                 message: t('myProfile.toast.successMessage'),
             });
         } catch (error: unknown) {
+            console.error('Error al actualizar perfil:', error);
             let errorMessage = t('myProfile.errors.updateError');
             if (isAPIError(error)) {
                 errorMessage = error.messages.join(', ');
