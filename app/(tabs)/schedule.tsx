@@ -186,10 +186,10 @@ export default function HorariosScreen() {
             try {
                 const token = await AsyncStorage.getItem('token');
 
-                const response = await vitalFitApi.client.get({
-                    url: `/branches/${selectedBranchId}/schedule`,
-                    jwt: token || undefined,
-                });
+                const response = await vitalFitApi.schedule.ListBranchesClass(
+                    selectedBranchId,
+                    token || '',
+                );
 
                 const raw = (response as { data?: ApiScheduleItem[] } | ApiScheduleItem[] | undefined) ?? [];
                 const itemsFromApi = Array.isArray((raw as { data?: ApiScheduleItem[] }).data)
@@ -209,10 +209,7 @@ export default function HorariosScreen() {
 
                 for (const sid of uniqueServiceIds) {
                     try {
-                        const serviceResp = await vitalFitApi.client.get({
-                            url: `/services/${String(sid)}`,
-                            jwt: token || undefined,
-                        });
+                        const serviceResp = await vitalFitApi.products.getServiceByID(String(sid), token || '');
                         const s =
                             (serviceResp as { data?: ApiService }).data ?? (serviceResp as ApiService | undefined);
                         const serviceName =
@@ -227,7 +224,7 @@ export default function HorariosScreen() {
                             }
                         }
                     } catch (error) {
-                        console.error('Error cargando servicio en Schedule:', error);
+                        console.warn('Error cargando servicio en Schedule (ignorable si no existe):', sid);
                     }
                 }
 
@@ -376,10 +373,7 @@ export default function HorariosScreen() {
 
                 for (const sid of uniqueServiceIds) {
                     try {
-                        const serviceResp = await vitalFitApi.client.get({
-                            url: `/services/${String(sid)}`,
-                            jwt: token,
-                        });
+                        const serviceResp = await vitalFitApi.products.getServiceByID(String(sid), token || '');
                         const s =
                             (serviceResp as { data?: ApiService }).data ?? (serviceResp as ApiService | undefined);
 
@@ -395,7 +389,7 @@ export default function HorariosScreen() {
                             }
                         }
                     } catch (error) {
-                        console.error('Error cargando servicio para reservas:', error);
+                        console.warn('Error cargando servicio para reservas (ignorable si no existe):', sid);
                     }
                 }
 
@@ -556,9 +550,8 @@ export default function HorariosScreen() {
                         <Pressable
                             onPress={() => setActiveTab('classes')}
                             style={({ pressed }) => [{ transform: [{ scale: pressed ? 1.05 : 1 }] }]}
-                            className={`flex-1 items-center py-2.5 rounded-xl ${
-                                activeTab === 'classes' ? 'bg-neutral-700' : 'bg-transparent'
-                            }`}
+                            className={`flex-1 items-center py-2.5 rounded-xl ${activeTab === 'classes' ? 'bg-neutral-700' : 'bg-transparent'
+                                }`}
                         >
                             <ThemedText
                                 lightColor={activeTab === 'classes' ? '#ffffff' : '#9ca3af'}
@@ -571,9 +564,8 @@ export default function HorariosScreen() {
                         <Pressable
                             onPress={() => setActiveTab('reservas')}
                             style={({ pressed }) => [{ transform: [{ scale: pressed ? 1.05 : 1 }] }]}
-                            className={`flex-1 items-center py-2.5 rounded-xl ${
-                                activeTab === 'reservas' ? 'bg-neutral-700' : 'bg-transparent'
-                            }`}
+                            className={`flex-1 items-center py-2.5 rounded-xl ${activeTab === 'reservas' ? 'bg-neutral-700' : 'bg-transparent'
+                                }`}
                         >
                             <ThemedText
                                 lightColor={activeTab === 'reservas' ? '#ffffff' : '#9ca3af'}
@@ -596,58 +588,58 @@ export default function HorariosScreen() {
                         </ThemedText>
 
                         <View style={{ width: '100%', maxWidth: 400, zIndex: 100 }}>
-                                <TouchableOpacity
-                                    activeOpacity={0.7}
-                                    onPress={() => setBranchMenuVisible(!branchMenuVisible)}
-                                    className='flex-row items-center justify-between bg-neutral-100 rounded-xl px-4 py-2.5 border border-neutral-200'
-                                >
-                                    <ThemedText className='font-body text-sm font-semibold text-neutral-800' numberOfLines={1}>
-                                        {loadingBranches
-                                            ? 'Cargando...'
-                                            : branches.find((b) => b.branch_id === selectedBranchId)?.name || t('common.selectBranch')}
-                                    </ThemedText>
-                                    <Ionicons
-                                        name={branchMenuVisible ? 'chevron-up' : 'chevron-down'}
-                                        size={16}
-                                        color='#4b5563'
-                                    />
-                                </TouchableOpacity>
+                            <TouchableOpacity
+                                activeOpacity={0.7}
+                                onPress={() => setBranchMenuVisible(!branchMenuVisible)}
+                                className='flex-row items-center justify-between bg-neutral-100 rounded-xl px-4 py-2.5 border border-neutral-200'
+                            >
+                                <ThemedText className='font-body text-sm font-semibold text-neutral-800' numberOfLines={1}>
+                                    {loadingBranches
+                                        ? 'Cargando...'
+                                        : branches.find((b) => b.branch_id === selectedBranchId)?.name || t('common.selectBranch')}
+                                </ThemedText>
+                                <Ionicons
+                                    name={branchMenuVisible ? 'chevron-up' : 'chevron-down'}
+                                    size={16}
+                                    color='#4b5563'
+                                />
+                            </TouchableOpacity>
 
-                                {branchMenuVisible && (
-                                    <View className='absolute top-12 left-0 right-0 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-50'>
-                                        {branches.map((branch) => {
-                                            const isSelected = branch.branch_id === selectedBranchId;
-                                            return (
-                                                <TouchableOpacity
-                                                    key={branch.branch_id}
-                                                    className='px-4 py-2'
-                                                    onPress={() => {
-                                                        setSelectedBranchId(branch.branch_id);
-                                                        setBranchMenuVisible(false);
+                            {branchMenuVisible && (
+                                <View className='absolute top-12 left-0 right-0 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-50'>
+                                    {branches.map((branch) => {
+                                        const isSelected = branch.branch_id === selectedBranchId;
+                                        return (
+                                            <TouchableOpacity
+                                                key={branch.branch_id}
+                                                className='px-4 py-2'
+                                                onPress={() => {
+                                                    setSelectedBranchId(branch.branch_id);
+                                                    setBranchMenuVisible(false);
+                                                }}
+                                            >
+                                                <ThemedText
+                                                    className='font-body'
+                                                    style={{
+                                                        fontSize: isSelected ? 16 : 13,
+                                                        fontWeight: isSelected ? '800' : '400',
+                                                        color: isSelected ? '#f97316' : '#111827',
                                                     }}
+                                                    numberOfLines={1}
                                                 >
-                                                    <ThemedText
-                                                        className='font-body'
-                                                        style={{
-                                                            fontSize: isSelected ? 16 : 13,
-                                                            fontWeight: isSelected ? '800' : '400',
-                                                            color: isSelected ? '#f97316' : '#111827',
-                                                        }}
-                                                        numberOfLines={1}
-                                                    >
-                                                        {branch.name}
-                                                    </ThemedText>
-                                                </TouchableOpacity>
-                                            );
-                                        })}
-                                        {branches.length === 0 && (
-                                            <View className='px-4 py-3'>
-                                                <ThemedText className='font-body text-sm text-neutral-400'>{t('schedule.noClassesBranch')}</ThemedText>
-                                            </View>
-                                        )}
-                                    </View>
-                                )}
-                            </View>
+                                                    {branch.name}
+                                                </ThemedText>
+                                            </TouchableOpacity>
+                                        );
+                                    })}
+                                    {branches.length === 0 && (
+                                        <View className='px-4 py-3'>
+                                            <ThemedText className='font-body text-sm text-neutral-400'>{t('schedule.noClassesBranch')}</ThemedText>
+                                        </View>
+                                    )}
+                                </View>
+                            )}
+                        </View>
                     </View>
 
                     {activeTab === 'classes' && (
