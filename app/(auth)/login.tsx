@@ -8,7 +8,7 @@ import { useAuth as useAuthContext } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services';
-import { useAuth as useClerkAuth, useClerk, useOAuth } from '@clerk/clerk-expo';
+import { useClerk, useAuth as useClerkAuth, useOAuth } from '@clerk/clerk-expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import Checkbox from 'expo-checkbox';
@@ -80,12 +80,12 @@ export default function LoginScreen() {
             console.log('Login exitoso:', response);
 
             const token = response.token;
-            const refreshToken = (response as any).refresh_token;
+            const refreshToken = response.refresh_token;
 
-            if (token) {
+            if (token && refreshToken) {
                 // Use AuthContext to store tokens
                 await authLogin(token, refreshToken);
-                console.log('Token guardado en AsyncStorage');
+                console.log('Tokens guardados en AsyncStorage');
 
                 await fetchUser();
 
@@ -165,7 +165,7 @@ export default function LoginScreen() {
                         console.log('Respuesta exitosa del backend');
 
                         const backendToken = response.token;
-                        const backendRefreshToken = (response as any).refresh_token;
+                        const backendRefreshToken = (response as { refresh_token?: string }).refresh_token;
 
                         if (backendToken) {
                             // Use AuthContext to store tokens
@@ -237,7 +237,7 @@ export default function LoginScreen() {
         } finally {
             setIsGoogleLoading(false);
         }
-    }, [startOAuthFlow, getToken, signOut, router, showToast, fetchUser]);
+    }, [startOAuthFlow, getToken, signOut, router, showToast, fetchUser, authLogin]);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>

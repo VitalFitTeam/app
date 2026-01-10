@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(ls:*)",
-      "Bash(node scripts/update-sdk-imports.js:*)"
+      "Bash(node scripts/update-sdk-imports.js:*)",
+      "Bash(npm view:*)"
     ]
   }
 }

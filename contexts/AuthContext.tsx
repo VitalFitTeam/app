@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import vitalFitApi from '@/services';
+import vitalFitApi from '@/services/vitalfitSdk';
 
 type AuthContextType = {
 	isAuthenticated: boolean;
@@ -11,7 +11,6 @@ type AuthContextType = {
 	refreshToken: string | null;
 	login: (token: string, refreshToken?: string) => Promise<void>;
 	logout: () => Promise<void>;
-	refresh: () => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +22,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [refreshToken, setRefreshToken] = useState<string | null>(null);
 	const router = useRouter();
 
+	// Logout function - clears tokens and redirects
+	const logout = useCallback(async () => {
+		try {
+			await AsyncStorage.multiRemove(['token', 'refresh_token', 'temp_email', 'temp_password']);
+			vitalFitApi.client.removeTokens();
+			setToken(null);
+			setRefreshToken(null);
+			setIsAuthenticated(false);
+			router.replace('/(auth)/login');
+		} catch (error) {
+			console.error('Error during logout:', error);
+		}
+	}, [router]);
+
+	// Setup SDK callbacks for automatic token refresh
+	useEffect(() => {
+		vitalFitApi.client.setCallbacks(
+			// onTokenUpdate callback - called when tokens are refreshed
+			async (access: string, refresh: string) => {
+				console.log('[AuthContext] Tokens refreshed by SDK');
+				await AsyncStorage.setItem('token', access);
+				await AsyncStorage.setItem('refresh_token', refresh);
+				setToken(access);
+				setRefreshToken(refresh);
+				setIsAuthenticated(true);
+			},
+			// onLogout callback - called when refresh fails
+			async () => {
+				console.log('[AuthContext] Token refresh failed, logging out');
+				await logout();
+			}
+		);
+	}, [logout]);
+
 	// Initialize auth state from storage
 	const initializeAuth = useCallback(async () => {
 		try {
@@ -30,7 +63,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			const storedToken = await AsyncStorage.getItem('token');
 			const storedRefreshToken = await AsyncStorage.getItem('refresh_token');
 
-			if (storedToken) {
+			if (storedToken && storedRefreshToken) {
+				// Set tokens in SDK client for automatic refresh
+				vitalFitApi.client.setTokens(storedToken, storedRefreshToken);
 				setToken(storedToken);
 				setRefreshToken(storedRefreshToken);
 				setIsAuthenticated(true);
@@ -48,65 +83,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	// Login function - stores tokens and updates state
 	const login = useCallback(async (newToken: string, newRefreshToken?: string) => {
 		try {
-			await AsyncStorage.setItem('token', newToken);
-			if (newRefreshToken) {
-				await AsyncStorage.setItem('refresh_token', newRefreshToken);
+			if (!newRefreshToken) {
+				throw new Error('Refresh token is required');
 			}
+
+			await AsyncStorage.setItem('token', newToken);
+			await AsyncStorage.setItem('refresh_token', newRefreshToken);
+
+			// Set tokens in SDK client for automatic refresh
+			vitalFitApi.client.setTokens(newToken, newRefreshToken);
+
 			setToken(newToken);
-			setRefreshToken(newRefreshToken || null);
+			setRefreshToken(newRefreshToken);
 			setIsAuthenticated(true);
 		} catch (error) {
 			console.error('Error storing tokens:', error);
 			throw error;
 		}
 	}, []);
-
-	// Logout function - clears tokens and redirects
-	const logout = useCallback(async () => {
-		try {
-			await AsyncStorage.multiRemove(['token', 'refresh_token', 'temp_email', 'temp_password']);
-			setToken(null);
-			setRefreshToken(null);
-			setIsAuthenticated(false);
-			router.replace('/(auth)/login');
-		} catch (error) {
-			console.error('Error during logout:', error);
-		}
-	}, [router]);
-
-	// Refresh token function - gets new token using refresh_token
-	const refresh = useCallback(async (): Promise<boolean> => {
-		try {
-			const storedRefreshToken = await AsyncStorage.getItem('refresh_token');
-
-			if (!storedRefreshToken) {
-				console.error('No refresh token available');
-				await logout();
-				return false;
-			}
-
-			// Call the refresh endpoint
-			const response = await vitalFitApi.auth.refresh({
-				refresh_token: storedRefreshToken,
-			});
-
-			const newToken = response.token;
-			const newRefreshToken = (response as any).refresh_token;
-
-			if (newToken) {
-				await login(newToken, newRefreshToken || storedRefreshToken);
-				return true;
-			} else {
-				console.error('No token received from refresh');
-				await logout();
-				return false;
-			}
-		} catch (error) {
-			console.error('Error refreshing token:', error);
-			await logout();
-			return false;
-		}
-	}, [login, logout]);
 
 	// Initialize on mount
 	useEffect(() => {
@@ -121,9 +115,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			refreshToken,
 			login,
 			logout,
-			refresh,
 		}),
-		[isAuthenticated, isLoading, token, refreshToken, login, logout, refresh]
+		[isAuthenticated, isLoading, token, refreshToken, login, logout]
 	);
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
