@@ -8,7 +8,7 @@ import { useAuth as useAuthContext } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services';
-import { useAuth as useClerkAuth, useClerk, useOAuth } from '@clerk/clerk-expo';
+import { useClerk, useAuth as useClerkAuth, useOAuth } from '@clerk/clerk-expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import Checkbox from 'expo-checkbox';
