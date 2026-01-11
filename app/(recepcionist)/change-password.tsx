@@ -15,28 +15,31 @@ import { KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, Vie
 import { ChevronLeftIcon, ShieldCheckIcon } from 'react-native-heroicons/solid';
 import { z } from 'zod';
 
-const ChangePasswordSchema = z
-  .object({
-    currentPassword: z.string().min(1, { message: 'receptionist.changePassword.errors.currentRequired' }),
-    newPassword: z
-      .string()
-      .min(8, { message: 'receptionist.changePassword.errors.minLength' })
-      .regex(/[A-Z]/, { message: 'receptionist.changePassword.errors.uppercase' })
-      .regex(/[a-z]/, { message: 'receptionist.changePassword.errors.lowercase' })
-      .regex(/[0-9]/, { message: 'receptionist.changePassword.errors.number' })
-      .regex(/[^a-zA-Z0-9]/, { message: 'receptionist.changePassword.errors.special' }),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: 'receptionist.changePassword.errors.passwordMismatch',
-    path: ['confirmPassword'],
-  })
-  .refine((data) => data.newPassword !== data.currentPassword, {
-    message: 'receptionist.changePassword.errors.sameAsCurrent',
-    path: ['newPassword'],
-  });
+// Este schema se crea dentro del componente para acceder a useTranslation
+function createChangePasswordSchema() {
+  return z
+    .object({
+      currentPassword: z.string().min(1, { message: 'receptionist.changePassword.errors.currentRequired' }),
+      newPassword: z
+        .string()
+        .min(8, { message: 'receptionist.changePassword.errors.minLength' })
+        .regex(/[A-Z]/, { message: 'receptionist.changePassword.errors.uppercase' })
+        .regex(/[a-z]/, { message: 'receptionist.changePassword.errors.lowercase' })
+        .regex(/[0-9]/, { message: 'receptionist.changePassword.errors.number' })
+        .regex(/[^a-zA-Z0-9]/, { message: 'receptionist.changePassword.errors.special' }),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.newPassword === data.confirmPassword, {
+      message: 'receptionist.changePassword.errors.passwordMismatch',
+      path: ['confirmPassword'],
+    })
+    .refine((data) => data.newPassword !== data.currentPassword, {
+      message: 'receptionist.changePassword.errors.sameAsCurrent',
+      path: ['newPassword'],
+    });
+}
 
-type FormData = z.infer<typeof ChangePasswordSchema>;
+type FormData = z.infer<ReturnType<typeof createChangePasswordSchema>>;
 
 export default function RecepcionistChangePasswordScreen() {
   const router = useRouter();
@@ -50,7 +53,7 @@ export default function RecepcionistChangePasswordScreen() {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(ChangePasswordSchema),
+    resolver: zodResolver(createChangePasswordSchema()),
     defaultValues: {
       currentPassword: '',
       newPassword: '',
