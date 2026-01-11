@@ -150,6 +150,13 @@ export default function RecepcionistNavBar() {
         }}
       />
       <Tabs.Screen
+        name='language'
+        options={{
+          href: null,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+      <Tabs.Screen
         name='profile'
         options={{
           title: t('nav.profile'),

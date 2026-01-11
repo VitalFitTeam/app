@@ -1,17 +1,22 @@
+import { QRScannerModal } from '@/components/recepcionist/QRScannerModal';
+import { CheckInResultModal } from '@/components/recepcionista/CheckInResultModal';
 import { ThemedView } from '@/components/themed-view';
+import { useBranch } from '@/contexts/BranchContext';
 import { useUser } from '@/contexts/UserContext';
+import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isAPIError } from '@vitalfit/sdk';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
   ArrowRightOnRectangleIcon,
   BellIcon,
   ChevronRightIcon,
+  LanguageIcon,
   QrCodeIcon,
-  QuestionMarkCircleIcon,
   ShieldCheckIcon,
   UserCircleIcon
 } from 'react-native-heroicons/outline';
@@ -20,8 +25,13 @@ export default function RecepcionistProfileComponent() {
   const { t } = useTranslation();
   const router = useRouter();
   const { user, loading: userLoading, clearUser } = useUser();
-  const [qrModalVisible, setQrModalVisible] = useState(false);
+  const { selectedBranchId } = useBranch();
+  const [scannerVisible, setScannerVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [resultModalVisible, setResultModalVisible] = useState(false);
+  const [checkInSuccess, setCheckInSuccess] = useState(false);
+  const [checkInUserName, setCheckInUserName] = useState('');
+  const [checkInMessage, setCheckInMessage] = useState('');
 
   if (userLoading && !user) {
     return (
@@ -35,7 +45,7 @@ export default function RecepcionistProfileComponent() {
     ? user.lastName
       ? `${user.firstName} ${user.lastName}`
       : user.firstName
-    : 'Recepcionista';
+    : t('dashboard.recepcionistDefault');
 
   const avatarSource = user?.profilePicture
     ? { uri: user.profilePicture }
@@ -43,12 +53,77 @@ export default function RecepcionistProfileComponent() {
     ? require('@/assets/images/Female.svg')
     : require('@/assets/images/Man.svg');
 
+  const handleValidateMembership = async (qrJwtLong: string) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) return;
+      if (!selectedBranchId) {
+        Alert.alert(`${t('common.attention')}`, t('checkIn.error.selectBranch'));
+        return;
+      }
+      const branchId = selectedBranchId;
+
+      console.log("Enviando Check-In...", { qrJwtLong: qrJwtLong.substring(0, 20) + '...', branchId });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response = await (vitalFitApi as any).access.checkIn(
+        token,
+        {
+          qr_jwt: qrJwtLong,
+          branch_id: branchId
+        }
+      );
+
+      const data = response.data || response;
+
+      console.log('[Check-In] Respuesta completa:', JSON.stringify(data, null, 2));
+
+      let userName = t('dashboard.defaultUser');
+
+      if (data?.user?.first_name) {
+        userName = `${data.user.first_name} ${data.user.last_name || ''}`.trim();
+      } else if (data?.first_name) {
+        userName = `${data.first_name} ${data.last_name || ''}`.trim();
+      } else if (data?.name) {
+        userName = data.name;
+      }
+
+      setCheckInSuccess(true);
+      setCheckInUserName(userName);
+      setResultModalVisible(true);
+      setScannerVisible(false);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Error en Check-In:", error);
+
+      let errorMessage = t('checkIn.error.default');
+
+      if (isAPIError(error)) {
+        if (error.status === 402) {
+          errorMessage = t('checkIn.error.paymentPending');
+        } else if (error.status === 403) {
+          errorMessage = t('checkIn.error.accessDenied');
+        } else if (error.status === 401) {
+          errorMessage = t('checkIn.error.qrExpired');
+        } else {
+          errorMessage = error.message || t('checkIn.error.default');
+        }
+      } else {
+        errorMessage = error.message || t('common.error.connection');
+      }
+
+      setCheckInSuccess(false);
+      setCheckInMessage(errorMessage);
+      setResultModalVisible(true);
+    }
+  };
+
   const handleConfirmLogout = async () => {
     try {
       await AsyncStorage.removeItem('token');
       clearUser();
     } catch (error) {
-      console.error('Error al eliminar el token en logout:', error);
+      console.error(t('profile.error.logoutToken'), error);
     } finally {
       setLogoutModalVisible(false);
       router.replace('/(auth)/login');
@@ -73,7 +148,6 @@ export default function RecepcionistProfileComponent() {
           <Text className='text-[13px] text-[#f97316] mt-0.5'>{t('profile.staffViralFit')}</Text>
         </View>
         <View className='mb-4'>
-          <Text className='text-[14px] font-semibold text-[#111827] mb-1'>{t('profile.aboutMe')}</Text>
           <Text className='text-[13px] text-[#4b5563] leading-5'>
             {t('profile.aboutMeDescription')}
           </Text>
@@ -82,25 +156,10 @@ export default function RecepcionistProfileComponent() {
         <TouchableOpacity
           activeOpacity={0.85}
           className='w-full rounded-2xl border border-[#d1d5db] py-3 px-4 mb-4 flex-row items-center justify-center bg-white'
-          onPress={() => setQrModalVisible(true)}>
+          onPress={() => setScannerVisible(true)}>
           <QrCodeIcon width={18} height={18} color='#111827' />
           <Text className='ml-2 text-[13px] font-medium text-[#111827]'>{t('dashboard.validateCheckIn.scanQr')}</Text>
         </TouchableOpacity>
-
-        <View className='flex-row justify-between mb-6'>
-          <View className='flex-1 bg-white rounded-xl border border-[#e5e7eb] py-3 px-2 mx-1 items-center'>
-            <Text className='text-[16px] font-bold text-[#f97316] mb-1'>6</Text>
-            <Text className='text-[11px] text-[#4b5563]'>{t('common.years')}</Text>
-          </View>
-          <View className='flex-1 bg-white rounded-xl border border-[#e5e7eb] py-3 px-2 mx-1 items-center'>
-            <Text className='text-[16px] font-bold text-[#f97316] mb-1'>46</Text>
-            <Text className='text-[11px] text-[#4b5563]'>{t('common.classes')}</Text>
-          </View>
-          <View className='flex-1 bg-white rounded-xl border border-[#e5e7eb] py-3 px-2 mx-1 items-center'>
-            <Text className='text-[16px] font-bold text-[#f97316] mb-1'>25</Text>
-            <Text className='text-[11px] text-[#4b5563]'>{t('common.clients')}</Text>
-          </View>
-        </View>
 
         <View className='mb-2'>
           <Text className='text-[14px] font-semibold text-[#111827] mb-2'>{t('profile.settings')}</Text>
@@ -140,13 +199,13 @@ export default function RecepcionistProfileComponent() {
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
           onPress={() => {
-            router.push('/(recepcionist)/notifications');
+            router.push('/(recepcionist)/language');
           }}>
           <View className='flex-row items-center'>
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
-              <BellIcon width={18} height={18} color='#111827' />
+              <LanguageIcon width={18} height={18} color='#111827' />
             </View>
-            <Text className='text-[13px] text-[#111827]'>{t('dashboard.notifications.title')}</Text>
+            <Text className='text-[13px] text-[#111827]'>{t('profile.language')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
@@ -155,13 +214,13 @@ export default function RecepcionistProfileComponent() {
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
           onPress={() => {
-            alert(t('profile.helpSupportDev'));
+            router.push('/(recepcionist)/notifications');
           }}>
           <View className='flex-row items-center'>
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
-              <QuestionMarkCircleIcon width={18} height={18} color='#111827' />
+              <BellIcon width={18} height={18} color='#111827' />
             </View>
-            <Text className='text-[13px] text-[#111827]'>{t('profile.helpSupport')}</Text>
+            <Text className='text-[13px] text-[#111827]'>{t('dashboard.notifications.title')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
@@ -182,80 +241,19 @@ export default function RecepcionistProfileComponent() {
         </TouchableOpacity>
       </ScrollView>
 
-      <Modal
-        animationType='fade'
-        transparent
-        visible={qrModalVisible}
-        onRequestClose={() => setQrModalVisible(false)}>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => setQrModalVisible(false)}
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.55)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingHorizontal: 24,
-          }}>
-          <View
-            style={{
-              width: '100%',
-              maxWidth: 360,
-              borderRadius: 16,
-              backgroundColor: '#1f2937',
-              paddingVertical: 24,
-              paddingHorizontal: 20,
-              alignItems: 'center',
-            }}>
-            <Text
-              style={{
-                color: '#F9FAFB',
-                fontSize: 16,
-                fontWeight: '600',
-                marginBottom: 8,
-              }}>
-              {t('profile.qrModalTitle')}
-            </Text>
-            <Text
-              style={{
-                color: '#E5E7EB',
-                fontSize: 13,
-                textAlign: 'center',
-                marginBottom: 20,
-              }}>
-              {t('profile.qrModalDescription')}
-            </Text>
+      <QRScannerModal
+        visible={scannerVisible}
+        onClose={() => setScannerVisible(false)}
+        onScan={handleValidateMembership}
+      />
 
-            <View
-              style={{
-                width: 170,
-                height: 170,
-                borderRadius: 28,
-                backgroundColor: '#374151',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: 12,
-              }}>
-              <QrCodeIcon width={120} height={120} color='#F9FAFB' />
-            </View>
-            
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => setQrModalVisible(false)}
-              style={{
-                marginTop: 12,
-                paddingVertical: 8,
-                paddingHorizontal: 16,
-                borderRadius: 999,
-                backgroundColor: '#f97316',
-              }}>
-              <Text style={{ fontSize: 13, color: '#FFFFFF', fontWeight: '600' }}>
-                {t('profile.startScan')}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
+      <CheckInResultModal
+        visible={resultModalVisible}
+        onClose={() => setResultModalVisible(false)}
+        success={checkInSuccess}
+        userName={checkInUserName}
+        message={checkInMessage}
+      />
 
       <Modal
         visible={logoutModalVisible}

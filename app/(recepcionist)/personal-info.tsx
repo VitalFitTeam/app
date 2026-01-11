@@ -2,8 +2,8 @@ import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
 import { useUser } from '@/contexts/UserContext';
-import { uploadProfilePicture } from '@/services/imageUpload';
 import vitalFitApi from '@/services';
+import { uploadProfilePicture } from '@/services/imageUpload';
 import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -105,8 +105,9 @@ export default function PersonalInfoScreen() {
                 return;
             }
 
+            // --- CAMBIO AQUÍ: Usamos ['images'] igual que en my-profile.tsx ---
             const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                mediaTypes: ['images'], 
                 allowsEditing: true,
                 aspect: [1, 1],
                 quality: 0.5,
