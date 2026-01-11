@@ -1023,6 +1023,40 @@
         "length": "Phone number must be between 10 and 15 digits."
       },
       "acceptTerms": "You must accept terms and conditions."
+    },
+    "receptionist": {
+      "changePassword": {
+        "title": "Change password",
+        "sectionTitle": "Account security",
+        "sectionSubtitle": "Update your access password",
+        "currentPassword": "Current password",
+        "currentPasswordPlaceholder": "Enter your current password",
+        "newPassword": "New password",
+        "newPasswordPlaceholder": "Enter your new password",
+        "confirmPassword": "Confirm password",
+        "confirmPasswordPlaceholder": "Repeat your new password",
+        "saving": "Saving...",
+        "save": "Save changes",
+        "toast": {
+          "successTitle": "Password updated",
+          "successMessage": "Your password was updated successfully",
+          "errorTitle": "Error"
+        },
+        "errors": {
+          "currentRequired": "Enter your current password.",
+          "minLength": "Password must be at least 8 characters.",
+          "uppercase": "Must contain at least one uppercase letter.",
+          "lowercase": "Must contain at least one lowercase letter.",
+          "number": "Must contain at least one number.",
+          "special": "Must contain at least one special character.",
+          "passwordMismatch": "Passwords do not match.",
+          "sameAsCurrent": "New password cannot be the same as the current one.",
+          "noSession": "No active session found.",
+          "generic": "An error occurred while changing the password.",
+          "incorrectCurrent": "The current password is incorrect.",
+          "tryAgain": "Check your current password and try again."
+        }
+      }
     }
   }
 }
