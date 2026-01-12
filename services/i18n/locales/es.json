@@ -1198,6 +1198,21 @@
         "clientProgressBody": "Tu cliente Juan Pérez actualizó su progreso de rutina.",
         "hiitClassBody": "Tienes una clase de HIIT programada para mañana."
       }
+    },
+    "instructorProfile": {
+      "title": "Perfil de Instructor",
+      "specialty": "Especialidad",
+      "defaultSpecialty": "Entrenador Personal",
+      "role": "Instructor"
+    },
+    "instructorNotifications": {
+      "mock": {
+        "classReminder": "Recordatorio de clase",
+        "classReminderBody": "Tienes una clase de Functional Strength hoy a las 6:00 pm.",
+        "clientProgress": "Nuevo progreso de cliente",
+        "clientProgressBody": "Tu cliente Juan Pérez actualizó su progreso de rutina.",
+        "hiitClassBody": "Tienes una clase de HIIT programada para mañana."
+      }
     }
   }
 }

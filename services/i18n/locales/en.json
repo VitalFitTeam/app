@@ -1208,6 +1208,21 @@
         "clientProgressBody": "Your client Juan Pérez updated their routine progress.",
         "hiitClassBody": "You have a HIIT class scheduled for tomorrow."
       }
+    },
+    "instructorProfile": {
+      "title": "Instructor Profile",
+      "specialty": "Specialty",
+      "defaultSpecialty": "Personal Trainer",
+      "role": "Instructor"
+    },
+    "instructorNotifications": {
+      "mock": {
+        "classReminder": "Class Reminder",
+        "classReminderBody": "You have a Functional Strength class today at 6:00 pm.",
+        "clientProgress": "New Client Progress",
+        "clientProgressBody": "Your client Juan Pérez updated their routine progress.",
+        "hiitClassBody": "You have a HIIT class scheduled for tomorrow."
+      }
     }
   },
   "classesScreen": {
