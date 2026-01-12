@@ -436,6 +436,16 @@
         "crossfit": "High intensity functional training combining strength, endurance and power using varied movements with your own weight and equipment.",
         "pilates": "Session focused on core strengthening, posture and mobility, with controlled exercises that protect joints.",
         "default": "This workout focuses on muscle development and endurance. Includes exercises with weights, resistance bands and body weight. Ideal for all levels."
+      },
+      "mock": {
+        "powerlifting": "Powerlifting (Advanced)",
+        "crossfit": "CrossFit (Intermediate)",
+        "functional": "Functional (Beginners)"
+      },
+      "mockLocations": {
+        "salonA": "Room A",
+        "salonB": "Room B",
+        "areaFunctional": "Functional Area"
       }
     },
     "profile": {
@@ -699,7 +709,7 @@
       },
       "routineUpdates": {
         "title": "Routine Updates",
-        "description": "When your progress or routines change"
+        "description": "When your client updates their routine progress"
       }
     },
     "membershipEntry": {
@@ -946,7 +956,34 @@
           "fetchUser": "An unexpected error occurred while fetching user data."
         },
         "todayClasses": "Today's Classes",
-        "clientMessages": "Client Messages"
+        "clientMessages": "Client Messages",
+        "nextClass": "Next Class",
+        "noPending": "No pending",
+        "noClassesPending": "No pending classes",
+        "upcomingClass": "Upcoming class",
+        "noClassesToday": "No classes scheduled for today.",
+        "tabs": {
+          "clients": "Clients",
+          "classes": "Classes",
+          "messages": "Messages"
+        },
+        "mockMessages": {
+          "adjustPlan": "I need to adjust my training plan",
+          "changeSchedule": "Can we change tomorrow's schedule?",
+          "addDay": "I want to add one more training day",
+          "cantAttend": "I won't be able to attend tomorrow",
+          "reviewTechnique": "Can you review my squat technique?",
+          "yesterday": "yesterday"
+        },
+        "stats": {
+          "monthlyClasses": "Monthly Classes",
+          "studentsToday": "Students Today",
+          "attendanceRate": "Attendance Rate"
+        },
+        "myClients": {
+          "title": "My Clients",
+          "level": "Level"
+        }
       },
       "classes": {
         "title": "Class Calendar",
@@ -960,6 +997,58 @@
         "title": "My Clients",
         "assignRoutine": "Assign New Routine",
         "viewProgress": "View Progress"
+      },
+      "clientProgress": {
+        "title": "Progress",
+        "currentRoutine": "CURRENT ROUTINE",
+        "beginnerLevel": "Beginner",
+        "routineDescription": "Want your body to be healthy. Join our program with guidance adapted to your goals. Increasing physical strength is the main objective of strength training. Maintain body fitness by doing physical exercise at least 2-3 times a week.",
+        "exerciseDetails": "Exercise details",
+        "completed": "Completed",
+        "pending": "Pending",
+        "day": "Day",
+        "series": "Sets",
+        "reps": "Reps",
+        "time": "Time",
+        "routineNotes": "Routine notes",
+        "notesExample": "Client reports good squat technique, but fatigue in the last set. Recommend focus on rest and breathing.",
+        "backToClients": "Back to My Clients",
+        "workoutsThisWeek": "Workouts this week",
+        "days": {
+          "monday": "Monday",
+          "wednesday": "Wednesday"
+        }
+      },
+      "assignRoutine": {
+        "title": "Assign Routine",
+        "defaultClient": "Client",
+        "defaultLevel": "Level 1",
+        "defaultProgram": "Current routine - Week 1",
+        "selectRoutine": "Select routine",
+        "routineStrength": "Strength routine - Week 1",
+        "level": "Level",
+        "progress": "Progress",
+        "workouts": "Workouts",
+        "routineDetails": "Selected routine details",
+        "time": "Time",
+        "routineNotes": "Routine notes",
+        "notesPlaceholder": "Personalized instructions for the client",
+        "assignButton": "Assign routine",
+        "backToClients": "Back to My Clients",
+        "minutes": "minutes",
+        "exercises": {
+          "squats": "Barbell Squats – 4×12",
+          "benchPress": "Bench Press – 4×10",
+          "barbellRow": "Barbell Row – 4×12",
+          "monday": "Monday"
+        },
+        "programs": {
+          "maxStrength": "Max Strength - Week 2",
+          "hypertrophy": "Hypertrophy - Week 1",
+          "endurance": "Endurance - Week 4",
+          "powerlifting": "Powerlifting - Week 3",
+          "functionalStart": "Functional Start - Week 3"
+        }
       }
     },
     "client": {
@@ -1057,6 +1146,29 @@
           "tryAgain": "Check your current password and try again."
         }
       }
+    },
+    "instructorProfile": {
+      "title": "Instructor Profile",
+      "specialty": "Specialty",
+      "defaultSpecialty": "Personal Trainer",
+      "role": "Instructor"
+    },
+    "instructorNotifications": {
+      "mock": {
+        "classReminder": "Class Reminder",
+        "classReminderBody": "You have a Functional Strength class today at 6:00 pm.",
+        "clientProgress": "New Client Progress",
+        "clientProgressBody": "Your client Juan Pérez updated their routine progress.",
+        "hiitClassBody": "You have a HIIT class scheduled for tomorrow."
+      }
     }
+  },
+  "classesScreen": {
+    "title": "Class Calendar",
+    "calendar": "CALENDAR",
+    "week": "Week",
+    "month": "Month",
+    "classesOfDay": "CLASSES OF THE DAY",
+    "noClasses": "No classes scheduled for this date."
   }
 }

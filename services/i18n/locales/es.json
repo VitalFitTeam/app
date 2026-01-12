@@ -699,7 +699,7 @@
       },
       "routineUpdates": {
         "title": "Actualizaciones de rutina",
-        "description": "Cuando tu progreso o rutinas cambien"
+        "description": "Cuando tu cliente actualice su progreso de la rutina"
       }
     },
     "membershipEntry": {
@@ -946,7 +946,34 @@
           "fetchUser": "Ocurrió un error inesperado al obtener los datos del usuario."
         },
         "todayClasses": "Clases de hoy",
-        "clientMessages": "Mensajes de Clientes"
+        "clientMessages": "Mensajes de Clientes",
+        "nextClass": "Próxima Clase",
+        "noPending": "Sin pendientes",
+        "noClassesPending": "Sin clases pendientes",
+        "upcomingClass": "Próxima clase",
+        "noClassesToday": "No hay clases programadas para hoy.",
+        "tabs": {
+          "clients": "Clientes",
+          "classes": "Clases",
+          "messages": "Mensajes"
+        },
+        "mockMessages": {
+          "adjustPlan": "Necesito ajustar mi plan de entreno",
+          "changeSchedule": "¿Podemos cambiar el horario de mañana?",
+          "addDay": "Quiero añadir un día más de entrenamiento",
+          "cantAttend": "No podré asistir mañana",
+          "reviewTechnique": "¿Puedes revisar mi técnica de sentadilla?",
+          "yesterday": "ayer"
+        },
+        "stats": {
+          "monthlyClasses": "Clases Mes",
+          "studentsToday": "Alumnos Hoy",
+          "attendanceRate": "Tasa Asistencia"
+        },
+        "myClients": {
+          "title": "Mis Clientes",
+          "level": "Nivel"
+        }
       },
       "classes": {
         "title": "Calendario de clases",
@@ -960,6 +987,58 @@
         "title": "Mis clientes",
         "assignRoutine": "Asignar nueva rutina",
         "viewProgress": "Ver progreso"
+      },
+      "clientProgress": {
+        "title": "Progreso",
+        "currentRoutine": "RUTINA ACTUAL",
+        "beginnerLevel": "Principiante",
+        "routineDescription": "Want your body to be healthy. Join our program with guidance adapted to your goals. Increasing physical strength is the main objective of strength training. Maintain body fitness by doing physical exercise at least 2-3 times a week.",
+        "exerciseDetails": "Detalle de ejercicios",
+        "completed": "Completado",
+        "pending": "Pendiente",
+        "day": "Día",
+        "series": "Series",
+        "reps": "Repeticiones",
+        "time": "Tiempo",
+        "routineNotes": "Notas de la rutina",
+        "notesExample": "Cliente reporta buena técnica en sentadillas, pero fatiga en la última serie. Recomendar foco en descanso y respiración.",
+        "backToClients": "Volver a Mis clientes",
+        "workoutsThisWeek": "Entrenamientos esta semana",
+        "days": {
+          "monday": "Lunes",
+          "wednesday": "Miércoles"
+        }
+      },
+      "assignRoutine": {
+        "title": "Asignar rutina",
+        "defaultClient": "Cliente",
+        "defaultLevel": "Nivel 1",
+        "defaultProgram": "Rutina actual - Semana 1",
+        "selectRoutine": "Seleccionar rutina",
+        "routineStrength": "Rutina fuerza - Semana 1",
+        "level": "Nivel",
+        "progress": "progreso",
+        "workouts": "Entrenamientos",
+        "routineDetails": "Detalles de la rutina seleccionada",
+        "time": "Tiempo",
+        "routineNotes": "Notas de la rutina",
+        "notesPlaceholder": "Instrucciones personalizadas para el cliente",
+        "assignButton": "Asignar rutina",
+        "backToClients": "Volver a Mis clientes",
+        "minutes": "minutos",
+        "exercises": {
+          "squats": "Sentadillas con barra – 4×12",
+          "benchPress": "Press banca – 4×10",
+          "barbellRow": "Remo con barra – 4×12",
+          "monday": "Lunes"
+        },
+        "programs": {
+          "maxStrength": "Fuerza Máxima - Semana 2",
+          "hypertrophy": "Hipertrofia - Semana 1",
+          "endurance": "Resistencia - Semana 4",
+          "powerlifting": "Powerlifting - Semana 3",
+          "functionalStart": "Inicio Funcional - Semana 3"
+        }
       }
     },
     "client": {
@@ -1056,6 +1135,21 @@
           "incorrectCurrent": "La contraseña actual es incorrecta.",
           "tryAgain": "Verifique su contraseña actual e intente nuevamente."
         }
+      }
+    },
+    "instructorProfile": {
+      "title": "Perfil de Instructor",
+      "specialty": "Especialidad",
+      "defaultSpecialty": "Entrenador Personal",
+      "role": "Instructor"
+    },
+    "instructorNotifications": {
+      "mock": {
+        "classReminder": "Recordatorio de clase",
+        "classReminderBody": "Tienes una clase de Functional Strength hoy a las 6:00 pm.",
+        "clientProgress": "Nuevo progreso de cliente",
+        "clientProgressBody": "Tu cliente Juan Pérez actualizó su progreso de rutina.",
+        "hiitClassBody": "Tienes una clase de HIIT programada para mañana."
       }
     }
   }

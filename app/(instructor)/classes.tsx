@@ -12,10 +12,12 @@ import { ChevronRightIcon } from 'react-native-heroicons/outline';
 type InstructorClass = {
 	id: string;
 	title: string;
-	date: string; 
-	time: string; 
+	titleKey?: string;
+	date: string;
+	time: string;
 	durationMinutes: number;
 	location: string;
+	locationKey?: string;
 	capacity: number;
 	occupied: number;
 };
@@ -24,30 +26,36 @@ const MOCK_CLASSES: InstructorClass[] = [
 	{
 		id: '1',
 		title: 'Powerlifting Avanzado',
+		titleKey: 'classes.mock.powerlifting',
 		date: '2025-11-15',
 		time: '07:00',
 		durationMinutes: 90,
 		location: 'Salón B',
+		locationKey: 'classes.mockLocations.salonB',
 		capacity: 15,
 		occupied: 10,
 	},
 	{
 		id: '2',
 		title: 'Crossfit Intermedio',
+		titleKey: 'classes.mock.crossfit',
 		date: '2025-11-15',
 		time: '09:00',
 		durationMinutes: 60,
 		location: 'Área funcional',
+		locationKey: 'classes.mockLocations.areaFunctional',
 		capacity: 18,
 		occupied: 15,
 	},
 	{
 		id: '3',
 		title: 'Funcional Principiantes',
+		titleKey: 'classes.mock.functional',
 		date: '2025-11-16',
 		time: '18:00',
 		durationMinutes: 60,
 		location: 'Salón A',
+		locationKey: 'classes.mockLocations.salonA',
 		capacity: 20,
 		occupied: 12,
 	},
@@ -203,7 +211,7 @@ export default function InstructorClassesScreen() {
 										pathname: '/class-details',
 										params: {
 											id: cls.id,
-											title: cls.title,
+											title: cls.titleKey ? t(cls.titleKey) : cls.title,
 											date: cls.date,
 											time: cls.time,
 											mode: 'instructor',
@@ -212,9 +220,11 @@ export default function InstructorClassesScreen() {
 								}>
 								<View className='mb-3 rounded-xl bg-white px-4 py-4 flex-row justify-between items-center border border-[#e5e7eb]'>
 									<View className='flex-col flex-1 pr-3'>
-										<Text className='text-[14px] font-semibold text-[#111827]'>{cls.title}</Text>
+										<Text className='text-[14px] font-semibold text-[#111827]'>
+											{cls.titleKey ? t(cls.titleKey) : cls.title}
+										</Text>
 										<Text className='mt-[2px] text-[12px] text-[#4b5563]'>
-											{cls.date} · {cls.location}
+											{cls.date} · {cls.locationKey ? t(cls.locationKey) : cls.location}
 										</Text>
 										<View className='mt-3 flex-row items-center'>
 											<ClockIcon width={14} height={14} color='#f97316' />
