@@ -15,6 +15,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { Calendar } from 'lucide-react-native';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, BackHandler, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon, PencilSquareIcon, PhoneIcon, UserCircleIcon } from 'react-native-heroicons/solid';
 import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
@@ -48,6 +49,7 @@ type ProfileFormData = z.infer<typeof ProfileSchema>;
 
 export default function PersonalInfoScreen() {
     const router = useRouter();
+    const { t } = useTranslation();
     const { user, fetchUser } = useUser();
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
@@ -114,7 +116,7 @@ export default function PersonalInfoScreen() {
             const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
             if (permissionResult.status !== 'granted') {
-                Alert.alert("Permisos necesarios", "Necesitamos acceso a tu galería para cambiar la foto de perfil.");
+                Alert.alert(t('receptionist.personalInfo.permissions.title'), t('receptionist.personalInfo.permissions.galleryAccess'));
                 return;
             }
 
@@ -130,9 +132,9 @@ export default function PersonalInfoScreen() {
                 setSelectedImage(result.assets[0].uri);
             }
         } catch {
-            Alert.alert("Error", "No se pudo abrir la galería.");
+            Alert.alert(t('receptionist.personalInfo.toast.errorTitle'), t('receptionist.personalInfo.errors.galleryError'));
         }
-    }, []);
+    }, [t]);
 
     const onSubmit = useCallback(async (data: ProfileFormData) => {
         setSaving(true);
@@ -142,8 +144,8 @@ export default function PersonalInfoScreen() {
                 setToast({
                     visible: true,
                     type: 'error',
-                    title: 'Error',
-                    message: !token ? 'No se encontró token de autenticación' : 'No se encontró el ID del usuario',
+                    title: t('receptionist.personalInfo.toast.errorTitle'),
+                    message: !token ? t('receptionist.personalInfo.errors.noToken') : t('receptionist.personalInfo.errors.noUserId'),
                 });
                 setSaving(false);
                 return;
@@ -159,8 +161,8 @@ export default function PersonalInfoScreen() {
                     setToast({
                         visible: true,
                         type: 'error',
-                        title: 'Error',
-                        message: 'No se pudo subir la imagen de perfil',
+                        title: t('receptionist.personalInfo.toast.errorTitle'),
+                        message: t('receptionist.personalInfo.errors.uploadFailed'),
                     });
                     setSaving(false);
                     return;
@@ -191,11 +193,11 @@ export default function PersonalInfoScreen() {
             setToast({
                 visible: true,
                 type: 'success',
-                title: '¡Perfil actualizado!',
-                message: 'Tus cambios se guardaron correctamente',
+                title: t('receptionist.personalInfo.toast.successTitle'),
+                message: t('receptionist.personalInfo.toast.successMessage'),
             });
         } catch (error: unknown) {
-            let errorMessage = 'Ocurrió un error inesperado al actualizar el perfil.';
+            let errorMessage = t('receptionist.personalInfo.toast.defaultError');
             if (isAPIError(error)) {
                 errorMessage = error.messages.join(', ');
             } else if (error instanceof Error) {
@@ -204,13 +206,13 @@ export default function PersonalInfoScreen() {
             setToast({
                 visible: true,
                 type: 'error',
-                title: 'Error',
+                title: t('receptionist.personalInfo.toast.errorTitle'),
                 message: errorMessage,
             });
         } finally {
             setSaving(false);
         }
-    }, [user, selectedImage, fetchUser]);
+    }, [user, selectedImage, fetchUser, t]);
 
     const handleToggleEdit = useCallback(() => {
         if (isEditing) {
@@ -237,9 +239,9 @@ export default function PersonalInfoScreen() {
     }, [user, reset]);
 
     const displayName = useMemo(() => {
-        if (!user) return 'Recepcionista';
-        return user.lastName && user.firstName ? `${user.firstName} ${user.lastName}` : user.firstName || user.lastName || 'Recepcionista';
-    }, [user]);
+        if (!user) return t('receptionist.personalInfo.defaultRole');
+        return user.lastName && user.firstName ? `${user.firstName} ${user.lastName}` : user.firstName || user.lastName || t('receptionist.personalInfo.defaultRole');
+    }, [user, t]);
 
     const profileImageSource = useMemo(() => {
         if (selectedImage) return { uri: selectedImage };
@@ -276,7 +278,7 @@ export default function PersonalInfoScreen() {
                         <ChevronLeftIcon width={20} height={20} color='#f97316' />
                     </TouchableOpacity>
 
-                    <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Perfil Recepcionista</Text>
+                    <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('receptionist.personalInfo.title')}</Text>
                 </View>
 
                 <View className='mb-4 items-center'>
@@ -301,8 +303,8 @@ export default function PersonalInfoScreen() {
                     </TouchableOpacity>
                     <Text className='font-heading' style={{ color: '#111827', fontSize: 20, fontWeight: '600' }}>{displayName}</Text>
 
-                    <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>{user?.specialty || 'Atención al Cliente'}</Text>
-                    <Text className='font-body' style={{ color: '#f97316', fontSize: 13, marginTop: 2 }}>{user?.roleName || 'Recepcionista'}</Text>
+                    <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>{user?.specialty || t('receptionist.personalInfo.defaultSpecialty')}</Text>
+                    <Text className='font-body' style={{ color: '#f97316', fontSize: 13, marginTop: 2 }}>{user?.roleName || t('receptionist.personalInfo.defaultRole')}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', gap: 8, marginBottom: 20 }}>
@@ -316,7 +318,7 @@ export default function PersonalInfoScreen() {
                             <ActivityIndicator size='small' color='#ffffff' />
                         ) : (
                             <Text className='font-body' style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>
-                                {isEditing ? 'Guardar cambios' : 'Editar'}
+                                {isEditing ? t('receptionist.personalInfo.saveButton') : t('receptionist.personalInfo.editButton')}
                             </Text>
                         )}
                     </TouchableOpacity>
@@ -328,7 +330,7 @@ export default function PersonalInfoScreen() {
                             style={{ backgroundColor: '#9CA3AF' }}
                             onPress={handleCancelEdit}
                             disabled={saving}>
-                            <Text className='font-body' style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>Cancelar</Text>
+                            <Text className='font-body' style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>{t('receptionist.personalInfo.cancelButton')}</Text>
                         </TouchableOpacity>
                     )}
                 </View>
@@ -336,10 +338,10 @@ export default function PersonalInfoScreen() {
                 <View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
                     <View className='flex-row items-center mb-3'>
                         <UserCircleIcon width={18} height={18} color='#111827' />
-                        <Text className='font-body' style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>Información Personal</Text>
+                        <Text className='font-body' style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>{t('receptionist.personalInfo.personalInformationSection')}</Text>
                     </View>
 
-                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Nombre</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('receptionist.personalInfo.firstName')}</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -350,7 +352,7 @@ export default function PersonalInfoScreen() {
                                     onBlur={onBlur}
                                     onChangeText={onChange}
                                     value={value}
-                                    placeholder='Nombre'
+                                    placeholder={t('receptionist.personalInfo.firstNamePlaceholder')}
                                     error={errors.firstName?.message}
                                 />
                             )}
@@ -359,13 +361,13 @@ export default function PersonalInfoScreen() {
                         <TextInput
                             editable={false}
                             value={user?.firstName}
-                            placeholder='Nombre'
+                            placeholder={t('receptionist.personalInfo.firstNamePlaceholder')}
                             placeholderTextColor='#9CA3AF'
                             style={styles.readOnlyInput}
                         />
                     )}
 
-                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Apellido</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('receptionist.personalInfo.lastName')}</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -376,7 +378,7 @@ export default function PersonalInfoScreen() {
                                     onBlur={onBlur}
                                     onChangeText={onChange}
                                     value={value}
-                                    placeholder='Apellido'
+                                    placeholder={t('receptionist.personalInfo.lastNamePlaceholder')}
                                     error={errors.lastName?.message}
                                 />
                             )}
@@ -385,13 +387,13 @@ export default function PersonalInfoScreen() {
                         <TextInput
                             editable={false}
                             value={user?.lastName}
-                            placeholder='Apellido'
+                            placeholder={t('receptionist.personalInfo.lastNamePlaceholder')}
                             placeholderTextColor='#9CA3AF'
                             style={styles.readOnlyInput}
                         />
                     )}
 
-                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Documento de identidad</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('receptionist.personalInfo.documentId')}</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -402,7 +404,7 @@ export default function PersonalInfoScreen() {
                                     onBlur={onBlur}
                                     onChangeText={onChange}
                                     value={value}
-                                    placeholder='Documento de identidad'
+                                    placeholder={t('receptionist.personalInfo.documentIdPlaceholder')}
                                     keyboardType='numeric'
                                     error={errors.documentId?.message}
                                 />
@@ -412,14 +414,14 @@ export default function PersonalInfoScreen() {
                         <TextInput
                             editable={false}
                             value={user?.identityDocument}
-                            placeholder='Documento de identidad'
+                            placeholder={t('receptionist.personalInfo.documentIdPlaceholder')}
                             placeholderTextColor='#9CA3AF'
                             keyboardType='numeric'
                             style={styles.readOnlyInput}
                         />
                     )}
 
-                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Fecha de nacimiento</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('receptionist.personalInfo.birthDate')}</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -436,7 +438,7 @@ export default function PersonalInfoScreen() {
                                                 value={value ? format(date, 'yyyy-MM-dd') : ''}
                                                 editable={false}
                                                 pointerEvents='none'
-                                                placeholder='yyyy-mm-dd'
+                                                placeholder={t('receptionist.personalInfo.birthDatePlaceholder')}
                                                 error={errors.birthDate?.message}
                                             />
                                             <View style={{ position: 'absolute', right: 10, bottom: 10 }}>
@@ -465,7 +467,7 @@ export default function PersonalInfoScreen() {
                             <TextInput
                                 editable={false}
                                 value={user?.birthDate ? format(new Date(user.birthDate), 'yyyy-MM-dd') : ''}
-                                placeholder='mm/dd/yy'
+                                placeholder={t('receptionist.personalInfo.birthDatePlaceholder')}
                                 placeholderTextColor='#9CA3AF'
                                 style={[styles.readOnlyInput, { paddingRight: 32 }]}
                             />
@@ -475,7 +477,7 @@ export default function PersonalInfoScreen() {
                         </View>
                     )}
 
-                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Género</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('receptionist.personalInfo.gender')}</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -487,13 +489,13 @@ export default function PersonalInfoScreen() {
                                             activeOpacity={0.7}
                                             onPress={() => onChange('M')}
                                             style={[styles.genderButton, { backgroundColor: value === 'M' ? '#f97316' : '#E5E7EB' }]}>
-                                            <Text style={{ color: value === 'M' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>Masculino</Text>
+                                            <Text style={{ color: value === 'M' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>{t('receptionist.personalInfo.male')}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity
                                             activeOpacity={0.7}
                                             onPress={() => onChange('F')}
                                             style={[styles.genderButton, { backgroundColor: value === 'F' ? '#f97316' : '#E5E7EB' }]}>
-                                            <Text style={{ color: value === 'F' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>Femenino</Text>
+                                            <Text style={{ color: value === 'F' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>{t('receptionist.personalInfo.female')}</Text>
                                         </TouchableOpacity>
                                     </View>
                                     {errors.gender && <Text style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{errors.gender.message}</Text>}
@@ -503,8 +505,8 @@ export default function PersonalInfoScreen() {
                     ) : (
                         <TextInput
                             editable={false}
-                            value={user?.gender === 'M' ? 'Masculino' : user?.gender === 'F' ? 'Femenino' : ''}
-                            placeholder='Género'
+                            value={user?.gender === 'M' ? t('receptionist.personalInfo.male') : user?.gender === 'F' ? t('receptionist.personalInfo.female') : ''}
+                            placeholder={t('receptionist.personalInfo.genderPlaceholder')}
                             placeholderTextColor='#9CA3AF'
                             style={styles.readOnlyInput}
                         />
@@ -514,20 +516,20 @@ export default function PersonalInfoScreen() {
                 <View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
                     <View className='flex-row items-center mb-3'>
                         <PhoneIcon width={18} height={18} color='#111827' />
-                        <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>Información de contacto</Text>
+                        <Text style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>{t('receptionist.personalInfo.contactInformationSection')}</Text>
                     </View>
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Correo electrónico</Text>
+                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('receptionist.personalInfo.email')}</Text>
                     <TextInput
                         editable={false}
                         value={user?.email}
-                        placeholder='Correo electrónico'
+                        placeholder={t('receptionist.personalInfo.emailPlaceholder')}
                         placeholderTextColor='#9CA3AF'
                         keyboardType='email-address'
                         style={styles.readOnlyInput}
                     />
 
-                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Teléfono</Text>
+                    <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('receptionist.personalInfo.phone')}</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -539,7 +541,7 @@ export default function PersonalInfoScreen() {
                                         value={value || ''}
                                         onChangePhoneNumber={(phoneNumber) => onChange(phoneNumber)}
                                         defaultCountry='VE'
-                                        placeholder='Número de teléfono'
+                                        placeholder={t('receptionist.personalInfo.phonePlaceholder')}
                                         phoneInputStyles={{
                                             container: { ...styles.phoneContainer, opacity: 1 },
                                             flagContainer: styles.flagContainer,
@@ -558,7 +560,7 @@ export default function PersonalInfoScreen() {
                         <TextInput
                             editable={false}
                             value={user?.phone}
-                            placeholder='Teléfono'
+                            placeholder={t('receptionist.personalInfo.phonePlaceholder')}
                             placeholderTextColor='#9CA3AF'
                             keyboardType='phone-pad'
                             style={styles.readOnlyInput}

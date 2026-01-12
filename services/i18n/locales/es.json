@@ -1140,6 +1140,48 @@
         "title": "Seguridad",
         "options": "Opciones",
         "changePassword": "Cambiar contraseña"
+      },
+      "personalInfo": {
+        "title": "Perfil Recepcionista",
+        "defaultRole": "Recepcionista",
+        "defaultSpecialty": "Atención al Cliente",
+        "editButton": "Editar",
+        "saveButton": "Guardar cambios",
+        "cancelButton": "Cancelar",
+        "personalInformationSection": "Información Personal",
+        "contactInformationSection": "Información de contacto",
+        "firstName": "Nombre",
+        "firstNamePlaceholder": "Nombre",
+        "lastName": "Apellido",
+        "lastNamePlaceholder": "Apellido",
+        "documentId": "Documento de identidad",
+        "documentIdPlaceholder": "Documento de identidad",
+        "birthDate": "Fecha de nacimiento",
+        "birthDatePlaceholder": "yyyy-mm-dd",
+        "gender": "Género",
+        "genderPlaceholder": "Género",
+        "male": "Masculino",
+        "female": "Femenino",
+        "email": "Correo electrónico",
+        "emailPlaceholder": "Correo electrónico",
+        "phone": "Teléfono",
+        "phonePlaceholder": "Número de teléfono",
+        "permissions": {
+          "title": "Permisos necesarios",
+          "galleryAccess": "Necesitamos acceso a tu galería para cambiar la foto de perfil."
+        },
+        "errors": {
+          "noToken": "No se encontró token de autenticación",
+          "noUserId": "No se encontró el ID del usuario",
+          "uploadFailed": "No se pudo subir la imagen de perfil",
+          "galleryError": "No se pudo abrir la galería."
+        },
+        "toast": {
+          "successTitle": "¡Perfil actualizado!",
+          "successMessage": "Tus cambios se guardaron correctamente",
+          "errorTitle": "Error",
+          "defaultError": "Ocurrió un error inesperado al actualizar el perfil."
+        }
       }
     },
     "instructorProfile": {
