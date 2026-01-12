@@ -11,11 +11,11 @@ import { isAPIError } from '@vitalfit/sdk';
 import { format } from 'date-fns';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { Calendar } from 'lucide-react-native';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, BackHandler, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon, PencilSquareIcon, PhoneIcon, UserCircleIcon } from 'react-native-heroicons/solid';
 import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
 import { z } from 'zod';
@@ -95,6 +95,19 @@ export default function PersonalInfoScreen() {
 
         setLoading(false);
     }, [user, reset]);
+
+    useFocusEffect(
+        useCallback(() => {
+            const onBackPress = () => {
+                router.replace('/(recepcionist)/profile');
+                return true;
+            };
+
+            const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () => subscription.remove();
+        }, [router])
+    );
 
     const handleImagePick = useCallback(async () => {
         try {
@@ -258,7 +271,7 @@ export default function PersonalInfoScreen() {
                 <View className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center' style={{ position: 'relative' }}>
                     <TouchableOpacity
                         activeOpacity={0.7}
-                        onPress={() => router.back()}
+                        onPress={() => router.replace('/(recepcionist)/profile')}
                         style={{ position: 'absolute', left: 12, top: 8, bottom: 8, justifyContent: 'center' }}>
                         <ChevronLeftIcon width={20} height={20} color='#f97316' />
                     </TouchableOpacity>
