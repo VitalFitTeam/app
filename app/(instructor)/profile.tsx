@@ -131,7 +131,7 @@ export default function InstructorProfileScreen() {
 					activeOpacity={0.8}
 					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
 					onPress={() => {
-						router.push('/instructor-language');
+						router.push('/language');
 					}}>
 					<View className='flex-row items-center'>
 						<View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
