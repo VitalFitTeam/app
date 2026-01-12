@@ -3,11 +3,13 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon, UserIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function InstructorClientProgressScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{
     clientId?: string;
@@ -16,14 +18,14 @@ export default function InstructorClientProgressScreen() {
     program?: string;
   }>();
 
-  const clientName = params.name ?? 'Cliente';
-  const clientLevel = params.level ?? 'Nivel 1';
-  const currentProgram = params.program ?? 'Rutina actual - Semana 1';
+  const clientName = params.name ?? t('instructor.assignRoutine.defaultClient');
+  const clientLevel = params.level ?? t('instructor.assignRoutine.defaultLevel');
+  const currentProgram = params.program ?? t('instructor.assignRoutine.defaultProgram');
 
   const exercises = [
-    { id: 'ex1', title: 'Sentadillas con barra – 4×12', day: 'Lunes', series: 4, reps: 12, time: '5 minutos', done: true },
-    { id: 'ex2', title: 'Press banca – 4×10', day: 'Lunes', series: 4, reps: 10, time: '6 minutos', done: true },
-    { id: 'ex3', title: 'Remo con barra – 4×12', day: 'Miércoles', series: 4, reps: 12, time: '5 minutos', done: false },
+    { id: 'ex1', title: t('instructor.assignRoutine.exercises.squats'), day: t('instructor.clientProgress.days.monday'), series: 4, reps: 12, time: `5 ${t('instructor.assignRoutine.minutes')}`, done: true },
+    { id: 'ex2', title: t('instructor.assignRoutine.exercises.benchPress'), day: t('instructor.clientProgress.days.monday'), series: 4, reps: 10, time: `6 ${t('instructor.assignRoutine.minutes')}`, done: true },
+    { id: 'ex3', title: t('instructor.assignRoutine.exercises.barbellRow'), day: t('instructor.clientProgress.days.wednesday'), series: 4, reps: 12, time: `5 ${t('instructor.assignRoutine.minutes')}`, done: false },
   ];
 
   return (
@@ -62,7 +64,7 @@ export default function InstructorClientProgressScreen() {
             lightColor='#111827'
             style={{ fontFamily: 'System', fontSize: 16, fontWeight: '600' }}
           >
-            Progreso
+            {t('instructor.clientProgress.title')}
           </ThemedText>
         </View>
         <View style={{ alignItems: 'flex-start', marginBottom: 16 }}>
@@ -98,22 +100,22 @@ export default function InstructorClientProgressScreen() {
             }}
           >
             <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">{clientLevel.replace('Nivel ', '') || '1'}</Text>
-              <Text style={{ color: '#4B5563', fontSize: 12 }} className="font-body">Nivel</Text>
+              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">{clientLevel.replace(t('instructor.assignRoutine.level') + ' ', '') || '1'}</Text>
+              <Text style={{ color: '#4B5563', fontSize: 12 }} className="font-body">{t('instructor.assignRoutine.level')}</Text>
             </View>
 
             <View style={{ width: 1, height: 32, backgroundColor: '#D1D5DB' }} />
 
             <View style={{ flex: 1, alignItems: 'center' }}>
               <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">4/5</Text>
-              <Text style={{ color: '#4B5563', fontSize: 12 }} className="font-body">progreso</Text>
+              <Text style={{ color: '#4B5563', fontSize: 12 }} className="font-body">{t('instructor.assignRoutine.progress')}</Text>
             </View>
 
             <View style={{ width: 1, height: 32, backgroundColor: '#D1D5DB' }} />
 
             <View style={{ flex: 1, alignItems: 'center' }}>
               <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">8</Text>
-              <Text style={{ color: '#4B5563', fontSize: 12, textAlign: 'center' }} className="font-body">Entrenamientos esta semana</Text>
+              <Text style={{ color: '#4B5563', fontSize: 12, textAlign: 'center' }} className="font-body">{t('instructor.clientProgress.workoutsThisWeek')}</Text>
             </View>
           </View>
         </View>
@@ -127,22 +129,20 @@ export default function InstructorClientProgressScreen() {
             }}
           >
             <Text style={{ color: '#111827', fontSize: 18, fontWeight: '800', marginBottom: 8 }} className="font-heading">
-              RUTINA ACTUAL
+              {t('instructor.clientProgress.currentRoutine')}
             </Text>
             <Text style={{ color: '#111827', fontSize: 15, fontWeight: '600', marginBottom: 2 }} className="font-body">
               {currentProgram}
             </Text>
-            <Text style={{ color: '#6B7280', fontSize: 13, marginBottom: 10 }} className="font-body">Principiante</Text>
+            <Text style={{ color: '#6B7280', fontSize: 13, marginBottom: 10 }} className="font-body">{t('instructor.clientProgress.beginnerLevel')}</Text>
 
             <Text style={{ color: '#4B5563', fontSize: 13, lineHeight: 18 }} className="font-body">
-              Want your body to be healthy. Join our program with guidance adapted to your goals.
-              Increasing physical strength is the main objective of strength training. Maintain
-              body fitness by doing physical exercise at least 2-3 times a week.
+              {t('instructor.clientProgress.routineDescription')}
             </Text>
           </View>
         </View>
         <View style={{ marginBottom: 16 }}>
-          <Text style={{ color: '#111827', fontWeight: '700', fontSize: 16, marginBottom: 8 }} className="font-heading">Detalle de ejercicios</Text>
+          <Text style={{ color: '#111827', fontWeight: '700', fontSize: 16, marginBottom: 8 }} className="font-heading">{t('instructor.clientProgress.exerciseDetails')}</Text>
 
           <View style={{ height: 8, backgroundColor: '#E5E7EB', borderRadius: 4, overflow: 'hidden', marginBottom: 16 }}>
             <View style={{ width: '60%', height: '100%', backgroundColor: '#F27F2A' }} />
@@ -170,26 +170,26 @@ export default function InstructorClientProgressScreen() {
                   }}
                 >
                   <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '600' }} className="font-body">
-                    {ex.done ? 'Completado' : 'Pendiente'}
+                    {ex.done ? t('instructor.clientProgress.completed') : t('instructor.clientProgress.pending')}
                   </Text>
                 </View>
               </View>
 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <View>
-                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">Día</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">{t('instructor.clientProgress.day')}</Text>
                   <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.day}</Text>
                 </View>
                 <View>
-                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">Series</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">{t('instructor.clientProgress.series')}</Text>
                   <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.series}</Text>
                 </View>
                 <View>
-                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">Repeticiones</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">{t('instructor.clientProgress.reps')}</Text>
                   <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.reps}</Text>
                 </View>
                 <View>
-                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">Tiempo</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">{t('instructor.clientProgress.time')}</Text>
                   <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.time}</Text>
                 </View>
               </View>
@@ -197,10 +197,10 @@ export default function InstructorClientProgressScreen() {
           ))}
         </View>
         <View style={{ marginBottom: 20 }}>
-          <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }} className="font-body">Notas de la rutina</Text>
+          <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }} className="font-body">{t('instructor.clientProgress.routineNotes')}</Text>
           <View style={{ borderRadius: 16, borderWidth: 1, borderColor: '#e5e7eb', paddingHorizontal: 12, paddingVertical: 10, backgroundColor: '#F9FAFB' }}>
             <Text style={{ color: '#4b5563', fontSize: 13 }} className="font-body">
-              Cliente reporta buena técnica en sentadillas, pero fatiga en la última serie. Recomendar foco en descanso y respiración.
+              {t('instructor.clientProgress.notesExample')}
             </Text>
           </View>
         </View>
@@ -209,7 +209,7 @@ export default function InstructorClientProgressScreen() {
           style={{ width: '100%', paddingVertical: 14, borderRadius: 16, backgroundColor: '#4b5563', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}
           onPress={() => router.back()}
         >
-          <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }} className="font-body">Volver a Mis clientes</Text>
+          <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }} className="font-body">{t('instructor.clientProgress.backToClients')}</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

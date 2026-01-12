@@ -3,30 +3,32 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon } from 'react-native-heroicons/solid';
-
-const mockNotifications = [
-  {
-    id: '1',
-    title: 'Recordatorio de clase',
-    body: 'Tienes una clase de Functional Strength hoy a las 6:00 pm.',
-    dateLabel: 'Sep 9, 2024',
-  },
-  {
-    id: '2',
-    title: 'Nuevo progreso de cliente',
-    body: 'Tu cliente Juan Pérez actualizó su progreso de rutina.',
-    dateLabel: 'Sep 9, 2024',
-  },
-  {
-    id: '3',
-    title: 'Recordatorio de clase',
-    body: 'Tienes una clase de HIIT programada para mañana.',
-    dateLabel: 'Sep 8, 2024',
-  },
-];
+import { useTranslation } from 'react-i18next';
 
 export default function InstructorNotificationsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
+
+  const mockNotifications = [
+    {
+      id: '1',
+      title: t('instructorNotifications.mock.classReminder'),
+      body: t('instructorNotifications.mock.classReminderBody'),
+      dateLabel: 'Sep 9, 2024',
+    },
+    {
+      id: '2',
+      title: t('instructorNotifications.mock.clientProgress'),
+      body: t('instructorNotifications.mock.clientProgressBody'),
+      dateLabel: 'Sep 9, 2024',
+    },
+    {
+      id: '3',
+      title: t('instructorNotifications.mock.classReminder'),
+      body: t('instructorNotifications.mock.hiitClassBody'),
+      dateLabel: 'Sep 8, 2024',
+    },
+  ];
 
   const handleOpenSettings = () => {
     router.push('/instructor-notifications-settings');
@@ -47,16 +49,16 @@ export default function InstructorNotificationsScreen() {
             <ChevronLeftIcon width={20} height={20} color='#f97316' />
           </TouchableOpacity>
 
-          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Notificaciones</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('notifications.title')}</Text>
 
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={handleOpenSettings}
             style={{ position: 'absolute', right: 12, top: 8, bottom: 8, justifyContent: 'center' }}>
-            <Text className='font-body' style={{ color: '#f97316', fontSize: 13, fontWeight: '600' }}>Configurar</Text>
+            <Text className='font-body' style={{ color: '#f97316', fontSize: 13, fontWeight: '600' }}>{t('notifications.configure')}</Text>
           </TouchableOpacity>
         </View>
-        <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 8 }}>Hoy</Text>
+        <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 8 }}>{t('notifications.timeLabels.today')}</Text>
         {mockNotifications.slice(0, 2).map((n) => (
           <View
             key={n.id}
@@ -84,7 +86,7 @@ export default function InstructorNotificationsScreen() {
                 justifyContent: 'center',
                 marginRight: 10,
               }}>
-              <Text className='font-body' style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>Gym</Text>
+              <Text className='font-body' style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>{t('notifications.badges.gym')}</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text
@@ -109,7 +111,7 @@ export default function InstructorNotificationsScreen() {
           </View>
         ))}
 
-        <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 16 }}>Ayer</Text>
+        <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginBottom: 8, marginTop: 16 }}>{t('notifications.timeLabels.yesterday')}</Text>
         {mockNotifications.slice(2).map((n) => (
           <View
             key={n.id}
@@ -137,7 +139,7 @@ export default function InstructorNotificationsScreen() {
                 justifyContent: 'center',
                 marginRight: 10,
               }}>
-              <Text className='font-body' style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>Gym</Text>
+              <Text className='font-body' style={{ color: '#166534', fontSize: 12, fontWeight: '700' }}>{t('notifications.badges.gym')}</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text

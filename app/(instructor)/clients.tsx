@@ -16,29 +16,29 @@ export default function ClientsScreen() {
 			{
 				id: '1',
 				name: 'Juan Perez',
-				level: 'Nivel 5',
-				program: 'Fuerza Máxima - Semana 2',
+				level: `${t('instructor.assignRoutine.level')} 5`,
+				program: t('instructor.assignRoutine.programs.maxStrength'),
 			},
 			{
 				id: '2',
 				name: 'María López',
-				level: 'Nivel 3',
-				program: 'Hipertrofia - Semana 1',
+				level: `${t('instructor.assignRoutine.level')} 3`,
+				program: t('instructor.assignRoutine.programs.hypertrophy'),
 			},
 			{
 				id: '3',
 				name: 'Carlos Pérez',
-				level: 'Nivel 4',
-				program: 'Resistencia - Semana 4',
+				level: `${t('instructor.assignRoutine.level')} 4`,
+				program: t('instructor.assignRoutine.programs.endurance'),
 			},
 			{
 				id: '4',
 				name: 'Ana García',
-				level: 'Nivel 2',
-				program: 'Inicio Funcional - Semana 3',
+				level: `${t('instructor.assignRoutine.level')} 2`,
+				program: t('instructor.assignRoutine.programs.functionalStart'),
 			},
 		],
-		[],
+		[t],
 	);
 
 	return (
