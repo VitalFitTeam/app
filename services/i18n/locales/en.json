@@ -1150,6 +1150,63 @@
         "title": "Security",
         "options": "Options",
         "changePassword": "Change password"
+      },
+      "personalInfo": {
+        "title": "Receptionist Profile",
+        "defaultRole": "Receptionist",
+        "defaultSpecialty": "Customer Service",
+        "editButton": "Edit",
+        "saveButton": "Save changes",
+        "cancelButton": "Cancel",
+        "personalInformationSection": "Personal Information",
+        "contactInformationSection": "Contact information",
+        "firstName": "First name",
+        "firstNamePlaceholder": "First name",
+        "lastName": "Last name",
+        "lastNamePlaceholder": "Last name",
+        "documentId": "ID number",
+        "documentIdPlaceholder": "ID number",
+        "birthDate": "Birth date",
+        "birthDatePlaceholder": "yyyy-mm-dd",
+        "gender": "Gender",
+        "genderPlaceholder": "Gender",
+        "male": "Male",
+        "female": "Female",
+        "email": "Email",
+        "emailPlaceholder": "Email",
+        "phone": "Phone",
+        "phonePlaceholder": "Phone number",
+        "permissions": {
+          "title": "Permissions required",
+          "galleryAccess": "We need access to your gallery to change your profile picture."
+        },
+        "errors": {
+          "noToken": "Authentication token not found",
+          "noUserId": "User ID not found",
+          "uploadFailed": "Failed to upload profile picture",
+          "galleryError": "Could not open gallery."
+        },
+        "toast": {
+          "successTitle": "Profile updated!",
+          "successMessage": "Your changes were saved successfully",
+          "errorTitle": "Error",
+          "defaultError": "An unexpected error occurred while updating the profile."
+        }
+      }
+    },
+    "instructorProfile": {
+      "title": "Instructor Profile",
+      "specialty": "Specialty",
+      "defaultSpecialty": "Personal Trainer",
+      "role": "Instructor"
+    },
+    "instructorNotifications": {
+      "mock": {
+        "classReminder": "Class Reminder",
+        "classReminderBody": "You have a Functional Strength class today at 6:00 pm.",
+        "clientProgress": "New Client Progress",
+        "clientProgressBody": "Your client Juan Pérez updated their routine progress.",
+        "hiitClassBody": "You have a HIIT class scheduled for tomorrow."
       }
     },
     "instructorProfile": {
