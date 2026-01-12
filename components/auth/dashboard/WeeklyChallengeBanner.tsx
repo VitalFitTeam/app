@@ -22,14 +22,12 @@ export default function WeeklyChallengeBanner({ onPress }: WeeklyChallengeBanner
 				</TouchableOpacity>
 			</View>
 
-			<View className='w-1/2 flex-1 justify-center items-center'>
-				<View className='h-full w-56 rounded-2xl overflow-hidden'>
-					<Image
-						source={require('@/assets/images/woman4.png')}
-						style={{ width: '100%', height: '100%' }}
-						resizeMode='cover'
-					/>
-				</View>
+			<View className='w-1/2 flex-1'>
+				<Image
+					source={require('@/assets/images/woman4.png')}
+					style={{ width: '100%', height: '100%' }}
+					resizeMode='cover'
+				/>
 			</View>
 		</View>
 	);
