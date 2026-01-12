@@ -1,6 +1,7 @@
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
+import { UserAvatar } from '@/components/UserAvatar';
 import { useUser } from '@/contexts/UserContext';
 import vitalFitApi from '@/services';
 import { uploadProfilePicture } from '@/services/imageUpload';
@@ -237,10 +238,7 @@ export default function MyProfileScreen() {
         return user.lastName && user.firstName ? `${user.firstName} ${user.lastName}` : user.firstName || user.lastName || t('clientProfile.defaultName');
     }, [user, t]);
 
-    const profileImageSource = useMemo(() => {
-        if (selectedImage) return { uri: selectedImage };
-        return user?.gender === 'F' ? require('@/assets/images/Female.svg') : require('@/assets/images/Man.svg');
-    }, [selectedImage, user?.gender]);
+
 
     if (loading) {
         return (
@@ -281,14 +279,11 @@ export default function MyProfileScreen() {
                         onPress={isEditing ? handleImagePick : undefined}
                         disabled={!isEditing}
                         style={{ position: 'relative', marginBottom: 12 }}>
-                        <View className='w-24 h-24 rounded-full overflow-hidden bg-[#FED7AA] items-center justify-center'>
-                            <Image
-                                source={profileImageSource}
-                                style={{ width: '100%', height: '100%' }}
-                                contentFit='cover'
-                                cachePolicy='memory-disk'
-                            />
-                        </View>
+                        <UserAvatar
+                            name={displayName}
+                            imageUrl={selectedImage}
+                            size={96}
+                        />
                         {isEditing && (
                             <View style={{ position: 'absolute', right: 0, bottom: 0, width: 28, height: 28, borderRadius: 14, backgroundColor: '#f97316', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FFFFFF' }}>
                                 <PencilSquareIcon width={16} height={16} color='#FFFFFF' />
