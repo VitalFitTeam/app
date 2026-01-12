@@ -1023,6 +1023,45 @@
         "length": "El número de teléfono debe tener entre 10 y 15 dígitos."
       },
       "acceptTerms": "Debes aceptar los términos y condiciones."
+    },
+    "receptionist": {
+      "changePassword": {
+        "title": "Cambiar contraseña",
+        "sectionTitle": "Seguridad de la cuenta",
+        "sectionSubtitle": "Actualiza tu contraseña de acceso",
+        "currentPassword": "Contraseña actual",
+        "currentPasswordPlaceholder": "Ingresa tu contraseña actual",
+        "newPassword": "Nueva contraseña",
+        "newPasswordPlaceholder": "Ingresa tu nueva contraseña",
+        "confirmPassword": "Confirmar contraseña",
+        "confirmPasswordPlaceholder": "Repite tu nueva contraseña",
+        "saving": "Guardando...",
+        "save": "Guardar cambios",
+        "toast": {
+          "successTitle": "Contraseña actualizada",
+          "successMessage": "La contraseña se guardó correctamente",
+          "errorTitle": "Error"
+        },
+        "errors": {
+          "currentRequired": "Ingresa tu contraseña actual.",
+          "minLength": "La contraseña debe tener al menos 8 caracteres.",
+          "uppercase": "Debe contener al menos una mayúscula.",
+          "lowercase": "Debe contener al menos una minúscula.",
+          "number": "Debe contener al menos un número.",
+          "special": "Debe contener al menos un caracter especial.",
+          "passwordMismatch": "Las contraseñas no coinciden.",
+          "sameAsCurrent": "La nueva contraseña no puede ser igual a la actual.",
+          "noSession": "No se encontró sesión activa.",
+          "generic": "Ocurrió un error al cambiar la contraseña.",
+          "incorrectCurrent": "La contraseña actual es incorrecta.",
+          "tryAgain": "Verifique su contraseña actual e intente nuevamente."
+        }
+      },
+      "security": {
+        "title": "Seguridad",
+        "options": "Opciones",
+        "changePassword": "Cambiar contraseña"
+      }
     }
   }
 }
