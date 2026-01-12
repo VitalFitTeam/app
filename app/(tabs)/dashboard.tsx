@@ -144,7 +144,6 @@ export default function DashboardScreen() {
 				<UserHeader
 					name={displayName}
 					avatarUrl={user?.profilePicture}
-					gender={user?.gender}
 					onBadgesPress={() => console.log('Abrir vista de medallas/insignias')}
 				/>
 

@@ -1,12 +1,12 @@
 import { QRScannerModal } from '@/components/recepcionist/QRScannerModal';
 import { CheckInResultModal } from '@/components/recepcionista/CheckInResultModal';
 import { ThemedView } from '@/components/themed-view';
+import { UserAvatar } from '@/components/UserAvatar';
 import { useBranch } from '@/contexts/BranchContext';
 import { useUser } from '@/contexts/UserContext';
 import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
-import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,11 +47,7 @@ export default function RecepcionistProfileComponent() {
       : user.firstName
     : t('dashboard.recepcionistDefault');
 
-  const avatarSource = user?.profilePicture
-    ? { uri: user.profilePicture }
-    : user?.gender === 'F'
-    ? require('@/assets/images/Female.svg')
-    : require('@/assets/images/Man.svg');
+
 
   const handleValidateMembership = async (qrJwtLong: string) => {
     try {
@@ -136,13 +132,12 @@ export default function RecepcionistProfileComponent() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
         <View className='mb-4 items-start'>
-          <View className='w-24 h-24 rounded-full overflow-hidden mb-3 bg-[#FED7AA] items-center justify-center'>
-            <Image
-              source={avatarSource}
-              style={{ width: '100%', height: '100%' }}
-              contentFit='cover'
-            />
-          </View>
+          <UserAvatar
+            name={displayName}
+            imageUrl={user?.profilePicture}
+            size={96}
+            style={{ marginBottom: 12 }}
+          />
           <Text className='text-[20px] font-semibold text-[#111827]'>{displayName}</Text>
           <Text className='text-[13px] text-[#6b7280] mt-1'>{user?.roleName || t('dashboard.recepcionistDefault')}</Text>
           <Text className='text-[13px] text-[#f97316] mt-0.5'>{t('profile.staffViralFit')}</Text>

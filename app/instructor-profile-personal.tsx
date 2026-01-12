@@ -19,14 +19,16 @@ import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, Touc
 import { ChevronLeftIcon, PencilSquareIcon, PhoneIcon, UserCircleIcon } from 'react-native-heroicons/solid';
 import PhoneInput, { IPhoneInputRef } from 'react-native-international-phone-number';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 
 const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
 
-const ProfileSchema = z.object({
-    firstName: z.string().min(1, 'El nombre es requerido.').regex(nameRegex, 'El nombre solo puede contener letras.'),
-    lastName: z.string().min(1, 'El apellido es requerido.').regex(nameRegex, 'El apellido solo puede contener letras.'),
-    documentId: z.string().min(6, 'El documento debe tener al menos 6 dígitos.').regex(/^[0-9]+$/, 'El documento solo puede contener números.'),
-    birthDate: z.string().min(1, 'La fecha de nacimiento es requerida.').refine((date) => {
+// Schema will use dynamic error messages from t() function
+const createProfileSchema = (t: (key: string) => string) => z.object({
+    firstName: z.string().min(1, t('myProfile.errors.nameRequired')).regex(nameRegex, t('validations.name.letters')),
+    lastName: z.string().min(1, t('myProfile.errors.lastNameRequired')).regex(nameRegex, t('validations.lastName.letters')),
+    documentId: z.string().min(6, t('myProfile.errors.documentMin')).regex(/^[0-9]+$/, t('myProfile.errors.documentNumeric')),
+    birthDate: z.string().min(1, t('myProfile.errors.birthDateRequired')).refine((date) => {
         const birthDate = new Date(date);
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
@@ -35,18 +37,26 @@ const ProfileSchema = z.object({
             age--;
         }
         return age >= 18;
-    }, { message: 'Debes ser mayor de 18 años.' }),
+    }, { message: t('myProfile.errors.adult') }),
     phone: z.string().optional().refine((phone) => {
         if (!phone) return true;
         const numericPhone = phone.replace(/\D/g, '');
         return numericPhone.length >= 10 && numericPhone.length <= 15;
-    }, { message: 'El número de teléfono debe tener entre 10 y 15 dígitos.' }),
-    gender: z.string().min(1, 'El género es requerido.'),
+    }, { message: t('myProfile.errors.phoneLength') }),
+    gender: z.string().min(1, t('myProfile.errors.genderRequired')),
 });
 
-type ProfileFormData = z.infer<typeof ProfileSchema>;
+type ProfileFormData = {
+    firstName: string;
+    lastName: string;
+    documentId: string;
+    birthDate: string;
+    phone?: string;
+    gender: string;
+};
 
 export default function InstructorProfilePersonalScreen() {
+    const { t } = useTranslation();
     const router = useRouter();
     const { user, fetchUser } = useUser();
     const [loading, setLoading] = useState(true);
@@ -61,6 +71,8 @@ export default function InstructorProfilePersonalScreen() {
         title: '',
         message: '',
     });
+
+    const ProfileSchema = useMemo(() => createProfileSchema(t), [t]);
 
     const { control, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>({
         resolver: zodResolver(ProfileSchema),
@@ -101,7 +113,7 @@ export default function InstructorProfilePersonalScreen() {
             const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
             if (permissionResult.status !== 'granted') {
-                Alert.alert("Permisos necesarios", "Necesitamos acceso a tu galería para cambiar la foto de perfil.");
+                Alert.alert(t('myProfile.permissions.title'), t('myProfile.permissions.message'));
                 return;
             }
 
@@ -117,9 +129,9 @@ export default function InstructorProfilePersonalScreen() {
                 setSelectedImage(result.assets[0].uri);
             }
         } catch {
-            Alert.alert("Error", "No se pudo abrir la galería.");
+            Alert.alert(t('myProfile.toast.errorTitle'), t('myProfile.galleryError'));
         }
-    }, []);
+    }, [t]);
 
     const onSubmit = useCallback(async (data: ProfileFormData) => {
         setSaving(true);
@@ -129,8 +141,8 @@ export default function InstructorProfilePersonalScreen() {
                 setToast({
                     visible: true,
                     type: 'error',
-                    title: 'Error',
-                    message: !token ? 'No se encontró token de autenticación' : 'No se encontró el ID del usuario',
+                    title: t('myProfile.toast.errorTitle'),
+                    message: !token ? t('myProfile.errors.noToken') : t('myProfile.errors.noUserId'),
                 });
                 setSaving(false);
                 return;
@@ -146,8 +158,8 @@ export default function InstructorProfilePersonalScreen() {
                     setToast({
                         visible: true,
                         type: 'error',
-                        title: 'Error',
-                        message: 'No se pudo subir la imagen de perfil',
+                        title: t('myProfile.toast.errorTitle'),
+                        message: t('myProfile.errors.uploadImageError'),
                     });
                     setSaving(false);
                     return;
@@ -178,11 +190,11 @@ export default function InstructorProfilePersonalScreen() {
             setToast({
                 visible: true,
                 type: 'success',
-                title: '¡Perfil actualizado!',
-                message: 'Tus cambios se guardaron correctamente',
+                title: t('myProfile.toast.successTitle'),
+                message: t('myProfile.toast.successMessage'),
             });
         } catch (error: unknown) {
-            let errorMessage = 'Ocurrió un error inesperado al actualizar el perfil.';
+            let errorMessage = t('myProfile.errors.updateError');
             if (isAPIError(error)) {
                 errorMessage = error.messages.join(', ');
             } else if (error instanceof Error) {
@@ -191,13 +203,13 @@ export default function InstructorProfilePersonalScreen() {
             setToast({
                 visible: true,
                 type: 'error',
-                title: 'Error',
+                title: t('myProfile.toast.errorTitle'),
                 message: errorMessage,
             });
         } finally {
             setSaving(false);
         }
-    }, [user, selectedImage, fetchUser]);
+    }, [user, selectedImage, fetchUser, t]);
 
     const handleToggleEdit = useCallback(() => {
         if (isEditing) {
@@ -224,9 +236,9 @@ export default function InstructorProfilePersonalScreen() {
     }, [user, reset]);
 
     const displayName = useMemo(() => {
-        if (!user) return 'Instructor';
-        return user.lastName && user.firstName ? `${user.firstName} ${user.lastName}` : user.firstName || user.lastName || 'Instructor';
-    }, [user]);
+        if (!user) return t('instructor.profile.defaultName');
+        return user.lastName && user.firstName ? `${user.firstName} ${user.lastName}` : user.firstName || user.lastName || t('instructor.profile.defaultName');
+    }, [user, t]);
 
     const profileImageSource = useMemo(() => {
         if (selectedImage) return { uri: selectedImage };
@@ -263,7 +275,7 @@ export default function InstructorProfilePersonalScreen() {
                         <ChevronLeftIcon width={20} height={20} color='#f97316' />
                     </TouchableOpacity>
 
-                    <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Perfil Instructor</Text>
+                    <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('instructorProfile.title')}</Text>
                 </View>
 
                 <View className='mb-4 items-center'>
@@ -288,8 +300,8 @@ export default function InstructorProfilePersonalScreen() {
                     </TouchableOpacity>
                     <Text className='font-body' style={{ color: '#111827', fontSize: 20, fontWeight: '600' }}>{displayName}</Text>
 
-                    <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>{user?.specialty || 'Entrenador Personal'}</Text>
-                    <Text className='font-body' style={{ color: '#f97316', fontSize: 13, marginTop: 2 }}>{user?.roleName || 'Instructor'}</Text>
+                    <Text className='font-body' style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>{user?.specialty || t('instructorProfile.defaultSpecialty')}</Text>
+                    <Text className='font-body' style={{ color: '#f97316', fontSize: 13, marginTop: 2 }}>{user?.roleName || t('instructor.profile.defaultName')}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', gap: 8, marginBottom: 20 }}>
@@ -303,7 +315,7 @@ export default function InstructorProfilePersonalScreen() {
                             <ActivityIndicator size='small' color='#ffffff' />
                         ) : (
                             <Text className='font-body' style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>
-                                {isEditing ? 'Guardar cambios' : 'Editar'}
+                                {isEditing ? t('myProfile.saveChanges') : t('myProfile.edit')}
                             </Text>
                         )}
                     </TouchableOpacity>
@@ -315,7 +327,7 @@ export default function InstructorProfilePersonalScreen() {
                             style={{ backgroundColor: '#9CA3AF' }}
                             onPress={handleCancelEdit}
                             disabled={saving}>
-                            <Text className='font-body' style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>Cancelar</Text>
+                            <Text className='font-body' style={{ color: '#ffffff', fontSize: 14, fontWeight: '700' }}>{t('myProfile.cancel')}</Text>
                         </TouchableOpacity>
                     )}
                 </View>
@@ -323,10 +335,10 @@ export default function InstructorProfilePersonalScreen() {
                 <View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
                     <View className='flex-row items-center mb-3'>
                         <UserCircleIcon width={18} height={18} color='#111827' />
-                        <Text className='font-heading' style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>Información Personal</Text>
+                        <Text className='font-heading' style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>{t('myProfile.personalInfo')}</Text>
                     </View>
 
-                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Nombre</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('myProfile.firstName')}</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -337,7 +349,7 @@ export default function InstructorProfilePersonalScreen() {
                                     onBlur={onBlur}
                                     onChangeText={onChange}
                                     value={value}
-                                    placeholder='Nombre'
+                                    placeholder={t('myProfile.placeholders.name')}
                                     error={errors.firstName?.message}
                                 />
                             )}
@@ -346,13 +358,13 @@ export default function InstructorProfilePersonalScreen() {
                         <TextInput
                             editable={false}
                             value={user?.firstName}
-                            placeholder='Nombre'
+                            placeholder={t('myProfile.placeholders.name')}
                             placeholderTextColor='#9CA3AF'
                             style={styles.readOnlyInput}
                         />
                     )}
 
-                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Apellido</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('myProfile.lastName')}</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -363,7 +375,7 @@ export default function InstructorProfilePersonalScreen() {
                                     onBlur={onBlur}
                                     onChangeText={onChange}
                                     value={value}
-                                    placeholder='Apellido'
+                                    placeholder={t('myProfile.placeholders.lastName')}
                                     error={errors.lastName?.message}
                                 />
                             )}
@@ -372,13 +384,13 @@ export default function InstructorProfilePersonalScreen() {
                         <TextInput
                             editable={false}
                             value={user?.lastName}
-                            placeholder='Apellido'
+                            placeholder={t('myProfile.placeholders.lastName')}
                             placeholderTextColor='#9CA3AF'
                             style={styles.readOnlyInput}
                         />
                     )}
 
-                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Documento de identidad</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('myProfile.identityDoc')}</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -389,7 +401,7 @@ export default function InstructorProfilePersonalScreen() {
                                     onBlur={onBlur}
                                     onChangeText={onChange}
                                     value={value}
-                                    placeholder='Documento de identidad'
+                                    placeholder={t('myProfile.placeholders.identityDoc')}
                                     keyboardType='numeric'
                                     error={errors.documentId?.message}
                                 />
@@ -399,23 +411,23 @@ export default function InstructorProfilePersonalScreen() {
                         <TextInput
                             editable={false}
                             value={user?.identityDocument}
-                            placeholder='Documento de identidad'
+                            placeholder={t('myProfile.placeholders.identityDoc')}
                             placeholderTextColor='#9CA3AF'
                             keyboardType='numeric'
                             style={styles.readOnlyInput}
                         />
                     )}
 
-                     <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Especialidad</Text>
+                     <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('instructorProfile.specialty')}</Text>
                      <TextInput
                         editable={false}
                         value={user?.specialty}
-                        placeholder='Especialidad'
+                        placeholder={t('instructorProfile.specialty')}
                         placeholderTextColor='#9CA3AF'
                         style={styles.readOnlyInput}
                     />
 
-                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Fecha de nacimiento</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('myProfile.birthDate')}</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -432,7 +444,7 @@ export default function InstructorProfilePersonalScreen() {
                                                 value={value ? format(date, 'yyyy-MM-dd') : ''}
                                                 editable={false}
                                                 pointerEvents='none'
-                                                placeholder='yyyy-mm-dd'
+                                                placeholder={t('myProfile.placeholders.birthDate')}
                                                 error={errors.birthDate?.message}
                                             />
                                             <View style={{ position: 'absolute', right: 10, bottom: 10 }}>
@@ -461,7 +473,7 @@ export default function InstructorProfilePersonalScreen() {
                             <TextInput
                                 editable={false}
                                 value={user?.birthDate ? format(new Date(user.birthDate), 'yyyy-MM-dd') : ''}
-                                placeholder='mm/dd/yy'
+                                placeholder={t('myProfile.placeholders.birthDate')}
                                 placeholderTextColor='#9CA3AF'
                                 style={[styles.readOnlyInput, { paddingRight: 32 }]}
                             />
@@ -471,7 +483,7 @@ export default function InstructorProfilePersonalScreen() {
                         </View>
                     )}
 
-                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Género</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('myProfile.gender')}</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -483,13 +495,13 @@ export default function InstructorProfilePersonalScreen() {
                                             activeOpacity={0.7}
                                             onPress={() => onChange('M')}
                                             style={[styles.genderButton, { backgroundColor: value === 'M' ? '#f97316' : '#E5E7EB' }]}>
-                                            <Text className='font-body' style={{ color: value === 'M' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>Masculino</Text>
+                                            <Text className='font-body' style={{ color: value === 'M' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>{t('myProfile.male')}</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity
                                             activeOpacity={0.7}
                                             onPress={() => onChange('F')}
                                             style={[styles.genderButton, { backgroundColor: value === 'F' ? '#f97316' : '#E5E7EB' }]}>
-                                            <Text className='font-body' style={{ color: value === 'F' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>Femenino</Text>
+                                            <Text className='font-body' style={{ color: value === 'F' ? '#FFFFFF' : '#6b7280', fontSize: 13, fontWeight: '600' }}>{t('myProfile.female')}</Text>
                                         </TouchableOpacity>
                                     </View>
                                     {errors.gender && <Text className='font-body' style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{errors.gender.message}</Text>}
@@ -499,8 +511,8 @@ export default function InstructorProfilePersonalScreen() {
                     ) : (
                         <TextInput
                             editable={false}
-                            value={user?.gender === 'M' ? 'Masculino' : user?.gender === 'F' ? 'Femenino' : ''}
-                            placeholder='Género'
+                            value={user?.gender === 'M' ? t('myProfile.male') : user?.gender === 'F' ? t('myProfile.female') : ''}
+                            placeholder={t('myProfile.placeholders.gender')}
                             placeholderTextColor='#9CA3AF'
                             style={styles.readOnlyInput}
                         />
@@ -510,20 +522,20 @@ export default function InstructorProfilePersonalScreen() {
                 <View className='mb-4 rounded-2xl bg-[#F3F4F6] px-4 py-4'>
                     <View className='flex-row items-center mb-3'>
                         <PhoneIcon width={18} height={18} color='#111827' />
-                        <Text className='font-heading' style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>Información de contacto</Text>
+                        <Text className='font-heading' style={{ marginLeft: 8, fontSize: 14, fontWeight: '600', color: '#111827' }}>{t('myProfile.contactInfo')}</Text>
                     </View>
 
-                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Correo electrónico</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('myProfile.email')}</Text>
                     <TextInput
                         editable={false}
                         value={user?.email}
-                        placeholder='Correo electrónico'
+                        placeholder={t('myProfile.placeholders.email')}
                         placeholderTextColor='#9CA3AF'
                         keyboardType='email-address'
                         style={styles.readOnlyInput}
                     />
 
-                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Teléfono</Text>
+                    <Text className='font-body' style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{t('myProfile.phone')}</Text>
                     {isEditing ? (
                         <Controller
                             control={control}
@@ -535,7 +547,7 @@ export default function InstructorProfilePersonalScreen() {
                                         value={value || ''}
                                         onChangePhoneNumber={(phoneNumber) => onChange(phoneNumber)}
                                         defaultCountry='VE'
-                                        placeholder='Número de teléfono'
+                                        placeholder={t('myProfile.placeholders.phone')}
                                         phoneInputStyles={{
                                             container: { ...styles.phoneContainer, opacity: 1 },
                                             flagContainer: styles.flagContainer,
@@ -554,7 +566,7 @@ export default function InstructorProfilePersonalScreen() {
                         <TextInput
                             editable={false}
                             value={user?.phone}
-                            placeholder='Teléfono'
+                            placeholder={t('myProfile.placeholders.phone')}
                             placeholderTextColor='#9CA3AF'
                             keyboardType='phone-pad'
                             style={styles.readOnlyInput}

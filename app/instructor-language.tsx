@@ -1,6 +1,6 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedView } from '@/components/themed-view';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -12,21 +12,23 @@ const LANGUAGES = [
   { code: 'en', name: 'English', countryCode: 'gb' },
 ];
 
-export default function LanguageScreen() {
+export default function InstructorLanguageScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
 
   const handleSaveLanguage = () => {
     i18n.changeLanguage(selectedLanguage);
-    router.replace('/');
+    router.back();
   };
 
   return (
-    <ThemedView className="flex-1 bg-white">
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <ThemedView className="flex-1 bg-white pt-10">
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 40, paddingBottom: 96 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}
       >
         <View
           className="w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center"
@@ -113,5 +115,6 @@ export default function LanguageScreen() {
         </View>
       </ScrollView>
     </ThemedView>
+    </>
   );
 }

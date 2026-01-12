@@ -1,13 +1,26 @@
 import { ThemedView } from '@/components/themed-view';
-import { useRouter } from 'expo-router';
-import React from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { BackHandler, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon, ShieldCheckIcon } from 'react-native-heroicons/solid';
 
 export default function SecurityScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        router.replace('/(recepcionist)/profile');
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () => subscription.remove();
+    }, [router])
+  );
 
   return (
     <ThemedView className="flex-1 bg-white pt-10">
@@ -22,7 +35,7 @@ export default function SecurityScreen() {
         >
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => router.back()}
+            onPress={() => router.replace('/(recepcionist)/profile')}
             style={{
               position: 'absolute',
               left: 12,

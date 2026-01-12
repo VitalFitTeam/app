@@ -1,6 +1,7 @@
 import { KPICard } from '@/types/reports';
 import { Dumbbell } from 'lucide-react-native';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { CheckCircleIcon, UsersIcon } from 'react-native-heroicons/outline';
 
@@ -11,20 +12,20 @@ type Props = {
 };
 
 export function InstructorStatsCardGroup({ monthlyClasses, studentCount, attendanceRate }: Props) {
-	console.log('InstructorStatsCardGroup Props:', { monthlyClasses, studentCount, attendanceRate });
+	const { t } = useTranslation();
 	const cards = [
 		{
-			label: monthlyClasses?.trend ? `Clases Mes ${monthlyClasses.trend}` : 'Clases Mes',
+			label: monthlyClasses?.trend ? `${t('instructor.dashboard.stats.monthlyClasses')} ${monthlyClasses.trend}` : t('instructor.dashboard.stats.monthlyClasses'),
 			value: monthlyClasses ? `${monthlyClasses.value}` : '--',
 			icon: <Dumbbell size={16} color='#f97316' strokeWidth={1.8} />,
 		},
 		{
-			label: studentCount?.trend ? `Alumnos Hoy ${studentCount.trend}` : 'Alumnos Hoy',
+			label: studentCount?.trend ? `${t('instructor.dashboard.stats.studentsToday')} ${studentCount.trend}` : t('instructor.dashboard.stats.studentsToday'),
 			value: studentCount ? `${studentCount.value}` : '--',
 			icon: <UsersIcon size={16} color='#f97316' />,
 		},
 		{
-			label: 'Tasa Asistencia',
+			label: t('instructor.dashboard.stats.attendanceRate'),
 			value: attendanceRate !== undefined ? `${attendanceRate}%` : '--%',
 			icon: <CheckCircleIcon size={16} color='#f97316' />,
 		},
