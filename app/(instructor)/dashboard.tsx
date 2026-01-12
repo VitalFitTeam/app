@@ -105,9 +105,11 @@ export default function DashboardInstructor() {
 		);
 	}
 
-	const firstName = user?.firstName || t('instructor.dashboard.defaultName');
+	const displayName = user?.lastName
+		? `${user.firstName} ${user.lastName}`
+		: user?.firstName || t('instructor.dashboard.defaultName');
 	const avatarUrl = user?.profilePicture;
-	const gender = user?.gender;
+
 
 
 	const messages = [
@@ -157,9 +159,8 @@ export default function DashboardInstructor() {
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: Math.max(insets.bottom + 80, 96) }}>
 				<UserHeader
-					name={firstName}
+					name={displayName}
 					avatarUrl={avatarUrl}
-					gender={gender}
 				/>
 
 				<InstructorStatsCardGroup 

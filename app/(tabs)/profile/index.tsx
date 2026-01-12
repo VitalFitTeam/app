@@ -1,6 +1,7 @@
 import { QRModal } from '@/components/auth/dashboard/QRModal';
-import { useUser } from '@/contexts/UserContext';
+import { UserAvatar } from '@/components/UserAvatar';
 import { useReservations } from '@/contexts/reservations';
+import { useUser } from '@/contexts/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -66,11 +67,7 @@ export default function ProfileScreen() {
     }
   };
 
-  const defaultImage = user?.gender === 'F' 
-    ? require('@/assets/images/Female.svg') 
-    : require('@/assets/images/Man.svg');
 
-  const profileImageSource = user?.profilePicture ? { uri: user.profilePicture } : defaultImage;
 
   return (
     <View className="flex-1 bg-white dark:bg-neutral-950">
@@ -79,13 +76,12 @@ export default function ProfileScreen() {
         contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 40, paddingBottom: 96 }}
       >
         <View className="mb-4 items-start">
-          <View className="w-24 h-24 rounded-full overflow-hidden mb-3 bg-[#FED7AA] items-center justify-center">
-            <Image
-              source={profileImageSource}
-              style={{ width: '100%', height: '100%' }}
-              contentFit='cover'
-            />
-          </View>
+          <UserAvatar
+            name={displayName}
+            imageUrl={user?.profilePicture}
+            size={96}
+            style={{ marginBottom: 12 }}
+          />
           <Text className="text-[20px] font-semibold text-[#111827]">{displayName}</Text>
           {(user?.roleName === 'Instructor' || user?.roleName === 'Staff') ? (
             <>

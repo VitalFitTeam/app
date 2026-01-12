@@ -1,8 +1,8 @@
 import { InstructorQRModal } from '@/components/instructor/InstructorQRModal';
 import { ThemedView } from '@/components/themed-view';
+import { UserAvatar } from '@/components/UserAvatar';
 import { useUser } from '@/contexts/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -49,11 +49,7 @@ export default function InstructorProfileScreen() {
 		}
 	};
 
-	const defaultImage = user?.gender === 'F' 
-		? require('@/assets/images/Female.svg') 
-		: require('@/assets/images/Man.svg');
 
-	const profileImageSource = user?.profilePicture ? { uri: user.profilePicture } : defaultImage;
 
 	return (
 		<ThemedView className='flex-1 bg-white pt-10'>
@@ -62,12 +58,12 @@ export default function InstructorProfileScreen() {
 				contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
 				{/* Avatar e info básica */}
 				<View className='mb-4 items-start'>
-					<View className='w-24 h-24 rounded-full overflow-hidden mb-3 bg-[#FED7AA] items-center justify-center'>
-						<Image
-							source={profileImageSource}
-							style={{ width: '100%', height: '100%' }}
-						/>
-					</View>
+					<UserAvatar
+						name={displayName}
+						imageUrl={user?.profilePicture}
+						size={96}
+						style={{ marginBottom: 12 }}
+					/>
 					<Text className='text-[20px] font-semibold text-[#111827]'>{displayName}</Text>
 
 					<Text className='text-[13px] text-[#f97316] mt-0.5'>{t('instructorProfile.role')}</Text>

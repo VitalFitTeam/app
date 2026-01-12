@@ -26,7 +26,9 @@ export default function DashboardRecepcionist() {
 	const [checkInUserName, setCheckInUserName] = useState('');
 	const [checkInMessage, setCheckInMessage] = useState('');
 
-	const displayName = user?.firstName || t('dashboard.recepcionistDefault');
+	const displayName = user?.lastName
+		? `${user.firstName} ${user.lastName}`
+		: user?.firstName || t('dashboard.recepcionistDefault');
 
 	const handleValidateMembership = async (qrJwtLong: string) => {
 		try {
@@ -110,7 +112,6 @@ export default function DashboardRecepcionist() {
 				<UserHeader
 					name={displayName}
 					avatarUrl={user?.profilePicture || undefined}
-                    gender={user?.gender}
 				/>
 
 				<View style={{ alignItems: 'center', paddingHorizontal: 20, marginBottom: 10, marginTop: -15 }}>
