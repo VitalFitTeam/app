@@ -12,10 +12,8 @@ import {
 	BellIcon,
 	ChevronRightIcon,
 	GlobeAltIcon,
-	QrCodeIcon,
-	QuestionMarkCircleIcon,
 	ShieldCheckIcon,
-	UserCircleIcon,
+	UserCircleIcon
 } from 'react-native-heroicons/outline';
 
 export default function InstructorProfileScreen() {
@@ -71,24 +69,12 @@ export default function InstructorProfileScreen() {
 						/>
 					</View>
 					<Text className='text-[20px] font-semibold text-[#111827]'>{displayName}</Text>
-					<Text className='text-[13px] text-[#6b7280] mt-1'>{user?.specialty || t('instructor.profile.specialty')}</Text>
-					<Text className='text-[13px] text-[#f97316] mt-0.5'>{user?.roleName || 'Instructor'}</Text>
+
+					<Text className='text-[13px] text-[#f97316] mt-0.5'>{t('instructorProfile.role')}</Text>
 				</View>
 
 				<View className='mb-4'>
-					<Text className='text-[14px] font-semibold text-[#111827] mb-1'>{t('instructor.profile.aboutMe')}</Text>
-					<Text className='text-[13px] text-[#4b5563] leading-5'>
-						{t('instructor.profile.aboutMeDescription')}
-					</Text>
 				</View>
-
-				<TouchableOpacity
-					activeOpacity={0.85}
-					className='w-full rounded-2xl border border-[#d1d5db] py-3 px-4 mb-4 flex-row items-center justify-center bg-white'
-					onPress={() => setQrModalVisible(true)}>
-					<QrCodeIcon width={18} height={18} color='#111827' />
-					<Text className='ml-2 text-[13px] font-medium text-[#111827]'>{t('instructor.profile.scanQR')}</Text>
-				</TouchableOpacity>
 
 				<View className='w-full bg-[#F3F4F6] rounded-2xl py-3 px-3 mb-6 flex-row justify-between'>
 					<View className='flex-1 items-center'>
@@ -145,7 +131,7 @@ export default function InstructorProfileScreen() {
 					activeOpacity={0.8}
 					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
 					onPress={() => {
-						console.log('Idioma');
+						router.push('/instructor-language');
 					}}>
 					<View className='flex-row items-center'>
 						<View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
@@ -167,36 +153,6 @@ export default function InstructorProfileScreen() {
 							<BellIcon width={18} height={18} color='#111827' />
 						</View>
 						<Text className='text-[13px] text-[#111827]'>{t('instructor.profile.notifications')}</Text>
-					</View>
-					<ChevronRightIcon width={16} height={16} color='#9ca3af' />
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					activeOpacity={0.8}
-					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
-					onPress={() => {
-						console.log('Ayuda y soporte');
-					}}>
-					<View className='flex-row items-center'>
-						<View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
-							<QuestionMarkCircleIcon width={18} height={18} color='#111827' />
-						</View>
-						<Text className='text-[13px] text-[#111827]'>{t('instructor.profile.helpSupport')}</Text>
-					</View>
-					<ChevronRightIcon width={16} height={16} color='#9ca3af' />
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					activeOpacity={0.8}
-					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
-					onPress={() => {
-						console.log('Términos y condiciones');
-					}}>
-					<View className='flex-row items-center'>
-						<View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
-							<GlobeAltIcon width={18} height={18} color='#111827' />
-						</View>
-						<Text className='text-[13px] text-[#111827]'>{t('instructor.profile.termsConditions')}</Text>
 					</View>
 					<ChevronRightIcon width={16} height={16} color='#9ca3af' />
 				</TouchableOpacity>
