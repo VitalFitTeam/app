@@ -35,7 +35,7 @@ export default function ClassDetailsScreen() {
   const classDateFormatted = useMemo(() => {
     try {
       const dateToFormat = startsAt ? new Date(String(startsAt)) : new Date();
-      
+
       if (startsAt && String(startsAt).match(/^\d{4}-\d{2}-\d{2}$/)) {
         dateToFormat.setMinutes(dateToFormat.getMinutes() + dateToFormat.getTimezoneOffset());
       }
@@ -51,6 +51,12 @@ export default function ClassDetailsScreen() {
   }, [startsAt]);
 
   const [serviceDescription, setServiceDescription] = useState<string | null>(null);
+  const isPast = useMemo(() => {
+    if (!startsAt) return false;
+    const now = new Date();
+    const start = new Date(String(startsAt));
+    return start < now;
+  }, [startsAt]);
   const [serviceImageUrl, setServiceImageUrl] = useState<string | null>(null);
   const [instructorImageUrl, setInstructorImageUrl] = useState<string | null>(null);
 
@@ -360,28 +366,24 @@ export default function ClassDetailsScreen() {
 
           <View className='flex-row bg-[#F3F4F6] rounded-2xl p-1 mb-3'>
             <TouchableOpacity
-              className={`flex-1 py-2 rounded-xl items-center ${
-                activeTab === 'clientes' ? 'bg-white' : 'bg-transparent'
-              }`}
+              className={`flex-1 py-2 rounded-xl items-center ${activeTab === 'clientes' ? 'bg-white' : 'bg-transparent'
+                }`}
               activeOpacity={0.7}
               onPress={() => setActiveTab('clientes')}>
               <Text
-                className={`font-semibold font-body ${
-                  activeTab === 'clientes' ? 'text-[#111827]' : 'text-[#6b7280]'
-                }`}>
+                className={`font-semibold font-body ${activeTab === 'clientes' ? 'text-[#111827]' : 'text-[#6b7280]'
+                  }`}>
                 Clientes
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`flex-1 py-2 rounded-xl items-center ${
-                activeTab === 'pasar-lista' ? 'bg-white' : 'bg-transparent'
-              }`}
+              className={`flex-1 py-2 rounded-xl items-center ${activeTab === 'pasar-lista' ? 'bg-white' : 'bg-transparent'
+                }`}
               activeOpacity={0.7}
               onPress={() => setActiveTab('pasar-lista')}>
               <Text
-                className={`font-semibold font-body ${
-                  activeTab === 'pasar-lista' ? 'text-[#111827]' : 'text-[#6b7280]'
-                }`}>
+                className={`font-semibold font-body ${activeTab === 'pasar-lista' ? 'text-[#111827]' : 'text-[#6b7280]'
+                  }`}>
                 Pasar lista
               </Text>
             </TouchableOpacity>
@@ -473,49 +475,44 @@ export default function ClassDetailsScreen() {
 
                       <View className='flex-row gap-2'>
                         <TouchableOpacity
-                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${
-                            status === 'present'
+                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${status === 'present'
                               ? 'bg-[#f97316]'
                               : 'bg-white border border-[#f97316]'
-                          }`}
+                            }`}
                           activeOpacity={0.8}
                           onPress={() =>
                             setAttendance((prev) => ({ ...prev, [client.id]: 'present' }))
                           }>
                           <CheckIcon size={16} color={status === 'present' ? '#ffffff' : '#f97316'} strokeWidth={3} />
                           <Text
-                            className={`ml-2 text-[13px] font-body ${
-                              status === 'present' ? 'text-white' : 'text-[#f97316]'
-                            }`}
+                            className={`ml-2 text-[13px] font-body ${status === 'present' ? 'text-white' : 'text-[#f97316]'
+                              }`}
                             style={{ fontFamily: 'Montserrat_600SemiBold' }}>
                             Presente
                           </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${
-                            status === 'late'
+                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${status === 'late'
                               ? 'bg-[#D1D5DB]'
                               : 'bg-white border border-[#D1D5DB]'
-                          }`}
+                            }`}
                           activeOpacity={0.8}
                           onPress={() =>
                             setAttendance((prev) => ({ ...prev, [client.id]: 'late' }))
                           }>
                           <OutlineClockIcon size={16} color={status === 'late' ? '#374151' : '#9ca3af'} strokeWidth={2.5} />
                           <Text
-                            className={`ml-2 text-[13px] font-body ${
-                              status === 'late' ? 'text-[#374151]' : 'text-[#9ca3af]'
-                            }`}
+                            className={`ml-2 text-[13px] font-body ${status === 'late' ? 'text-[#374151]' : 'text-[#9ca3af]'
+                              }`}
                             style={{ fontFamily: 'Montserrat_600SemiBold' }}>
                             Tarde
                           </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 bg-white border ${
-                            status === 'absent' ? 'border-[#374151]' : 'border-[#e5e7eb]'
-                          }`}
+                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 bg-white border ${status === 'absent' ? 'border-[#374151]' : 'border-[#e5e7eb]'
+                            }`}
                           activeOpacity={0.8}
                           onPress={() =>
                             setAttendance((prev) => ({ ...prev, [client.id]: 'absent' }))
@@ -754,9 +751,24 @@ export default function ClassDetailsScreen() {
         ) : (
           <View className='mb-6'>
             <PrimaryButton
-              title={effectiveFull ? 'Clase llena' : reserved ? 'Cancelar' : 'Reservar'}
-              disabled={effectiveFull || (!hasMembership && !reserved)}
-              style={{ backgroundColor: effectiveFull || (!hasMembership && !reserved) ? '#6b7280' : reserved ? '#ef4444' : '#f97316' }}
+              title={
+                isPast
+                  ? 'Clase pasada'
+                  : effectiveFull
+                    ? 'Clase llena'
+                    : reserved
+                      ? 'Cancelar'
+                      : 'Reservar'
+              }
+              disabled={isPast || effectiveFull || (!hasMembership && !reserved)}
+              style={{
+                backgroundColor:
+                  isPast || effectiveFull || (!hasMembership && !reserved)
+                    ? '#6b7280'
+                    : reserved
+                      ? '#ef4444'
+                      : '#f97316',
+              }}
               onPress={async () => {
                 if (effectiveFull) return;
 
@@ -790,11 +802,20 @@ export default function ClassDetailsScreen() {
                   };
                   const userId = whoAmI?.user?.id || whoAmI?.user?.user_id;
 
-                  await vitalFitApi.client.post({
-                    url: `/schedule/${String(classId)}/book`,
-                    jwt: token,
-                    data: userId ? { user_id: String(userId) } : undefined,
-                  });
+                  if (!userId) {
+                    showToast(
+                      'error',
+                      'Usuario no identificado',
+                      'No se pudo obtener la información del usuario.',
+                    );
+                    return;
+                  }
+
+                  await vitalFitApi.booking.bookClass(
+                    { user_id: String(userId) },
+                    String(classId),
+                    token
+                  );
 
                   const img =
                     typeof heroSource === 'number'
@@ -886,10 +907,7 @@ export default function ClassDetailsScreen() {
                     }
 
                     if (bookingId) {
-                      await vitalFitApi.client.patch({
-                        url: `/bookings/${String(bookingId)}/cancel`,
-                        jwt: token,
-                      });
+                      await vitalFitApi.booking.cancelBooking(String(bookingId), token);
                     }
 
                     await cancel(id);
