@@ -55,6 +55,7 @@
     },
     "common": {
       "attention": "Atenção",
+      "instructor": "Instrutor",
       "error": {
         "connection": "Erro de conexão com o servidor.",
         "unexpected": "Ocorreu um erro inesperado.",
@@ -338,7 +339,8 @@
       "upcomingClasses": {
         "title": "Próximas Aulas",
         "time": "Hora",
-        "burn": "Queima"
+        "burn": "Queima",
+        "bookNow": "Reserve sua próxima aula"
       },
       "upcomingRoutines": {
         "title": "Próximas Rotinas",

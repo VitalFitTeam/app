@@ -55,6 +55,7 @@
     },
     "common": {
       "attention": "Attenzione",
+      "instructor": "Istruttore",
       "error": {
         "connection": "Errore di connessione con il server.",
         "unexpected": "Si è verificato un errore imprevisto.",
@@ -338,7 +339,8 @@
       "upcomingClasses": {
         "title": "Prossime Lezioni",
         "time": "Ora",
-        "burn": "Calorie"
+        "burn": "Calorie",
+        "bookNow": "Prenota la tua prossima lezione"
       },
       "upcomingRoutines": {
         "title": "Prossime Routine",

@@ -55,6 +55,7 @@
     },
     "common": {
       "attention": "Achtung",
+      "instructor": "Trainer",
       "error": {
         "connection": "Verbindungsfehler zum Server.",
         "unexpected": "Ein unerwarteter Fehler ist aufgetreten.",
@@ -338,7 +339,8 @@
       "upcomingClasses": {
         "title": "Anstehende Kurse",
         "time": "Zeit",
-        "burn": "Kalorien"
+        "burn": "Kalorien",
+        "bookNow": "Buche deinen nächsten Kurs"
       },
       "upcomingRoutines": {
         "title": "Anstehende Routinen",
