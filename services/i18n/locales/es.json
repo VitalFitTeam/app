@@ -1023,6 +1023,118 @@
         "length": "El número de teléfono debe tener entre 10 y 15 dígitos."
       },
       "acceptTerms": "Debes aceptar los términos y condiciones."
+    },
+    "receptionist": {
+      "changePassword": {
+        "title": "Cambiar contraseña",
+        "sectionTitle": "Seguridad de la cuenta",
+        "sectionSubtitle": "Actualiza tu contraseña de acceso",
+        "currentPassword": "Contraseña actual",
+        "currentPasswordPlaceholder": "Ingresa tu contraseña actual",
+        "newPassword": "Nueva contraseña",
+        "newPasswordPlaceholder": "Ingresa tu nueva contraseña",
+        "confirmPassword": "Confirmar contraseña",
+        "confirmPasswordPlaceholder": "Repite tu nueva contraseña",
+        "saving": "Guardando...",
+        "save": "Guardar cambios",
+        "toast": {
+          "successTitle": "Contraseña actualizada",
+          "successMessage": "La contraseña se guardó correctamente",
+          "errorTitle": "Error"
+        },
+        "errors": {
+          "currentRequired": "Ingresa tu contraseña actual.",
+          "minLength": "La contraseña debe tener al menos 8 caracteres.",
+          "uppercase": "Debe contener al menos una mayúscula.",
+          "lowercase": "Debe contener al menos una minúscula.",
+          "number": "Debe contener al menos un número.",
+          "special": "Debe contener al menos un caracter especial.",
+          "passwordMismatch": "Las contraseñas no coinciden.",
+          "sameAsCurrent": "La nueva contraseña no puede ser igual a la actual.",
+          "noSession": "No se encontró sesión activa.",
+          "generic": "Ocurrió un error al cambiar la contraseña.",
+          "incorrectCurrent": "La contraseña actual es incorrecta.",
+          "tryAgain": "Verifique su contraseña actual e intente nuevamente."
+        }
+      },
+      "security": {
+        "title": "Seguridad",
+        "options": "Opciones",
+        "changePassword": "Cambiar contraseña"
+      },
+      "personalInfo": {
+        "title": "Perfil Recepcionista",
+        "defaultRole": "Recepcionista",
+        "defaultSpecialty": "Atención al Cliente",
+        "editButton": "Editar",
+        "saveButton": "Guardar cambios",
+        "cancelButton": "Cancelar",
+        "personalInformationSection": "Información Personal",
+        "contactInformationSection": "Información de contacto",
+        "firstName": "Nombre",
+        "firstNamePlaceholder": "Nombre",
+        "lastName": "Apellido",
+        "lastNamePlaceholder": "Apellido",
+        "documentId": "Documento de identidad",
+        "documentIdPlaceholder": "Documento de identidad",
+        "birthDate": "Fecha de nacimiento",
+        "birthDatePlaceholder": "yyyy-mm-dd",
+        "gender": "Género",
+        "genderPlaceholder": "Género",
+        "male": "Masculino",
+        "female": "Femenino",
+        "email": "Correo electrónico",
+        "emailPlaceholder": "Correo electrónico",
+        "phone": "Teléfono",
+        "phonePlaceholder": "Número de teléfono",
+        "permissions": {
+          "title": "Permisos necesarios",
+          "galleryAccess": "Necesitamos acceso a tu galería para cambiar la foto de perfil."
+        },
+        "errors": {
+          "noToken": "No se encontró token de autenticación",
+          "noUserId": "No se encontró el ID del usuario",
+          "uploadFailed": "No se pudo subir la imagen de perfil",
+          "galleryError": "No se pudo abrir la galería."
+        },
+        "toast": {
+          "successTitle": "¡Perfil actualizado!",
+          "successMessage": "Tus cambios se guardaron correctamente",
+          "errorTitle": "Error",
+          "defaultError": "Ocurrió un error inesperado al actualizar el perfil."
+        }
+      }
+    },
+    "instructorProfile": {
+      "title": "Perfil de Instructor",
+      "specialty": "Especialidad",
+      "defaultSpecialty": "Entrenador Personal",
+      "role": "Instructor"
+    },
+    "instructorNotifications": {
+      "mock": {
+        "classReminder": "Recordatorio de clase",
+        "classReminderBody": "Tienes una clase de Functional Strength hoy a las 6:00 pm.",
+        "clientProgress": "Nuevo progreso de cliente",
+        "clientProgressBody": "Tu cliente Juan Pérez actualizó su progreso de rutina.",
+        "hiitClassBody": "Tienes una clase de HIIT programada para mañana."
+      }
+    },
+    "instructorProfile": {
+      "title": "Perfil de Instructor",
+      "specialty": "Especialidad",
+      "defaultSpecialty": "Entrenador Personal",
+      "role": "Instructor"
+    },
+    "instructorNotifications": {
+      "mock": {
+        "classReminder": "Recordatorio de clase",
+        "classReminderBody": "Tienes una clase de Functional Strength hoy a las 6:00 pm.",
+        "clientProgress": "Nuevo progreso de cliente",
+        "clientProgressBody": "Tu cliente Juan Pérez actualizó su progreso de rutina.",
+        "hiitClassBody": "Tienes una clase de HIIT programada para mañana."
+      }
     }
   }
 }
+   

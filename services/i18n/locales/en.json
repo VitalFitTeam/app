@@ -1023,6 +1023,127 @@
         "length": "Phone number must be between 10 and 15 digits."
       },
       "acceptTerms": "You must accept terms and conditions."
+    },
+    "receptionist": {
+      "changePassword": {
+        "title": "Change password",
+        "sectionTitle": "Account security",
+        "sectionSubtitle": "Update your access password",
+        "currentPassword": "Current password",
+        "currentPasswordPlaceholder": "Enter your current password",
+        "newPassword": "New password",
+        "newPasswordPlaceholder": "Enter your new password",
+        "confirmPassword": "Confirm password",
+        "confirmPasswordPlaceholder": "Repeat your new password",
+        "saving": "Saving...",
+        "save": "Save changes",
+        "toast": {
+          "successTitle": "Password updated",
+          "successMessage": "Your password was updated successfully",
+          "errorTitle": "Error"
+        },
+        "errors": {
+          "currentRequired": "Enter your current password.",
+          "minLength": "Password must be at least 8 characters.",
+          "uppercase": "Must contain at least one uppercase letter.",
+          "lowercase": "Must contain at least one lowercase letter.",
+          "number": "Must contain at least one number.",
+          "special": "Must contain at least one special character.",
+          "passwordMismatch": "Passwords do not match.",
+          "sameAsCurrent": "New password cannot be the same as the current one.",
+          "noSession": "No active session found.",
+          "generic": "An error occurred while changing the password.",
+          "incorrectCurrent": "The current password is incorrect.",
+          "tryAgain": "Check your current password and try again."
+        }
+      },
+      "security": {
+        "title": "Security",
+        "options": "Options",
+        "changePassword": "Change password"
+      },
+      "personalInfo": {
+        "title": "Receptionist Profile",
+        "defaultRole": "Receptionist",
+        "defaultSpecialty": "Customer Service",
+        "editButton": "Edit",
+        "saveButton": "Save changes",
+        "cancelButton": "Cancel",
+        "personalInformationSection": "Personal Information",
+        "contactInformationSection": "Contact information",
+        "firstName": "First name",
+        "firstNamePlaceholder": "First name",
+        "lastName": "Last name",
+        "lastNamePlaceholder": "Last name",
+        "documentId": "ID number",
+        "documentIdPlaceholder": "ID number",
+        "birthDate": "Birth date",
+        "birthDatePlaceholder": "yyyy-mm-dd",
+        "gender": "Gender",
+        "genderPlaceholder": "Gender",
+        "male": "Male",
+        "female": "Female",
+        "email": "Email",
+        "emailPlaceholder": "Email",
+        "phone": "Phone",
+        "phonePlaceholder": "Phone number",
+        "permissions": {
+          "title": "Permissions required",
+          "galleryAccess": "We need access to your gallery to change your profile picture."
+        },
+        "errors": {
+          "noToken": "Authentication token not found",
+          "noUserId": "User ID not found",
+          "uploadFailed": "Failed to upload profile picture",
+          "galleryError": "Could not open gallery."
+        },
+        "toast": {
+          "successTitle": "Profile updated!",
+          "successMessage": "Your changes were saved successfully",
+          "errorTitle": "Error",
+          "defaultError": "An unexpected error occurred while updating the profile."
+        }
+      }
+    },
+    "instructorProfile": {
+      "title": "Instructor Profile",
+      "specialty": "Specialty",
+      "defaultSpecialty": "Personal Trainer",
+      "role": "Instructor"
+    },
+    "instructorNotifications": {
+      "mock": {
+        "classReminder": "Class Reminder",
+        "classReminderBody": "You have a Functional Strength class today at 6:00 pm.",
+        "clientProgress": "New Client Progress",
+        "clientProgressBody": "Your client Juan Pérez updated their routine progress.",
+        "hiitClassBody": "You have a HIIT class scheduled for tomorrow."
+      }
+    },
+    "instructorProfile": {
+      "title": "Instructor Profile",
+      "specialty": "Specialty",
+      "defaultSpecialty": "Personal Trainer",
+      "role": "Instructor"
+    },
+    "instructorNotifications": {
+      "mock": {
+        "classReminder": "Class Reminder",
+        "classReminderBody": "You have a Functional Strength class today at 6:00 pm.",
+        "clientProgress": "New Client Progress",
+        "clientProgressBody": "Your client Juan Pérez updated their routine progress.",
+        "hiitClassBody": "You have a HIIT class scheduled for tomorrow."
+      }
     }
+  },
+  "classesScreen": {
+    "title": "Class Calendar",
+    "calendar": "CALENDAR",
+    "week": "Week",
+    "month": "Month",
+    "classesOfDay": "CLASSES OF THE DAY",
+    "noClasses": "No classes scheduled for this date."
   }
 }
+
+  

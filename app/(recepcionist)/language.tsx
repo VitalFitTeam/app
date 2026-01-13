@@ -1,14 +1,27 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Stack, useRouter } from 'expo-router';
 import { Check } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const LANGUAGES = [
   { code: 'en', name: 'English' },
   { code: 'es', name: 'Español' },
+  { code: 'fr', name: 'Français' },
+  { code: 'it', name: 'Italiano' },
+  { code: 'pt', name: 'Português' },
+  { code: 'de', name: 'Deutsch' },
 ];
 
 export default function RecepcionistLanguageScreen() {
@@ -17,7 +30,9 @@ export default function RecepcionistLanguageScreen() {
   const { t, i18n } = useTranslation();
   const insets = useSafeAreaInsets();
 
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
+  
+  const normalizedCurrentLang = useMemo(() => i18n.language.split('-')[0], [i18n.language]);
+  const [selectedLanguage, setSelectedLanguage] = useState(normalizedCurrentLang);
 
   const handleSaveLanguage = () => {
     i18n.changeLanguage(selectedLanguage);
@@ -44,7 +59,7 @@ export default function RecepcionistLanguageScreen() {
         keyboardVerticalOffset={100}
       >
         <ScrollView
-          style={styles.scrollView}
+          style={[styles.scrollView, { paddingTop: insets.top + 10 }]}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
@@ -53,12 +68,14 @@ export default function RecepcionistLanguageScreen() {
               <TouchableOpacity
                 key={lang.code}
                 style={styles.option}
-                onPress={() => setSelectedLanguage(lang.code)}>
-                <Text className='font-body' style={styles.optionText}>{lang.name}</Text>
+                onPress={() => setSelectedLanguage(lang.code)}
+                activeOpacity={0.8}
+              >
+                <Text className="font-body" style={styles.optionText} numberOfLines={1}>
+                  {lang.name}
+                </Text>
 
-                {selectedLanguage === lang.code && (
-                  <Check color='#F27F2A' size={24} />
-                )}
+                {selectedLanguage === lang.code && <Check color="#F27F2A" size={24} />}
               </TouchableOpacity>
             ))}
           </View>
@@ -104,6 +121,7 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 16,
     fontWeight: '500',
+    flexShrink: 1,
   },
   buttonContainer: {
     padding: 16,
