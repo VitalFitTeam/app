@@ -9,6 +9,7 @@ type AuthContextType = {
 	isLoading: boolean;
 	token: string | null;
 	refreshToken: string | null;
+	role: string | null; // Added role
 	login: (token: string, refreshToken?: string) => Promise<void>;
 	logout: () => Promise<void>;
 };
@@ -20,6 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [token, setToken] = useState<string | null>(null);
 	const [refreshToken, setRefreshToken] = useState<string | null>(null);
+	const [role, setRole] = useState<string | null>(null); // Added role state
 	const router = useRouter();
 
 	// Logout function - clears tokens and redirects
@@ -29,6 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			vitalFitApi.client.removeTokens();
 			setToken(null);
 			setRefreshToken(null);
+			setRole(null); // Clear role
 			setIsAuthenticated(false);
 			router.replace('/(auth)/login');
 		} catch (error) {
@@ -66,6 +69,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			if (storedToken && storedRefreshToken) {
 				// Set tokens in SDK client for automatic refresh
 				vitalFitApi.client.setTokens(storedToken, storedRefreshToken);
+
+				// Fetch user role
+				try {
+					const whoamiResponse = (await vitalFitApi.user.WhoAmI(storedToken)) as unknown as {
+						user?: { role?: { name?: string } };
+					};
+					const userRole = whoamiResponse.user?.role?.name?.toLowerCase() || null;
+					setRole(userRole);
+				} catch (err) {
+					console.warn('Failed to fetch user role on init:', err);
+					// If WhoAmI fails (e.g. invalid token), maybe we should logout or just proceed with null role?
+					// For robust persistence, if token is invalid, the SDK intercepts 401 and might try refresh.
+				}
+
 				setToken(storedToken);
 				setRefreshToken(storedRefreshToken);
 				setIsAuthenticated(true);
@@ -93,6 +110,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			// Set tokens in SDK client for automatic refresh
 			vitalFitApi.client.setTokens(newToken, newRefreshToken);
 
+			// Fetch role on login
+			try {
+				const whoamiResponse = (await vitalFitApi.user.WhoAmI(newToken)) as unknown as {
+					user?: { role?: { name?: string } };
+				};
+				const userRole = whoamiResponse.user?.role?.name?.toLowerCase() || null;
+				setRole(userRole);
+			} catch (err) {
+				console.error('Failed to fetch role during login:', err);
+			}
+
 			setToken(newToken);
 			setRefreshToken(newRefreshToken);
 			setIsAuthenticated(true);
@@ -113,10 +141,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			isLoading,
 			token,
 			refreshToken,
+			role, // Expose role
 			login,
 			logout,
 		}),
-		[isAuthenticated, isLoading, token, refreshToken, login, logout]
+		[isAuthenticated, isLoading, token, refreshToken, role, login, logout] // Add role to dependency array
 	);
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -23,14 +23,20 @@ export default function HomeScreen() {
 
 	const slideTexts = [t('slide1'), t('slide2'), t('slide3')];
 
-	const { isAuthenticated, isLoading } = useAuth();
+	const { isAuthenticated, isLoading, role } = useAuth();
 
 	React.useEffect(() => {
 		if (!isLoading && isAuthenticated) {
-			// Redirect to dashboard if already logged in
-			router.replace('/(tabs)/dashboard');
+			if (role === 'instructor') {
+				router.replace('/(instructor)/dashboard');
+			} else if (role === 'recepcionist' || role === 'receptionist') {
+				router.replace('/(recepcionist)/dashboard');
+			} else {
+				// Default to client dashboard
+				router.replace('/(tabs)/dashboard');
+			}
 		}
-	}, [isLoading, isAuthenticated, router]);
+	}, [isLoading, isAuthenticated, role, router]);
 
 	if (!fontsLoaded || isLoading) {
 		return (

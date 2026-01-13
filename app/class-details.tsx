@@ -5,7 +5,7 @@ import { useReservations } from '@/contexts/reservations';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services';
-import { isAPIError } from '@vitalfit/sdk';
+import { ClientBookingResponse, isAPIError } from '@vitalfit/sdk';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
@@ -30,6 +30,31 @@ export default function ClassDetailsScreen() {
 
   const { isReserved, reserve, cancel } = useReservations();
   const { user } = useUser();
+  const [serverBookingId, setServerBookingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkBookingStatus = async () => {
+      try {
+        if (!user?.userId || !classId) return;
+        const token = await AsyncStorage.getItem('token');
+        if (!token) return;
+
+        const bookingsResp = await vitalFitApi.booking.getClientBooking(String(user.userId), token);
+        const bookings = (Array.isArray((bookingsResp as unknown as { data: ClientBookingResponse[] }).data)
+          ? (bookingsResp as unknown as { data: ClientBookingResponse[] }).data
+          : bookingsResp) as ClientBookingResponse[];
+
+        const found = bookings.find((b) => String(b.class_id) === String(classId));
+        if (found?.booking_id) {
+          setServerBookingId(String(found.booking_id));
+        }
+      } catch (err) {
+        console.warn('Error checking booking status:', err);
+      }
+    };
+    void checkBookingStatus();
+  }, [user?.userId, classId]);
+
   const hasMembership = user?.membership?.status === 'Active';
 
   const classDateFormatted = useMemo(() => {
@@ -175,7 +200,7 @@ export default function ClassDetailsScreen() {
   const id = useMemo(() => `${String(title || '')}|${String(time || '')}`, [title, time]);
   const reservedFromContext = isReserved(id);
   const hasBookingId = Boolean(bookingId);
-  const reserved = reservedFromContext || hasBookingId;
+  const reserved = reservedFromContext || hasBookingId || Boolean(serverBookingId);
 
   const { showToast } = useToast();
   const isCrossfitCompleted =
@@ -476,8 +501,8 @@ export default function ClassDetailsScreen() {
                       <View className='flex-row gap-2'>
                         <TouchableOpacity
                           className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${status === 'present'
-                              ? 'bg-[#f97316]'
-                              : 'bg-white border border-[#f97316]'
+                            ? 'bg-[#f97316]'
+                            : 'bg-white border border-[#f97316]'
                             }`}
                           activeOpacity={0.8}
                           onPress={() =>
@@ -494,8 +519,8 @@ export default function ClassDetailsScreen() {
 
                         <TouchableOpacity
                           className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${status === 'late'
-                              ? 'bg-[#D1D5DB]'
-                              : 'bg-white border border-[#D1D5DB]'
+                            ? 'bg-[#D1D5DB]'
+                            : 'bg-white border border-[#D1D5DB]'
                             }`}
                           activeOpacity={0.8}
                           onPress={() =>
@@ -906,8 +931,8 @@ export default function ClassDetailsScreen() {
                       return;
                     }
 
-                    if (bookingId) {
-                      await vitalFitApi.booking.cancelBooking(String(bookingId), token);
+                    if (bookingId || serverBookingId) {
+                      await vitalFitApi.booking.cancelBooking(String(bookingId || serverBookingId), token);
                     }
 
                     await cancel(id);
