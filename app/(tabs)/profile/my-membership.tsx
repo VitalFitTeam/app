@@ -2,8 +2,8 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedView } from '@/components/themed-view';
 import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, ChevronLeftIcon } from 'react-native-heroicons/solid';
@@ -35,56 +35,58 @@ export default function MyMembershipScreen() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [availablePlans, setAvailablePlans] = useState<any[]>([]); 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const token = await AsyncStorage.getItem('token');
-        if (!token) {
-           return;
-        }
-
-        // Fetch current membership using SDK generic get
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
         try {
-            const response = await vitalFitApi.client.get({
-                url: '/client-memberships/me',
-                jwt: token
-            });
-            
-            // Cast response to any to safely access data based on verified structure
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const json = response as any;
-            if (json && json.data) {
-                setCurrentMembership(json.data);
-            } else if (json && json.client_membership_id) {
-                 // Fallback if response is the data itself
-                 setCurrentMembership(json);
-            }
-        } catch (err) {
-            console.error('Error fetching user membership:', err);
+          setLoading(true);
+          const token = await AsyncStorage.getItem('token');
+          if (!token) {
+             return;
+          }
+
+          // Fetch current membership using SDK generic get
+          try {
+              const response = await vitalFitApi.client.get({
+                  url: '/client-memberships/me',
+                  jwt: token
+              });
+              
+              // Cast response to any to safely access data based on verified structure
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const json = response as any;
+              if (json && json.data) {
+                  setCurrentMembership(json.data);
+              } else if (json && json.client_membership_id) {
+                   // Fallback if response is the data itself
+                   setCurrentMembership(json);
+              }
+          } catch (err) {
+              console.error('Error fetching user membership:', err);
+          }
+
+          // Fetch all available plans
+          try {
+              const plansResponse = await vitalFitApi.membership.publicGetMemberships(
+                  token,
+                  { page: 1, limit: 10, sort: 'asc' },
+                  'USD'
+              );
+              if (plansResponse && plansResponse.data) {
+                  setAvailablePlans(plansResponse.data);
+              }
+          } catch (err) {
+              console.error('Error fetching membership plans:', err);
+          }
+
+        } finally {
+          setLoading(false);
         }
+      };
 
-        // Fetch all available plans
-        try {
-            const plansResponse = await vitalFitApi.membership.publicGetMemberships(
-                token,
-                { page: 1, limit: 10, sort: 'asc' },
-                'USD'
-            );
-            if (plansResponse && plansResponse.data) {
-                setAvailablePlans(plansResponse.data);
-            }
-        } catch (err) {
-            console.error('Error fetching membership plans:', err);
-        }
-
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+      fetchData();
+    }, [])
+  );
 
   if (loading) {
       return (
@@ -179,7 +181,7 @@ export default function MyMembershipScreen() {
 
           {availablePlans.length > 0 ? (
               availablePlans.map(plan => {
-                const isCurrent = plan.membership_type_id === currentPlanId;
+                const isCurrent = plan.membership_type_id === currentPlanId && currentMembership?.status === 'Active';
 
                 return (
                   <View

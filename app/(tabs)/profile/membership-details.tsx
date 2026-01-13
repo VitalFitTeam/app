@@ -1,13 +1,14 @@
+import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedView } from '@/components/themed-view';
+import { ToastNotification } from '@/components/ToastNotification';
+import { useUser } from '@/contexts/UserContext';
+import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon } from 'react-native-heroicons/solid';
-
-
-import vitalFitApi from '@/services';
 
 interface MembershipDetail {
   client_membership_id: string;
@@ -23,12 +24,33 @@ interface MembershipDetail {
   };
 }
 
+interface CancellationReason {
+  reason_id: string;
+  description: string;
+  is_active: boolean;
+}
+
 export default function MembershipDetailsScreen() {
   const router = useRouter();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { t } = useTranslation();
+  const { fetchUser } = useUser();
   const [loading, setLoading] = useState(true);
   const [membershipDetail, setMembershipDetail] = useState<MembershipDetail | null>(null);
+  const [toast, setToast] = useState<{ visible: boolean; type: 'success' | 'error'; title: string; message: string; }>({
+        visible: false,
+        type: 'success',
+        title: '',
+        message: '',
+    });
+  
+  // Cancellation State
+  const [isCancelModalVisible, setCancelModalVisible] = useState(false);
+  const [cancellationReasons, setCancellationReasons] = useState<CancellationReason[]>([]);
+  const [selectedReasonId, setSelectedReasonId] = useState<string>('');
+  const [cancelNotes, setCancelNotes] = useState('');
+  const [processingCancellation, setProcessingCancellation] = useState(false);
+  const [loadingReasons, setLoadingReasons] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -68,9 +90,92 @@ export default function MembershipDetailsScreen() {
     return new Date(dateString).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
+  const fetchCancellationReasons = async () => {
+    try {
+      setLoadingReasons(true);
+      const token = await AsyncStorage.getItem('token');
+      if (!token) return;
+
+      const response = await vitalFitApi.client.get({
+        url: '/memberships/cancellation-reasons',
+        jwt: token
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const json = response as any;
+      if (json && json.data) {
+        setCancellationReasons(json.data);
+      }
+    } catch (error) {
+      console.error('Error fetching cancellation reasons:', error);
+      setToast({
+          visible: true,
+          type: 'error',
+          title: 'Error',
+          message: 'No se pudieron cargar las razones de cancelación.',
+      });
+    } finally {
+      setLoadingReasons(false);
+    }
+  };
+
   const handleCancelMembership = () => {
-      // Placeholder for cancellation logic
-      console.log("Cancel membership logic to be implemented");
+      setCancelModalVisible(true);
+      fetchCancellationReasons();
+  };
+
+  const confirmCancellation = async () => {
+    if (!selectedReasonId || !membershipDetail) return;
+
+    try {
+      setProcessingCancellation(true);
+      const token = await AsyncStorage.getItem('token');
+      if (!token) return;
+
+      const body = {
+        cancel_notes: cancelNotes,
+        cancel_reason_id: selectedReasonId,
+        status: "Cancelled" 
+      };
+
+       
+      await vitalFitApi.client.put({
+          url: `/client-memberships/${membershipDetail.client_membership_id}`,
+          jwt: token,
+          data: body 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any); // Type assertion needed if SDK types are strict
+
+      // Close modal first
+      setCancelModalVisible(false);
+      
+      // Update global state
+      await fetchUser(); 
+      
+      // Show success toast
+      setToast({
+          visible: true,
+          type: 'success',
+          title: 'Éxito',
+          message: 'La solicitud de cancelación ha sido procesada.',
+      });
+
+      // Navigate back after a short delay to let user see the toast
+      setTimeout(() => {
+          router.back(); 
+      }, 2000);
+
+    } catch (error) {
+      console.error('Error cancelling membership:', error);
+      setToast({
+          visible: true,
+          type: 'error',
+          title: 'Error',
+          message: 'Ocurrió un error al procesar la cancelación.',
+      });
+    } finally {
+      setProcessingCancellation(false);
+    }
   };
 
   if (loading) {
@@ -180,42 +285,101 @@ export default function MembershipDetailsScreen() {
             
           </View>
 
-          <TouchableOpacity
-            onPress={handleCancelMembership}
-            className="w-full py-4 mt-4 rounded-xl items-center border border-red-500"
-          >
-              <Text className="text-red-500 font-semibold font-body">
-                  Cancelar membresía
-              </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View className="mt-2">
-          <View
-            className="rounded-2xl border px-4 py-4"
-            style={{ borderColor: '#DC2626', backgroundColor: '#FFFFFF' }}>
-            <Text
-              className="font-heading text-[12px] font-semibold mb-1"
-              style={{ color: '#B91C1C' }}>
-              CANCELAR MEMBRESÍA
-            </Text>
-            <Text className="font-body text-xs mb-4" style={{ color: '#B91C1C' }}>
-              Tu membresía permanecerá activa hasta el {formatDate(membershipDetail.end_date)}.
-            </Text>
-
+          {membershipDetail.status === 'Active' && (
             <TouchableOpacity
-              activeOpacity={0.85}
-              className="w-full rounded-full py-3 items-center justify-center"
-              style={{ backgroundColor: '#EF4444' }}
-              onPress={() => {
-                router.push('/profile/cancel-membership');
-              }}>
-              <Text className="font-body text-sm font-semibold" style={{ color: '#FFFFFF' }}>
-                Cancelar renovación
-              </Text>
+              onPress={handleCancelMembership}
+              className="w-full py-4 mt-4 rounded-xl items-center border border-red-500"
+            >
+                <Text className="text-red-500 font-semibold font-body">
+                    Cancelar membresía
+                </Text>
             </TouchableOpacity>
-          </View>
+          )}
         </View>
+
+        {/* Modal de Cancelación */}
+        <Modal
+          visible={isCancelModalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setCancelModalVisible(false)}
+        >
+          <View className="flex-1 justify-end bg-black/50">
+            <View className="bg-white rounded-t-3xl p-6 h-[80%]">
+              <View className="flex-row justify-between items-center mb-6">
+                <Text className="font-heading text-xl font-bold text-gray-900">
+                  Cancelar Membresía
+                </Text>
+                <TouchableOpacity onPress={() => setCancelModalVisible(false)}>
+                  <Text className="text-gray-500 font-body">Cerrar</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+                <Text className="font-body text-gray-600 mb-4">
+                  Por favor, selecciona una razón para cancelar tu membresía:
+                </Text>
+
+                {loadingReasons ? (
+                  <ActivityIndicator size="small" color="#f97316" className="my-4" />
+                ) : (
+                  cancellationReasons.map((reason) => (
+                    <TouchableOpacity
+                      key={reason.reason_id}
+                      className={`flex-row items-center p-4 mb-3 rounded-xl border ${
+                        selectedReasonId === reason.reason_id
+                          ? 'border-orange-500 bg-orange-50'
+                          : 'border-gray-200'
+                      }`}
+                      onPress={() => setSelectedReasonId(reason.reason_id)}
+                    >
+                      <View className={`w-5 h-5 rounded-full border items-center justify-center mr-3 ${
+                         selectedReasonId === reason.reason_id ? 'border-orange-500' : 'border-gray-300'
+                      }`}>
+                        {selectedReasonId === reason.reason_id && (
+                          <View className="w-2.5 h-2.5 rounded-full bg-orange-500" />
+                        )}
+                      </View>
+                      <Text className={`font-body ${selectedReasonId === reason.reason_id ? 'text-orange-900 font-semibold' : 'text-gray-700'}`}>
+                        {reason.description}
+                      </Text>
+                    </TouchableOpacity>
+                  ))
+                )}
+
+                <Text className="font-body text-gray-600 mt-4 mb-2">Comentarios adicionales (opcional):</Text>
+                <TextInput
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 font-body min-h-[100px]"
+                  style={{ textAlignVertical: 'top' }}
+                  multiline
+                  placeholder="Escribe aquí..."
+                  value={cancelNotes}
+                  onChangeText={setCancelNotes}
+                />
+
+                <View className="mt-6">
+                  {processingCancellation ? (
+                    <ActivityIndicator size="large" color="#f97316" />
+                  ) : (
+                    <PrimaryButton
+                      title="Confirmar Cancelación"
+                      onPress={confirmCancellation}
+                      disabled={!selectedReasonId}
+                    />
+                  )}
+                </View>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+
+        <ToastNotification
+            visible={toast.visible}
+            type={toast.type}
+            title={toast.title}
+            message={toast.message}
+            onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+        />
       </ScrollView>
     </ThemedView>
   );
