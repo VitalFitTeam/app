@@ -63,13 +63,6 @@ export default function DashboardInstructor() {
 						}),
 					]);
 
-					console.log('--- VERIFICACIÓN DE REPORTES (FIXED) ---');
-					console.log('1. Clases Mensuales:', JSON.stringify(monthlyCount, null, 2));
-					console.log('2. Alumnos KPI:', JSON.stringify(studentKPI, null, 2));
-					console.log('3. Clases Hoy:', JSON.stringify(classesToday, null, 2));
-					console.log('4. Próxima Clase:', nextClass);
-					console.log('--------------------------------');
-
 					setMonthlyClasses(monthlyCount && monthlyCount.data ? monthlyCount.data : null);
 					setStudentCount(studentKPI && studentKPI.data ? studentKPI.data : null);
 					setTodaysClasses(classesToday && classesToday.data ? classesToday.data : []);
@@ -112,41 +105,43 @@ export default function DashboardInstructor() {
 		);
 	}
 
-	const firstName = user?.firstName || t('instructor.dashboard.defaultName');
+	const displayName = user?.lastName
+		? `${user.firstName} ${user.lastName}`
+		: user?.firstName || t('instructor.dashboard.defaultName');
 	const avatarUrl = user?.profilePicture;
-	const gender = user?.gender;
+
 
 
 	const messages = [
 		{
 			id: '1',
 			name: 'Carlos Pérez',
-			snippet: 'Necesito ajustar mi plan de entreno',
+			snippet: t('instructor.dashboard.mockMessages.adjustPlan'),
 			time: '30 min',
 		},
 		{
 			id: '2',
 			name: 'Carlos Pérez',
-			snippet: '¿Podemos cambiar el horario de mañana?',
+			snippet: t('instructor.dashboard.mockMessages.changeSchedule'),
 			time: '1 h',
 		},
 		{
 			id: '3',
 			name: 'María López',
-			snippet: 'Quiero añadir un día más de entrenamiento',
+			snippet: t('instructor.dashboard.mockMessages.addDay'),
 			time: '2 h',
 		},
 		{
 			id: '4',
 			name: 'Juan Pérez',
-			snippet: 'No podré asistir mañana',
+			snippet: t('instructor.dashboard.mockMessages.cantAttend'),
 			time: '3 h',
 		},
 		{
 			id: '5',
 			name: 'Ana García',
-			snippet: '¿Puedes revisar mi técnica de sentadilla?',
-			time: 'ayer',
+			snippet: t('instructor.dashboard.mockMessages.reviewTechnique'),
+			time: t('instructor.dashboard.mockMessages.yesterday'),
 		},
 	];
 
@@ -164,9 +159,8 @@ export default function DashboardInstructor() {
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: Math.max(insets.bottom + 80, 96) }}>
 				<UserHeader
-					name={firstName}
+					name={displayName}
 					avatarUrl={avatarUrl}
-					gender={gender}
 				/>
 
 				<InstructorStatsCardGroup 
@@ -175,9 +169,9 @@ export default function DashboardInstructor() {
 					attendanceRate={attendanceRate}
 				/>
 
-				<TodayClassCard 
+				<TodayClassCard
 					headerTitle={t('instructor.dashboard.nextClass')}
-					title={upcomingClass ? upcomingClass.class_name : (nextClassTime === 'Sin pendientes' ? 'Sin clases pendientes' : 'Próxima clase')}
+					title={upcomingClass ? upcomingClass.class_name : (nextClassTime === 'Sin pendientes' ? t('instructor.dashboard.noClassesPending') : t('instructor.dashboard.upcomingClass'))}
 					timeLabel={nextClassTime || '--:--'}
 					spotsLabel={upcomingClass ? `${upcomingClass.occupied || 0}/${upcomingClass.max_capacity}` : '-/-'}
 					dateLabel={new Date().toLocaleDateString()}
@@ -196,7 +190,7 @@ export default function DashboardInstructor() {
 						</View>
 
 						{todaysClasses.length === 0 ? (
-							<Text className='py-4 text-center text-gray-500'>No hay clases programadas para hoy.</Text>
+							<Text className='py-4 text-center text-gray-500'>{t('instructor.dashboard.noClassesToday')}</Text>
 						) : (
 							todaysClasses.map((cls, index) => (
 								<View

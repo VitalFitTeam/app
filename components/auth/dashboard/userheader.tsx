@@ -1,3 +1,4 @@
+import { UserAvatar } from '@/components/UserAvatar';
 import { Award, Bell } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +13,6 @@ interface Notification {
 interface Props {
 	name: string;
 	avatarUrl?: string;
-	gender?: string;
 	notifications?: Notification[];
 	onBadgesPress?: () => void;
 }
@@ -20,7 +20,6 @@ interface Props {
 export const UserHeader: React.FC<Props> = ({
 	name,
 	avatarUrl,
-	gender,
 	notifications,
 	onBadgesPress,
 }) => {
@@ -33,11 +32,7 @@ export const UserHeader: React.FC<Props> = ({
 	const [showNotifications, setShowNotifications] = useState(false);
 	const firstName = name.split(' ')[0];
 
-	const defaultImage = gender === 'F'
-		? require('@/assets/images/Female.svg')
-		: require('@/assets/images/Man.svg');
 
-	const imageSource = avatarUrl ? { uri: avatarUrl } : defaultImage;
 
 	return (
 		<View className='mt-2 mb-6'>
@@ -51,15 +46,11 @@ export const UserHeader: React.FC<Props> = ({
 
 			<View className='flex-row justify-between items-center mt-6'>
 				<View className='flex-row items-center flex-1'>
-					<Image
-						source={imageSource}
-						style={{
-							width: 70,
-							height: 70,
-							borderRadius: 35,
-							backgroundColor: '#FED7AA',
-							marginRight: 12,
-						}}
+					<UserAvatar
+						name={name}
+						imageUrl={avatarUrl}
+						size={70}
+						style={{ marginRight: 12 }}
 					/>
 					<View>
 						<Text

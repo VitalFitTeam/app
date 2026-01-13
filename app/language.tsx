@@ -1,36 +1,26 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
-import { Stack, useRouter } from 'expo-router';
-import { Check } from 'lucide-react-native';
+import { ThemedView } from '@/components/themed-view';
+import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import CountryFlag from 'react-native-country-flag';
+import { ChevronLeftIcon } from 'react-native-heroicons/solid';
 
 const LANGUAGES = [
-  { code: 'en', name: 'English' },
-  { code: 'es', name: 'Español' },
-  { code: 'fr', name: 'Français' },
-  { code: 'it', name: 'Italiano' },
-  { code: 'pt', name: 'Português' },
-  { code: 'de', name: 'Deutsch' },
+  { code: 'es', name: 'Español', countryCode: 'es' },
+  { code: 'en', name: 'English', countryCode: 'gb' },
+  { code: 'it', name: 'Italiano', countryCode: 'it' },
+  { code: 'de', name: 'Deutsch', countryCode: 'de' },
+  { code: 'pt', name: 'Português', countryCode: 'pt' },
+  { code: 'fr', name: 'Français', countryCode: 'fr' },
 ];
 
 export default function LanguageScreen() {
   const router = useRouter();
-
   const { t, i18n } = useTranslation();
-  const insets = useSafeAreaInsets();
-
-  // Normaliza el idioma actual (ej. 'pt-BR' -> 'pt') para coincidir con la lista
+  
+  // Normaliza el idioma (ej. 'es-ES' -> 'es') para que coincida con la lista
   const normalizedCurrentLang = useMemo(() => i18n.language.split('-')[0], [i18n.language]);
   const [selectedLanguage, setSelectedLanguage] = useState(normalizedCurrentLang);
 
@@ -40,91 +30,97 @@ export default function LanguageScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <Stack.Screen
-        options={{
-          title: t('languageLabel'),
-          headerBackTitle: t('nav.back'),
-          headerShadowVisible: false,
-          headerStyle: { backgroundColor: '#F2F2F7' },
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        }}
-      />
-
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={100}
+    <ThemedView className="flex-1 bg-white">
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 40, paddingBottom: 96 }}
       >
-        <ScrollView
-          style={[styles.scrollView, { paddingTop: insets.top + 10 }]}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
+        <View
+          className="w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center"
+          style={{ position: 'relative' }}
         >
-          <View style={styles.optionsContainer}>
-            {LANGUAGES.map((lang) => (
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => router.back()}
+            style={{ position: 'absolute', left: 12, top: 8, bottom: 8, justifyContent: 'center' }}
+          >
+            <ChevronLeftIcon width={20} height={20} color="#f97316" />
+          </TouchableOpacity>
+
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>
+            {t('language.title')}
+          </Text>
+        </View>
+
+        <View style={{ marginBottom: 16 }}>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 4 }}>
+            {t('language.changeLanguage')}
+          </Text>
+          <Text className='font-body' style={{ color: '#4B5563', fontSize: 13, lineHeight: 18 }}>
+            {t('language.selectOption')}
+          </Text>
+        </View>
+
+        <View>
+          {LANGUAGES.map(lang => {
+            const isSelected = selectedLanguage === lang.code;
+            return (
               <TouchableOpacity
                 key={lang.code}
-                style={styles.option}
-                onPress={() => setSelectedLanguage(lang.code)}
                 activeOpacity={0.8}
+                className="w-full flex-row items-center justify-between rounded-2xl px-4 py-3 mb-3"
+                style={{
+                  backgroundColor: isSelected ? '#111827' : '#FFFFFF',
+                  borderColor: isSelected ? '#111827' : '#E5E7EB',
+                  borderWidth: 1,
+                }}
+                onPress={() => setSelectedLanguage(lang.code)}
               >
-                <Text className="font-body" style={styles.optionText} numberOfLines={1}>
-                  {lang.name}
-                </Text>
-
-                {selectedLanguage === lang.code && <Check color="#F27F2A" size={24} />}
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{ marginRight: 10 }}>
+                    <CountryFlag isoCode={lang.countryCode} size={16} />
+                  </View>
+                  <Text
+                    className='font-body'
+                    style={{
+                      color: isSelected ? '#F9FAFB' : '#111827',
+                      fontSize: 14,
+                    }}
+                  >
+                    {lang.name}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: 999,
+                    borderWidth: 2,
+                    borderColor: isSelected ? '#F97316' : '#D1D5DB',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {isSelected ? (
+                    <View
+                      style={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: 999,
+                        backgroundColor: '#F97316',
+                      }}
+                    />
+                  ) : null}
+                </View>
               </TouchableOpacity>
-            ))}
-          </View>
-        </ScrollView>
+            );
+          })}
+        </View>
 
-        <View style={[styles.buttonContainer, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+        <View style={{ marginTop: 16 }}>
           <PrimaryButton title={t('save')} onPress={handleSaveLanguage} />
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </ScrollView>
+    </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#F2F2F7',
-  },
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  optionsContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    margin: 16,
-    overflow: 'hidden',
-  },
-  option: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-  },
-  optionText: {
-    fontSize: 16,
-    fontWeight: '500',
-    flexShrink: 1,
-  },
-  buttonContainer: {
-    padding: 16,
-    paddingTop: 8,
-  },
-});

@@ -1,42 +1,44 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { ChevronRightIcon, UserIcon, UsersIcon } from 'react-native-heroicons/outline';
 
 export function MyClientsCardGroup() {
+  const { t } = useTranslation();
   const clients = [
     {
       id: 1,
       name: 'Juan Perez',
-      level: 'Nivel 5',
-      program: 'Fuerza Máxima - Semana 2',
+      level: `${t('instructor.dashboard.myClients.level')} 5`,
+      program: t('instructor.assignRoutine.programs.maxStrength'),
       avatar: null,
     },
     {
       id: 2,
       name: 'Juan Perez',
-      level: 'Nivel 5',
-      program: 'Fuerza Máxima - Semana 2',
+      level: `${t('instructor.dashboard.myClients.level')} 5`,
+      program: t('instructor.assignRoutine.programs.maxStrength'),
       avatar: null,
     },
     {
       id: 3,
       name: 'Ana García',
-      level: 'Nivel 3',
-      program: 'Hipertrofia - Semana 1',
+      level: `${t('instructor.dashboard.myClients.level')} 3`,
+      program: t('instructor.assignRoutine.programs.hypertrophy'),
       avatar: null,
     },
     {
       id: 4,
       name: 'Luis Martínez',
-      level: 'Nivel 2',
-      program: 'Resistencia - Semana 4',
+      level: `${t('instructor.dashboard.myClients.level')} 2`,
+      program: t('instructor.assignRoutine.programs.endurance'),
       avatar: null,
     },
     {
       id: 5,
       name: 'María López',
-      level: 'Nivel 4',
-      program: 'Powerlifting - Semana 3',
+      level: `${t('instructor.dashboard.myClients.level')} 4`,
+      program: t('instructor.assignRoutine.programs.powerlifting'),
       avatar: null,
     },
   ];
@@ -45,7 +47,7 @@ export function MyClientsCardGroup() {
     <View className='mt-6 rounded-2xl bg-white px-4 py-3 border border-[#e5e7eb] shadow-sm'>
       <View className='flex-row items-center mb-3'>
         <UsersIcon size={18} color='#f97316' />
-        <Text className='ml-2 text-[14px] font-medium text-[#111827]'>Mis Clientes</Text>
+        <Text className='ml-2 text-[14px] font-medium text-[#111827]'>{t('instructor.dashboard.myClients.title')}</Text>
       </View>
 
       {clients.map((client) => (

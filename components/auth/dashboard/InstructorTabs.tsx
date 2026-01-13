@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 type TabType = 'clientes' | 'clases' | 'mensajes';
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function InstructorTabs({ activeTab, onChange }: Props) {
+  const { t } = useTranslation();
   const getTextStyle = (tab: TabType) => {
     const base = 'font-bold text-center';
     const size = activeTab === tab ? 'text-[16px]' : 'text-[14px]';
@@ -23,7 +25,7 @@ export function InstructorTabs({ activeTab, onChange }: Props) {
         className={`flex-1 py-2 rounded-xl items-center justify-center ${
           activeTab === 'clientes' ? 'bg-white dark:bg-neutral-800' : ''
         }`}>
-        <Text className={getTextStyle('clientes')}>Clientes</Text>
+        <Text className={getTextStyle('clientes')}>{t('instructor.dashboard.tabs.clients')}</Text>
       </TouchableOpacity>
 
       <View className='w-[1px] h-[20px] bg-[#E5E5E5]' />
@@ -33,18 +35,11 @@ export function InstructorTabs({ activeTab, onChange }: Props) {
         className={`flex-1 py-2 rounded-xl items-center justify-center ${
           activeTab === 'clases' ? 'bg-white dark:bg-neutral-800' : ''
         }`}>
-        <Text className={getTextStyle('clases')}>Clases</Text>
+        <Text className={getTextStyle('clases')}>{t('instructor.dashboard.tabs.classes')}</Text>
       </TouchableOpacity>
 
       <View className='w-[1px] h-[20px] bg-[#E5E5E5]' />
 
-      <TouchableOpacity
-        onPress={() => onChange('mensajes')}
-        className={`flex-1 py-2 rounded-xl items-center justify-center ${
-          activeTab === 'mensajes' ? 'bg-white dark:bg-neutral-800' : ''
-        }`}>
-        <Text className={getTextStyle('mensajes')}>Mensajes</Text>
-      </TouchableOpacity>
     </View>
   );
 }

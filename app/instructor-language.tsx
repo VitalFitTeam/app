@@ -1,50 +1,34 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedView } from '@/components/themed-view';
-import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import { Stack, useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BackHandler, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import CountryFlag from 'react-native-country-flag';
 import { ChevronLeftIcon } from 'react-native-heroicons/solid';
 
 const LANGUAGES = [
   { code: 'es', name: 'Español', countryCode: 'es' },
   { code: 'en', name: 'English', countryCode: 'gb' },
-  { code: 'it', name: 'Italiano', countryCode: 'it' },
-  { code: 'de', name: 'Deutsch', countryCode: 'de' },
-  { code: 'pt', name: 'Português', countryCode: 'pt' },
-  { code: 'fr', name: 'Français', countryCode: 'fr' },
 ];
 
-export default function RecepcionistLanguageScreen() {
+export default function InstructorLanguageScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  
-  // Normalizamos el idioma actual para evitar errores con códigos compuestos como 'en-US'
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language.split('-')[0]);
-
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => {
-        router.replace('/(recepcionist)/profile');
-        return true;
-      };
-
-      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-      return () => subscription.remove();
-    }, [router])
-  );
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
 
   const handleSaveLanguage = () => {
     i18n.changeLanguage(selectedLanguage);
-    router.replace('/(recepcionist)/profile');
+    router.back();
   };
 
   return (
-    <ThemedView className="flex-1 bg-white">
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <ThemedView className="flex-1 bg-white pt-10">
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 40, paddingBottom: 96 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}
       >
         <View
           className="w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center"
@@ -52,15 +36,13 @@ export default function RecepcionistLanguageScreen() {
         >
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => router.replace('/(recepcionist)/profile')}
+            onPress={() => router.back()}
             style={{ position: 'absolute', left: 12, top: 8, bottom: 8, justifyContent: 'center' }}
           >
             <ChevronLeftIcon width={20} height={20} color="#f97316" />
           </TouchableOpacity>
 
-          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>
-            {t('language.title')}
-          </Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('language.title')}</Text>
         </View>
 
         <View style={{ marginBottom: 16 }}>
@@ -133,5 +115,6 @@ export default function RecepcionistLanguageScreen() {
         </View>
       </ScrollView>
     </ThemedView>
+    </>
   );
 }
