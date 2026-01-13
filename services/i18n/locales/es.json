@@ -84,7 +84,9 @@
         "title": "Estado",
         "assisted": "Asistida",
         "absent": "Ausente",
-        "cancelled": "Cancelada por ti"
+        "cancelled": "Cancelada",
+        "active": "Activo",
+        "cancelled_generic": "Cancelado"
       },
       "client": "Cliente",
       "loading": "Cargando...",
@@ -643,7 +645,34 @@
       "viewDetails": "Ver detalles",
       "allPlans": "Todos los planes",
       "update": "Actualizar",
-      "mockDate": "11 de Diciembre del 2025"
+      "mockDate": "11 de Diciembre del 2025",
+      "noActivePlan": "No tienes un plan activo actualmente.",
+      "noOtherPlans": "No hay otros planes disponibles en este momento."
+    },
+    "membershipDetails": {
+      "title": "Detalles de membresía",
+      "notFound": "No se encontraron detalles de membresía activa.",
+      "currentPlan": "Plan actual",
+      "price": "Precio",
+      "duration": "Duración",
+      "days": "días",
+      "startDate": "Fecha de inicio",
+      "expirationDate": "Fecha de vencimiento",
+      "unknownName": "Nombre no disponible",
+      "cancelButton": "Cancelar membresía"
+    },
+    "membershipCancellation": {
+      "modalTitle": "Cancelar Membresía",
+      "close": "Cerrar",
+      "selectReason": "Por favor, selecciona una razón para cancelar tu membresía:",
+      "commentsLabel": "Comentarios adicionales (opcional):",
+      "commentsPlaceholder": "Escribe aquí...",
+      "confirmButton": "Confirmar Cancelación",
+      "errors": {
+        "fetchReasons": "No se pudieron cargar las razones de cancelación.",
+        "processError": "Ocurrió un error al procesar la cancelación."
+      },
+      "success": "La solicitud de cancelación ha sido procesada."
     },
     "language": {
       "title": "Idioma",
@@ -1198,22 +1227,8 @@
         "clientProgressBody": "Tu cliente Juan Pérez actualizó su progreso de rutina.",
         "hiitClassBody": "Tienes una clase de HIIT programada para mañana."
       }
-    },
-    "instructorProfile": {
-      "title": "Perfil de Instructor",
-      "specialty": "Especialidad",
-      "defaultSpecialty": "Entrenador Personal",
-      "role": "Instructor"
-    },
-    "instructorNotifications": {
-      "mock": {
-        "classReminder": "Recordatorio de clase",
-        "classReminderBody": "Tienes una clase de Functional Strength hoy a las 6:00 pm.",
-        "clientProgress": "Nuevo progreso de cliente",
-        "clientProgressBody": "Tu cliente Juan Pérez actualizó su progreso de rutina.",
-        "hiitClassBody": "Tienes una clase de HIIT programada para mañana."
-      }
     }
+
   }
 }
    

@@ -84,7 +84,9 @@
         "title": "Status",
         "assisted": "Presente",
         "absent": "Ausente",
-        "cancelled": "Cancelado por você"
+        "cancelled": "Cancelado",
+        "active": "Ativo",
+        "cancelled_generic": "Cancelado"
       },
       "client": "Cliente",
       "loading": "Carregando...",
@@ -643,7 +645,9 @@
       "viewDetails": "Ver Detalhes",
       "allPlans": "Todos os Planos",
       "update": "Atualizar",
-      "mockDate": "11 de Dezembro de 2025"
+      "mockDate": "11 de Dezembro de 2025",
+      "noActivePlan": "Nenhum plano ativo",
+      "noOtherPlans": "Não há outros planos disponíveis no momento."
     },
     "language": {
       "title": "Idioma",
@@ -1119,6 +1123,43 @@
         "clientProgressBody": "Seu cliente Juan Pérez atualizou o progresso da rotina.",
         "hiitClassBody": "Você tem uma aula de HIIT agendada para amanhã."
       }
+    },
+    "membershipDetails": {
+      "title": "Membership Details",
+      "currentPlan": "Plano Atual",
+      "price": "Preço",
+      "duration": "Duração",
+      "startDate": "Data de início",
+      "expirationDate": "Data de validade",
+      "cancelButton": "Cancel Membership",
+      "keepSubscription": "Keep Subscription",
+      "feature1": "Unlimited gym access",
+      "feature2": "Access to group classes",
+      "feature3": "Personalized tracking",
+      "days": "days",
+      "unknownName": "Unknown Plan",
+      "unknownDescription": "No description available",
+      "activeStatus": "Ativo",
+      "cancelledStatus": "Cancelado",
+      "startedOn": "Started on",
+      "expiresOn": "Expires on",
+      "benefit1": "Unlimited Access to all areas",
+      "benefit2": "Free Group Classes included",
+      "benefit3": "Personalized Routine via App",
+      "benefit4": "Body Composition Analysis",
+      "cancellationParams": "Cancellation details (No refund)",
+      "toastAccessDenied": "Access denied"
+    },
+    "membershipCancellation": {
+      "modalTitle": "Cancel Membership",
+      "modalDescription": "Are you sure you want to cancel your membership? This action cannot be undone.",
+      "confirmButton": "Yes, cancel",
+      "cancelButton": "No, keep",
+      "successTitle": "Membership Cancelled",
+      "successMessage": "Your membership has been cancelled successfully.",
+      "errorTitle": "Cancellation Error",
+      "errorMessage": "An error occurred while cancelling the membership.",
+      "alreadyCancelled": "This membership is already cancelled."
     },
     "classesScreen": {
       "title": "Calendário de Aulas",

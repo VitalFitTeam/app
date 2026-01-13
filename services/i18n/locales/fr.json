@@ -84,7 +84,9 @@
         "title": "Statut",
         "assisted": "Présent",
         "absent": "Absent",
-        "cancelled": "Annulé par vous"
+        "cancelled": "Annulé",
+        "active": "Actif",
+        "cancelled_generic": "Annulé"
       },
       "client": "Client",
       "loading": "Chargement...",
@@ -643,7 +645,9 @@
       "viewDetails": "Voir Détails",
       "allPlans": "Tous les Plans",
       "update": "Mettre à jour",
-      "mockDate": "11 Décembre 2025"
+      "mockDate": "11 Décembre 2025",
+      "noActivePlan": "Aucun plan actif",
+      "noOtherPlans": "Il n'y a pas d'autres plans disponibles pour le moment."
     },
     "language": {
       "title": "Langue",
@@ -1119,6 +1123,43 @@
         "clientProgressBody": "Votre client Juan Pérez a mis à jour ses progrès de routine.",
         "hiitClassBody": "Vous avez un cours de HIIT prévu pour demain."
       }
+    },
+    "membershipDetails": {
+      "title": "Membership Details",
+      "currentPlan": "Plan Actuel",
+      "price": "Prix",
+      "duration": "Durée",
+      "startDate": "Date de début",
+      "expirationDate": "Date d'expiration",
+      "cancelButton": "Cancel Membership",
+      "keepSubscription": "Keep Subscription",
+      "feature1": "Unlimited gym access",
+      "feature2": "Access to group classes",
+      "feature3": "Personalized tracking",
+      "days": "days",
+      "unknownName": "Unknown Plan",
+      "unknownDescription": "No description available",
+      "activeStatus": "Actif",
+      "cancelledStatus": "Annulé",
+      "startedOn": "Started on",
+      "expiresOn": "Expires on",
+      "benefit1": "Unlimited Access to all areas",
+      "benefit2": "Free Group Classes included",
+      "benefit3": "Personalized Routine via App",
+      "benefit4": "Body Composition Analysis",
+      "cancellationParams": "Cancellation details (No refund)",
+      "toastAccessDenied": "Access denied"
+    },
+    "membershipCancellation": {
+      "modalTitle": "Cancel Membership",
+      "modalDescription": "Are you sure you want to cancel your membership? This action cannot be undone.",
+      "confirmButton": "Yes, cancel",
+      "cancelButton": "No, keep",
+      "successTitle": "Membership Cancelled",
+      "successMessage": "Your membership has been cancelled successfully.",
+      "errorTitle": "Cancellation Error",
+      "errorMessage": "An error occurred while cancelling the membership.",
+      "alreadyCancelled": "This membership is already cancelled."
     },
     "classesScreen": {
       "title": "Calendrier des Cours",

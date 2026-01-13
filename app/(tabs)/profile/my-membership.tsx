@@ -130,13 +130,13 @@ export default function MyMembershipScreen() {
                   <View className="flex-1 mr-2">
                     <Text className="font-body text-xs text-[#6B7280] mb-1">{t('myMembership.currentSubscription')}</Text>
                     <Text className="font-heading text-lg font-semibold" style={{ color: '#F97316' }}>
-                      {currentMembership.membership_type?.name || 'Plan desconocido'}
+                      {currentMembership.membership_type?.name || t('membershipDetails.unknownName')}
                     </Text>
                   </View>
 
                   <View className="px-3 py-1 rounded-full" style={{ backgroundColor: '#FEF3C7' }}>
                     <Text className="font-body text-[10px] font-semibold" style={{ color: '#F97316' }}>
-                      {currentMembership.status}
+                      {t(`common.status.${currentMembership.status.toLowerCase()}`, { defaultValue: currentMembership.status })}
                     </Text>
                   </View>
                 </View>
@@ -168,7 +168,7 @@ export default function MyMembershipScreen() {
               </View>
           ) : (
               <View className="p-4 rounded-xl bg-gray-50 border border-gray-200">
-                  <Text className="text-gray-500 text-center">{t('dashboard.member.noActivePlan')}</Text>
+                  <Text className="text-gray-500 text-center">{t('myMembership.noActivePlan')}</Text>
               </View>
           )}
         </View>
@@ -229,7 +229,7 @@ export default function MyMembershipScreen() {
                                 id: plan.membership_type_id,
                                 title: plan.name,
                                 price: plan.price.toString(),
-                                period: plan.duration_days ? `${plan.duration_days} días` : ''
+                                period: plan.duration_days ? `${plan.duration_days} ${t('membershipDetails.days')}` : ''
                             }).toString();
                             router.push(`/membership-checkout?${params}` as never);
                         }}
@@ -239,7 +239,7 @@ export default function MyMembershipScreen() {
                 );
               })
           ) : (
-            <Text className="text-gray-400 text-center py-4">No hay otros planes disponibles en este momento.</Text>
+            <Text className="text-gray-400 text-center py-4">{t('myMembership.noOtherPlans')}</Text>
           )}
         </View>
       </ScrollView>

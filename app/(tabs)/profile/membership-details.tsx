@@ -32,8 +32,7 @@ interface CancellationReason {
 
 export default function MembershipDetailsScreen() {
   const router = useRouter();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { t } = useTranslation();
+  const { t } = useTranslation();
   const { fetchUser } = useUser();
   const [loading, setLoading] = useState(true);
   const [membershipDetail, setMembershipDetail] = useState<MembershipDetail | null>(null);
@@ -111,8 +110,8 @@ export default function MembershipDetailsScreen() {
       setToast({
           visible: true,
           type: 'error',
-          title: 'Error',
-          message: 'No se pudieron cargar las razones de cancelación.',
+          title: t('membershipCancellation.errors.processError'), // Reusing process error or similar generic
+          message: t('membershipCancellation.errors.fetchReasons'),
       });
     } finally {
       setLoadingReasons(false);
@@ -156,8 +155,8 @@ export default function MembershipDetailsScreen() {
       setToast({
           visible: true,
           type: 'success',
-          title: 'Éxito',
-          message: 'La solicitud de cancelación ha sido procesada.',
+          title: t('membershipCancellation.success'), // Or a generic success title
+          message: t('membershipCancellation.success'),
       });
 
       // Navigate back after a short delay to let user see the toast
@@ -170,8 +169,8 @@ export default function MembershipDetailsScreen() {
       setToast({
           visible: true,
           type: 'error',
-          title: 'Error',
-          message: 'Ocurrió un error al procesar la cancelación.',
+          title: t('membershipCancellation.errors.processError'),
+          message: t('membershipCancellation.errors.processError'),
       });
     } finally {
       setProcessingCancellation(false);
@@ -196,10 +195,10 @@ export default function MembershipDetailsScreen() {
                     style={{ position: 'absolute', left: 12, top: 8, bottom: 8, justifyContent: 'center' }}>
                     <ChevronLeftIcon width={20} height={20} color="#f97316" />
                 </TouchableOpacity>
-                <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Detalles de membresía</Text>
+                <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('membershipDetails.title')}</Text>
             </View>
             <View className="flex-1 items-center justify-center font-body">
-                <Text style={{ color: '#111827' }}>No se encontraron detalles de membresía activa.</Text>
+                <Text style={{ color: '#111827' }}>{t('membershipDetails.notFound')}</Text>
             </View>
         </ThemedView>
     );
@@ -220,11 +219,11 @@ export default function MembershipDetailsScreen() {
             <ChevronLeftIcon width={20} height={20} color="#f97316" />
           </TouchableOpacity>
 
-          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>Detalles de membresía</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('membershipDetails.title')}</Text>
         </View>
 
         <View className="mb-4">
-          <Text className="font-heading text-[14px] font-semibold text-[#111827] mb-2">Plan actual</Text>
+          <Text className="font-heading text-[14px] font-semibold text-[#111827] mb-2">{t('membershipDetails.currentPlan')}</Text>
 
           <View
             className="rounded-2xl px-4 py-4 border"
@@ -232,7 +231,7 @@ export default function MembershipDetailsScreen() {
             <View className="flex-row items-center justify-between mb-2">
               <View className="flex-1 mr-2">
                 <Text className="font-body text-xs mb-1" style={{ color: '#6B7280' }}>
-                  {membershipDetail.membership_type?.name || 'Nombre no disponible'}
+                  {membershipDetail.membership_type?.name || t('membershipDetails.unknownName')}
                 </Text>
                 <Text className="font-heading text-sm font-semibold" style={{ color: '#F97316' }}>
                   {membershipDetail.membership_type?.description || ''}
@@ -241,7 +240,7 @@ export default function MembershipDetailsScreen() {
 
               <View className="px-3 py-1 rounded-full" style={{ backgroundColor: '#FEF3C7' }}>
                 <Text className="font-body text-[10px] font-semibold" style={{ color: '#F97316' }}>
-                  {membershipDetail.status}
+                  {t(`common.status.${membershipDetail.status.toLowerCase()}`, { defaultValue: membershipDetail.status })}
                 </Text>
               </View>
             </View>
@@ -249,7 +248,7 @@ export default function MembershipDetailsScreen() {
              <View className="mb-4 flex-row justify-between">
                <View>
                   <Text className="font-body text-xs mb-1" style={{ color: '#6B7280' }}>
-                    Precio
+                    {t('membershipDetails.price')}
                   </Text>
                   <Text className="font-body text-sm font-semibold" style={{ color: '#111827' }}>
                     ${membershipDetail.membership_type?.price}
@@ -257,17 +256,17 @@ export default function MembershipDetailsScreen() {
                </View>
                <View>
                   <Text className="font-body text-xs mb-1" style={{ color: '#6B7280' }}>
-                    Duración
+                    {t('membershipDetails.duration')}
                   </Text>
                   <Text className="font-body text-sm font-semibold" style={{ color: '#111827' }}>
-                    {membershipDetail.membership_type?.duration_days} días
+                    {membershipDetail.membership_type?.duration_days} {t('membershipDetails.days')}
                   </Text>
                </View>
             </View>
 
             <View className="mb-4">
               <Text className="font-body text-xs mb-1" style={{ color: '#6B7280' }}>
-                Fecha de inicio
+                {t('membershipDetails.startDate')}
               </Text>
               <Text className="font-body text-xs" style={{ color: '#111827' }}>
                 {formatDate(membershipDetail.start_date)}
@@ -276,7 +275,7 @@ export default function MembershipDetailsScreen() {
 
             <View className="mb-4">
               <Text className="font-body text-xs mb-1" style={{ color: '#6B7280' }}>
-                Fecha de vencimiento
+                {t('membershipDetails.expirationDate')}
               </Text>
               <Text className="font-body text-xs" style={{ color: '#111827' }}>
                 {formatDate(membershipDetail.end_date)}
@@ -291,7 +290,7 @@ export default function MembershipDetailsScreen() {
               className="w-full py-4 mt-4 rounded-xl items-center border border-red-500"
             >
                 <Text className="text-red-500 font-semibold font-body">
-                    Cancelar membresía
+                    {t('membershipDetails.cancelButton')}
                 </Text>
             </TouchableOpacity>
           )}
@@ -308,16 +307,16 @@ export default function MembershipDetailsScreen() {
             <View className="bg-white rounded-t-3xl p-6 h-[80%]">
               <View className="flex-row justify-between items-center mb-6">
                 <Text className="font-heading text-xl font-bold text-gray-900">
-                  Cancelar Membresía
+                  {t('membershipCancellation.modalTitle')}
                 </Text>
                 <TouchableOpacity onPress={() => setCancelModalVisible(false)}>
-                  <Text className="text-gray-500 font-body">Cerrar</Text>
+                  <Text className="text-gray-500 font-body">{t('membershipCancellation.close')}</Text>
                 </TouchableOpacity>
               </View>
 
               <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
                 <Text className="font-body text-gray-600 mb-4">
-                  Por favor, selecciona una razón para cancelar tu membresía:
+                  {t('membershipCancellation.selectReason')}
                 </Text>
 
                 {loadingReasons ? (
@@ -347,12 +346,12 @@ export default function MembershipDetailsScreen() {
                   ))
                 )}
 
-                <Text className="font-body text-gray-600 mt-4 mb-2">Comentarios adicionales (opcional):</Text>
+                <Text className="font-body text-gray-600 mt-4 mb-2">{t('membershipCancellation.commentsLabel')}</Text>
                 <TextInput
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 font-body min-h-[100px]"
                   style={{ textAlignVertical: 'top' }}
                   multiline
-                  placeholder="Escribe aquí..."
+                  placeholder={t('membershipCancellation.commentsPlaceholder')}
                   value={cancelNotes}
                   onChangeText={setCancelNotes}
                 />
@@ -362,7 +361,7 @@ export default function MembershipDetailsScreen() {
                     <ActivityIndicator size="large" color="#f97316" />
                   ) : (
                     <PrimaryButton
-                      title="Confirmar Cancelación"
+                      title={t('membershipCancellation.confirmButton')}
                       onPress={confirmCancellation}
                       disabled={!selectedReasonId}
                     />
