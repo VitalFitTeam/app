@@ -1,7 +1,7 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedView } from '@/components/themed-view';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import CountryFlag from 'react-native-country-flag';
@@ -10,12 +10,19 @@ import { ChevronLeftIcon } from 'react-native-heroicons/solid';
 const LANGUAGES = [
   { code: 'es', name: 'Español', countryCode: 'es' },
   { code: 'en', name: 'English', countryCode: 'gb' },
+  { code: 'it', name: 'Italiano', countryCode: 'it' },
+  { code: 'de', name: 'Deutsch', countryCode: 'de' },
+  { code: 'pt', name: 'Português', countryCode: 'pt' },
+  { code: 'fr', name: 'Français', countryCode: 'fr' },
 ];
 
 export default function LanguageScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
+  
+  // Normaliza el idioma (ej. 'es-ES' -> 'es') para que coincida con la lista
+  const normalizedCurrentLang = useMemo(() => i18n.language.split('-')[0], [i18n.language]);
+  const [selectedLanguage, setSelectedLanguage] = useState(normalizedCurrentLang);
 
   const handleSaveLanguage = () => {
     i18n.changeLanguage(selectedLanguage);
@@ -40,7 +47,9 @@ export default function LanguageScreen() {
             <ChevronLeftIcon width={20} height={20} color="#f97316" />
           </TouchableOpacity>
 
-          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('language.title')}</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>
+            {t('language.title')}
+          </Text>
         </View>
 
         <View style={{ marginBottom: 16 }}>

@@ -10,12 +10,18 @@ import { ChevronLeftIcon } from 'react-native-heroicons/solid';
 const LANGUAGES = [
   { code: 'es', name: 'Español', countryCode: 'es' },
   { code: 'en', name: 'English', countryCode: 'gb' },
+  { code: 'it', name: 'Italiano', countryCode: 'it' },
+  { code: 'de', name: 'Deutsch', countryCode: 'de' },
+  { code: 'pt', name: 'Português', countryCode: 'pt' },
+  { code: 'fr', name: 'Français', countryCode: 'fr' },
 ];
 
 export default function RecepcionistLanguageScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
+  
+  // Normalizamos el idioma actual para evitar errores con códigos compuestos como 'en-US'
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language.split('-')[0]);
 
   useFocusEffect(
     useCallback(() => {
@@ -25,7 +31,6 @@ export default function RecepcionistLanguageScreen() {
       };
 
       const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
       return () => subscription.remove();
     }, [router])
   );
@@ -53,7 +58,9 @@ export default function RecepcionistLanguageScreen() {
             <ChevronLeftIcon width={20} height={20} color="#f97316" />
           </TouchableOpacity>
 
-          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('language.title')}</Text>
+          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>
+            {t('language.title')}
+          </Text>
         </View>
 
         <View style={{ marginBottom: 16 }}>
