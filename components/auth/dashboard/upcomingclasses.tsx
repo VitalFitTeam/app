@@ -1,7 +1,7 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dimensions, FlatList, Image, StyleSheet, Text, View } from 'react-native';
 import { ClockIcon, FireIcon } from 'react-native-heroicons/solid';
-import { useTranslation } from 'react-i18next';
 
 const ClassImage = require('@/assets/images/Rectangle.png');
 

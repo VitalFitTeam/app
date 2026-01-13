@@ -1,5 +1,5 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
 	Dimensions,
 	Image,
@@ -9,7 +9,6 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
 
 interface Routine {
 	id: string;
@@ -36,12 +35,8 @@ export const UpcomingRoutinesSection: React.FC<Props> = ({ routines, mode = 'mem
 		<View style={styles.container}>
 			<Text className='font-heading' style={styles.sectionTitle}>{sectionTitle}</Text>
 			{routines.map((routine) => (
-				<LinearGradient
+				<View
 					key={routine.id}
-					colors={['#4F3521', '#F27F2A']}
-					locations={[0.2, 0.9]}
-					start={{ x: 0.5, y: 0 }}
-					end={{ x: 0.5, y: 1 }}
 					style={[styles.card, { width: cardWidth }]}>
 					<Image
 						source={require('@/assets/images/Male.png')}
@@ -62,7 +57,7 @@ export const UpcomingRoutinesSection: React.FC<Props> = ({ routines, mode = 'mem
 							<Text className='font-body' style={styles.buttonText}>{buttonLabel}</Text>
 						</TouchableOpacity>
 					</View>
-				</LinearGradient>
+				</View>
 			))}
 		</View>
 	);
@@ -77,9 +72,10 @@ const styles = StyleSheet.create({
 		fontSize: 28,
 		color: '#000000',
 		marginBottom: 12,
-		textAlign: 'center', 
+		textAlign: 'center',
 	},
 	card: {
+		backgroundColor: '#262626',
 		alignSelf: 'center',
 		marginBottom: 16,
 		borderRadius: 16,
@@ -114,25 +110,25 @@ const styles = StyleSheet.create({
 	subtitle: {
 		fontFamily: 'Montserrat_500Medium',
 		fontSize: 18,
-		color: '#FFFFFF',
+		color: '#f97316',
 		marginBottom: 2,
 	},
 	duration: {
 		fontFamily: 'Montserrat_400Regular',
 		fontSize: 15,
-		color: '#E0E0E0',
+		color: '#f97316',
 		marginBottom: 6,
 	},
 	title: {
 		fontFamily: 'BebasNeue-Regular',
 		fontSize: 25,
-		color: '#FFFFFF',
+		color: '#f97316',
 		fontWeight: '700',
 		textAlign: 'left',
 		marginBottom: 4,
 	},
 	button: {
-		backgroundColor: '#FFFFFF',
+		backgroundColor: '#f97316',
 		paddingHorizontal: 25,
 		paddingVertical: 8,
 		borderRadius: 11,
@@ -142,7 +138,7 @@ const styles = StyleSheet.create({
 	buttonText: {
 		fontFamily: 'Montserrat_600SemiBold',
 		fontSize: 18,
-		color: '#000000',
+		color: '#262626',
 		textAlign: 'center',
 		fontWeight: '600',
 	},
