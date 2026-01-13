@@ -2,8 +2,8 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedView } from '@/components/themed-view';
 import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { CheckCircleIcon, ChevronLeftIcon } from 'react-native-heroicons/solid';
@@ -35,56 +35,58 @@ export default function MyMembershipScreen() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [availablePlans, setAvailablePlans] = useState<any[]>([]); 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const token = await AsyncStorage.getItem('token');
-        if (!token) {
-           return;
-        }
-
-        // Fetch current membership using SDK generic get
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
         try {
-            const response = await vitalFitApi.client.get({
-                url: '/client-memberships/me',
-                jwt: token
-            });
-            
-            // Cast response to any to safely access data based on verified structure
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const json = response as any;
-            if (json && json.data) {
-                setCurrentMembership(json.data);
-            } else if (json && json.client_membership_id) {
-                 // Fallback if response is the data itself
-                 setCurrentMembership(json);
-            }
-        } catch (err) {
-            console.error('Error fetching user membership:', err);
+          setLoading(true);
+          const token = await AsyncStorage.getItem('token');
+          if (!token) {
+             return;
+          }
+
+          // Fetch current membership using SDK generic get
+          try {
+              const response = await vitalFitApi.client.get({
+                  url: '/client-memberships/me',
+                  jwt: token
+              });
+              
+              // Cast response to any to safely access data based on verified structure
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const json = response as any;
+              if (json && json.data) {
+                  setCurrentMembership(json.data);
+              } else if (json && json.client_membership_id) {
+                   // Fallback if response is the data itself
+                   setCurrentMembership(json);
+              }
+          } catch (err) {
+              console.error('Error fetching user membership:', err);
+          }
+
+          // Fetch all available plans
+          try {
+              const plansResponse = await vitalFitApi.membership.publicGetMemberships(
+                  token,
+                  { page: 1, limit: 10, sort: 'asc' },
+                  'USD'
+              );
+              if (plansResponse && plansResponse.data) {
+                  setAvailablePlans(plansResponse.data);
+              }
+          } catch (err) {
+              console.error('Error fetching membership plans:', err);
+          }
+
+        } finally {
+          setLoading(false);
         }
+      };
 
-        // Fetch all available plans
-        try {
-            const plansResponse = await vitalFitApi.membership.publicGetMemberships(
-                token,
-                { page: 1, limit: 10, sort: 'asc' },
-                'USD'
-            );
-            if (plansResponse && plansResponse.data) {
-                setAvailablePlans(plansResponse.data);
-            }
-        } catch (err) {
-            console.error('Error fetching membership plans:', err);
-        }
-
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+      fetchData();
+    }, [])
+  );
 
   if (loading) {
       return (
@@ -128,13 +130,13 @@ export default function MyMembershipScreen() {
                   <View className="flex-1 mr-2">
                     <Text className="font-body text-xs text-[#6B7280] mb-1">{t('myMembership.currentSubscription')}</Text>
                     <Text className="font-heading text-lg font-semibold" style={{ color: '#F97316' }}>
-                      {currentMembership.membership_type?.name || 'Plan desconocido'}
+                      {currentMembership.membership_type?.name || t('membershipDetails.unknownName')}
                     </Text>
                   </View>
 
                   <View className="px-3 py-1 rounded-full" style={{ backgroundColor: '#FEF3C7' }}>
                     <Text className="font-body text-[10px] font-semibold" style={{ color: '#F97316' }}>
-                      {currentMembership.status}
+                      {t(`common.status.${currentMembership.status.toLowerCase()}`, { defaultValue: currentMembership.status })}
                     </Text>
                   </View>
                 </View>
@@ -166,7 +168,7 @@ export default function MyMembershipScreen() {
               </View>
           ) : (
               <View className="p-4 rounded-xl bg-gray-50 border border-gray-200">
-                  <Text className="text-gray-500 text-center">{t('dashboard.member.noActivePlan')}</Text>
+                  <Text className="text-gray-500 text-center">{t('myMembership.noActivePlan')}</Text>
               </View>
           )}
         </View>
@@ -179,7 +181,7 @@ export default function MyMembershipScreen() {
 
           {availablePlans.length > 0 ? (
               availablePlans.map(plan => {
-                const isCurrent = plan.membership_type_id === currentPlanId;
+                const isCurrent = plan.membership_type_id === currentPlanId && currentMembership?.status === 'Active';
 
                 return (
                   <View
@@ -227,7 +229,7 @@ export default function MyMembershipScreen() {
                                 id: plan.membership_type_id,
                                 title: plan.name,
                                 price: plan.price.toString(),
-                                period: plan.duration_days ? `${plan.duration_days} días` : ''
+                                period: plan.duration_days ? `${plan.duration_days} ${t('membershipDetails.days')}` : ''
                             }).toString();
                             router.push(`/membership-checkout?${params}` as never);
                         }}
@@ -237,7 +239,7 @@ export default function MyMembershipScreen() {
                 );
               })
           ) : (
-            <Text className="text-gray-400 text-center py-4">No hay otros planes disponibles en este momento.</Text>
+            <Text className="text-gray-400 text-center py-4">{t('myMembership.noOtherPlans')}</Text>
           )}
         </View>
       </ScrollView>
