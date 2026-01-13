@@ -61,7 +61,7 @@ export const UserHeader: React.FC<Props> = ({
 								fontSize: 31,
 								color: '#000',
 							}}>
-							{t('dashboard.hello')}{firstName}
+							{firstName}
 						</Text>
 					</View>
 				</View>

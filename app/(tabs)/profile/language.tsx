@@ -1,7 +1,7 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedView } from '@/components/themed-view';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import CountryFlag from 'react-native-country-flag';
@@ -10,12 +10,19 @@ import { ChevronLeftIcon } from 'react-native-heroicons/solid';
 const LANGUAGES = [
   { code: 'es', name: 'Español', countryCode: 'es' },
   { code: 'en', name: 'English', countryCode: 'gb' },
+  { code: 'fr', name: 'Français', countryCode: 'fr' },
+  { code: 'it', name: 'Italiano', countryCode: 'it' },
+  { code: 'pt', name: 'Português', countryCode: 'pt' },
+  { code: 'de', name: 'Deutsch', countryCode: 'de' },
 ];
 
 export default function ProfileLanguageScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
+
+  // Normaliza el idioma actual (ej. 'pt-BR' -> 'pt') para que coincida con las opciones
+  const normalizedCurrentLang = useMemo(() => i18n.language.split('-')[0], [i18n.language]);
+  const [selectedLanguage, setSelectedLanguage] = useState(normalizedCurrentLang);
 
   const handleSaveLanguage = () => {
     i18n.changeLanguage(selectedLanguage);
@@ -40,20 +47,25 @@ export default function ProfileLanguageScreen() {
             <ChevronLeftIcon width={20} height={20} color="#f97316" />
           </TouchableOpacity>
 
-          <Text className='font-heading' style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>{t('language.title')}</Text>
+          <Text className="font-heading" style={{ color: '#111827', fontSize: 16, fontWeight: '600' }}>
+            {t('language.title')}
+          </Text>
         </View>
 
         <View style={{ marginBottom: 16 }}>
-          <Text className='font-heading' style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 4 }}>
+          <Text
+            className="font-heading"
+            style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 4 }}
+          >
             {t('language.changeLanguage')}
           </Text>
-          <Text className='font-body' style={{ color: '#4B5563', fontSize: 13, lineHeight: 18 }}>
+          <Text className="font-body" style={{ color: '#4B5563', fontSize: 13, lineHeight: 18 }}>
             {t('language.selectOption')}
           </Text>
         </View>
 
         <View>
-          {LANGUAGES.map(lang => {
+          {LANGUAGES.map((lang) => {
             const isSelected = selectedLanguage === lang.code;
             return (
               <TouchableOpacity
@@ -72,7 +84,7 @@ export default function ProfileLanguageScreen() {
                     <CountryFlag isoCode={lang.countryCode} size={16} />
                   </View>
                   <Text
-                    className='font-body'
+                    className="font-body"
                     style={{
                       color: isSelected ? '#F9FAFB' : '#111827',
                       fontSize: 14,
