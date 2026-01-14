@@ -109,30 +109,13 @@ export default function ProfileScreen() {
           </Text>
         </View>
 
-        <View className="w-full bg-[#F3F4F6] rounded-2xl py-3 px-3 mb-6 flex-row justify-between">
-          <View className="flex-1 items-center">
-            <Text className="text-[18px] font-semibold text-[#111827]">6</Text>
-            <Text className="text-[11px] text-[#4b5563] mt-1">{t('client.profile.stats.workouts')}</Text>
-          </View>
-          <View className="w-px bg-[#d1d5db] mx-2" />
-          <View className="flex-1 items-center">
-            <Text className="text-[18px] font-semibold text-[#111827]">46</Text>
-            <Text className="text-[11px] text-[#4b5563] mt-1">{t('client.profile.stats.badges')}</Text>
-          </View>
-          <View className="w-px bg-[#d1d5db] mx-2" />
-          <View className="flex-1 items-center">
-            <Text className="text-[18px] font-semibold text-[#111827]">25</Text>
-            <Text className="text-[11px] text-[#4b5563] mt-1">{t('client.profile.stats.points')}</Text>
-          </View>
-        </View>
-
         <TouchableOpacity
           activeOpacity={0.85}
-          className="w-full rounded-2xl border border-[#d1d5db] py-3 px-4 mb-4 flex-row items-center justify-center bg-white"
+          className="w-full rounded-2xl border border-[#f97316] py-3 px-4 mb-4 flex-row items-center justify-center bg-white"
           onPress={() => setQrModalVisible(true)}
         >
-          <QrCodeIcon width={18} height={18} color="#111827" />
-          <Text className="ml-2 text-[13px] font-medium text-[#111827]">{t('client.profile.checkIn')}</Text>
+          <QrCodeIcon width={18} height={18} color="#f97316" />
+          <Text className="ml-2 text-[13px] font-medium text-[#f97316]">{t('client.profile.checkIn')}</Text>
         </TouchableOpacity>
 
         <View className="mb-2">
@@ -141,119 +124,119 @@ export default function ProfileScreen() {
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
+          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3"
           onPress={() => {
             router.push('/profile/my-profile');
           }}
         >
           <View className="flex-row items-center">
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
-              <UserCircleIcon width={18} height={18} color="#111827" />
+              <UserCircleIcon width={18} height={18} color="#f97316" />
             </View>
-            <Text className="text-[13px] text-[#111827]">{t('client.profile.personalInfo')}</Text>
+            <Text className="text-[13px] text-[#f97316]">{t('client.profile.personalInfo')}</Text>
           </View>
-          <ChevronRightIcon width={16} height={16} color="#9ca3af" />
+          <ChevronRightIcon width={16} height={16} color="#f97316" />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
+          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3"
           onPress={() => {
             router.push('/profile/profile-settings');
           }}
         >
           <View className="flex-row items-center">
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
-              <ShieldCheckIcon width={18} height={18} color="#111827" />
+              <ShieldCheckIcon width={18} height={18} color="#f97316" />
             </View>
-            <Text className="text-[13px] text-[#111827]">{t('client.profile.security')}</Text>
+            <Text className="text-[13px] text-[#f97316]">{t('client.profile.security')}</Text>
           </View>
-          <ChevronRightIcon width={16} height={16} color="#9ca3af" />
+          <ChevronRightIcon width={16} height={16} color="#f97316" />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
+          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3"
           onPress={() => {
             router.push('/profile/my-membership');
           }}
         >
           <View className="flex-row items-center">
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
-              <TicketIcon width={18} height={18} color="#111827" />
+              <TicketIcon width={18} height={18} color="#f97316" />
             </View>
-            <Text className="text-[13px] text-[#111827]">{t('client.profile.myMembership')}</Text>
+            <Text className="text-[13px] text-[#f97316]">{t('client.profile.myMembership')}</Text>
           </View>
-          <ChevronRightIcon width={16} height={16} color="#9ca3af" />
+          <ChevronRightIcon width={16} height={16} color="#f97316" />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
+          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3"
           onPress={() => {
             router.push('/profile/insignias');
           }}
         >
           <View className="flex-row items-center">
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
-              <TrophyIcon width={18} height={18} color="#111827" />
+              <TrophyIcon width={18} height={18} color="#f97316" />
             </View>
-            <Text className="text-[13px] text-[#111827]">{t('client.profile.badges')}</Text>
+            <Text className="text-[13px] text-[#f97316]">{t('client.profile.badges')}</Text>
           </View>
-          <ChevronRightIcon width={16} height={16} color="#9ca3af" />
+          <ChevronRightIcon width={16} height={16} color="#f97316" />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
+          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3"
           onPress={() => {
             router.push('/profile/language');
           }}
         >
           <View className="flex-row items-center">
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
-              <LanguageIcon width={18} height={18} color="#111827" />
+              <LanguageIcon width={18} height={18} color="#f97316" />
             </View>
-            <Text className="text-[13px] text-[#111827]">{t('client.profile.language')}</Text>
+            <Text className="text-[13px] text-[#f97316]">{t('client.profile.language')}</Text>
           </View>
-          <ChevronRightIcon width={16} height={16} color="#9ca3af" />
+          <ChevronRightIcon width={16} height={16} color="#f97316" />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
+          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3"
           onPress={() => {
             router.push('/profile/notifications');
           }}
         >
           <View className="flex-row items-center">
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
-              <BellIcon width={18} height={18} color="#111827" />
+              <BellIcon width={18} height={18} color="#f97316" />
             </View>
-            <Text className="text-[13px] text-[#111827]">{t('client.profile.notifications')}</Text>
+            <Text className="text-[13px] text-[#f97316]">{t('client.profile.notifications')}</Text>
           </View>
-          <ChevronRightIcon width={16} height={16} color="#9ca3af" />
+          <ChevronRightIcon width={16} height={16} color="#f97316" />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3"
+          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3"
           onPress={() => {
             router.push('/profile/payment-history');
           }}
         >
           <View className="flex-row items-center">
             <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
-              <CreditCardIcon width={18} height={18} color="#111827" />
+              <CreditCardIcon width={18} height={18} color="#f97316" />
             </View>
-            <Text className="text-[13px] text-[#111827]">{t('client.profile.paymentHistory')}</Text>
+            <Text className="text-[13px] text-[#f97316]">{t('client.profile.paymentHistory')}</Text>
           </View>
-          <ChevronRightIcon width={16} height={16} color="#9ca3af" />
+          <ChevronRightIcon width={16} height={16} color="#f97316" />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-6"
+          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-6"
           onPress={() => {
             setLogoutModalVisible(true);
           }}

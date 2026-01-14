@@ -84,29 +84,7 @@ export default function DashboardScreen() {
 		{ id: '3', title: t('dashboard.member.progress'), current: 4, total: 5, iconType: 'target' as const },
 	];
 
-	const mockClasses = [
-		{
-			id: '1',
-			title: 'Hora',
-			time: '07:00 - 08:00 AM',
-			calories: '95 kcal',
-			image: require('@/assets/images/rutina.png'),
-		},
-		{
-			id: '2',
-			title: 'Burn',
-			time: '09:00 - 10:00 AM',
-			calories: '120 kcal',
-			image: require('@/assets/images/rutina.png'),
-		},
-		{
-			id: '3',
-			title: 'Hora',
-			time: '11:00 - 12:00 PM',
-			calories: '85 kcal',
-			image: require('@/assets/images/rutina.png'),
-		},
-	];
+
 
 	const mockRoutines = [
 		{
@@ -157,7 +135,7 @@ export default function DashboardScreen() {
 					onGetMembershipPress={() => router.replace('/membership-entry')}
 				/>
 
-				{hasMembership && <UpcomingClassesCarousel classes={mockClasses} />}
+				{hasMembership && <UpcomingClassesCarousel />}
 
 				<UpcomingRoutinesSection
 					mode={hasMembership ? 'member' : 'guest'}

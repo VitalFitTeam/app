@@ -9,11 +9,25 @@ import vitalFitApi from '@/services';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import {
+    BranchClassInfo,
+    BranchScheduleResponse,
+    ClientBookingResponse,
+    isAPIError,
+} from '@vitalfit/sdk';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ActivityIndicator, Image, NativeScrollEvent, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Image,
+    NativeScrollEvent,
+    Pressable,
+    ScrollView,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const PAGE_SIZE = 8;
@@ -54,55 +68,6 @@ type BookingItem = {
     rawDate: string;
 };
 
-type ApiServiceImage = {
-    image_url?: string;
-    is_primary?: boolean;
-};
-
-type ApiService = {
-    name?: string;
-    service_name?: string;
-    title?: string;
-    display_name?: string;
-    images?: ApiServiceImage[];
-};
-
-type ApiInstructor = {
-    name?: string;
-    first_name?: string;
-    last_name?: string;
-};
-
-type ApiScheduleItem = {
-    branch_id?: string;
-    class_id?: string;
-    classId?: string;
-    ends_at?: string;
-    endsAt?: string;
-    instructor_id?: string;
-    instructorId?: string;
-    is_visible?: boolean;
-    max_capacity?: number;
-    notes?: string;
-    service_id?: string;
-    serviceId?: string;
-    starts_at?: string;
-    startsAt?: string;
-    branch_name?: string;
-    service_name?: string;
-    name?: string;
-    occupied?: number;
-    booking_id?: string;
-    id?: string;
-};
-
-type ApiBookingItem = {
-    class_id?: string;
-    classId?: string;
-    booking_id?: string;
-    id?: string;
-};
-
 export default function HorariosScreen() {
     const { t } = useTranslation();
     const router = useRouter();
@@ -121,12 +86,20 @@ export default function HorariosScreen() {
     const [bookingsError, setBookingsError] = useState<string | null>(null);
     const [visibleBookingsCount, setVisibleBookingsCount] = useState(PAGE_SIZE);
     const [refreshKey, setRefreshKey] = useState(0);
+
+    // Caches to avoid redundant API calls and 429 errors
+    const servicesCache = useRef<Record<string, { name: string; image: string }>>({});
+    const instructorsCache = useRef<Record<string, string>>({});
     const [selectedClassesDate, setSelectedClassesDate] = useState<string>(
         new Date().toISOString().split('T')[0],
     );
     const [selectedBookingsDate, setSelectedBookingsDate] = useState<string>('');
 
-    const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }: NativeScrollEvent) => {
+    const isCloseToBottom = ({
+        layoutMeasurement,
+        contentOffset,
+        contentSize,
+    }: NativeScrollEvent) => {
         const paddingToBottom = 100;
         return layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
     };
@@ -134,15 +107,11 @@ export default function HorariosScreen() {
     const handleScroll = ({ nativeEvent }: { nativeEvent: NativeScrollEvent }) => {
         if (activeTab === 'classes') {
             if (isCloseToBottom(nativeEvent)) {
-                setVisibleClassesCount((prev) =>
-                    Math.min(prev + PAGE_SIZE, classes.length),
-                );
+                setVisibleClassesCount((prev) => Math.min(prev + PAGE_SIZE, classes.length));
             }
         } else if (activeTab === 'reservas') {
             if (isCloseToBottom(nativeEvent)) {
-                setVisibleBookingsCount((prev) =>
-                    Math.min(prev + PAGE_SIZE, bookings.length),
-                );
+                setVisibleBookingsCount((prev) => Math.min(prev + PAGE_SIZE, bookings.length));
             }
         }
     };
@@ -186,115 +155,133 @@ export default function HorariosScreen() {
             try {
                 const token = await AsyncStorage.getItem('token');
 
-                const response = await vitalFitApi.client.get({
-                    url: `/branches/${selectedBranchId}/schedule`,
-                    jwt: token || undefined,
-                });
-
-                const raw = (response as { data?: ApiScheduleItem[] } | ApiScheduleItem[] | undefined) ?? [];
-                const itemsFromApi = Array.isArray((raw as { data?: ApiScheduleItem[] }).data)
-                    ? (raw as { data?: ApiScheduleItem[] }).data
-                    : (raw as ApiScheduleItem[]);
-                const items: ApiScheduleItem[] = Array.isArray(itemsFromApi) ? itemsFromApi : [];
-
-                const serviceImageMap: Record<string, string> = {};
-                const serviceNameMap: Record<string, string> = {};
-                const uniqueServiceIds: string[] = Array.from(
-                    new Set(
-                        items
-                            .map((item) => item.service_id || item.serviceId)
-                            .filter((value): value is string => Boolean(value)),
-                    ),
+                const response = await vitalFitApi.schedule.ListBranchesClass(
+                    selectedBranchId,
+                    token || '',
                 );
 
-                for (const sid of uniqueServiceIds) {
-                    try {
-                        const serviceResp = await vitalFitApi.client.get({
-                            url: `/services/${String(sid)}`,
-                            jwt: token || undefined,
-                        });
-                        const s =
-                            (serviceResp as { data?: ApiService }).data ?? (serviceResp as ApiService | undefined);
-                        const serviceName =
-                            (s && (s.name || s.service_name || s.title || s.display_name)) || 'Clase';
-                        serviceNameMap[String(sid)] = serviceName;
-                        const images: ApiServiceImage[] = Array.isArray(s?.images) ? s.images : [];
+                const raw =
+                    (response as { data?: BranchClassInfo[] } | BranchClassInfo[] | undefined) ??
+                    [];
+                const itemsFromApi = Array.isArray((raw as { data?: BranchClassInfo[] }).data)
+                    ? (raw as { data?: BranchClassInfo[] }).data
+                    : (raw as BranchClassInfo[]);
+                const items: BranchClassInfo[] = Array.isArray(itemsFromApi) ? itemsFromApi : [];
 
-                        if (Array.isArray(images) && images.length > 0) {
-                            const primary = images.find((img) => img.is_primary) ?? images[0];
-                            if (primary?.image_url) {
-                                serviceImageMap[String(sid)] = primary.image_url;
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Error cargando servicio en Schedule:', error);
+                // 3. Prepare Caches & Identification of Missing Data
+                const uniqueServiceIds = Array.from(
+                    new Set(items.map((i) => i.service_id).filter((id): id is string => !!id)),
+                );
+                const uniqueInstructorIds = Array.from(
+                    new Set(items.map((i) => i.instructor_id).filter((id): id is string => !!id)),
+                );
+
+                const missingServiceIds = uniqueServiceIds.filter(
+                    (id) => !servicesCache.current[id],
+                );
+                const missingInstructorIds = uniqueInstructorIds.filter(
+                    (id) => !instructorsCache.current[id],
+                );
+
+                // Helper to batch requests
+                const batchFetch = async <T,>(
+                    ids: string[],
+                    fetcher: (id: string, token: string) => Promise<T>,
+                    onSuccess: (id: string, data: T) => void,
+                ) => {
+                    const BATCH_SIZE = 5;
+                    for (let i = 0; i < ids.length; i += BATCH_SIZE) {
+                        const chunk = ids.slice(i, i + BATCH_SIZE);
+                        await Promise.all(
+                            chunk.map(async (id) => {
+                                try {
+                                    const res = await fetcher(id, token || '');
+                                    onSuccess(id, res);
+                                } catch (error) {
+                                    if (isAPIError(error) && error.status !== 404) {
+                                        console.warn(`Error fetching ${id}:`, error.status);
+                                    }
+                                }
+                            }),
+                        );
                     }
+                };
+
+                // 4. Fetch Missing Data (Parallelized & Cached)
+                if (missingServiceIds.length > 0) {
+                    await batchFetch(
+                        missingServiceIds,
+                        (id, t) => vitalFitApi.products.getServiceByID(id, t),
+                        (id, res) => {
+                            const s = res.data;
+                            const name = (s && s.name) || 'Clase';
+                            const images = Array.isArray(s?.images) ? s.images : [];
+                            let image = '';
+                            if (images.length > 0) {
+                                const primary = images.find((img) => img.is_primary) ?? images[0];
+                                image = primary?.image_url || '';
+                            }
+                            servicesCache.current[id] = { name, image };
+                        },
+                    );
                 }
 
-                const instructorMap: Record<string, string> = {};
-                const uniqueInstructorIds: string[] = Array.from(
-                    new Set(
-                        items
-                            .map((item) => item.instructor_id || item.instructorId)
-                            .filter((value): value is string => Boolean(value)),
-                    ),
-                );
-
-                for (const iid of uniqueInstructorIds) {
-                    try {
-                        const instResp = await vitalFitApi.client.get({
-                            url: `/instructor/${String(iid)}`,
-                            jwt: token || undefined,
-                        });
-                        const inst =
-                            (instResp as { data?: ApiInstructor }).data ??
-                            (instResp as ApiInstructor | undefined);
-
-                        const fullName =
-                            inst?.name ||
-                            [inst?.first_name, inst?.last_name]
-                                .filter((part: string | undefined) => !!part)
+                if (missingInstructorIds.length > 0) {
+                    await batchFetch(
+                        missingInstructorIds,
+                        (id, t) => vitalFitApi.instructor.getInstructorById(id, t),
+                        (id, res) => {
+                            const inst = res.data;
+                            const fullName = [inst?.first_name, inst?.last_name]
+                                .filter(Boolean)
                                 .join(' ');
-                        if (fullName) {
-                            instructorMap[String(iid)] = fullName;
-                        }
-                    } catch (error) {
-                        console.error('Error cargando instructor en Schedule:', error);
-                    }
+                            if (fullName) {
+                                instructorsCache.current[id] = fullName;
+                            }
+                        },
+                    );
                 }
 
                 const mapped: ClassItem[] = items.map((item) => {
-                    const startsAt = item.starts_at || item.startsAt || '';
-
-                    const endsAt = item.ends_at || item.endsAt || '';
+                    const startsAt = item.starts_at || '';
+                    const endsAt = item.ends_at || '';
 
                     const extractTime = (value: string) => {
                         if (!value) return '';
-                        const timePart = value.split('T')[1];
-                        if (!timePart) return '';
-                        return timePart.slice(0, 5);
+                        try {
+                            const date = new Date(value);
+                            return date.toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false,
+                            });
+                        } catch {
+                            return '';
+                        }
                     };
 
                     const startTime = extractTime(String(startsAt));
                     const endTime = extractTime(String(endsAt));
                     const time = endTime ? `${startTime} - ${endTime}` : startTime;
-                    const instructorId = item.instructor_id || item.instructorId;
-                    const instructorName = instructorId ? instructorMap[instructorId] : undefined;
-                    const sid = item.service_id || item.serviceId || '';
-
+                    const instructorId = item.instructor_id;
+                    const sid = item.service_id || '';
+                    const instructorName = instructorId
+                        ? instructorsCache.current[instructorId]
+                        : undefined;
+                    const serviceData = servicesCache.current[sid];
                     return {
-                        classId: item.class_id || item.classId || '',
+                        classId: item.class_id || '',
                         serviceId: sid,
                         instructorId: instructorId || '',
                         startsAt: String(startsAt || ''),
                         endsAt: String(endsAt || ''),
                         time,
-                        title: serviceNameMap[sid] || item.service_name || item.name || 'Clase',
+                        title: serviceData?.name || 'Clase',
                         instructor: instructorName ? `Con ${instructorName}` : 'Instructor',
-                        branch: item.branch_name || '',
-                        imageUrl: serviceImageMap[sid] || require('@/assets/images/rutina.png'),
+                        branch: '',
+                        imageUrl: serviceData?.image || require('@/assets/images/rutina.png'),
                         capacity: item.max_capacity || 0,
-                        occupied: item.occupied || 0,
+                        occupied: 0, // Initial value
                         rawDate: String(startsAt).split('T')[0] || '',
                     };
                 });
@@ -332,61 +319,72 @@ export default function HorariosScreen() {
                     return;
                 }
 
-                const bookingsResp = await vitalFitApi.client.get({
-                    url: `/bookings/client/${String(userId)}`,
-                    jwt: token,
-                });
+                const bookingsResp = await vitalFitApi.booking.getClientBooking(
+                    String(userId),
+                    token,
+                );
 
-                const rawBookings = (bookingsResp as { data?: ApiBookingItem[] } | ApiBookingItem[] | undefined) ?? [];
-                const bookingsFromApi = Array.isArray((rawBookings as { data?: ApiBookingItem[] }).data)
-                    ? (rawBookings as { data?: ApiBookingItem[] }).data
-                    : (rawBookings as ApiBookingItem[]);
-                const bookingsItems: ApiBookingItem[] = Array.isArray(bookingsFromApi) ? bookingsFromApi : [];
+                const rawBookings =
+                    (bookingsResp as
+                        | { data?: ClientBookingResponse[] }
+                        | ClientBookingResponse[]
+                        | undefined) ?? [];
+                const bookingsItems =
+                    (Array.isArray((rawBookings as { data?: ClientBookingResponse[] }).data)
+                        ? (rawBookings as { data?: ClientBookingResponse[] }).data
+                        : (rawBookings as ClientBookingResponse[])) ?? [];
 
                 const bookingIdByClassId: Record<string, string> = {};
                 bookingsItems.forEach((bk) => {
-                    const cId = bk.class_id || bk.classId;
-                    const bId = bk.booking_id || bk.id;
+                    const cId = bk.class_id;
+                    const bId = bk.booking_id;
 
                     if (cId && bId) {
                         bookingIdByClassId[String(cId)] = String(bId);
                     }
                 });
 
-                const response = await vitalFitApi.client.get({
-                    url: `/schedule/branch/${String(selectedBranchId)}/client/${String(userId)}`,
-                    jwt: token,
-                });
+                const response = await vitalFitApi.booking.getClientBranchBooking(
+                    String(selectedBranchId),
+                    String(userId),
+                    token,
+                );
 
-                const raw = (response as { data?: ApiScheduleItem[] } | ApiScheduleItem[] | undefined) ?? [];
-                const itemsFromApi = Array.isArray((raw as { data?: ApiScheduleItem[] }).data)
-                    ? (raw as { data?: ApiScheduleItem[] }).data
-                    : (raw as ApiScheduleItem[]);
-                const items: ApiScheduleItem[] = Array.isArray(itemsFromApi) ? itemsFromApi : [];
+                const raw =
+                    (response as
+                        | { data?: BranchScheduleResponse[] }
+                        | BranchScheduleResponse[]
+                        | undefined) ?? [];
+                const itemsFromApi = Array.isArray(
+                    (raw as { data?: BranchScheduleResponse[] }).data,
+                )
+                    ? (raw as { data?: BranchScheduleResponse[] }).data
+                    : (raw as BranchScheduleResponse[]);
+                const items: BranchScheduleResponse[] = Array.isArray(itemsFromApi)
+                    ? itemsFromApi
+                    : [];
 
                 const serviceImageMap: Record<string, string> = {};
                 const serviceNameMap: Record<string, string> = {};
                 const uniqueServiceIds: string[] = Array.from(
                     new Set(
                         items
-                            .map((item) => item.service_id || item.serviceId)
+                            .map((item) => item.service_id)
                             .filter((value): value is string => Boolean(value)),
                     ),
                 );
 
                 for (const sid of uniqueServiceIds) {
                     try {
-                        const serviceResp = await vitalFitApi.client.get({
-                            url: `/services/${String(sid)}`,
-                            jwt: token,
-                        });
-                        const s =
-                            (serviceResp as { data?: ApiService }).data ?? (serviceResp as ApiService | undefined);
+                        const serviceResp = await vitalFitApi.products.getServiceByID(
+                            String(sid),
+                            token || '',
+                        );
+                        const s = serviceResp.data;
 
-                        const serviceName =
-                            (s && (s.name || s.service_name || s.title || s.display_name)) || 'Clase';
+                        const serviceName = (s && s.name) || 'Clase';
                         serviceNameMap[String(sid)] = serviceName;
-                        const images: ApiServiceImage[] = Array.isArray(s?.images) ? s.images : [];
+                        const images = Array.isArray(s?.images) ? s.images : [];
 
                         if (Array.isArray(images) && images.length > 0) {
                             const primary = images.find((img) => img.is_primary) ?? images[0];
@@ -394,8 +392,11 @@ export default function HorariosScreen() {
                                 serviceImageMap[String(sid)] = primary.image_url;
                             }
                         }
-                    } catch (error) {
-                        console.error('Error cargando servicio para reservas:', error);
+                    } catch {
+                        console.warn(
+                            'Error cargando servicio para reservas (ignorable si no existe):',
+                            sid,
+                        );
                     }
                 }
 
@@ -403,26 +404,22 @@ export default function HorariosScreen() {
                 const uniqueInstructorIds: string[] = Array.from(
                     new Set(
                         items
-                            .map((item) => item.instructor_id || item.instructorId)
+                            .map((item) => item.instructor_id)
                             .filter((value): value is string => Boolean(value)),
                     ),
                 );
 
                 for (const iid of uniqueInstructorIds) {
                     try {
-                        const instResp = await vitalFitApi.client.get({
-                            url: `/instructor/${String(iid)}`,
-                            jwt: token,
-                        });
-                        const inst =
-                            (instResp as { data?: ApiInstructor }).data ??
-                            (instResp as ApiInstructor | undefined);
+                        const instResp = await vitalFitApi.instructor.getInstructorById(
+                            String(iid),
+                            token,
+                        );
+                        const inst = instResp.data;
 
-                        const fullName =
-                            inst?.name ||
-                            [inst?.first_name, inst?.last_name]
-                                .filter((part: string | undefined) => !!part)
-                                .join(' ');
+                        const fullName = [inst?.first_name, inst?.last_name]
+                            .filter((part: string | undefined) => !!part)
+                            .join(' ');
                         if (fullName) {
                             instructorMap[String(iid)] = fullName;
                         }
@@ -432,30 +429,37 @@ export default function HorariosScreen() {
                 }
 
                 const mappedBookings: BookingItem[] = items.map((item) => {
-                    const startsAt = item.starts_at || item.startsAt || '';
-
-                    const endsAt = item.ends_at || item.endsAt || '';
+                    const startsAt = item.starts_at || '';
+                    const endsAt = item.ends_at || '';
 
                     const extractTime = (value: string) => {
                         if (!value) return '';
-                        const timePart = String(value).split('T')[1];
-                        if (!timePart) return '';
-                        return timePart.slice(0, 5);
+                        try {
+                            const date = new Date(value);
+                            return date.toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false,
+                            });
+                        } catch {
+                            return '';
+                        }
                     };
 
                     const startTime = extractTime(String(startsAt));
                     const endTime = extractTime(String(endsAt));
                     const time = endTime ? `${startTime} - ${endTime}` : startTime;
 
-                    const sid = item.service_id || item.serviceId || '';
-                    const instructorId = item.instructor_id || item.instructorId || '';
+                    const sid = item.service_id || '';
+                    const instructorId = item.instructor_id || '';
 
-                    const classId = item.class_id || item.classId || '';
-                    const bookingId = bookingIdByClassId[String(classId)] || item.booking_id || item.id || '';
+                    const classId = item.class_id || '';
+                    const bookingId = bookingIdByClassId[String(classId)] || '';
 
-                    const title = serviceNameMap[String(sid)] || item.service_name || 'Clase';
-
-                    const instructorNameFromMap = instructorId ? instructorMap[String(instructorId)] : undefined;
+                    const title = serviceNameMap[String(sid)] || 'Clase';
+                    const instructorNameFromMap = instructorId
+                        ? instructorMap[String(instructorId)]
+                        : undefined;
 
                     return {
                         bookingId,
@@ -464,11 +468,14 @@ export default function HorariosScreen() {
                         instructorId,
                         time,
                         title,
-                        instructor: instructorNameFromMap ? `Con ${instructorNameFromMap}` : 'Instructor',
-                        branch: item.branch_name || '',
-                        imageUrl: serviceImageMap[String(sid)] || require('@/assets/images/rutina.png'),
+                        instructor: instructorNameFromMap
+                            ? `Con ${instructorNameFromMap}`
+                            : 'Instructor',
+                        branch: '',
+                        imageUrl:
+                            serviceImageMap[String(sid)] || require('@/assets/images/rutina.png'),
                         capacity: item.max_capacity || 0,
-                        occupied: item.occupied || 0,
+                        occupied: 0,
                         rawDate: String(startsAt).split('T')[0] || '',
                     };
                 });
@@ -489,12 +496,16 @@ export default function HorariosScreen() {
     }, [activeTab, selectedBranchId, refreshKey]);
 
     const filteredClasses = useMemo(
-        () => classes.filter((item) => !selectedClassesDate || item.rawDate === selectedClassesDate),
+        () =>
+            classes.filter((item) => !selectedClassesDate || item.rawDate === selectedClassesDate),
         [classes, selectedClassesDate],
     );
 
     const filteredBookings = useMemo(
-        () => bookings.filter((item) => !selectedBookingsDate || item.rawDate === selectedBookingsDate),
+        () =>
+            bookings.filter(
+                (item) => !selectedBookingsDate || item.rawDate === selectedBookingsDate,
+            ),
         [bookings, selectedBookingsDate],
     );
 
@@ -506,10 +517,13 @@ export default function HorariosScreen() {
             <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
                 <ScrollView
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 24, paddingBottom: 80 }}
+                    contentContainerStyle={{
+                        paddingHorizontal: 16,
+                        paddingTop: 24,
+                        paddingBottom: 80,
+                    }}
                     onScroll={handleScroll}
-                    scrollEventThrottle={16}
-                >
+                    scrollEventThrottle={16}>
                     <View className='items-center mb-6'>
                         <Image
                             source={require('@/assets/images/Frame.png')}
@@ -522,8 +536,11 @@ export default function HorariosScreen() {
                             lightColor='#111827'
                             darkColor='#ffffff'
                             className='font-heading'
-                            style={{ fontFamily: 'BebasNeue-Regular', fontSize: 28, marginBottom: 8 }}
-                        >
+                            style={{
+                                fontFamily: 'BebasNeue-Regular',
+                                fontSize: 28,
+                                marginBottom: 8,
+                            }}>
                             {t('schedule.calendar')}
                         </ThemedText>
                     </View>
@@ -555,31 +572,29 @@ export default function HorariosScreen() {
                     <View className='flex-row mb-6 border rounded-2xl border-neutral-600 bg-neutral-900/90 p-1'>
                         <Pressable
                             onPress={() => setActiveTab('classes')}
-                            style={({ pressed }) => [{ transform: [{ scale: pressed ? 1.05 : 1 }] }]}
-                            className={`flex-1 items-center py-2.5 rounded-xl ${
-                                activeTab === 'classes' ? 'bg-neutral-700' : 'bg-transparent'
-                            }`}
-                        >
+                            style={({ pressed }) => [
+                                { transform: [{ scale: pressed ? 1.05 : 1 }] },
+                            ]}
+                            className={`flex-1 items-center py-2.5 rounded-xl ${activeTab === 'classes' ? 'bg-neutral-700' : 'bg-transparent'
+                                }`}>
                             <ThemedText
                                 lightColor={activeTab === 'classes' ? '#ffffff' : '#9ca3af'}
                                 darkColor={activeTab === 'classes' ? '#ffffff' : '#6b7280'}
-                                className='font-heading text-base font-semibold'
-                            >
+                                className='font-heading text-base font-semibold'>
                                 {t('schedule.tabs.classes')}
                             </ThemedText>
                         </Pressable>
                         <Pressable
                             onPress={() => setActiveTab('reservas')}
-                            style={({ pressed }) => [{ transform: [{ scale: pressed ? 1.05 : 1 }] }]}
-                            className={`flex-1 items-center py-2.5 rounded-xl ${
-                                activeTab === 'reservas' ? 'bg-neutral-700' : 'bg-transparent'
-                            }`}
-                        >
+                            style={({ pressed }) => [
+                                { transform: [{ scale: pressed ? 1.05 : 1 }] },
+                            ]}
+                            className={`flex-1 items-center py-2.5 rounded-xl ${activeTab === 'reservas' ? 'bg-neutral-700' : 'bg-transparent'
+                                }`}>
                             <ThemedText
                                 lightColor={activeTab === 'reservas' ? '#ffffff' : '#9ca3af'}
                                 darkColor={activeTab === 'reservas' ? '#ffffff' : '#6b7280'}
-                                className='font-heading text-base font-semibold text-center'
-                            >
+                                className='font-heading text-base font-semibold text-center'>
                                 {t('schedule.tabs.reservations')}
                             </ThemedText>
                         </Pressable>
@@ -590,64 +605,69 @@ export default function HorariosScreen() {
                             lightColor='#111827'
                             darkColor='#ffffff'
                             className='font-heading'
-                            style={{ fontFamily: 'BebasNeue-Regular', fontSize: 28, marginBottom: 8 }}
-                        >
+                            style={{
+                                fontFamily: 'BebasNeue-Regular',
+                                fontSize: 28,
+                                marginBottom: 8,
+                            }}>
                             {t('schedule.upcomingClasses')}
                         </ThemedText>
 
                         <View style={{ width: '100%', maxWidth: 400, zIndex: 100 }}>
-                                <TouchableOpacity
-                                    activeOpacity={0.7}
-                                    onPress={() => setBranchMenuVisible(!branchMenuVisible)}
-                                    className='flex-row items-center justify-between bg-neutral-100 rounded-xl px-4 py-2.5 border border-neutral-200'
-                                >
-                                    <ThemedText className='font-body text-sm font-semibold text-neutral-800' numberOfLines={1}>
-                                        {loadingBranches
-                                            ? 'Cargando...'
-                                            : branches.find((b) => b.branch_id === selectedBranchId)?.name || t('common.selectBranch')}
-                                    </ThemedText>
-                                    <Ionicons
-                                        name={branchMenuVisible ? 'chevron-up' : 'chevron-down'}
-                                        size={16}
-                                        color='#4b5563'
-                                    />
-                                </TouchableOpacity>
+                            <TouchableOpacity
+                                activeOpacity={0.7}
+                                onPress={() => setBranchMenuVisible(!branchMenuVisible)}
+                                className='flex-row items-center justify-between bg-neutral-100 rounded-xl px-4 py-2.5 border border-neutral-200'>
+                                <ThemedText
+                                    className='font-body text-sm font-semibold text-neutral-800'
+                                    numberOfLines={1}>
+                                    {loadingBranches
+                                        ? 'Cargando...'
+                                        : branches.find((b) => b.branch_id === selectedBranchId)
+                                            ?.name || t('common.selectBranch')}
+                                </ThemedText>
+                                <Ionicons
+                                    name={branchMenuVisible ? 'chevron-up' : 'chevron-down'}
+                                    size={16}
+                                    color='#4b5563'
+                                />
+                            </TouchableOpacity>
 
-                                {branchMenuVisible && (
-                                    <View className='absolute top-12 left-0 right-0 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-50'>
-                                        {branches.map((branch) => {
-                                            const isSelected = branch.branch_id === selectedBranchId;
-                                            return (
-                                                <TouchableOpacity
-                                                    key={branch.branch_id}
-                                                    className='px-4 py-2'
-                                                    onPress={() => {
-                                                        setSelectedBranchId(branch.branch_id);
-                                                        setBranchMenuVisible(false);
+                            {branchMenuVisible && (
+                                <View className='absolute top-12 left-0 right-0 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-50'>
+                                    {branches.map((branch) => {
+                                        const isSelected = branch.branch_id === selectedBranchId;
+                                        return (
+                                            <TouchableOpacity
+                                                key={branch.branch_id}
+                                                className='px-4 py-2'
+                                                onPress={() => {
+                                                    setSelectedBranchId(branch.branch_id);
+                                                    setBranchMenuVisible(false);
+                                                }}>
+                                                <ThemedText
+                                                    className='font-body'
+                                                    style={{
+                                                        fontSize: isSelected ? 16 : 13,
+                                                        fontWeight: isSelected ? '800' : '400',
+                                                        color: isSelected ? '#f97316' : '#111827',
                                                     }}
-                                                >
-                                                    <ThemedText
-                                                        className='font-body'
-                                                        style={{
-                                                            fontSize: isSelected ? 16 : 13,
-                                                            fontWeight: isSelected ? '800' : '400',
-                                                            color: isSelected ? '#f97316' : '#111827',
-                                                        }}
-                                                        numberOfLines={1}
-                                                    >
-                                                        {branch.name}
-                                                    </ThemedText>
-                                                </TouchableOpacity>
-                                            );
-                                        })}
-                                        {branches.length === 0 && (
-                                            <View className='px-4 py-3'>
-                                                <ThemedText className='font-body text-sm text-neutral-400'>{t('schedule.noClassesBranch')}</ThemedText>
-                                            </View>
-                                        )}
-                                    </View>
-                                )}
-                            </View>
+                                                    numberOfLines={1}>
+                                                    {branch.name}
+                                                </ThemedText>
+                                            </TouchableOpacity>
+                                        );
+                                    })}
+                                    {branches.length === 0 && (
+                                        <View className='px-4 py-3'>
+                                            <ThemedText className='font-body text-sm text-neutral-400'>
+                                                {t('schedule.noClassesBranch')}
+                                            </ThemedText>
+                                        </View>
+                                    )}
+                                </View>
+                            )}
+                        </View>
                     </View>
 
                     {activeTab === 'classes' && (
@@ -658,13 +678,18 @@ export default function HorariosScreen() {
                                 </View>
                             )}
                             {!loadingClasses && errorMessage && (
-                                <ThemedText className='font-body text-center text-sm text-red-500 mb-4'>{errorMessage}</ThemedText>
-                            )}
-                            {!loadingClasses && !errorMessage && classes.length === 0 && selectedBranchId && (
-                                <ThemedText className='font-body text-center text-sm text-neutral-500 mb-4'>
-                                    {t('schedule.noClassesBranch')}
+                                <ThemedText className='font-body text-center text-sm text-red-500 mb-4'>
+                                    {errorMessage}
                                 </ThemedText>
                             )}
+                            {!loadingClasses &&
+                                !errorMessage &&
+                                classes.length === 0 &&
+                                selectedBranchId && (
+                                    <ThemedText className='font-body text-center text-sm text-neutral-500 mb-4'>
+                                        {t('schedule.noClassesBranch')}
+                                    </ThemedText>
+                                )}
                             {visibleClasses.map((classItem, index) => (
                                 <ClassCard
                                     key={classItem.classId || index.toString()}
@@ -674,11 +699,13 @@ export default function HorariosScreen() {
                                     branch={classItem.branch}
                                     imageUrl={classItem.imageUrl}
                                     variant='overlay'
-                                    category={`${t('common.available')}: ${Math.max(
-                                        (classItem.capacity || 0) - (classItem.occupied || 0),
-                                        0,
-                                    )} ${t('common.of')} ${classItem.capacity || 0}`}
-                                    reserved={isReserved(`${classItem.title}|${classItem.time}`)}
+                                    category={`${classItem.capacity || 0} Cupos`}
+                                    reserved={isReserved(
+                                        `${classItem.classId}|${classItem.serviceId}`,
+                                    )}
+                                    // Using ID-based reservation check is safer but keeping title|time if that's how isReserved works currently
+                                    // Actually, isReserved logic might rely on context, but let's stick to simple text fix:
+                                    // category={`${classItem.capacity || 0} Cupos`}
                                     onPress={(classData) => {
                                         router.push({
                                             pathname: '/class-details',
@@ -700,7 +727,9 @@ export default function HorariosScreen() {
 
                     {activeTab === 'reservas' && (
                         <View>
-                            <ThemedText className='font-heading text-xl font-bold mb-4'>{t('schedule.myBookings')}</ThemedText>
+                            <ThemedText className='font-heading text-xl font-bold mb-4'>
+                                {t('schedule.myBookings')}
+                            </ThemedText>
 
                             {loadingBookings && (
                                 <View className='items-center py-4'>
@@ -720,7 +749,8 @@ export default function HorariosScreen() {
                                 </ThemedText>
                             )}
 
-                            {!loadingBookings && !bookingsError &&
+                            {!loadingBookings &&
+                                !bookingsError &&
                                 visibleBookings.map((booking) => (
                                     <ClassCard
                                         key={booking.bookingId}

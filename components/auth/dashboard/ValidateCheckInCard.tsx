@@ -10,7 +10,7 @@ interface ValidateCheckInCardProps {
 export function ValidateCheckInCard({ onScanPress }: ValidateCheckInCardProps) {
 	const { t } = useTranslation();
 	return (
-		<View className='bg-white dark:bg-neutral-900 rounded-2xl p-4 mt-4 shadow-sm border border-neutral-200 dark:border-neutral-800'>
+		<View className='bg-white dark:bg-neutral-900 rounded-2xl p-4 mt-4 shadow-sm border border-[#f97316]'>
 			<View className='flex-row items-center mb-3'>
 				<CheckCircleIcon width={20} height={20} color='#0F172A' />
 				<Text className='ml-2 text-[16px] font-semibold text-neutral-900 dark:text-white'>

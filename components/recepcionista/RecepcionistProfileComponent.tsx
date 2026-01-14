@@ -150,10 +150,10 @@ export default function RecepcionistProfileComponent() {
 
         <TouchableOpacity
           activeOpacity={0.85}
-          className='w-full rounded-2xl border border-[#d1d5db] py-3 px-4 mb-4 flex-row items-center justify-center bg-white'
+          className='w-full rounded-2xl border border-[#f97316] py-3 px-4 mb-4 flex-row items-center justify-center bg-white'
           onPress={() => setScannerVisible(true)}>
-          <QrCodeIcon width={18} height={18} color='#111827' />
-          <Text className='ml-2 text-[13px] font-medium text-[#111827]'>{t('dashboard.validateCheckIn.scanQr')}</Text>
+          <QrCodeIcon width={18} height={18} color='#f97316' />
+          <Text className='ml-2 text-[13px] font-medium text-[#f97316]'>{t('dashboard.validateCheckIn.scanQr')}</Text>
         </TouchableOpacity>
 
         <View className='mb-2'>
@@ -162,67 +162,67 @@ export default function RecepcionistProfileComponent() {
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
+          className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3'
           onPress={() => {
             router.push('/(recepcionist)/personal-info');
           }}>
           <View className='flex-row items-center'>
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
-              <UserCircleIcon width={18} height={18} color='#111827' />
+              <UserCircleIcon width={18} height={18} color='#f97316' />
             </View>
-            <Text className='text-[13px] text-[#111827]'>{t('profile.personalInfo')}</Text>
+            <Text className='text-[13px] text-[#f97316]'>{t('profile.personalInfo')}</Text>
           </View>
-          <ChevronRightIcon width={16} height={16} color='#9ca3af' />
+          <ChevronRightIcon width={16} height={16} color='#f97316' />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
+          className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3'
           onPress={() => {
             router.push('/(recepcionist)/security');
           }}>
           <View className='flex-row items-center'>
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
-              <ShieldCheckIcon width={18} height={18} color='#111827' />
+              <ShieldCheckIcon width={18} height={18} color='#f97316' />
             </View>
-            <Text className='text-[13px] text-[#111827]'>{t('profile.security')}</Text>
+            <Text className='text-[13px] text-[#f97316]'>{t('profile.security')}</Text>
           </View>
-          <ChevronRightIcon width={16} height={16} color='#9ca3af' />
+          <ChevronRightIcon width={16} height={16} color='#f97316' />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
+          className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3'
           onPress={() => {
             router.push('/(recepcionist)/language');
           }}>
           <View className='flex-row items-center'>
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
-              <LanguageIcon width={18} height={18} color='#111827' />
+              <LanguageIcon width={18} height={18} color='#f97316' />
             </View>
-            <Text className='text-[13px] text-[#111827]'>{t('profile.language')}</Text>
+            <Text className='text-[13px] text-[#f97316]'>{t('profile.language')}</Text>
           </View>
-          <ChevronRightIcon width={16} height={16} color='#9ca3af' />
+          <ChevronRightIcon width={16} height={16} color='#f97316' />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
+          className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3'
           onPress={() => {
             router.push('/(recepcionist)/notifications');
           }}>
           <View className='flex-row items-center'>
             <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
-              <BellIcon width={18} height={18} color='#111827' />
+              <BellIcon width={18} height={18} color='#f97316' />
             </View>
-            <Text className='text-[13px] text-[#111827]'>{t('dashboard.notifications.title')}</Text>
+            <Text className='text-[13px] text-[#f97316]'>{t('dashboard.notifications.title')}</Text>
           </View>
-          <ChevronRightIcon width={16} height={16} color='#9ca3af' />
+          <ChevronRightIcon width={16} height={16} color='#f97316' />
         </TouchableOpacity>
 
         <TouchableOpacity
           activeOpacity={0.8}
-          className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-6'
+          className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-6'
           onPress={() => {
             setLogoutModalVisible(true);
           }}>

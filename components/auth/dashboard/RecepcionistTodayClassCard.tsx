@@ -7,7 +7,7 @@ import { CheckCircleIcon, ClockIcon, UserIcon, UsersIcon } from 'react-native-he
 export function RecepcionistTodayClassCard() {
 	const { t } = useTranslation();
 	return (
-		<View className='bg-white dark:bg-neutral-900 rounded-2xl border border-[#BBBBBB] p-4 mt-4'>
+		<View className='bg-white dark:bg-neutral-900 rounded-2xl border border-[#f97316] p-4 mt-4'>
 			<View className='flex-row items-center mb-3'>
 				<CheckCircleIcon width={16} height={16} color='#0F172A' />
 				<Text className='ml-2 text-[16px] font-semibold text-neutral-900 dark:text-white'>
@@ -22,7 +22,7 @@ export function RecepcionistTodayClassCard() {
 			{[1, 2].map((_, index) => (
 				<View
 					key={index}
-					className='border border-[#BBBBBB] rounded-xl mb-4 p-3 bg-white dark:bg-neutral-800'>
+					className='border border-[#f97316] rounded-xl mb-4 p-3 bg-white dark:bg-neutral-800'>
 					<View className='flex-row justify-between items-start mb-3'>
 						<View className='flex-row items-center'>
 							<View className='bg-[#F2F4F5] rounded-md p-2 mr-3'>

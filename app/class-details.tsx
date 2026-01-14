@@ -5,15 +5,36 @@ import { useReservations } from '@/contexts/reservations';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services';
-import { isAPIError } from '@vitalfit/sdk';
+import { ClientBookingResponse, isAPIError } from '@vitalfit/sdk';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { ChevronLeftIcon, ChevronRightIcon, MagnifyingGlassIcon, ClockIcon as OutlineClockIcon, UsersIcon, XMarkIcon } from 'react-native-heroicons/outline';
-import { CheckCircleIcon, CheckIcon, ExclamationCircleIcon, StarIcon, UserIcon } from 'react-native-heroicons/solid';
+import {
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  MagnifyingGlassIcon,
+  ClockIcon as OutlineClockIcon,
+  UsersIcon,
+  XMarkIcon,
+} from 'react-native-heroicons/outline';
+import {
+  CheckCircleIcon,
+  CheckIcon,
+  ExclamationCircleIcon,
+  StarIcon,
+  UserIcon,
+} from 'react-native-heroicons/solid';
 
 const styles = StyleSheet.create({
   heroImage: {
@@ -25,19 +46,91 @@ const styles = StyleSheet.create({
 
 export default function ClassDetailsScreen() {
   const router = useRouter();
-  const { time, title, instructor, imageUrl, capacity, occupied, mode, classId, serviceId, instructorId, bookingId, startsAt } =
-    useLocalSearchParams();
+  const {
+    time,
+    title,
+    instructor,
+    imageUrl,
+    capacity,
+    occupied,
+    mode,
+    classId,
+    serviceId,
+    instructorId,
+    bookingId,
+    startsAt,
+  } = useLocalSearchParams();
 
   const { isReserved, reserve, cancel } = useReservations();
   const { user } = useUser();
+  const [serverBookingId, setServerBookingId] = useState<string | null>(null);
+  const [currentOccupancyCount, setCurrentOccupancyCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const checkBookingStatus = async () => {
+      try {
+        if (!user?.userId || !classId) return;
+        const token = await AsyncStorage.getItem('token');
+        if (!token) return;
+
+        const bookingsResp = await vitalFitApi.booking.getClientBooking(
+          String(user.userId),
+          token,
+        );
+        const bookings = (
+          Array.isArray(
+            (bookingsResp as unknown as { data: ClientBookingResponse[] }).data,
+          )
+            ? (bookingsResp as unknown as { data: ClientBookingResponse[] }).data
+            : bookingsResp
+        ) as ClientBookingResponse[];
+
+        const found = bookings.find((b) => String(b.class_id) === String(classId));
+        if (found?.booking_id) {
+          setServerBookingId(String(found.booking_id));
+        }
+
+        // Fetch Occupancy using correct SDK method
+        try {
+          const occupancyResp = await vitalFitApi.booking.getClassBookingCount(
+            String(classId),
+            token,
+          );
+
+          // Try to find the count in the response - treating as any to be safe until typed
+          // Try to find the count in the response - treating as any to be safe until typed
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const resp = occupancyResp as any;
+          // Possible structures: { count: 5 }, { bookings_count: 5 }, { data: { count: 5 } }
+          const count =
+            resp?.count ??
+            resp?.bookings_count ??
+            resp?.data?.count ??
+            resp?.data?.bookings_count;
+
+          if (typeof count === 'number') {
+            setCurrentOccupancyCount(count);
+          }
+        } catch (e) {
+          console.warn('Could not fetch occupancy count:', e);
+        }
+      } catch (err) {
+        console.warn('Error checking booking status:', err);
+      }
+    };
+    void checkBookingStatus();
+  }, [user?.userId, classId]);
+
   const hasMembership = user?.membership?.status === 'Active';
 
   const classDateFormatted = useMemo(() => {
     try {
       const dateToFormat = startsAt ? new Date(String(startsAt)) : new Date();
-      
+
       if (startsAt && String(startsAt).match(/^\d{4}-\d{2}-\d{2}$/)) {
-        dateToFormat.setMinutes(dateToFormat.getMinutes() + dateToFormat.getTimezoneOffset());
+        dateToFormat.setMinutes(
+          dateToFormat.getMinutes() + dateToFormat.getTimezoneOffset(),
+        );
       }
 
       return dateToFormat.toLocaleDateString('es-ES', {
@@ -51,6 +144,12 @@ export default function ClassDetailsScreen() {
   }, [startsAt]);
 
   const [serviceDescription, setServiceDescription] = useState<string | null>(null);
+  const isPast = useMemo(() => {
+    if (!startsAt) return false;
+    const now = new Date();
+    const start = new Date(String(startsAt));
+    return start < now;
+  }, [startsAt]);
   const [serviceImageUrl, setServiceImageUrl] = useState<string | null>(null);
   const [instructorImageUrl, setInstructorImageUrl] = useState<string | null>(null);
 
@@ -81,7 +180,9 @@ export default function ClassDetailsScreen() {
               if (typeof s.description === 'string') {
                 setServiceDescription(s.description);
               }
-              const images: ApiServiceImage[] = Array.isArray(s.images) ? s.images : [];
+              const images: ApiServiceImage[] = Array.isArray(s.images)
+                ? s.images
+                : [];
               if (images.length > 0) {
                 const primary = images.find((img) => img.is_primary) ?? images[0];
                 if (primary?.image_url) {
@@ -103,7 +204,8 @@ export default function ClassDetailsScreen() {
             const inst =
               (instResp as { data?: ApiInstructorDetail }).data ??
               (instResp as ApiInstructorDetail | undefined);
-            const avatar = inst?.avatar_url || inst?.image_url || inst?.profile_image_url;
+            const avatar =
+              inst?.avatar_url || inst?.image_url || inst?.profile_image_url;
             if (typeof avatar === 'string' && avatar.startsWith('http')) {
               setInstructorImageUrl(avatar);
             }
@@ -164,16 +266,14 @@ export default function ClassDetailsScreen() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const isFullInitial = occNumInitial >= capNum;
   const effectiveFull = isFullInitial || forceFull;
-  const occNum = effectiveFull ? capNum : occNumInitial;
 
   const id = useMemo(() => `${String(title || '')}|${String(time || '')}`, [title, time]);
   const reservedFromContext = isReserved(id);
   const hasBookingId = Boolean(bookingId);
-  const reserved = reservedFromContext || hasBookingId;
+  const reserved = reservedFromContext || hasBookingId || Boolean(serverBookingId);
 
   const { showToast } = useToast();
-  const isCrossfitCompleted =
-    String(title || '').toLowerCase() === 'crossfit' && effectiveFull;
+  const isCrossfitCompleted = String(title || '').toLowerCase() === 'crossfit' && effectiveFull;
 
   const timeRange = useMemo(() => {
     const raw = String(time || '').trim();
@@ -199,6 +299,7 @@ export default function ClassDetailsScreen() {
 
   const isInstructorMode = String(mode || '').toLowerCase() === 'instructor';
 
+  /* Instructor logic restored */
   const [instructorFirstName, setInstructorFirstName] = useState<string | null>(null);
   const [instructorLastName, setInstructorLastName] = useState<string | null>(null);
 
@@ -221,33 +322,77 @@ export default function ClassDetailsScreen() {
     fetchInstructor();
   }, [isInstructorMode]);
 
+
+  type BookingParticipant = {
+    booking_id: string;
+    created_at: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    phone: string;
+    status: string;
+    user_id: string;
+  };
+
+  const [participants, setParticipants] = useState<BookingParticipant[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [loadingParticipants, setLoadingParticipants] = useState(false);
+
+  useEffect(() => {
+    if (!isInstructorMode || !classId) return;
+
+    const fetchParticipants = async () => {
+      setLoadingParticipants(true);
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) return;
+
+        // Fetch bookings for this class
+        const response = await vitalFitApi.booking.getBookingClass(String(classId), token, {
+          page: 1,
+          limit: 50,
+        });
+
+        // Handle PaginatedTotal<BookingParticipant[]> response
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const data = (response as any).data || (response as any).items || [];
+        if (Array.isArray(data)) {
+          setParticipants(data);
+        }
+      } catch (error) {
+        console.error('Error fetching class participants:', error);
+        showToast('error', 'Error', 'No se pudo cargar la lista de alumnos');
+      } finally {
+        setLoadingParticipants(false);
+      }
+    };
+
+    fetchParticipants();
+  }, [isInstructorMode, classId, showToast]);
+
+  /* State restored */
   const [activeTab, setActiveTab] = useState<'clientes' | 'pasar-lista'>('clientes');
   const [attendance, setAttendance] = useState<Record<string, 'present' | 'late' | 'absent'>>({});
   const [search, setSearch] = useState('');
   const [classNotes, setClassNotes] = useState('');
 
-  const filteredClients = useMemo(
-    () => {
-      const instructorClients = [
-        { id: '1', name: 'Juan Perez', level: 'Nivel 5', program: 'Fuerza Máxima - Semana 2' },
-        { id: '2', name: 'María López', level: 'Nivel 3', program: 'Resistencia Funcional - Semana 1' },
-        { id: '3', name: 'Carlos Pérez', level: 'Nivel 4', program: 'Hipertrofia - Semana 4' },
-        { id: '4', name: 'Ana García', level: 'Nivel 2', program: 'Inicio Funcional - Semana 3' },
-      ];
-
-      return instructorClients.filter((c) =>
-        c.name.toLowerCase().includes(search.toLowerCase().trim()),
-      );
-    },
-    [search],
-  );
+  const filteredClients = useMemo(() => {
+    return participants
+      .filter((p) => {
+        const fullName = `${p.first_name || ''} ${p.last_name || ''}`.toLowerCase();
+        return fullName.includes(search.toLowerCase().trim());
+      })
+      .map((p) => ({
+        id: p.booking_id, // Map booking_id to id for UI
+        name: `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Usuario sin nombre',
+        level: 'General', // Default value as API doesn't return level yet
+        program: 'Sin programa', // Default value
+      }));
+  }, [participants, search]);
 
   if (isInstructorMode) {
     return (
-      <ThemedView
-        lightColor='#FFFFFF'
-        darkColor='#050816'
-        className='flex-1 p-4 pt-12'>
+      <ThemedView lightColor='#FFFFFF' darkColor='#050816' className='flex-1 p-4 pt-12'>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-4 flex-row items-center justify-center'>
             <TouchableOpacity
@@ -294,10 +439,7 @@ export default function ClassDetailsScreen() {
           </View>
 
           <View className='mb-3'>
-            <ThemedText
-              lightColor='#f97316'
-              darkColor='#f97316'
-              className='font-bold'>
+            <ThemedText lightColor='#f97316' darkColor='#f97316' className='font-bold'>
               07:00 - 08:00 AM
             </ThemedText>
           </View>
@@ -353,35 +495,34 @@ export default function ClassDetailsScreen() {
               darkColor='#ffffff'
               className='text-sm leading-relaxed'
               style={{ fontFamily: 'Montserrat_400Regular' }}>
-              Este entrenamiento de fuerza se enfoca en el desarrollo muscular y la resistencia. Incluye ejercicios con pesas,
-              bandas de resistencia y peso corporal. Ideal para todos los niveles.
+              Este entrenamiento de fuerza se enfoca en el desarrollo muscular y la
+              resistencia. Incluye ejercicios con pesas, bandas de resistencia y peso
+              corporal. Ideal para todos los niveles.
             </ThemedText>
           </View>
 
           <View className='flex-row bg-[#F3F4F6] rounded-2xl p-1 mb-3'>
             <TouchableOpacity
-              className={`flex-1 py-2 rounded-xl items-center ${
-                activeTab === 'clientes' ? 'bg-white' : 'bg-transparent'
-              }`}
+              className={`flex-1 py-2 rounded-xl items-center ${activeTab === 'clientes' ? 'bg-white' : 'bg-transparent'
+                }`}
               activeOpacity={0.7}
               onPress={() => setActiveTab('clientes')}>
               <Text
-                className={`font-semibold font-body ${
-                  activeTab === 'clientes' ? 'text-[#111827]' : 'text-[#6b7280]'
-                }`}>
+                className={`font-semibold font-body ${activeTab === 'clientes' ? 'text-[#111827]' : 'text-[#6b7280]'
+                  }`}>
                 Clientes
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`flex-1 py-2 rounded-xl items-center ${
-                activeTab === 'pasar-lista' ? 'bg-white' : 'bg-transparent'
-              }`}
+              className={`flex-1 py-2 rounded-xl items-center ${activeTab === 'pasar-lista' ? 'bg-white' : 'bg-transparent'
+                }`}
               activeOpacity={0.7}
               onPress={() => setActiveTab('pasar-lista')}>
               <Text
-                className={`font-semibold font-body ${
-                  activeTab === 'pasar-lista' ? 'text-[#111827]' : 'text-[#6b7280]'
-                }`}>
+                className={`font-semibold font-body ${activeTab === 'pasar-lista'
+                  ? 'text-[#111827]'
+                  : 'text-[#6b7280]'
+                  }`}>
                 Pasar lista
               </Text>
             </TouchableOpacity>
@@ -466,64 +607,102 @@ export default function ClassDetailsScreen() {
                           lightColor='#111827'
                           darkColor='#e5e5e5'
                           className='text-[15px] font-semibold'
-                          style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+                          style={{
+                            fontFamily: 'Montserrat_600SemiBold',
+                          }}>
                           {client.program}
                         </ThemedText>
                       </View>
 
                       <View className='flex-row gap-2'>
                         <TouchableOpacity
-                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${
-                            status === 'present'
-                              ? 'bg-[#f97316]'
-                              : 'bg-white border border-[#f97316]'
-                          }`}
+                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${status === 'present'
+                            ? 'bg-[#f97316]'
+                            : 'bg-white border border-[#f97316]'
+                            }`}
                           activeOpacity={0.8}
                           onPress={() =>
-                            setAttendance((prev) => ({ ...prev, [client.id]: 'present' }))
+                            setAttendance((prev) => ({
+                              ...prev,
+                              [client.id]: 'present',
+                            }))
                           }>
-                          <CheckIcon size={16} color={status === 'present' ? '#ffffff' : '#f97316'} strokeWidth={3} />
+                          <CheckIcon
+                            size={16}
+                            color={
+                              status === 'present'
+                                ? '#ffffff'
+                                : '#f97316'
+                            }
+                            strokeWidth={3}
+                          />
                           <Text
-                            className={`ml-2 text-[13px] font-body ${
-                              status === 'present' ? 'text-white' : 'text-[#f97316]'
-                            }`}
-                            style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+                            className={`ml-2 text-[13px] font-body ${status === 'present'
+                              ? 'text-white'
+                              : 'text-[#f97316]'
+                              }`}
+                            style={{
+                              fontFamily: 'Montserrat_600SemiBold',
+                            }}>
                             Presente
                           </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${
-                            status === 'late'
-                              ? 'bg-[#D1D5DB]'
-                              : 'bg-white border border-[#D1D5DB]'
-                          }`}
+                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${status === 'late'
+                            ? 'bg-[#D1D5DB]'
+                            : 'bg-white border border-[#D1D5DB]'
+                            }`}
                           activeOpacity={0.8}
                           onPress={() =>
-                            setAttendance((prev) => ({ ...prev, [client.id]: 'late' }))
+                            setAttendance((prev) => ({
+                              ...prev,
+                              [client.id]: 'late',
+                            }))
                           }>
-                          <OutlineClockIcon size={16} color={status === 'late' ? '#374151' : '#9ca3af'} strokeWidth={2.5} />
+                          <OutlineClockIcon
+                            size={16}
+                            color={
+                              status === 'late'
+                                ? '#374151'
+                                : '#9ca3af'
+                            }
+                            strokeWidth={2.5}
+                          />
                           <Text
-                            className={`ml-2 text-[13px] font-body ${
-                              status === 'late' ? 'text-[#374151]' : 'text-[#9ca3af]'
-                            }`}
-                            style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+                            className={`ml-2 text-[13px] font-body ${status === 'late'
+                              ? 'text-[#374151]'
+                              : 'text-[#9ca3af]'
+                              }`}
+                            style={{
+                              fontFamily: 'Montserrat_600SemiBold',
+                            }}>
                             Tarde
                           </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 bg-white border ${
-                            status === 'absent' ? 'border-[#374151]' : 'border-[#e5e7eb]'
-                          }`}
+                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 bg-white border ${status === 'absent'
+                            ? 'border-[#374151]'
+                            : 'border-[#e5e7eb]'
+                            }`}
                           activeOpacity={0.8}
                           onPress={() =>
-                            setAttendance((prev) => ({ ...prev, [client.id]: 'absent' }))
+                            setAttendance((prev) => ({
+                              ...prev,
+                              [client.id]: 'absent',
+                            }))
                           }>
-                          <XMarkIcon size={16} color='#374151' strokeWidth={2.5} />
+                          <XMarkIcon
+                            size={16}
+                            color='#374151'
+                            strokeWidth={2.5}
+                          />
                           <Text
                             className='ml-2 text-[13px] text-[#374151] font-body'
-                            style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+                            style={{
+                              fontFamily: 'Montserrat_600SemiBold',
+                            }}>
                             Ausente
                           </Text>
                         </TouchableOpacity>
@@ -568,12 +747,16 @@ export default function ClassDetailsScreen() {
                   <TouchableOpacity
                     activeOpacity={0.8}
                     className='w-full py-3 rounded-2xl mb-3 items-center justify-center'
-                    style={{ backgroundColor: '#4b5563', borderWidth: 1, borderColor: '#e5e7eb' }}
+                    style={{
+                      backgroundColor: '#4b5563',
+                      borderWidth: 1,
+                      borderColor: '#e5e7eb',
+                    }}
                     onPress={() =>
                       showToast(
                         'success',
                         'Notas guardadas',
-                        'Las notas internas se han guardado correctamente.'
+                        'Las notas internas se han guardado correctamente.',
                       )
                     }>
                     <ThemedText
@@ -593,7 +776,7 @@ export default function ClassDetailsScreen() {
                       showToast(
                         'success',
                         'Asistencia guardada',
-                        'La asistencia de la clase se ha guardado correctamente.'
+                        'La asistencia de la clase se ha guardado correctamente.',
                       )
                     }>
                     <ThemedText
@@ -614,10 +797,7 @@ export default function ClassDetailsScreen() {
   }
 
   return (
-    <ThemedView
-      lightColor='#FFFFFF'
-      darkColor='#050816'
-      className='flex-1 p-4 pt-12'>
+    <ThemedView lightColor='#FFFFFF' darkColor='#050816' className='flex-1 p-4 pt-12'>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-4 flex-row items-center justify-center'>
           <TouchableOpacity
@@ -653,6 +833,20 @@ export default function ClassDetailsScreen() {
           </ThemedText>
         </View>
 
+        {/* Occupancy Indicator */}
+        <View className='mb-4 flex-row items-center'>
+          <UserIcon size={16} color='#6b7280' style={{ marginRight: 6 }} />
+          <ThemedText
+            className='text-sm text-gray-500 font-medium'
+            style={{ fontFamily: 'Montserrat_500Medium' }}>
+            {currentOccupancyCount !== null && capacity
+              ? `${currentOccupancyCount} / ${capacity} cupos ocupados`
+              : capacity
+                ? `${capacity} cupos totales`
+                : 'Cupos limitados'}
+          </ThemedText>
+        </View>
+
         {effectiveFull && !isCrossfitCompleted && (
           <View
             className='mb-2 flex-row items-center rounded-2xl px-4 py-2'
@@ -671,16 +865,6 @@ export default function ClassDetailsScreen() {
           </View>
         )}
 
-        <View className='mb-1'>
-          <ThemedText
-            lightColor={effectiveFull ? '#b91c1c' : '#4b5563'}
-            darkColor={effectiveFull ? '#fca5a5' : '#e5e5e5'}
-            className='text-sm'
-            style={{ fontFamily: 'Montserrat_500Medium' }}>
-            {occNum} / {capNum} cupos ocupados
-          </ThemedText>
-        </View>
-
         {reserved && (
           <View className='mb-3'>
             <View className='self-start bg-emerald-500 px-3 py-1 rounded-full'>
@@ -695,10 +879,7 @@ export default function ClassDetailsScreen() {
         )}
 
         <View className='mb-3'>
-          <ThemedText
-            lightColor='#f97316'
-            darkColor='#f97316'
-            className='font-bold'>
+          <ThemedText lightColor='#f97316' darkColor='#f97316' className='font-bold'>
             {timeRange}
           </ThemedText>
         </View>
@@ -754,9 +935,24 @@ export default function ClassDetailsScreen() {
         ) : (
           <View className='mb-6'>
             <PrimaryButton
-              title={effectiveFull ? 'Clase llena' : reserved ? 'Cancelar' : 'Reservar'}
-              disabled={effectiveFull || (!hasMembership && !reserved)}
-              style={{ backgroundColor: effectiveFull || (!hasMembership && !reserved) ? '#6b7280' : reserved ? '#ef4444' : '#f97316' }}
+              title={
+                isPast
+                  ? 'Clase pasada'
+                  : effectiveFull
+                    ? 'Clase llena'
+                    : reserved
+                      ? 'Cancelar'
+                      : 'Reservar'
+              }
+              disabled={isPast || effectiveFull || (!hasMembership && !reserved)}
+              style={{
+                backgroundColor:
+                  isPast || effectiveFull || (!hasMembership && !reserved)
+                    ? '#6b7280'
+                    : reserved
+                      ? '#ef4444'
+                      : '#f97316',
+              }}
               onPress={async () => {
                 if (effectiveFull) return;
 
@@ -785,16 +981,27 @@ export default function ClassDetailsScreen() {
                     return;
                   }
 
-                  const whoAmI = (await vitalFitApi.user.WhoAmI(token)) as unknown as {
+                  const whoAmI = (await vitalFitApi.user.WhoAmI(
+                    token,
+                  )) as unknown as {
                     user?: { id?: string; user_id?: string };
                   };
                   const userId = whoAmI?.user?.id || whoAmI?.user?.user_id;
 
-                  await vitalFitApi.client.post({
-                    url: `/schedule/${String(classId)}/book`,
-                    jwt: token,
-                    data: userId ? { user_id: String(userId) } : undefined,
-                  });
+                  if (!userId) {
+                    showToast(
+                      'error',
+                      'Usuario no identificado',
+                      'No se pudo obtener la información del usuario.',
+                    );
+                    return;
+                  }
+
+                  await vitalFitApi.booking.bookClass(
+                    { user_id: String(userId) },
+                    String(classId),
+                    token,
+                  );
 
                   const img =
                     typeof heroSource === 'number'
@@ -830,7 +1037,10 @@ export default function ClassDetailsScreen() {
             />
             {!hasMembership && !reserved && (
               <View className='mt-2 items-center'>
-                <ThemedText lightColor='#ef4444' darkColor='#ef4444' className='text-xs font-medium'>
+                <ThemedText
+                  lightColor='#ef4444'
+                  darkColor='#ef4444'
+                  className='text-xs font-medium'>
                   Necesitas una membresía activa para reservar
                 </ThemedText>
               </View>
@@ -854,10 +1064,23 @@ export default function ClassDetailsScreen() {
         onRequestClose={() => setShowCancelModal(false)}>
         <TouchableOpacity
           activeOpacity={1}
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 24,
+          }}
           onPress={() => setShowCancelModal(false)}>
           <View
-            style={{ backgroundColor: '#ffffff', borderRadius: 24, paddingVertical: 24, paddingHorizontal: 20, width: '100%', maxWidth: 360 }}>
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: 24,
+              paddingVertical: 24,
+              paddingHorizontal: 20,
+              width: '100%',
+              maxWidth: 360,
+            }}>
             <ThemedText
               lightColor='#111827'
               darkColor='#ffffff'
@@ -885,11 +1108,11 @@ export default function ClassDetailsScreen() {
                       return;
                     }
 
-                    if (bookingId) {
-                      await vitalFitApi.client.patch({
-                        url: `/bookings/${String(bookingId)}/cancel`,
-                        jwt: token,
-                      });
+                    if (bookingId || serverBookingId) {
+                      await vitalFitApi.booking.cancelBooking(
+                        String(bookingId || serverBookingId),
+                        token,
+                      );
                     }
 
                     await cancel(id);
@@ -904,13 +1127,42 @@ export default function ClassDetailsScreen() {
                     router.back();
                   } catch (error: unknown) {
                     let message = 'Ocurrió un error al cancelar la reserva.';
-                    if (isAPIError(error)) {
+                    let isLateCancellation = false;
+
+                    // Robust error text extraction
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const errAny = error as any;
+                    const errorString = (
+                      (errAny?.message || '') +
+                      ' ' +
+                      (Array.isArray(errAny?.messages)
+                        ? errAny.messages.join(' ')
+                        : '') +
+                      ' ' +
+                      String(error)
+                    ).toLowerCase();
+
+                    // Detect restricted time window error globally
+                    if (errorString.includes('restricted time window')) {
+                      message =
+                        'Ya no es posible cancelar porque ha pasado el tiempo límite permitido por el gimnasio.';
+                      isLateCancellation = true;
+                    } else if (isAPIError(error)) {
                       message = error.messages.join(', ');
                     } else if (error instanceof Error) {
                       message = error.message;
                     }
-                    console.error('Error al cancelar reserva:', error);
-                    showToast('error', 'No se pudo cancelar', message);
+
+                    if (isLateCancellation) {
+                      console.warn(
+                        'Cancelación tardía detectada (Handled):',
+                        message,
+                      );
+                      showToast('error', 'Tiempo límite excedido', message);
+                    } else {
+                      console.error('Error al cancelar reserva:', error);
+                      showToast('error', 'No se pudo cancelar', message);
+                    }
                   }
                 }}
                 className='py-3 rounded-2xl items-center'

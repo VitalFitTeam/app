@@ -1,11 +1,12 @@
 // app/index.tsx
+import { useAuth } from '@/contexts/AuthContext';
 import { Montserrat_500Medium, Montserrat_700Bold, useFonts } from '@expo-google-fonts/montserrat';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
 import { Global } from 'iconsax-react-native';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundCarousel, SignInButton, SignUpButton } from '../components/auth/home';
 
@@ -17,12 +18,34 @@ export default function HomeScreen() {
 	});
 	const insets = useSafeAreaInsets();
 	const router = useRouter();
-	const { t } = useTranslation(); 
+	const { t } = useTranslation();
 
 
 	const slideTexts = [t('slide1'), t('slide2'), t('slide3')];
 
-	if (!fontsLoaded) return null;
+	const { isAuthenticated, isLoading, role } = useAuth();
+
+	React.useEffect(() => {
+		if (!isLoading && isAuthenticated) {
+			if (role === 'instructor') {
+				router.replace('/(instructor)/dashboard');
+			} else if (role === 'recepcionist' || role === 'receptionist') {
+				router.replace('/(recepcionist)/dashboard');
+			} else {
+				// Default to client dashboard
+				router.replace('/(tabs)/dashboard');
+			}
+		}
+	}, [isLoading, isAuthenticated, role, router]);
+
+	if (!fontsLoaded || isLoading) {
+		return (
+			<View className='flex-1 items-center justify-center bg-black'>
+				<StatusBar barStyle='light-content' backgroundColor='#000' />
+				<ActivityIndicator size="large" color="#f97316" />
+			</View>
+		);
+	}
 
 	return (
 		<View className='flex-1 bg-black'>
@@ -68,9 +91,8 @@ export default function HomeScreen() {
 					{[0, 1, 2].map((i) => (
 						<View
 							key={i}
-							className={`mx-2 h-1.5 rounded-full ${
-								i === index ? 'w-5 bg-white' : 'w-1.5 bg-white/40'
-							}`}
+							className={`mx-2 h-1.5 rounded-full ${i === index ? 'w-5 bg-white' : 'w-1.5 bg-white/40'
+								}`}
 						/>
 					))}
 				</View>
