@@ -95,7 +95,9 @@
       "category": "Catégorie",
       "reserved": "Réservé",
       "viewMore": "Voir plus",
-      "availability": "Disponibilité"
+      "availability": "Disponibilité",
+      "unknown": "Inconnu",
+      "notes": "Notes"
     },
     "login": {
       "title": "Se connecter",
@@ -430,7 +432,12 @@
       "duration": "(1 heure)",
       "descriptionTitle": "Description du Cours :",
       "classFull": "Cours Complet",
-      "enrollClient": "Inscrire un Client"
+      "enrollClient": "Inscrire un Client",
+      "clientList": "Liste des clients",
+      "searchPlaceholder": "Rechercher un client...",
+      "noClientsFound": "Aucun client trouvé",
+      "viewAllRegistered": "Voir tous les inscrits",
+      "showLess": "Voir moins"
     },
     "classes": {
       "description": {

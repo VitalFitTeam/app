@@ -95,7 +95,10 @@
       "category": "Category",
       "reserved": "Reserved",
       "viewMore": "View more",
-      "availability": "Availability"
+      "availability": "Availability",
+      "unknown": "Unknown",
+      "notes": "Notes",
+      "noClientsFound": "No clients found"
     },
     "login": {
       "title": "Sign In",
@@ -430,7 +433,12 @@
       "duration": "(1 hour)",
       "descriptionTitle": "Class Description:",
       "classFull": "Class Full",
-      "enrollClient": "Enroll Client"
+      "enrollClient": "Enroll Client",
+      "clientList": "Client List",
+      "searchPlaceholder": "Search client...",
+      "noClientsFound": "No clients found",
+      "viewAllRegistered": "View all registered",
+      "showLess": "Show less"
     },
     "classes": {
       "description": {

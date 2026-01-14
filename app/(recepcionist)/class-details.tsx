@@ -1,15 +1,22 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { UserAvatar } from '@/components/UserAvatar';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BackHandler, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { CalendarDaysIcon, UserIcon } from 'react-native-heroicons/outline';
+import { ActivityIndicator, BackHandler, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const formatFullDate = (dateString: string | undefined, t: any, i18n: any) => {
+import vitalFitApi from '@/services';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TFunction } from 'i18next';
+
+// Format date helper
+const formatFullDate = (dateString: string | undefined, t: TFunction, i18n: { language: string }) => {
   if (!dateString) return t('common.dateUndefined');
-  const [year, monthIndex, dayNumber] = dateString.split('-').map(Number);
+  
+  // Handle if dateString is full ISO or just YYYY-MM-DD
+  const cleanDate = dateString.split('T')[0];
+  const [year, monthIndex, dayNumber] = cleanDate.split('-').map(Number);
   const date = new Date(year, (monthIndex || 1) - 1, dayNumber || 1);
 
   const day = date.getDate();
@@ -19,59 +26,6 @@ const formatFullDate = (dateString: string | undefined, t: any, i18n: any) => {
   const capitalizedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
 
   return `${capitalizedWeekday}, ${day} ${t('common.of')} ${month} ${t('common.of')} ${year}`;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getClassDescription = (name: string, t: any) => {
-  const upper = name.toUpperCase();
-
-  if (upper.includes('YOGA')) {
-    return t('classes.description.yoga');
-  }
-
-  if (upper.includes('ZUMBA')) {
-    return t('classes.description.zumba');
-  }
-
-  if (upper.includes('SPINNING')) {
-    return t('classes.description.spinning');
-  }
-
-  if (upper.includes('CROSSFIT')) {
-    return t('classes.description.crossfit');
-  }
-
-  if (upper.includes('PILATES')) {
-    return t('classes.description.pilates');
-  }
-
-  return t('classes.description.default');
-};
-
-const getClassImage = (name: string) => {
-  const upper = name.toUpperCase();
-
-  if (upper.includes('ZUMBA')) {
-    return require('@/assets/images/zumba-w.jpg');
-  }
-
-  if (upper.includes('YOGA')) {
-    return require('@/assets/images/yoga-w.jpg');
-  }
-
-  if (upper.includes('SPINNING')) {
-    return require('@/assets/images/spinning-w.jpg');
-  }
-
-  if (upper.includes('CROSSFIT')) {
-    return require('@/assets/images/crossfit-w.jpg');
-  }
-
-  if (upper.includes('PILATES')) {
-    return require('@/assets/images/pilates.png');
-  }
-
-  return require('@/assets/images/man_black.png');
 };
 
 export default function ClassDetailsScreen() {
@@ -86,7 +40,25 @@ export default function ClassDetailsScreen() {
     enrolled?: string;
     status?: string;
     instructor?: string;
+    description?: string;
+    instructorImage?: string;
+    serviceImage?: string;
+    notes?: string;
   }>();
+
+  const [searchText, setSearchText] = useState('');
+  // Client List State
+  interface Client {
+      name: string;
+      email: string;
+      image: string;
+      id: string;
+  }
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loadingClients, setLoadingClients] = useState(false);
+
+  const [currentEnrolled, setCurrentEnrolled] = useState(Number(params.enrolled || 0));
+
   useFocusEffect(
     useCallback(() => {
       const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -94,29 +66,105 @@ export default function ClassDetailsScreen() {
         return true;
       });
 
+      // Fetch latest booking count & Client List
+      if (params.id) {
+        (async () => {
+            try {
+                const token = await AsyncStorage.getItem('token');
+                if (!token) return;
+
+                // 1. Fetch Booking Count
+                try {
+                     const res = await vitalFitApi.booking.getClassBookingCount(params.id!, token);
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                     const val = (res as any).count ?? (res as any).total ?? (typeof res === 'number' ? res : 0);
+                     setCurrentEnrolled(Number(val));
+                } catch (e) {
+                    console.error("Failed to fetch booking count:", e);
+                }
+
+                // 2. Fetch Client List
+                setLoadingClients(true);
+                try {
+                    // Fetch bookings for this class
+                    // Pagination params: page 1, limit 100 (assuming reasonable class size)
+                    const bookingsRes = await vitalFitApi.booking.getBookingClass(params.id!, token, { page: 1, limit: 100 });
+                    
+                    const bookingItems = bookingsRes?.data || []; // Adjust based on actual response structure: PaginatedTotal has .data
+                    
+                    // Fetch profile pics in parallel (or optimize if bulk endpoint exists - standard is GetUserByID)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const promises = bookingItems.map(async (booking: any) => {
+                         const userId = booking.user_id;
+                         let profilePic = '';
+                         
+                         // Try to fetch user profile for image
+                         if (userId) {
+                             try {
+                                 const userRes = await vitalFitApi.user.GetUserByID(userId, token);
+                                 profilePic = userRes?.data?.profile_picture_url || '';
+                             } catch {
+                                 // Ignore individual user fetch error, just show default avatar
+                             }
+                         }
+
+                         return {
+                             name: `${booking.first_name || ''} ${booking.last_name || ''}`.trim() || t('common.unknown'),
+                             email: booking.email || '',
+                             image: profilePic,
+                             id: booking.booking_id || Math.random().toString(),
+                         };
+                    });
+                    
+                    const results = await Promise.all(promises);
+                    setClients(results);
+
+                } catch (e) {
+                    console.error("Failed to fetch client list:", e);
+                } finally {
+                    setLoadingClients(false);
+                }
+
+            } catch (e) {
+                console.error("General error in fetch:", e);
+            }
+        })();
+      }
+
       return () => backHandler.remove();
-    }, [router])
+    }, [router, params.id, t]) // added t to deps
   );
 
   const name = params.name || t('classDetails.defaultName');
-  const date = params.date || '2025-07-15';
-  const time = params.time || '07:00 - 08:00 AM';
-  const capacity = Number(params.capacity || 25);
-  const enrolled = Number(params.enrolled || 45);
+  const date = params.date || '';
+  const time = params.time || '';
+  const capacity = Number(params.capacity || 0);
+  const enrolled = currentEnrolled; // Use state
   const status = params.status || 'available';
   const instructorName = params.instructor || t('classDetails.defaultInstructor');
 
   const formattedDate = formatFullDate(date, t, i18n);
-  const description = getClassDescription(name, t);
-  const heroImageSource = getClassImage(name);
+  const description = params.description || t('classes.description.default');
+  
+  // Images
+  const heroImageSource = params.serviceImage 
+      ? { uri: params.serviceImage } 
+      : require('@/assets/images/rutina.png');
+      
+  const instructorImageSource = params.instructorImage 
+      ? { uri: params.instructorImage } 
+      : undefined;
 
-  const clients = Array.from({ length: enrolled > 0 ? Math.min(enrolled, 4) : 4 }).map((_, index) => ({
-    id: index.toString(),
-    name: 'Juan Perez',
-    level: 'Nivel 5',
-  }));
+  const notes = params.notes || '';
 
-  const isFull = status === 'full' || enrolled >= capacity;
+  const isFull = status === 'full' || (capacity > 0 && enrolled >= capacity);
+
+  const filteredClients = clients.filter(client => 
+      client.name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  const [showAllClients, setShowAllClients] = useState(false);
+  const displayedClients = showAllClients ? filteredClients : filteredClients.slice(0, 5);
 
   return (
     <ThemedView style={styles.container}>
@@ -135,20 +183,88 @@ export default function ClassDetailsScreen() {
           <View style={styles.metaBlock}>
             <ThemedText className='font-body' style={styles.dateText}>{formattedDate}</ThemedText>
             <ThemedText className='font-body' style={styles.capacityText}>
-              {enrolled}/{capacity} {t('schedule.spotsOccupied')}
+              {currentEnrolled}/{capacity} {t('schedule.spotsOccupied')}
             </ThemedText>
             <ThemedText className='font-body' style={styles.timeText}>{time}</ThemedText>
             <ThemedText className='font-body' style={styles.durationText}>{t('classDetails.duration')}</ThemedText>
           </View>
 
           <View style={styles.instructorCard}>
-            <Image
-              source={{ uri: 'https://randomuser.me/api/portraits/women/31.jpg' }}
-              style={styles.instructorPhoto}
-            />
+            {instructorImageSource ? (
+                <Image
+                    source={instructorImageSource}
+                    style={styles.instructorPhoto}
+                />
+            ) : (
+                <UserAvatar 
+                    name={instructorName} 
+                    size={32} 
+                    style={{ marginRight: 8 }}
+                />
+            )}
+            
             <View style={styles.instructorInfo}>
               <ThemedText className='font-body' style={styles.instructorName}>{instructorName}</ThemedText>
             </View>
+          </View>
+
+          {/* Client List Section */}
+          <View style={styles.clientSection}>
+            <View style={styles.clientHeader}>
+                <ThemedText className='font-heading' style={styles.sectionTitle}>
+                    {t('classDetails.clientList')} ({clients.length})
+                </ThemedText>
+            </View>
+
+            <View style={styles.searchBar}>
+                 <TextInput 
+                    style={styles.searchInput}
+                    placeholder={t('classDetails.searchPlaceholder')}
+                    placeholderTextColor="#9CA3AF"
+                    value={searchText}
+                    onChangeText={setSearchText}
+                 />
+            </View>
+             
+             {loadingClients ? (
+                 <ActivityIndicator size="small" color="#F97316" style={{ marginTop: 20 }} />
+             ) : (
+                 <View style={styles.clientsList}>
+                    {displayedClients.length > 0 ? (
+                        displayedClients.map((client) => (
+                            <View key={client.id} style={styles.clientRow}>
+                                <View style={styles.clientAvatarContainer}>
+                                    <UserAvatar 
+                                        name={client.name} 
+                                        imageUrl={client.image} 
+                                        size={40} 
+                                    />
+                                </View>
+                                <View style={styles.clientInfo}>
+                                    <ThemedText className='font-body' style={styles.clientName}>{client.name}</ThemedText>
+                                    <ThemedText className='font-body' style={styles.clientEmail}>{client.email}</ThemedText>
+                                </View>
+                            </View>
+                        ))
+                    ) : (
+                        <ThemedText style={{ color: '#6B7280', textAlign: 'center', marginTop: 10 }}>
+                            {t('classDetails.noClientsFound')}
+                        </ThemedText>
+                    )}
+                 </View>
+             )}
+             
+             {!loadingClients && filteredClients.length > 5 && (
+                 <TouchableOpacity 
+                    style={styles.viewAllButton} 
+                    onPress={() => setShowAllClients(!showAllClients)}
+                    activeOpacity={0.8}
+                 >
+                    <ThemedText style={styles.viewAllButtonText}>
+                        {showAllClients ? t('classDetails.showLess') : t('classDetails.viewAllRegistered')}
+                    </ThemedText>
+                 </TouchableOpacity>
+             )}
           </View>
 
           <View style={styles.section}>
@@ -158,40 +274,15 @@ export default function ClassDetailsScreen() {
             </ThemedText>
           </View>
 
-          <View style={styles.searchWrapper}>
-            <TextInput
-              placeholder={t('checkIn.clientList.searchPlaceholder')}
-              placeholderTextColor='#9CA3AF'
-              style={styles.searchInput}
-            />
-          </View>
-
-          <View style={styles.clientsHeader}>
-            <View style={styles.clientsTitleRow}>
-              <CalendarDaysIcon size={20} color='#6B7280' />
-              <ThemedText className='font-body' style={styles.clientsTitle}>
-                {t('checkIn.clientList.title')} ({enrolled}/{capacity})
-              </ThemedText>
+          {notes ? (
+            <View style={[styles.section, { marginTop: 8 }]}>
+                <ThemedText className='font-heading' style={styles.sectionTitle}>{t('common.notes')}</ThemedText>
+                <ThemedText className='font-body' style={styles.sectionBody}>
+                {notes}
+                </ThemedText>
             </View>
-          </View>
+          ) : null}
 
-          <View style={styles.clientsList}>
-            {clients.map(client => (
-              <TouchableOpacity key={client.id} style={styles.clientCard} activeOpacity={0.8}>
-                <View style={styles.clientAvatar}>
-                  <UserIcon size={24} color='#F97316' />
-                </View>
-                <View style={styles.clientInfo}>
-                  <ThemedText className='font-body' style={styles.clientName}>{client.name}</ThemedText>
-                  <ThemedText className='font-body' style={styles.clientLevel}>{client.level}</ThemedText>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <TouchableOpacity style={styles.viewAllButton} activeOpacity={0.8}>
-            <ThemedText className='font-body' style={styles.viewAllButtonText}>{t('common.viewAllRegistered')}</ThemedText>
-          </TouchableOpacity>
 
           {isFull ? (
             <TouchableOpacity style={styles.fullButton} activeOpacity={0.8}>
@@ -242,70 +333,69 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   content: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    padding: 20,
   },
   className: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 8,
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#1F2937',
   },
   metaBlock: {
-    marginBottom: 16,
+    marginBottom: 24,
   },
   dateText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#4B5563',
     marginBottom: 4,
   },
   capacityText: {
     fontSize: 14,
-    color: '#4B5563',
+    color: '#6B7280',
     marginBottom: 4,
   },
   timeText: {
     fontSize: 14,
-    color: '#F97316',
-    fontWeight: '600',
-    marginBottom: 2,
+    color: '#6B7280',
+    marginBottom: 4,
   },
   durationText: {
-    fontSize: 12,
-    color: '#6B7280',
+    fontSize: 14,
+    color: '#9CA3AF',
   },
   instructorCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#111827',
-    borderRadius: 999,
+    backgroundColor: '#F97316', // Orange background
     padding: 8,
-    marginBottom: 16,
+    borderRadius: 999, // Pill shape
+    marginBottom: 24,
+    paddingRight: 16,
+    alignSelf: 'flex-start',
+  },
+  instructorPhoto: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 8,
   },
   instructorAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 999,
-    backgroundColor: '#4B5563',
-    alignItems: 'center',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
   },
   instructorInfo: {
-    marginLeft: 12,
+    justifyContent: 'center',
   },
   instructorName: {
     fontSize: 14,
-    color: '#F9FAFB',
     fontWeight: '500',
-  },
-  instructorPhoto: {
-    width: 44,
-    height: 44,
-    borderRadius: 999,
-    marginRight: 12,
-  },
-  section: {
-    marginBottom: 16,
+    color: '#FFFFFF', // White text
+    marginBottom: 0,
   },
   sectionTitle: {
     fontSize: 14,
@@ -361,10 +451,61 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 999,
-    backgroundColor: '#FEF3C7',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
+  },
+  // New Styles for Dynamic List
+  clientSection: {
+      marginTop: 20,
+      marginBottom: 30,
+  },
+  clientHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12
+  },
+  searchBar: {
+     backgroundColor: '#FFFFFF',
+     borderRadius: 12,
+     paddingHorizontal: 12,
+     paddingVertical: 10,
+     marginBottom: 16,
+     borderWidth: 1,
+     borderColor: '#E5E7EB',
+  },
+  clientRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#FFFFFF',
+      borderRadius: 12,
+      padding: 12,
+      marginBottom: 8,
+      borderWidth: 1,
+      borderColor: '#E5E7EB',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 1,
+  },
+  clientAvatarContainer: {
+     marginRight: 12,
+  },
+  clientAvatarImg: {
+     width: 40,
+     height: 40,
+     borderRadius: 20,
+  },
+  clientAvatarPlaceholder: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: '#E5E7EB',
+      justifyContent: 'center',
+      alignItems: 'center'
+  },
+  clientEmail: {
+      fontSize: 13, 
+      color: '#6B7280'
   },
   clientInfo: {
     flex: 1,
@@ -372,12 +513,12 @@ const styles = StyleSheet.create({
   clientName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111827',
+    color: '#1F2937',
   },
-  clientLevel: {
-    fontSize: 12,
-    color: '#6B7280',
+  section: {
+    marginBottom: 16,
   },
+
   viewAllButton: {
     borderRadius: 999,
     borderWidth: 1,
