@@ -1,15 +1,13 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { UserAvatar } from '@/components/UserAvatar';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BackHandler, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { CalendarDaysIcon, UserIcon } from 'react-native-heroicons/outline';
+import { ActivityIndicator, BackHandler, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
 import { TFunction } from 'i18next';
 
 // Format date helper
@@ -49,6 +47,16 @@ export default function ClassDetailsScreen() {
   }>();
 
   const [searchText, setSearchText] = useState('');
+  // Client List State
+  interface Client {
+      name: string;
+      email: string;
+      image: string;
+      id: string;
+  }
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loadingClients, setLoadingClients] = useState(false);
+
   const [currentEnrolled, setCurrentEnrolled] = useState(Number(params.enrolled || 0));
 
   useFocusEffect(
@@ -58,31 +66,73 @@ export default function ClassDetailsScreen() {
         return true;
       });
 
-      // Fetch latest booking count
+      // Fetch latest booking count & Client List
       if (params.id) {
         (async () => {
             try {
                 const token = await AsyncStorage.getItem('token');
-                // Use correct service and method found in SDK definition
-                // getClassBookingCount(classID: string, jwt: string): Promise<ClassBookingCount>
-                const res = await vitalFitApi.booking.getClassBookingCount(params.id!, token || '');
-                
-                // Assuming res is the object ClassBookingCount. 
-                // We'll inspect it via log if needed, but commonly it has a 'count' or 'total' property, 
-                // or if it's a raw number (unlikely for an object type).
-                // Let's safe-guard:
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const val = (res as any).count ?? (res as any).total ?? (typeof res === 'number' ? res : 0);
-                
-                setCurrentEnrolled(Number(val));
+                if (!token) return;
+
+                // 1. Fetch Booking Count
+                try {
+                     const res = await vitalFitApi.booking.getClassBookingCount(params.id!, token);
+                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                     const val = (res as any).count ?? (res as any).total ?? (typeof res === 'number' ? res : 0);
+                     setCurrentEnrolled(Number(val));
+                } catch (e) {
+                    console.error("Failed to fetch booking count:", e);
+                }
+
+                // 2. Fetch Client List
+                setLoadingClients(true);
+                try {
+                    // Fetch bookings for this class
+                    // Pagination params: page 1, limit 100 (assuming reasonable class size)
+                    const bookingsRes = await vitalFitApi.booking.getBookingClass(params.id!, token, { page: 1, limit: 100 });
+                    
+                    const bookingItems = bookingsRes?.data || []; // Adjust based on actual response structure: PaginatedTotal has .data
+                    
+                    // Fetch profile pics in parallel (or optimize if bulk endpoint exists - standard is GetUserByID)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const promises = bookingItems.map(async (booking: any) => {
+                         const userId = booking.user_id;
+                         let profilePic = '';
+                         
+                         // Try to fetch user profile for image
+                         if (userId) {
+                             try {
+                                 const userRes = await vitalFitApi.user.GetUserByID(userId, token);
+                                 profilePic = userRes?.data?.profile_picture_url || '';
+                             } catch {
+                                 // Ignore individual user fetch error, just show default avatar
+                             }
+                         }
+
+                         return {
+                             name: `${booking.first_name || ''} ${booking.last_name || ''}`.trim() || t('common.unknown'),
+                             email: booking.email || '',
+                             image: profilePic,
+                             id: booking.booking_id || Math.random().toString(),
+                         };
+                    });
+                    
+                    const results = await Promise.all(promises);
+                    setClients(results);
+
+                } catch (e) {
+                    console.error("Failed to fetch client list:", e);
+                } finally {
+                    setLoadingClients(false);
+                }
+
             } catch (e) {
-                console.error("Failed to fetch booking count:", e);
+                console.error("General error in fetch:", e);
             }
         })();
       }
 
       return () => backHandler.remove();
-    }, [router, params.id])
+    }, [router, params.id, t]) // added t to deps
   );
 
   const name = params.name || t('classDetails.defaultName');
@@ -109,14 +159,12 @@ export default function ClassDetailsScreen() {
 
   const isFull = status === 'full' || (capacity > 0 && enrolled >= capacity);
 
-  // Client List Logic (Placeholder for future API integration)
-  // Currently empty as requested to remove hardcoded data
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const allClients: any[] = []; 
-  
-  const filteredClients = allClients.filter(client => 
+  const filteredClients = clients.filter(client => 
       client.name.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  const [showAllClients, setShowAllClients] = useState(false);
+  const displayedClients = showAllClients ? filteredClients : filteredClients.slice(0, 5);
 
   return (
     <ThemedView style={styles.container}>
@@ -135,7 +183,7 @@ export default function ClassDetailsScreen() {
           <View style={styles.metaBlock}>
             <ThemedText className='font-body' style={styles.dateText}>{formattedDate}</ThemedText>
             <ThemedText className='font-body' style={styles.capacityText}>
-              {enrolled}/{capacity} {t('schedule.spotsOccupied')}
+              {currentEnrolled}/{capacity} {t('schedule.spotsOccupied')}
             </ThemedText>
             <ThemedText className='font-body' style={styles.timeText}>{time}</ThemedText>
             <ThemedText className='font-body' style={styles.durationText}>{t('classDetails.duration')}</ThemedText>
@@ -144,18 +192,79 @@ export default function ClassDetailsScreen() {
           <View style={styles.instructorCard}>
             {instructorImageSource ? (
                 <Image
-                source={instructorImageSource}
-                style={styles.instructorPhoto}
+                    source={instructorImageSource}
+                    style={styles.instructorPhoto}
                 />
             ) : (
-                <View style={styles.instructorAvatar}>
-                    <UserIcon size={24} color="#FFF" />
-                </View>
+                <UserAvatar 
+                    name={instructorName} 
+                    size={32} 
+                    style={{ marginRight: 8 }}
+                />
             )}
             
             <View style={styles.instructorInfo}>
               <ThemedText className='font-body' style={styles.instructorName}>{instructorName}</ThemedText>
             </View>
+          </View>
+
+          {/* Client List Section */}
+          <View style={styles.clientSection}>
+            <View style={styles.clientHeader}>
+                <ThemedText className='font-heading' style={styles.sectionTitle}>
+                    {t('classDetails.clientList')} ({clients.length})
+                </ThemedText>
+            </View>
+
+            <View style={styles.searchBar}>
+                 <TextInput 
+                    style={styles.searchInput}
+                    placeholder={t('classDetails.searchPlaceholder')}
+                    placeholderTextColor="#9CA3AF"
+                    value={searchText}
+                    onChangeText={setSearchText}
+                 />
+            </View>
+             
+             {loadingClients ? (
+                 <ActivityIndicator size="small" color="#F97316" style={{ marginTop: 20 }} />
+             ) : (
+                 <View style={styles.clientsList}>
+                    {displayedClients.length > 0 ? (
+                        displayedClients.map((client) => (
+                            <View key={client.id} style={styles.clientRow}>
+                                <View style={styles.clientAvatarContainer}>
+                                    <UserAvatar 
+                                        name={client.name} 
+                                        imageUrl={client.image} 
+                                        size={40} 
+                                    />
+                                </View>
+                                <View style={styles.clientInfo}>
+                                    <ThemedText className='font-body' style={styles.clientName}>{client.name}</ThemedText>
+                                    <ThemedText className='font-body' style={styles.clientEmail}>{client.email}</ThemedText>
+                                </View>
+                            </View>
+                        ))
+                    ) : (
+                        <ThemedText style={{ color: '#6B7280', textAlign: 'center', marginTop: 10 }}>
+                            {t('classDetails.noClientsFound')}
+                        </ThemedText>
+                    )}
+                 </View>
+             )}
+             
+             {!loadingClients && filteredClients.length > 5 && (
+                 <TouchableOpacity 
+                    style={styles.viewAllButton} 
+                    onPress={() => setShowAllClients(!showAllClients)}
+                    activeOpacity={0.8}
+                 >
+                    <ThemedText style={styles.viewAllButtonText}>
+                        {showAllClients ? t('classDetails.showLess') : t('classDetails.viewAllRegistered')}
+                    </ThemedText>
+                 </TouchableOpacity>
+             )}
           </View>
 
           <View style={styles.section}>
@@ -174,50 +283,6 @@ export default function ClassDetailsScreen() {
             </View>
           ) : null}
 
-          <View style={styles.searchWrapper}>
-            <TextInput
-              placeholder={t('checkIn.clientList.searchPlaceholder')}
-              placeholderTextColor='#9CA3AF'
-              style={styles.searchInput}
-              value={searchText}
-              onChangeText={setSearchText}
-            />
-          </View>
-
-          <View style={styles.clientsHeader}>
-            <View style={styles.clientsTitleRow}>
-              <CalendarDaysIcon size={20} color='#6B7280' />
-              <ThemedText className='font-body' style={styles.clientsTitle}>
-                {t('checkIn.clientList.title')} ({enrolled}/{capacity})
-              </ThemedText>
-            </View>
-          </View>
-
-          <View style={styles.clientsList}>
-            {filteredClients.length > 0 ? (
-                filteredClients.map((client, index) => (
-                <TouchableOpacity key={client.id || index} style={styles.clientCard} activeOpacity={0.8}>
-                    <View style={styles.clientAvatar}>
-                    <UserIcon size={24} color='#F97316' />
-                    </View>
-                    <View style={styles.clientInfo}>
-                    <ThemedText className='font-body' style={styles.clientName}>{client.name}</ThemedText>
-                    <ThemedText className='font-body' style={styles.clientLevel}>{client.level}</ThemedText>
-                    </View>
-                </TouchableOpacity>
-                ))
-            ) : (
-                <ThemedText style={{ color: '#9CA3AF', textAlign: 'center', marginTop: 10, marginBottom: 10 }}>
-                    {t('common.noClientsFound') || 'No clients found'}
-                </ThemedText>
-            )}
-          </View>
- 
-        {/*
-          <TouchableOpacity style={styles.viewAllButton} activeOpacity={0.8}>
-            <ThemedText className='font-body' style={styles.viewAllButtonText}>{t('common.viewAllRegistered')}</ThemedText>
-          </TouchableOpacity>
-        */}
 
           {isFull ? (
             <TouchableOpacity style={styles.fullButton} activeOpacity={0.8}>
@@ -268,71 +333,69 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   content: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    padding: 20,
   },
   className: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 8,
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#1F2937',
   },
   metaBlock: {
-    marginBottom: 16,
+    marginBottom: 24,
   },
   dateText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#4B5563',
     marginBottom: 4,
   },
   capacityText: {
     fontSize: 14,
-    color: '#4B5563',
+    color: '#6B7280',
     marginBottom: 4,
   },
   timeText: {
     fontSize: 14,
-    color: '#F97316',
-    fontWeight: '600',
-    marginBottom: 2,
+    color: '#6B7280',
+    marginBottom: 4,
   },
   durationText: {
-    fontSize: 12,
-    color: '#6B7280',
+    fontSize: 14,
+    color: '#9CA3AF',
   },
   instructorCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#111827',
-    borderRadius: 999,
+    backgroundColor: '#F97316', // Orange background
     padding: 8,
-    marginBottom: 16,
+    borderRadius: 999, // Pill shape
+    marginBottom: 24,
+    paddingRight: 16,
+    alignSelf: 'flex-start',
+  },
+  instructorPhoto: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 8,
   },
   instructorAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 999,
-    backgroundColor: '#4B5563',
-    alignItems: 'center',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
-    marginRight: 12,
+    alignItems: 'center',
+    marginRight: 8,
   },
   instructorInfo: {
-    marginLeft: 12,
+    justifyContent: 'center',
   },
   instructorName: {
     fontSize: 14,
-    color: '#F9FAFB',
     fontWeight: '500',
-  },
-  instructorPhoto: {
-    width: 44,
-    height: 44,
-    borderRadius: 999,
-    marginRight: 12,
-  },
-  section: {
-    marginBottom: 16,
+    color: '#FFFFFF', // White text
+    marginBottom: 0,
   },
   sectionTitle: {
     fontSize: 14,
@@ -388,10 +451,61 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 999,
-    backgroundColor: '#FEF3C7',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
+  },
+  // New Styles for Dynamic List
+  clientSection: {
+      marginTop: 20,
+      marginBottom: 30,
+  },
+  clientHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12
+  },
+  searchBar: {
+     backgroundColor: '#FFFFFF',
+     borderRadius: 12,
+     paddingHorizontal: 12,
+     paddingVertical: 10,
+     marginBottom: 16,
+     borderWidth: 1,
+     borderColor: '#E5E7EB',
+  },
+  clientRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#FFFFFF',
+      borderRadius: 12,
+      padding: 12,
+      marginBottom: 8,
+      borderWidth: 1,
+      borderColor: '#E5E7EB',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 1,
+  },
+  clientAvatarContainer: {
+     marginRight: 12,
+  },
+  clientAvatarImg: {
+     width: 40,
+     height: 40,
+     borderRadius: 20,
+  },
+  clientAvatarPlaceholder: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: '#E5E7EB',
+      justifyContent: 'center',
+      alignItems: 'center'
+  },
+  clientEmail: {
+      fontSize: 13, 
+      color: '#6B7280'
   },
   clientInfo: {
     flex: 1,
@@ -399,12 +513,12 @@ const styles = StyleSheet.create({
   clientName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111827',
+    color: '#1F2937',
   },
-  clientLevel: {
-    fontSize: 12,
-    color: '#6B7280',
+  section: {
+    marginBottom: 16,
   },
+
   viewAllButton: {
     borderRadius: 999,
     borderWidth: 1,

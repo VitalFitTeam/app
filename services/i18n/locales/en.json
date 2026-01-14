@@ -433,7 +433,12 @@
       "duration": "(1 hour)",
       "descriptionTitle": "Class Description:",
       "classFull": "Class Full",
-      "enrollClient": "Enroll Client"
+      "enrollClient": "Enroll Client",
+      "clientList": "Client List",
+      "searchPlaceholder": "Search client...",
+      "noClientsFound": "No clients found",
+      "viewAllRegistered": "View all registered",
+      "showLess": "Show less"
     },
     "classes": {
       "description": {

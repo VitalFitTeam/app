@@ -432,7 +432,12 @@
       "duration": "(1 ora)",
       "descriptionTitle": "Descrizione Lezione:",
       "classFull": "Lezione Esaurita",
-      "enrollClient": "Iscrivi Cliente"
+      "enrollClient": "Iscrivi Cliente",
+      "clientList": "Lista Clienti",
+      "searchPlaceholder": "Cerca cliente...",
+      "noClientsFound": "Nessun cliente trovato",
+      "viewAllRegistered": "Vedi tutti gli iscritti",
+      "showLess": "Vedi meno"
     },
     "classes": {
       "description": {

@@ -432,7 +432,12 @@
       "duration": "(1 hora)",
       "descriptionTitle": "Descrição da Aula:",
       "classFull": "Aula Lotada",
-      "enrollClient": "Inscrever Cliente"
+      "enrollClient": "Inscrever Cliente",
+      "clientList": "Lista de Clientes",
+      "searchPlaceholder": "Buscar cliente...",
+      "noClientsFound": "Nenhum cliente encontrado",
+      "viewAllRegistered": "Ver todos os inscritos",
+      "showLess": "Ver menos"
     },
     "classes": {
       "description": {
