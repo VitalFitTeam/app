@@ -95,7 +95,10 @@
       "category": "Categoría",
       "reserved": "Reservado",
       "viewMore": "Ver más",
-      "availability": "Disponibilidad"
+      "availability": "Disponibilidad",
+      "unknown": "Desconocido",
+      "notes": "Notas",
+      "noClientsFound": "No se encontraron clientes"
     },
     "login": {
       "title": "Iniciar Sesión",

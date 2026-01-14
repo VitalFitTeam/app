@@ -95,7 +95,9 @@
       "category": "Categoria",
       "reserved": "Reservado",
       "viewMore": "Ver mais",
-      "availability": "Disponibilidade"
+      "availability": "Disponibilidade",
+      "unknown": "Desconhecido",
+      "notes": "Notas"
     },
     "login": {
       "title": "Entrar",

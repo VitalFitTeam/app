@@ -95,7 +95,9 @@
       "category": "Kategorie",
       "reserved": "Reserviert",
       "viewMore": "Mehr anzeigen",
-      "availability": "Verfügbarkeit"
+      "availability": "Verfügbarkeit",
+      "unknown": "Unbekannt",
+      "notes": "Notizen"
     },
     "login": {
       "title": "Anmelden",

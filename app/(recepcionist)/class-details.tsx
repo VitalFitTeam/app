@@ -1,15 +1,24 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BackHandler, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { CalendarDaysIcon, UserIcon } from 'react-native-heroicons/outline';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const formatFullDate = (dateString: string | undefined, t: any, i18n: any) => {
+import vitalFitApi from '@/services';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+import { TFunction } from 'i18next';
+
+// Format date helper
+const formatFullDate = (dateString: string | undefined, t: TFunction, i18n: { language: string }) => {
   if (!dateString) return t('common.dateUndefined');
-  const [year, monthIndex, dayNumber] = dateString.split('-').map(Number);
+  
+  // Handle if dateString is full ISO or just YYYY-MM-DD
+  const cleanDate = dateString.split('T')[0];
+  const [year, monthIndex, dayNumber] = cleanDate.split('-').map(Number);
   const date = new Date(year, (monthIndex || 1) - 1, dayNumber || 1);
 
   const day = date.getDate();
@@ -19,59 +28,6 @@ const formatFullDate = (dateString: string | undefined, t: any, i18n: any) => {
   const capitalizedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
 
   return `${capitalizedWeekday}, ${day} ${t('common.of')} ${month} ${t('common.of')} ${year}`;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getClassDescription = (name: string, t: any) => {
-  const upper = name.toUpperCase();
-
-  if (upper.includes('YOGA')) {
-    return t('classes.description.yoga');
-  }
-
-  if (upper.includes('ZUMBA')) {
-    return t('classes.description.zumba');
-  }
-
-  if (upper.includes('SPINNING')) {
-    return t('classes.description.spinning');
-  }
-
-  if (upper.includes('CROSSFIT')) {
-    return t('classes.description.crossfit');
-  }
-
-  if (upper.includes('PILATES')) {
-    return t('classes.description.pilates');
-  }
-
-  return t('classes.description.default');
-};
-
-const getClassImage = (name: string) => {
-  const upper = name.toUpperCase();
-
-  if (upper.includes('ZUMBA')) {
-    return require('@/assets/images/zumba-w.jpg');
-  }
-
-  if (upper.includes('YOGA')) {
-    return require('@/assets/images/yoga-w.jpg');
-  }
-
-  if (upper.includes('SPINNING')) {
-    return require('@/assets/images/spinning-w.jpg');
-  }
-
-  if (upper.includes('CROSSFIT')) {
-    return require('@/assets/images/crossfit-w.jpg');
-  }
-
-  if (upper.includes('PILATES')) {
-    return require('@/assets/images/pilates.png');
-  }
-
-  return require('@/assets/images/man_black.png');
 };
 
 export default function ClassDetailsScreen() {
@@ -86,7 +42,15 @@ export default function ClassDetailsScreen() {
     enrolled?: string;
     status?: string;
     instructor?: string;
+    description?: string;
+    instructorImage?: string;
+    serviceImage?: string;
+    notes?: string;
   }>();
+
+  const [searchText, setSearchText] = useState('');
+  const [currentEnrolled, setCurrentEnrolled] = useState(Number(params.enrolled || 0));
+
   useFocusEffect(
     useCallback(() => {
       const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -94,29 +58,65 @@ export default function ClassDetailsScreen() {
         return true;
       });
 
+      // Fetch latest booking count
+      if (params.id) {
+        (async () => {
+            try {
+                const token = await AsyncStorage.getItem('token');
+                // Use correct service and method found in SDK definition
+                // getClassBookingCount(classID: string, jwt: string): Promise<ClassBookingCount>
+                const res = await vitalFitApi.booking.getClassBookingCount(params.id!, token || '');
+                
+                // Assuming res is the object ClassBookingCount. 
+                // We'll inspect it via log if needed, but commonly it has a 'count' or 'total' property, 
+                // or if it's a raw number (unlikely for an object type).
+                // Let's safe-guard:
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const val = (res as any).count ?? (res as any).total ?? (typeof res === 'number' ? res : 0);
+                
+                setCurrentEnrolled(Number(val));
+            } catch (e) {
+                console.error("Failed to fetch booking count:", e);
+            }
+        })();
+      }
+
       return () => backHandler.remove();
-    }, [router])
+    }, [router, params.id])
   );
 
   const name = params.name || t('classDetails.defaultName');
-  const date = params.date || '2025-07-15';
-  const time = params.time || '07:00 - 08:00 AM';
-  const capacity = Number(params.capacity || 25);
-  const enrolled = Number(params.enrolled || 45);
+  const date = params.date || '';
+  const time = params.time || '';
+  const capacity = Number(params.capacity || 0);
+  const enrolled = currentEnrolled; // Use state
   const status = params.status || 'available';
   const instructorName = params.instructor || t('classDetails.defaultInstructor');
 
   const formattedDate = formatFullDate(date, t, i18n);
-  const description = getClassDescription(name, t);
-  const heroImageSource = getClassImage(name);
+  const description = params.description || t('classes.description.default');
+  
+  // Images
+  const heroImageSource = params.serviceImage 
+      ? { uri: params.serviceImage } 
+      : require('@/assets/images/rutina.png');
+      
+  const instructorImageSource = params.instructorImage 
+      ? { uri: params.instructorImage } 
+      : undefined;
 
-  const clients = Array.from({ length: enrolled > 0 ? Math.min(enrolled, 4) : 4 }).map((_, index) => ({
-    id: index.toString(),
-    name: 'Juan Perez',
-    level: 'Nivel 5',
-  }));
+  const notes = params.notes || '';
 
-  const isFull = status === 'full' || enrolled >= capacity;
+  const isFull = status === 'full' || (capacity > 0 && enrolled >= capacity);
+
+  // Client List Logic (Placeholder for future API integration)
+  // Currently empty as requested to remove hardcoded data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const allClients: any[] = []; 
+  
+  const filteredClients = allClients.filter(client => 
+      client.name.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   return (
     <ThemedView style={styles.container}>
@@ -142,10 +142,17 @@ export default function ClassDetailsScreen() {
           </View>
 
           <View style={styles.instructorCard}>
-            <Image
-              source={{ uri: 'https://randomuser.me/api/portraits/women/31.jpg' }}
-              style={styles.instructorPhoto}
-            />
+            {instructorImageSource ? (
+                <Image
+                source={instructorImageSource}
+                style={styles.instructorPhoto}
+                />
+            ) : (
+                <View style={styles.instructorAvatar}>
+                    <UserIcon size={24} color="#FFF" />
+                </View>
+            )}
+            
             <View style={styles.instructorInfo}>
               <ThemedText className='font-body' style={styles.instructorName}>{instructorName}</ThemedText>
             </View>
@@ -158,11 +165,22 @@ export default function ClassDetailsScreen() {
             </ThemedText>
           </View>
 
+          {notes ? (
+            <View style={[styles.section, { marginTop: 8 }]}>
+                <ThemedText className='font-heading' style={styles.sectionTitle}>{t('common.notes')}</ThemedText>
+                <ThemedText className='font-body' style={styles.sectionBody}>
+                {notes}
+                </ThemedText>
+            </View>
+          ) : null}
+
           <View style={styles.searchWrapper}>
             <TextInput
               placeholder={t('checkIn.clientList.searchPlaceholder')}
               placeholderTextColor='#9CA3AF'
               style={styles.searchInput}
+              value={searchText}
+              onChangeText={setSearchText}
             />
           </View>
 
@@ -176,22 +194,30 @@ export default function ClassDetailsScreen() {
           </View>
 
           <View style={styles.clientsList}>
-            {clients.map(client => (
-              <TouchableOpacity key={client.id} style={styles.clientCard} activeOpacity={0.8}>
-                <View style={styles.clientAvatar}>
-                  <UserIcon size={24} color='#F97316' />
-                </View>
-                <View style={styles.clientInfo}>
-                  <ThemedText className='font-body' style={styles.clientName}>{client.name}</ThemedText>
-                  <ThemedText className='font-body' style={styles.clientLevel}>{client.level}</ThemedText>
-                </View>
-              </TouchableOpacity>
-            ))}
+            {filteredClients.length > 0 ? (
+                filteredClients.map((client, index) => (
+                <TouchableOpacity key={client.id || index} style={styles.clientCard} activeOpacity={0.8}>
+                    <View style={styles.clientAvatar}>
+                    <UserIcon size={24} color='#F97316' />
+                    </View>
+                    <View style={styles.clientInfo}>
+                    <ThemedText className='font-body' style={styles.clientName}>{client.name}</ThemedText>
+                    <ThemedText className='font-body' style={styles.clientLevel}>{client.level}</ThemedText>
+                    </View>
+                </TouchableOpacity>
+                ))
+            ) : (
+                <ThemedText style={{ color: '#9CA3AF', textAlign: 'center', marginTop: 10, marginBottom: 10 }}>
+                    {t('common.noClientsFound') || 'No clients found'}
+                </ThemedText>
+            )}
           </View>
-
+ 
+        {/*
           <TouchableOpacity style={styles.viewAllButton} activeOpacity={0.8}>
             <ThemedText className='font-body' style={styles.viewAllButtonText}>{t('common.viewAllRegistered')}</ThemedText>
           </TouchableOpacity>
+        */}
 
           {isFull ? (
             <TouchableOpacity style={styles.fullButton} activeOpacity={0.8}>
@@ -289,6 +315,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4B5563',
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 12,
   },
   instructorInfo: {
     marginLeft: 12,

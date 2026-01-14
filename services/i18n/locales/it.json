@@ -95,7 +95,9 @@
       "category": "Categoria",
       "reserved": "Prenotato",
       "viewMore": "Vedi altro",
-      "availability": "Disponibilità"
+      "availability": "Disponibilità",
+      "unknown": "Sconosciuto",
+      "notes": "Note"
     },
     "login": {
       "title": "Accedi",
