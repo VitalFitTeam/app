@@ -52,11 +52,19 @@ export async function registerForPushNotificationsAsync(): Promise<
 		}
 
 		try {
-			const pushToken = await Notifications.getExpoPushTokenAsync({
+			// Get Expo push token (for Expo's push service)
+			const expoPushToken = await Notifications.getExpoPushTokenAsync({
 				projectId: '3d30457b-07b3-4a1a-9700-dc7fc3df59f2',
 			});
-			token = pushToken.data;
-			console.log('Expo Push Token Generated:', token);
+			console.log('Expo Push Token:', expoPushToken.data);
+
+			// Get native device push token (FCM for Android, APNs for iOS)
+			const devicePushToken = await Notifications.getDevicePushTokenAsync();
+			console.log('Device Push Token (FCM/APNs):', devicePushToken.data);
+
+			// Use the native device token for backend registration
+			token = devicePushToken.data;
+			console.log('Using Device Push Token for backend:', token);
 			console.log('Copy this token for testing push notifications');
 		} catch (error) {
 			console.error('Error getting push token:', error);
