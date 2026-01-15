@@ -29,6 +29,7 @@ export default function ClientProfileScreen() {
   const [lastName, setLastName] = useState<string | null>(null);
   const [qrModalVisible, setQrModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [isOAuthUser, setIsOAuthUser] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -42,6 +43,10 @@ export default function ClientProfileScreen() {
         const userData = await vitalFitApi.user.WhoAmI(token);
         setFirstName(userData?.user?.first_name || t('clientProfile.defaultName'));
         setLastName(userData?.user?.last_name || '');
+
+        // Check if user signed in via OAuth
+        const oauthFlag = await AsyncStorage.getItem('is_oauth_user');
+        setIsOAuthUser(oauthFlag === 'true');
       } catch (error: unknown) {
         let errorMessage = t('clientProfile.error.fetchUser');
         if (isAPIError(error)) {
@@ -71,7 +76,7 @@ export default function ClientProfileScreen() {
   const handleConfirmLogout = async () => {
     try {
       console.log('Cerrando sesión...');
-      await AsyncStorage.multiRemove(['token', 'temp_email', 'temp_password', 'temp_gender']);
+      await AsyncStorage.multiRemove(['token', 'temp_email', 'temp_password', 'temp_gender', 'is_oauth_user']);
       console.log('AsyncStorage limpiado');
 
       try {
@@ -80,7 +85,7 @@ export default function ClientProfileScreen() {
       } catch (error) {
         console.log('No había sesión de Clerk activa: ', error);
       }
-      
+
       console.log('Logout completado');
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
@@ -164,20 +169,22 @@ export default function ClientProfileScreen() {
           </View>
           <ChevronRightIcon width={16} height={16} color='#9ca3af' />
         </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
-          onPress={() => {
-            router.replace('/profile/profile-settings');
-          }}>
-          <View className='flex-row items-center'>
-            <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
-              <ShieldCheckIcon width={18} height={18} color='#111827' />
+        {!isOAuthUser && (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'
+            onPress={() => {
+              router.replace('/profile/profile-settings');
+            }}>
+            <View className='flex-row items-center'>
+              <View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
+                <ShieldCheckIcon width={18} height={18} color='#111827' />
+              </View>
+              <Text className='font-body text-[13px] text-[#111827]'>{t('profile.settings')}</Text>
             </View>
-            <Text className='font-body text-[13px] text-[#111827]'>{t('profile.settings')}</Text>
-          </View>
-          <ChevronRightIcon width={16} height={16} color='#9ca3af' />
-        </TouchableOpacity>
+            <ChevronRightIcon width={16} height={16} color='#9ca3af' />
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           activeOpacity={0.8}
           className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#e5e7eb] px-4 py-3 mb-3'

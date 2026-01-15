@@ -98,6 +98,12 @@ export default function RegisterScreen() {
             await AsyncStorage.setItem('temp_email', cleanedData.email);
             await AsyncStorage.setItem('temp_password', cleanedData.password);
 
+            // Store flag if this is an OAuth registration
+            if (isOAuthFlow) {
+                await AsyncStorage.setItem('temp_oauth_registration', 'true');
+                console.log('OAuth registration flag stored');
+            }
+
             showToast(
                 'success',
                 t('register.toast.successTitle'),
