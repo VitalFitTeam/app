@@ -95,7 +95,9 @@
       "category": "Kategorie",
       "reserved": "Reserviert",
       "viewMore": "Mehr anzeigen",
-      "availability": "Verfügbarkeit"
+      "availability": "Verfügbarkeit",
+      "unknown": "Unbekannt",
+      "notes": "Notizen"
     },
     "login": {
       "title": "Anmelden",
@@ -430,7 +432,12 @@
       "duration": "(1 Stunde)",
       "descriptionTitle": "Kursbeschreibung:",
       "classFull": "Kurs voll belegt",
-      "enrollClient": "Kunde anmelden"
+      "enrollClient": "Kunde anmelden",
+      "clientList": "Kundenliste",
+      "searchPlaceholder": "Kunden suchen...",
+      "noClientsFound": "Keine Kunden gefunden",
+      "viewAllRegistered": "Alle registrierten anzeigen",
+      "showLess": "Weniger anzeigen"
     },
     "classes": {
       "description": {

@@ -95,7 +95,10 @@
       "category": "Categoría",
       "reserved": "Reservado",
       "viewMore": "Ver más",
-      "availability": "Disponibilidad"
+      "availability": "Disponibilidad",
+      "unknown": "Desconocido",
+      "notes": "Notas",
+      "noClientsFound": "No se encontraron clientes"
     },
     "login": {
       "title": "Iniciar Sesión",
@@ -430,7 +433,12 @@
       "duration": "(1 hora)",
       "descriptionTitle": "Descripción de la clase:",
       "classFull": "Clase Llena",
-      "enrollClient": "Inscribir Cliente"
+      "enrollClient": "Inscribir Cliente",
+      "clientList": "Lista de Clientes",
+      "searchPlaceholder": "Buscar cliente...",
+      "noClientsFound": "No se encontraron clientes",
+      "viewAllRegistered": "Ver todos los inscritos",
+      "showLess": "Ver menos"
     },
     "classes": {
       "description": {
