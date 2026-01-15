@@ -1,6 +1,10 @@
+import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+
+// Check if we're running in Expo Go (executionEnvironment will be 'storeClient' in Expo Go)
+const isExpoGo = Constants.executionEnvironment === 'storeClient';
 
 // Configure how notifications are handled when app is in foreground
 Notifications.setNotificationHandler({
@@ -26,6 +30,13 @@ export async function registerForPushNotificationsAsync(): Promise<
 	string | null
 > {
 	let token: string | null = null;
+
+	// Don't try to get push tokens in Expo Go (SDK 53+)
+	if (isExpoGo) {
+		console.log('⚠️ Push notifications are not supported in Expo Go (SDK 53+)');
+		console.log('📱 Use a development build to test push notifications');
+		return null;
+	}
 
 	if (Platform.OS === 'android') {
 		await Notifications.setNotificationChannelAsync('default', {

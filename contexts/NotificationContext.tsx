@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import React, {
 	createContext,
@@ -15,7 +16,6 @@ import {
 	markNotificationAsRead,
 	registerDeviceToken,
 	updateNotificationSettings,
-	type Notification,
 	type NotificationSettings,
 	type PaginatedNotifications,
 } from '../services/notificationApi';
@@ -26,6 +26,19 @@ import {
 	setBadgeCount,
 } from '../services/notificationService';
 import { useAuth } from './AuthContext';
+
+// Check if we're running in Expo Go
+const isExpoGo = Constants.executionEnvironment === 'storeClient';
+
+// UI Notification interface (formatted for display)
+export interface Notification {
+	id: string;
+	title: string;
+	body: string;
+	read: boolean;
+	createdAt: string;
+	data: Record<string, unknown>;
+}
 
 interface NotificationContextType {
 	notifications: Notification[];
@@ -61,8 +74,8 @@ export function NotificationProvider({
 	const [currentPage, setCurrentPage] = useState(1);
 	const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
 
-	const notificationListener = useRef<Notifications.Subscription>();
-	const responseListener = useRef<Notifications.Subscription>();
+	const notificationListener = useRef<Notifications.Subscription | undefined>(undefined);
+	const responseListener = useRef<Notifications.Subscription | undefined>(undefined);
 
 	// Request notification permissions and register device token
 	const requestPermissions = useCallback(async (): Promise<boolean> => {
@@ -266,6 +279,12 @@ export function NotificationProvider({
 	useEffect(() => {
 		console.log('NotificationContext: useEffect triggered');
 		console.log('accessToken available:', !!accessToken);
+
+		// Skip push notification setup in Expo Go
+		if (isExpoGo) {
+			console.log('Running in Expo Go - skipping push notification setup');
+			return;
+		}
 
 		if (accessToken) {
 			console.log('Initializing notifications...');
