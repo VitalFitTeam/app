@@ -106,14 +106,14 @@ export default function HomeScreen() {
 					</TouchableOpacity>
 				</Link>
 
-				{/* Test Notifications Button - For Development */}
+				{/* Test Notifications Button - For Development 
 				<TouchableOpacity
 					onPress={() => router.push('/test-notifications')}
 					className='mb-4 flex-row items-center justify-center rounded-lg border border-orange-500/50 bg-orange-500/20 py-2'>
 					<Text className='font-body text-sm text-orange-400'>
 						Test Notifications
 					</Text>
-				</TouchableOpacity>
+				</TouchableOpacity>*/}
 
 				<View
 					style={{
