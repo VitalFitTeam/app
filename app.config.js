@@ -24,6 +24,7 @@ export default {
 			edgeToEdgeEnabled: true,
 			predictiveBackGestureEnabled: false,
 			package: 'com.mrwisz.VitalFit',
+			googleServicesFile: './google-services.json',
 		},
 		web: {
 			output: 'static',
@@ -48,6 +49,14 @@ export default {
 				'expo-camera',
 				{
 					cameraPermission: 'Permite a VitalFit acceder a tu cámara para escanear códigos QR de miembros.',
+				},
+			],
+			[
+				'expo-notifications',
+				{
+					icon: './assets/images/isotipo.png',
+					color: '#0891B2',
+					mode: 'production',
 				},
 			],
 			'expo-font',

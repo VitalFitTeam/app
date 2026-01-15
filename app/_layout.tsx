@@ -1,4 +1,5 @@
 import { AuthProvider } from '@/contexts/AuthContext';
+import { NotificationProvider } from '@/contexts/NotificationContext';
 import { ReservationsProvider } from '@/contexts/reservations';
 import { UserProvider } from '@/contexts/UserContext';
 import { ClerkProvider } from '@clerk/clerk-expo';
@@ -58,8 +59,9 @@ export default function RootLayout() {
         <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
             <AuthProvider>
                 <UserProvider>
-                    <ReservationsProvider>
-                        <ThemeProvider value={DefaultTheme}>
+                    <NotificationProvider>
+                        <ReservationsProvider>
+                            <ThemeProvider value={DefaultTheme}>
                         <Stack>
                             <Stack.Screen name='index' options={{ headerShown: false }} />
                             <Stack.Screen name='(auth)' options={{ headerShown: false }} />
@@ -225,6 +227,7 @@ export default function RootLayout() {
                         <StatusBar style='auto' />
                     </ThemeProvider>
                 </ReservationsProvider>
+                    </NotificationProvider>
             </UserProvider>
         </AuthProvider>
         </ClerkProvider>
