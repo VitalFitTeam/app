@@ -46,7 +46,7 @@ async function sendFCMNotification(fcmToken) {
     },
   };
 
-  console.log('\n📱 Enviando notificación FCM...');
+  console.log('\n Enviando notificación FCM...');
   console.log('Token:', fcmToken.substring(0, 20) + '...');
 
   try {

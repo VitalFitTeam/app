@@ -101,6 +101,13 @@ export default function ConfirmEmailScreen() {
                 // Use AuthContext to store both tokens
                 await authLogin(token, refreshToken);
 
+                // Check if user registered via OAuth and store flag
+                const isOAuthRegistration = await AsyncStorage.getItem('temp_oauth_registration');
+                if (isOAuthRegistration === 'true') {
+                    await AsyncStorage.setItem('is_oauth_user', 'true');
+                    console.log('OAuth flag stored for OAuth registration');
+                }
+
                 // Fetch user data to populate context
                 await fetchUser();
 
@@ -108,7 +115,7 @@ export default function ConfirmEmailScreen() {
                 await new Promise(resolve => setTimeout(resolve, 300));
 
                 // Clean up temporary storage
-                await AsyncStorage.multiRemove(['temp_email', 'temp_password']);
+                await AsyncStorage.multiRemove(['temp_email', 'temp_password', 'temp_oauth_registration']);
 
                 // Get user role to navigate to correct dashboard
                 const whoamiResponse = await vitalFitApi.user.WhoAmI(token);

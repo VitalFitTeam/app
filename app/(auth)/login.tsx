@@ -172,6 +172,10 @@ export default function LoginScreen() {
                             await authLogin(backendToken, backendRefreshToken);
                             console.log('Token de backend guardado');
 
+                            // Store OAuth flag to indicate user signed in with Google
+                            await AsyncStorage.setItem('is_oauth_user', 'true');
+                            console.log('OAuth flag stored');
+
                             await fetchUser();
 
                             await new Promise(resolve => setTimeout(resolve, 1000));
