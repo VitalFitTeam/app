@@ -34,7 +34,6 @@ export default function MembershipPaymentScreen() {
   }>();
 
   const [loadingMethods, setLoadingMethods] = useState(true);
-  const [loading, setLoading] = useState(false);
   const [methods, setMethods] = useState<BranchPaymentMethod[]>([]);
   const [selectedMethodId, setSelectedMethodId] = useState<string | null>(null);
   const { toastState, showToast, hideToast } = useToast();
@@ -46,27 +45,37 @@ export default function MembershipPaymentScreen() {
         if (!token) return;
 
         if (!params.branchId) {
-            Alert.alert("Error", "No se identificó la sucursal.");
+            Alert.alert(t('common.error.title'), t('errors.missingBranch'));
             return;
         }
 
-        const response = await vitalFitApi.paymentMethod.getBranchPaymentMethods(params.branchId, token);
+        // Use the client directly to hit the correct endpoint as the specific method doesn't exist on the generic SDK
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const response = await vitalFitApi.client.get({
+            url: `/branches/${params.branchId}/payment-methods`,
+            jwt: token
+        });
+        
         const responseData = response.data || response || [];
-        const activeMethods = (responseData as BranchPaymentMethod[]).filter(m => m.is_active === true);
+        // Map response to BranchPaymentMethod interface if needed, or cast it.
+        // Assuming response structure matches what we expect
+        const methodsData = Array.isArray(responseData) ? responseData : (responseData.data || []);
+        const activeMethods = (methodsData as BranchPaymentMethod[]).filter(m => m.is_active === true);
         setMethods(activeMethods);
 
       } catch (error) {
         console.error('Error cargando métodos:', error);
-        Alert.alert('Aviso', 'No se pudieron cargar los métodos de pago.');
+        Alert.alert(t('common.warning'), t('errors.loadPaymentMethods'));
       } finally {
         setLoadingMethods(false);
       }
     };
 
     loadPaymentMethods();
-  }, [params.branchId]);
+  }, [params.branchId, t]);
 
-  const handlePay = async () => {
+  const handleContinue = () => {
     if (!selectedMethodId) {
       showToast('warning', t('common.attention'), t('payment.toast.selectMethod'));
       return;
@@ -74,54 +83,19 @@ export default function MembershipPaymentScreen() {
 
     const selectedMethod = methods.find(m => m.method_id === selectedMethodId);
     const methodName = selectedMethod?.name || '';
-    const nameLower = methodName.toLowerCase();
-
-    const nextParams = {
-        invoiceId: params.invoiceId,
-        totalAmount: params.totalAmount,
-        currency: params.currency || 'USD',
-        methodId: selectedMethodId,
-        methodName: methodName,
-    };
-
-    if (nameLower.includes('pago movil') || nameLower.includes('pago móvil')) {
-        router.push({ pathname: '/membership-payment-pagomovil', params: nextParams } as never);
-    } 
-    else if (nameLower.includes('zelle') || nameLower.includes('transfer') || selectedMethod?.type === 'Transfer') {
-        router.push({ pathname: '/membership-payment-transfer', params: nextParams } as never);
-    } 
-    else {
-        processDirectPayment(selectedMethodId);
-    }
+    
+    // Route EVERYTHING to the generic detail screen
+    router.push({
+        pathname: '/membership-payment-detail',
+        params: {
+            invoiceId: params.invoiceId,
+            totalAmount: params.totalAmount,
+            currency: params.currency || 'USD',
+            methodId: selectedMethodId,
+            methodName: methodName,
+        }
+    });
   };
-
-  const processDirectPayment = async (methodId: string) => {
-      setLoading(true);
-      try {
-        const token = await AsyncStorage.getItem('token');
-        
-        await vitalFitApi.billing.AddPaymentToInvoice({
-            invoice_id: params.invoiceId,
-            payment_method_id: methodId,
-            amount_paid: Number(params.totalAmount),
-            currency_paid: params.currency || 'USD',
-            transaction_id: `SITIO-${Date.now()}`,
-            receipt_url: 'Pago reportado en sitio' 
-        }, token || '');
-
-        showToast('success', t('payment.toast.orderCreated'), t('payment.toast.goToReception'));
-
-        setTimeout(() => {
-            router.replace('/(tabs)/dashboard');
-        }, 2500);
-
-      } catch (error) {
-          console.error('Error procesando pago directo:', error);
-          showToast('error', t('common.error.title'), t('payment.toast.errorRegistering'));
-      } finally {
-          setLoading(false);
-      }
-  }
 
   const renderMethodIcon = (methodName: string) => {
     const name = (methodName || '').toLowerCase();
@@ -168,7 +142,7 @@ export default function MembershipPaymentScreen() {
             <View className="flex-row justify-between items-center">
                 <ThemedText className="font-body text-neutral-500" style={{ fontFamily: 'Montserrat_400Regular' }}>{t('payment.concept')}</ThemedText>
                 <ThemedText className="font-body text-neutral-900 font-bold max-w-[60%] text-right text-base" numberOfLines={1} style={{ fontFamily: 'Montserrat_700Bold' }}>
-                    {params.title || 'Membresía VitalFit'}
+                    {params.title || t('payment.defaultTitle')}
                 </ThemedText>
             </View>
         </View>
@@ -218,14 +192,10 @@ export default function MembershipPaymentScreen() {
         )}
 
         <View className="mb-8">
-            {loading ? (
-                <ActivityIndicator size="large" color="#f97316" />
-            ) : (
                 <PrimaryButton
                     title={selectedMethodId ? t('payment.continue') : t('payment.selectMethod')}
-                    onPress={handlePay}
+                    onPress={handleContinue}
                 />
-            )}
         </View>
       </ScrollView>
     </SafeAreaView>

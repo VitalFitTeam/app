@@ -933,6 +933,24 @@
         "paymentReported": "Payment Reported",
         "sentToVerification": "Your payment has been sent for verification.",
         "errorPayment": "Payment Error"
+      },
+      "defaultTitle": "VitalFit Membership",
+      "defaultReceiptHelper": "Payment reported",
+      "cashReceiptHelper": "On-site/Cash payment",
+      "labels": {
+          "bank_name": "Bank",
+          "account_number": "Account No.",
+          "email": "Zelle Email",
+          "phone": "Phone",
+          "phone_number": "Phone",
+          "rif": "ID/Doc",
+          "beneficiary_name": "Beneficiary",
+          "holder": "Holder",
+          "number": "Number"
+      },
+      "confirmOrder": "Confirm Order",
+      "instructions": {
+        "cash": "Make the payment at the counter and report it here."
       }
     },
     "instructor": {
@@ -1222,6 +1240,21 @@
         "clientProgressBody": "Your client Juan Pérez updated their routine progress.",
         "hiitClassBody": "You have a HIIT class scheduled for tomorrow."
       }
+    },
+    "services": {
+      "title": "Services",
+      "headerTitle": "SERVICES",
+      "subtitle": "Select a branch and choose your service.",
+      "serviceFallback": "VitalFit Service",
+      "duration": "Duration: {{minutes}} min",
+      "memberPrice": "Member",
+      "generalPrice": "General",
+      "oneTimePayment": "One-time payment"
+    },
+    "errors": {
+      "missingBranch": "Branch not identified.",
+      "loadPaymentMethods": "Could not load payment methods.",
+      "sessionExpired": "Session expired"
     },
     "membershipDetails": {
       "title": "Membership Details",

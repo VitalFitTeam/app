@@ -922,6 +922,24 @@
         "paymentReported": "Paiement Signalé",
         "sentToVerification": "Votre paiement a été envoyé pour vérification.",
         "errorPayment": "Erreur de Paiement"
+      },
+      "defaultTitle": "Abonnement VitalFit",
+      "defaultReceiptHelper": "Paiement signalé",
+      "cashReceiptHelper": "Paiement sur place/caisse",
+      "labels": {
+          "bank_name": "Banque",
+          "account_number": "N° de Compte",
+          "email": "E-mail Zelle",
+          "phone": "Téléphone",
+          "phone_number": "Téléphone",
+          "rif": "ID/Doc",
+          "beneficiary_name": "Bénéficiaire",
+          "holder": "Titulaire",
+          "number": "Numéro"
+      },
+      "confirmOrder": "Confirmer la commande",
+      "instructions": {
+        "cash": "Effectuez le paiement à la caisse et signalez-le ici."
       }
     },
     "instructor": {
@@ -1132,6 +1150,21 @@
         "clientProgressBody": "Votre client Juan Pérez a mis à jour ses progrès de routine.",
         "hiitClassBody": "Vous avez un cours de HIIT prévu pour demain."
       }
+    },
+    "services": {
+      "title": "Services",
+      "headerTitle": "SERVICES",
+      "subtitle": "Sélectionnez une succursale et choisissez votre service.",
+      "serviceFallback": "Service VitalFit",
+      "duration": "Durée : {{minutes}} min",
+      "memberPrice": "Membre",
+      "generalPrice": "Général",
+      "oneTimePayment": "Paiement unique"
+    },
+    "errors": {
+      "missingBranch": "Succursale non identifiée.",
+      "loadPaymentMethods": "Impossible de charger les méthodes de paiement.",
+      "sessionExpired": "Session expirée"
     },
     "membershipDetails": {
       "title": "Membership Details",

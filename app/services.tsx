@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, Modal, ScrollView, TouchableOpacity, View } from 'react-native';
 import { MapPinIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -39,6 +40,7 @@ function ServiceCardComponent({
   onToggle: (s: BranchServiceItem) => void;
   userHasMembership: boolean;
 }) {
+  const { t } = useTranslation();
   const price = userHasMembership ? item.lowest_price_member : item.lowest_price_no_member;
   
   // Disable if user is member active and member price is 0
@@ -75,7 +77,7 @@ function ServiceCardComponent({
             className='text-xs mb-2'
             style={{ fontFamily: 'Montserrat_400Regular' }}
             numberOfLines={2}>
-            {item.description || 'Servicio VitalFit'}
+            {item.description || t('services.serviceFallback')}
           </ThemedText>
           
           {item.duration_minutes > 0 && (
@@ -84,7 +86,7 @@ function ServiceCardComponent({
              darkColor='#9ca3af'
              className='text-[10px]'
              style={{ fontFamily: 'Montserrat_400Regular' }}>
-             Duración: {item.duration_minutes} min
+             {t('services.duration', { minutes: item.duration_minutes })}
            </ThemedText>
           )}
         </View>
@@ -104,7 +106,7 @@ function ServiceCardComponent({
                   darkColor='#9ca3af'
                   className='text-[10px] text-right'
                   style={{ fontFamily: 'Montserrat_500Medium' }}>
-                  {userHasMembership ? 'Socio' : 'General'}
+                  {userHasMembership ? t('services.memberPrice') : t('services.generalPrice')}
                 </ThemedText>
             </View>
 
@@ -129,6 +131,7 @@ function ServiceCardComponent({
 const ServiceCard = React.memo(ServiceCardComponent);
 
 export default function ServicesScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { user } = useUser();
 
@@ -238,9 +241,9 @@ export default function ServicesScreen() {
       pathname: '/membership-checkout',
       params: {
         servicesJson: JSON.stringify(servicesForCheckout),
-        title: `Servicios`,
+        title: t('services.title'),
         price: total.toString(),
-        period: 'Pago único',
+        period: t('services.oneTimePayment'),
         type: 'service_bundle',
       },
     });
@@ -258,7 +261,7 @@ export default function ServicesScreen() {
     [toggleService, selectedServiceIds, userHasMembership]
   );
   
-  const selectedBranchName = branches.find(b => b.branch_id === selectedBranchId)?.name || 'Seleccionar Sucursal';
+  const selectedBranchName = branches.find(b => b.branch_id === selectedBranchId)?.name || t('common.selectBranch');
 
 
   const renderHeader = () => (
@@ -279,7 +282,7 @@ export default function ServicesScreen() {
               paddingHorizontal: 6,
               overflow: 'visible',
             }}>
-            SERVICIOS
+            {t('services.headerTitle')}
           </ThemedText>
 
           <ThemedText
@@ -296,7 +299,7 @@ export default function ServicesScreen() {
               paddingHorizontal: 6,
               overflow: 'visible',
             }}>
-            Selecciona una sucursal y elige tu servicio.
+            {t('services.subtitle')}
           </ThemedText>
         </View>
       </View>
