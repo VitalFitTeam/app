@@ -1,5 +1,6 @@
 import { QRModal } from '@/components/auth/dashboard/QRModal';
 import { UserAvatar } from '@/components/UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
 import { useReservations } from '@/contexts/reservations';
 import { useUser } from '@/contexts/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,6 +26,7 @@ export default function ProfileScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { user, loading, clearUser } = useUser();
+  const { logout } = useAuth();
   const { clearReservations } = useReservations();
   const [qrModalVisible, setQrModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
@@ -55,16 +57,10 @@ export default function ProfileScreen() {
     : t('client.profile.defaultUser');
 
   const handleConfirmLogout = async () => {
-    try {
-      await AsyncStorage.removeItem('token');
-      await clearReservations();
-      clearUser();
-    } catch (error) {
-      console.error('Error al eliminar el token en logout:', error);
-    } finally {
-      setLogoutModalVisible(false);
-      router.replace('/(auth)/login');
-    }
+    setLogoutModalVisible(false);
+    await clearReservations();
+    clearUser();
+    await logout();
   };
 
 

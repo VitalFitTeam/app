@@ -223,6 +223,14 @@ export default function RootLayout() {
                                     title: '',
                                 }}
                             />
+                            <Stack.Screen
+                                name="chatbot"
+                                options={{
+                                    headerShown: false,
+                                    title: '',
+                                    presentation: 'modal',
+                                }}
+                            />
                         </Stack>
                         <StatusBar style='auto' />
                     </ThemeProvider>
