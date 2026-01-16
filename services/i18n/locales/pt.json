@@ -349,7 +349,8 @@
         "services": "Serviços",
         "start": "Iniciar",
         "purchase": "Comprar"
-      }
+      },
+      "findBranches": "Encontrar Unidades"
     },
     "enrollClient": {
       "title": "Inscrever Cliente",
@@ -1190,6 +1191,16 @@
       "month": "Mês",
       "classesOfDay": "AULAS DO DIA",
       "noClasses": "Nenhuma aula agendada para esta data."
+    },
+    "branchesMap": {
+      "title": "Nossas Unidades",
+      "loading": "Carregando unidades...",
+      "noToken": "Nenhuma sessão ativa encontrada.",
+      "fetchError": "Erro ao carregar unidades.",
+      "connectionError": "Erro de conexão.",
+      "goBack": "Voltar",
+      "searchPlaceholder": "Buscar unidade...",
+      "noBranchesFound": "Nenhuma unidade encontrada."
     }
   }
 }
