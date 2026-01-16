@@ -1237,6 +1237,19 @@
         "clientProgressBody": "Tu cliente Juan Pérez actualizó su progreso de rutina.",
         "hiitClassBody": "Tienes una clase de HIIT programada para mañana."
       }
+    },
+    "chatbot": {
+      "title": "Asistente VitalFit",
+      "online": "En línea",
+      "inputPlaceholder": "Escribe tu mensaje...",
+      "welcomeMessage": "¡Hola! Soy tu asistente virtual de VitalFit. ¿En qué puedo ayudarte hoy?",
+      "staticResponse": "Gracias por tu mensaje. Esta es una respuesta estática. Pronto conectaremos el chatbot con un agente real.",
+      "quickActions": {
+        "classSchedules": "Horarios de clases",
+        "myMembership": "Mi membresía",
+        "bookClass": "Reservar clase",
+        "contactSupport": "Contactar soporte"
+      }
     }
 
   }

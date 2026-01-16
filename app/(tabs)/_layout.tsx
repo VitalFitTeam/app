@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { FloatingChatButton } from '@/components/FloatingChatButton';
 import { HapticTab } from '@/components/haptic-tab';
 
 import { Dumbbell } from 'lucide-react-native';
@@ -11,10 +12,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
     const { t } = useTranslation();
-    const insets = useSafeAreaInsets(); 
+    const insets = useSafeAreaInsets();
+    const tabBarHeight = 60 + insets.bottom;
 
     return (
-        <Tabs
+        <>
+            <FloatingChatButton bottomOffset={tabBarHeight + 16} />
+            <Tabs
             screenOptions={{
                 tabBarActiveTintColor: '#f97316',
                 tabBarInactiveTintColor: '#a1a1aa',
@@ -157,5 +161,6 @@ export default function TabLayout() {
                 }}
             />
         </Tabs>
+        </>
     );
 }

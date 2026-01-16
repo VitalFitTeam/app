@@ -1259,6 +1259,19 @@
       "errorTitle": "Cancellation Error",
       "errorMessage": "An error occurred while cancelling the membership.",
       "alreadyCancelled": "This membership is already cancelled."
+    },
+    "chatbot": {
+      "title": "VitalFit Assistant",
+      "online": "Online",
+      "inputPlaceholder": "Write your message...",
+      "welcomeMessage": "Hello! I'm your VitalFit virtual assistant. How can I help you today?",
+      "staticResponse": "Thank you for your message. This is a static response. We'll connect the chatbot to a real agent soon.",
+      "quickActions": {
+        "classSchedules": "Class schedules",
+        "myMembership": "My membership",
+        "bookClass": "Book class",
+        "contactSupport": "Contact support"
+      }
     }
   },
   "classesScreen": {

@@ -2,6 +2,7 @@ import { QRScannerModal } from '@/components/recepcionist/QRScannerModal';
 import { CheckInResultModal } from '@/components/recepcionista/CheckInResultModal';
 import { ThemedView } from '@/components/themed-view';
 import { UserAvatar } from '@/components/UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
 import { useBranch } from '@/contexts/BranchContext';
 import { useUser } from '@/contexts/UserContext';
 import vitalFitApi from '@/services';
@@ -25,6 +26,7 @@ export default function RecepcionistProfileComponent() {
   const { t } = useTranslation();
   const router = useRouter();
   const { user, loading: userLoading, clearUser } = useUser();
+  const { logout } = useAuth();
   const { selectedBranchId } = useBranch();
   const [scannerVisible, setScannerVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
@@ -115,15 +117,9 @@ export default function RecepcionistProfileComponent() {
   };
 
   const handleConfirmLogout = async () => {
-    try {
-      await AsyncStorage.removeItem('token');
-      clearUser();
-    } catch (error) {
-      console.error(t('profile.error.logoutToken'), error);
-    } finally {
-      setLogoutModalVisible(false);
-      router.replace('/(auth)/login');
-    }
+    setLogoutModalVisible(false);
+    clearUser();
+    await logout();
   };
 
   return (

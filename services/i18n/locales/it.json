@@ -1170,6 +1170,19 @@
       "errorMessage": "An error occurred while cancelling the membership.",
       "alreadyCancelled": "This membership is already cancelled."
     },
+    "chatbot": {
+      "title": "Assistente VitalFit",
+      "online": "Online",
+      "inputPlaceholder": "Scrivi il tuo messaggio...",
+      "welcomeMessage": "Ciao! Sono il tuo assistente virtuale VitalFit. Come posso aiutarti oggi?",
+      "staticResponse": "Grazie per il tuo messaggio. Questa è una risposta statica. Presto collegheremo il chatbot a un vero agente.",
+      "quickActions": {
+        "classSchedules": "Orari delle lezioni",
+        "myMembership": "Il mio abbonamento",
+        "bookClass": "Prenota lezione",
+        "contactSupport": "Contatta supporto"
+      }
+    },
     "classesScreen": {
       "title": "Calendario Lezioni",
       "calendar": "CALENDARIO",

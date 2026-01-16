@@ -1,5 +1,6 @@
 import { ClientQRModal } from '@/components/client/ClientQRModal';
 import { ThemedView } from '@/components/themed-view';
+import { useAuth } from '@/contexts/AuthContext';
 import vitalFitApi from '@/services';
 import { useClerk } from '@clerk/clerk-expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -23,7 +24,8 @@ import {
 export default function ClientProfileScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { signOut } = useClerk(); 
+  const { signOut } = useClerk();
+  const { logout } = useAuth(); 
   const [loading, setLoading] = useState(true);
   const [firstName, setFirstName] = useState<string | null>(null);
   const [lastName, setLastName] = useState<string | null>(null);
@@ -74,25 +76,14 @@ export default function ClientProfileScreen() {
   const displayName = lastName ? `${firstName ?? t('dashboard.defaultUser')} ${lastName}` : firstName ?? t('dashboard.defaultUser');
 
   const handleConfirmLogout = async () => {
+    setLogoutModalVisible(false);
+    await AsyncStorage.multiRemove(['temp_email', 'temp_password', 'temp_gender', 'is_oauth_user']);
     try {
-      console.log('Cerrando sesión...');
-      await AsyncStorage.multiRemove(['token', 'temp_email', 'temp_password', 'temp_gender', 'is_oauth_user']);
-      console.log('AsyncStorage limpiado');
-
-      try {
-        await signOut();
-        console.log('Sesión de Clerk cerrada');
-      } catch (error) {
-        console.log('No había sesión de Clerk activa: ', error);
-      }
-
-      console.log('Logout completado');
+      await signOut();
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-    } finally {
-      setLogoutModalVisible(false);
-      router.replace('/(auth)/login');
+      console.log('No había sesión de Clerk activa:', error);
     }
+    await logout();
   };
 
   return (
