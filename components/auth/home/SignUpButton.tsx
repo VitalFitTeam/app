@@ -28,13 +28,11 @@ export function SignUpButton({
 	);
 }
 
-const BUTTON_W = 150;
 const BUTTON_H = 46;
 const PADDING_V = 8;
 
 const styles = StyleSheet.create({
 	base: {
-		width: BUTTON_W,
 		height: BUTTON_H,
 		borderRadius: 25,
 		paddingVertical: PADDING_V,

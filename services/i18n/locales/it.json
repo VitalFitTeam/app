@@ -349,7 +349,8 @@
         "services": "Servizi",
         "start": "Inizia",
         "purchase": "Acquista"
-      }
+      },
+      "findBranches": "Trova Sedi"
     },
     "enrollClient": {
       "title": "Iscrivi Cliente",
@@ -1182,6 +1183,16 @@
         "bookClass": "Prenota lezione",
         "contactSupport": "Contatta supporto"
       }
+    },
+    "branchesMap": {
+      "title": "Le Nostre Sedi",
+      "loading": "Caricamento sedi...",
+      "noToken": "Nessuna sessione attiva trovata.",
+      "fetchError": "Errore nel caricamento delle sedi.",
+      "connectionError": "Errore di connessione.",
+      "goBack": "Indietro",
+      "searchPlaceholder": "Cerca sede...",
+      "noBranchesFound": "Nessuna sede trovata."
     },
     "classesScreen": {
       "title": "Calendario Lezioni",

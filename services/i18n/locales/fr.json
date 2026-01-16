@@ -349,7 +349,8 @@
         "services": "Services",
         "start": "Démarrer",
         "purchase": "Acheter"
-      }
+      },
+      "findBranches": "Trouver des Succursales"
     },
     "enrollClient": {
       "title": "Inscrire un Client",
@@ -1182,6 +1183,16 @@
         "bookClass": "Réserver un cours",
         "contactSupport": "Contacter le support"
       }
+    },
+    "branchesMap": {
+      "title": "Nos Succursales",
+      "loading": "Chargement des succursales...",
+      "noToken": "Aucune session active trouvée.",
+      "fetchError": "Erreur lors du chargement des succursales.",
+      "connectionError": "Erreur de connexion.",
+      "goBack": "Retour",
+      "searchPlaceholder": "Rechercher une succursale...",
+      "noBranchesFound": "Aucune succursale trouvée."
     },
     "classesScreen": {
       "title": "Calendrier des Cours",

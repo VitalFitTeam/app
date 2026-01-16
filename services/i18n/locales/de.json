@@ -349,7 +349,8 @@
         "services": "Dienste",
         "start": "Start",
         "purchase": "Kaufen"
-      }
+      },
+      "findBranches": "Filialen finden"
     },
     "enrollClient": {
       "title": "Kunden anmelden",
@@ -1182,6 +1183,16 @@
         "bookClass": "Kurs buchen",
         "contactSupport": "Support kontaktieren"
       }
+    },
+    "branchesMap": {
+      "title": "Unsere Standorte",
+      "loading": "Standorte werden geladen...",
+      "noToken": "Keine aktive Sitzung gefunden.",
+      "fetchError": "Fehler beim Laden der Standorte.",
+      "connectionError": "Verbindungsfehler.",
+      "goBack": "Zurück",
+      "searchPlaceholder": "Standort suchen...",
+      "noBranchesFound": "Keine Standorte gefunden."
     },
     "classesScreen": {
       "title": "Kurskalender",
