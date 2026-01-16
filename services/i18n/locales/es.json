@@ -268,6 +268,7 @@
     "dashboard": {
       "recepcionistDefault": "Recepcionista",
       "defaultUser": "Usuario",
+      "findBranches": "Encontrar Sedes",
       "member": {
         "activeMembership": "Membresía Activa",
         "noActivePlan": "Sin plan activo",
@@ -1250,6 +1251,16 @@
         "bookClass": "Reservar clase",
         "contactSupport": "Contactar soporte"
       }
+    },
+    "branchesMap": {
+      "title": "Nuestras Sedes",
+      "loading": "Cargando sedes...",
+      "noToken": "No se encontró sesión activa.",
+      "fetchError": "Error al cargar las sedes.",
+      "connectionError": "Error de conexión.",
+      "goBack": "Volver",
+      "searchPlaceholder": "Buscar sede...",
+      "noBranchesFound": "No se encontraron sedes."
     }
 
   }

@@ -231,6 +231,13 @@ export default function RootLayout() {
                                     presentation: 'modal',
                                 }}
                             />
+                            <Stack.Screen
+                                name="branches-map"
+                                options={{
+                                    headerShown: false,
+                                    title: '',
+                                }}
+                            />
                         </Stack>
                         <StatusBar style='auto' />
                     </ThemeProvider>

@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Montserrat_500Medium, Montserrat_700Bold, useFonts } from '@expo-google-fonts/montserrat';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
-import { Global } from 'iconsax-react-native';
+import { Global, Location } from 'iconsax-react-native';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Image, StatusBar, Text, TouchableOpacity, View } from 'react-native';
@@ -72,13 +72,13 @@ export default function HomeScreen() {
 			</View>
 
 			<LinearGradient
-				colors={['transparent', 'rgba(0,0,0,0.7)', 'black']}
+				colors={['transparent', 'rgba(0,0,0,0.7)', '#000000']}
 				style={{
 					position: 'absolute',
 					bottom: 0,
 					left: 0,
 					right: 0,
-					paddingBottom: insets.bottom + 32,
+					paddingBottom: insets.bottom + 20,
 					paddingHorizontal: 24,
 					paddingTop: 48,
 				}}>
@@ -97,14 +97,26 @@ export default function HomeScreen() {
 					))}
 				</View>
 
-				<Link href='/language' asChild>
-					<TouchableOpacity className='mb-4 flex-row items-center justify-center py-2'>
-						<Global color='white' size={16} variant='Outline' />
-						<Text className='ml-2 font-body text-sm text-white'>
-							{t('languageLabel')}
+				<View className='flex-row justify-center gap-6 mb-4'>
+					<Link href='/language' asChild>
+						<TouchableOpacity className='flex-row items-center justify-center py-2'>
+							<Global color='white' size={16} variant='Outline' />
+							<Text className='ml-2 font-body text-sm text-white'>
+								{t('languageLabel')}
+							</Text>
+						</TouchableOpacity>
+					</Link>
+
+					<TouchableOpacity
+						onPress={() => router.push('/branches-map')}
+						className='flex-row items-center justify-center py-2'
+					>
+						<Location color='#f97316' size={16} variant='Outline' />
+						<Text className='ml-2 font-body text-sm text-orange-500'>
+							{t('dashboard.findBranches')}
 						</Text>
 					</TouchableOpacity>
-				</Link>
+				</View>
 
 				{/* Test Notifications Button - For Development 
 				<TouchableOpacity
