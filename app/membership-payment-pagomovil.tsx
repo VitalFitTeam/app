@@ -5,7 +5,6 @@ import { ToastNotification } from '@/components/ToastNotification';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -96,82 +95,53 @@ export default function MembershipPaymentPagoMovilScreen() {
         </ThemedText>
 
         <View className='mb-6 border border-orange-500/80 rounded-2xl px-4 py-4 bg-orange-50'>
-          <ThemedText className='font-body text-xs font-bold tracking-widest mb-3 text-orange-800 uppercase'>
+          <ThemedText className='font-body text-xs font-bold tracking-widest mb-3 text-orange-800 uppercase' style={{ fontFamily: 'Montserrat_700Bold' }}>
             {t('payment.mobile.bankDetailsTitle')}
           </ThemedText>
 
           <View className='space-y-3'>
             <View className='flex-row justify-between border-b border-orange-200 pb-2'>
-                <ThemedText className='font-body text-gray-600 text-sm'>{t('payment.mobile.bankLabels.bank')}</ThemedText>
-                <ThemedText className='font-body font-bold text-gray-900'>Banco de Venezuela</ThemedText>
+                <ThemedText className='font-body text-gray-600 text-sm' style={{ fontFamily: 'Montserrat_400Regular' }}>{t('payment.mobile.bankLabels.bank')}</ThemedText>
+                <ThemedText className='font-body font-bold text-gray-900' style={{ fontFamily: 'Montserrat_700Bold' }}>Banco de Venezuela</ThemedText>
             </View>
             <View className='flex-row justify-between border-b border-orange-200 pb-2'>
-                <ThemedText className='font-body text-gray-600 text-sm'>{t('payment.mobile.bankLabels.phone')}</ThemedText>
-                <ThemedText className='font-body font-bold text-gray-900'>0414-1234567</ThemedText>
+                <ThemedText className='font-body text-gray-600 text-sm' style={{ fontFamily: 'Montserrat_400Regular' }}>{t('payment.mobile.bankLabels.phone')}</ThemedText>
+                <ThemedText className='font-body font-bold text-gray-900' style={{ fontFamily: 'Montserrat_700Bold' }}>0414-1234567</ThemedText>
             </View>
             <View className='flex-row justify-between border-b border-orange-200 pb-2'>
-                <ThemedText className='font-body text-gray-600 text-sm'>{t('payment.mobile.bankLabels.rif')}</ThemedText>
-                <ThemedText className='font-body font-bold text-gray-900'>J-12345678-9</ThemedText>
+                <ThemedText className='font-body text-gray-600 text-sm' style={{ fontFamily: 'Montserrat_400Regular' }}>{t('payment.mobile.bankLabels.rif')}</ThemedText>
+                <ThemedText className='font-body font-bold text-gray-900' style={{ fontFamily: 'Montserrat_700Bold' }}>J-12345678-9</ThemedText>
             </View>
             <View className='flex-row justify-between pt-1'>
-                <ThemedText className='font-body text-gray-600 text-sm'>{t('payment.mobile.bankLabels.holder')}</ThemedText>
-                <ThemedText className='font-body font-bold text-gray-900'>VitalFit Cabudare</ThemedText>
+                <ThemedText className='font-body text-gray-600 text-sm' style={{ fontFamily: 'Montserrat_400Regular' }}>{t('payment.mobile.bankLabels.holder')}</ThemedText>
+                <ThemedText className='font-body font-bold text-gray-900' style={{ fontFamily: 'Montserrat_700Bold' }}>VitalFit Cabudare</ThemedText>
             </View>
           </View>
         </View>
 
-        <LinearGradient
-          colors={['#4F3521', '#F27F2A']}
-          locations={[0.2, 0.9]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={{
-            borderRadius: 16,
-            paddingHorizontal: 20,
-            paddingVertical: 16,
-            marginBottom: 24,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <View>
-            <ThemedText
-              lightColor='#ffffff'
-              darkColor='#ffffff'
-              className='font-body text-xs tracking-widest mb-1'
-              style={{ opacity: 0.8 }}>
-              {t('payment.totalToPay')}
-            </ThemedText>
-            <ThemedText
-              lightColor='#ffffff'
-              darkColor='#ffffff'
-              className='font-body font-bold text-xs'>
-               {t('payment.transfer.order')} #{params.invoiceId?.slice(0,8)}
-            </ThemedText>
-          </View>
-          <View className='items-end'>
-            <ThemedText
-              lightColor='#ffffff'
-              darkColor='#ffffff'
-              className='font-heading text-3xl font-bold'
-              style={{ fontFamily: 'BebasNeue-Regular' }}>
-              ${parseFloat(params.totalAmount).toFixed(2)}
-            </ThemedText>
-            <ThemedText
-              lightColor='#ffffff'
-              darkColor='#ffffff'
-              className='font-body text-xs font-bold'
-              style={{ opacity: 0.9 }}>
-              {params.currency}
-            </ThemedText>
-          </View>
-        </LinearGradient>
+        <View className="bg-white p-6 rounded-3xl border border-orange-100 mb-8 flex-row justify-between items-center">
+            <View>
+                <ThemedText className="font-body text-xs text-orange-500 font-bold tracking-widest uppercase mb-1" style={{ fontFamily: 'Montserrat_700Bold' }}>
+                    {t('payment.totalToPay')}
+                </ThemedText>
+                 <ThemedText className="font-body font-bold text-neutral-900" style={{ fontFamily: 'Montserrat_700Bold' }}>
+                   {t('payment.transfer.order')} #{params.invoiceId?.slice(0,8)}
+                </ThemedText>
+            </View>
+            <View className="items-end">
+                <ThemedText className="font-heading text-4xl font-bold text-neutral-900" style={{ fontFamily: 'BebasNeue-Regular' }}>
+                    ${parseFloat(params.totalAmount || '0').toFixed(2)}
+                </ThemedText>
+                <ThemedText className="font-body text-sm text-orange-500 font-bold" style={{ fontFamily: 'Montserrat_700Bold' }}>
+                    {params.currency || 'VES'}
+                </ThemedText>
+            </View>
+        </View>
 
         <View className='mb-8 space-y-4'>
 
           <View>
-            <ThemedText className='font-body text-sm mb-2 text-gray-600 font-medium'>{t('payment.form.originPhone')}</ThemedText>
+            <ThemedText className='font-body text-sm mb-2 text-gray-600 font-medium' style={{ fontFamily: 'Montserrat_500Medium' }}>{t('payment.form.originPhone')}</ThemedText>
             <View className='border border-gray-300 rounded-xl bg-white overflow-hidden'>
                 <PhoneInput
                 ref={phoneInputRef}
@@ -209,10 +179,10 @@ export default function MembershipPaymentPagoMovilScreen() {
         <View className='mb-8 border border-blue-100 rounded-xl px-4 py-3 bg-blue-50 flex-row items-center'>
           <ExclamationTriangleIcon size={24} color='#3b82f6' />
           <View className='ml-3 flex-1'>
-            <ThemedText className='font-body text-xs text-blue-800 font-bold mb-1'>
+            <ThemedText className='font-body text-xs text-blue-800 font-bold mb-1' style={{ fontFamily: 'Montserrat_700Bold' }}>
               {t('payment.warning.verificationTitle')}
             </ThemedText>
-            <ThemedText className='font-body text-xs text-blue-600'>
+            <ThemedText className='font-body text-xs text-blue-600' style={{ fontFamily: 'Montserrat_400Regular' }}>
               {t('payment.warning.verificationMessage')}
             </ThemedText>
           </View>

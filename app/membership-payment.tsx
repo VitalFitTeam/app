@@ -147,33 +147,33 @@ export default function MembershipPaymentScreen() {
             <ThemedText className="font-heading text-3xl font-bold text-center mb-2" style={{ fontFamily: 'BebasNeue-Regular' }}>
                 {t('payment.method.title')}
             </ThemedText>
-            <ThemedText className="font-body text-gray-500 text-center">
+            <ThemedText className="font-body text-gray-500 text-center" style={{ fontFamily: 'Montserrat_400Regular' }}>
                 {t('payment.method.subtitle')}
             </ThemedText>
         </View>
 
-        <View className="bg-neutral-50 p-5 rounded-2xl border border-neutral-200 mb-8">
-            <ThemedText className="font-body text-xs text-orange-500 font-bold tracking-widest uppercase mb-3">
+        <View className="bg-white p-6 rounded-3xl border border-orange-100 mb-8">
+            <ThemedText className="font-body text-xs text-orange-500 font-bold tracking-widest uppercase mb-3" style={{ fontFamily: 'Montserrat_700Bold' }}>
                 {t('payment.totalToPay')}
             </ThemedText>
             <View className="flex-row items-end mb-4">
-                <ThemedText className="font-heading text-4xl font-bold text-neutral-900 mr-2">
+                <ThemedText className="font-heading text-5xl font-bold text-neutral-900 mr-2" style={{ fontFamily: 'BebasNeue-Regular' }}>
                     ${parseFloat(params.totalAmount || '0').toFixed(2)}
                 </ThemedText>
-                <ThemedText className="font-body text-lg text-orange-500 font-bold mb-1">
+                <ThemedText className="font-body text-lg text-orange-500 font-bold mb-2" style={{ fontFamily: 'Montserrat_700Bold' }}>
                     {params.currency || 'USD'}
                 </ThemedText>
             </View>
-            <View className="h-[1px] bg-neutral-200 w-full mb-3" />
-            <View className="flex-row justify-between">
-                <ThemedText className="font-body text-neutral-600">{t('payment.concept')}</ThemedText>
-                <ThemedText className="font-body text-neutral-900 font-bold max-w-[60%] text-right" numberOfLines={1}>
+            <View className="h-[1px] bg-gray-100 w-full mb-4" />
+            <View className="flex-row justify-between items-center">
+                <ThemedText className="font-body text-neutral-500" style={{ fontFamily: 'Montserrat_400Regular' }}>{t('payment.concept')}</ThemedText>
+                <ThemedText className="font-body text-neutral-900 font-bold max-w-[60%] text-right text-base" numberOfLines={1} style={{ fontFamily: 'Montserrat_700Bold' }}>
                     {params.title || 'Membresía VitalFit'}
                 </ThemedText>
             </View>
         </View>
 
-        <ThemedText className="font-heading text-lg font-bold mb-4 text-neutral-800">{t('payment.options.title')}</ThemedText>
+        <ThemedText className="font-heading text-2xl mb-4 text-neutral-800 tracking-wide" style={{ fontFamily: 'BebasNeue-Regular' }}>{t('payment.options.title')}</ThemedText>
 
         {loadingMethods ? (
             <ActivityIndicator size="large" color="#f97316" className="py-10" />
@@ -196,11 +196,11 @@ export default function MembershipPaymentScreen() {
                                 {renderMethodIcon(method.name)}
                             </View>
                             <View className="flex-1">
-                                <ThemedText className={`font-body font-bold text-base ${isSelected ? 'text-orange-900' : 'text-neutral-900'}`}>
+                                <ThemedText className={`font-body font-bold text-base ${isSelected ? 'text-orange-900' : 'text-neutral-900'}`} style={{ fontFamily: 'Montserrat_700Bold' }}>
                                     {method.name}
                                 </ThemedText>
                                 {method.description ? (
-                                    <ThemedText className="font-body text-xs text-gray-500 mt-0.5">
+                                    <ThemedText className="font-body text-xs text-gray-500 mt-0.5" style={{ fontFamily: 'Montserrat_400Regular' }}>
                                         {method.description}
                                     </ThemedText>
                                 ) : null}
@@ -212,7 +212,7 @@ export default function MembershipPaymentScreen() {
                     );
                 })}
                 {methods.length === 0 && (
-                    <ThemedText className="font-body text-center text-gray-500 py-4">{t('payment.options.noMethods')}</ThemedText>
+                    <ThemedText className="font-body text-center text-gray-500 py-4" style={{ fontFamily: 'Montserrat_400Regular' }}>{t('payment.options.noMethods')}</ThemedText>
                 )}
             </View>
         )}

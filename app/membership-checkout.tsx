@@ -29,10 +29,17 @@ export default function MembershipCheckoutScreen() {
     price?: string;
     period?: string;
     type?: string;
+    servicesJson?: string;
   }>(); 
   const router = useRouter();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const parsedServices = useMemo(() => {
+    try {
+        return params.servicesJson ? JSON.parse(params.servicesJson) : [];
+    } catch { return []; }
+  }, [params.servicesJson]);
 
   const {
     getValues,
@@ -60,7 +67,7 @@ export default function MembershipCheckoutScreen() {
       return;
     }
 
-    if (!params.id || !params.title || !params.price) {
+    if ((!params.id && parsedServices.length === 0) || !params.title || !params.price) {
       Alert.alert('Error', t('checkout.error.missingData'));
       return;
     }
@@ -100,6 +107,7 @@ export default function MembershipCheckoutScreen() {
           startDate: result.data.startDate,
           userId: userId,
           branchId: branchId,
+          servicesJson: params.servicesJson, 
         },
       } as never);
 
@@ -278,7 +286,7 @@ export default function MembershipCheckoutScreen() {
             {t('checkout.startDate')}
           </ThemedText>
           {errors.startDate?.message && (
-            <Text className='font-body' style={{ color: 'red', fontSize: 12, marginTop: 4 }}>
+            <Text className='font-body' style={{ color: 'red', fontSize: 12, marginTop: 4, fontFamily: 'Montserrat_400Regular' }}>
               {errors.startDate.message}
             </Text>
           )}
