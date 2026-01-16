@@ -118,6 +118,8 @@
       "toast": {
         "errorTitle": "Error",
         "loginErrorTitle": "Login Error",
+        "verifyData": "Please verify your data.",
+        "incorrectCredentials": "Incorrect username or password.",
         "emptyFields": "Please enter your email and password.",
         "invalidEmail": "Please enter a valid email address.",
         "unexpectedError": "An unexpected error occurred. Please try again.",

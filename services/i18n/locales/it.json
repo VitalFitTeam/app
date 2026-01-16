@@ -117,6 +117,8 @@
       "toast": {
         "errorTitle": "Errore",
         "loginErrorTitle": "Errore di Accesso",
+        "verifyData": "Si prega di verificare i dati.",
+        "incorrectCredentials": "Nome utente o password errati.",
         "emptyFields": "Inserisci email e password.",
         "invalidEmail": "Inserisci un indirizzo email valido.",
         "unexpectedError": "Si è verificato un errore imprevisto. Riprova.",
