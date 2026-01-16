@@ -77,17 +77,12 @@ export default function ClientProfileScreen() {
 
   const handleConfirmLogout = async () => {
     setLogoutModalVisible(false);
-
-    // Clear OAuth-specific data
     await AsyncStorage.multiRemove(['temp_email', 'temp_password', 'temp_gender', 'is_oauth_user']);
-
-    // Sign out from Clerk if OAuth user
     try {
       await signOut();
     } catch (error) {
       console.log('No había sesión de Clerk activa:', error);
     }
-
     await logout();
   };
 
