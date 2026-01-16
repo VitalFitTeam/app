@@ -223,6 +223,21 @@ export default function RootLayout() {
                                     title: '',
                                 }}
                             />
+                            <Stack.Screen
+                                name="chatbot"
+                                options={{
+                                    headerShown: false,
+                                    title: '',
+                                    presentation: 'modal',
+                                }}
+                            />
+                            <Stack.Screen
+                                name="branches-map"
+                                options={{
+                                    headerShown: false,
+                                    title: '',
+                                }}
+                            />
                         </Stack>
                         <StatusBar style='auto' />
                     </ThemeProvider>

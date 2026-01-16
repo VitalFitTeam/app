@@ -268,6 +268,7 @@
     "dashboard": {
       "recepcionistDefault": "Recepcionista",
       "defaultUser": "Usuario",
+      "findBranches": "Encontrar Sedes",
       "member": {
         "activeMembership": "Membresía Activa",
         "noActivePlan": "Sin plan activo",
@@ -1270,6 +1271,29 @@
       "missingBranch": "No se identificó la sucursal.",
       "loadPaymentMethods": "No se pudieron cargar los métodos de pago.",
       "sessionExpired": "Sesión expirada"
+    },
+    "chatbot": {
+      "title": "Asistente VitalFit",
+      "online": "En línea",
+      "inputPlaceholder": "Escribe tu mensaje...",
+      "welcomeMessage": "¡Hola! Soy tu asistente virtual de VitalFit. ¿En qué puedo ayudarte hoy?",
+      "staticResponse": "Gracias por tu mensaje. Esta es una respuesta estática. Pronto conectaremos el chatbot con un agente real.",
+      "quickActions": {
+        "classSchedules": "Horarios de clases",
+        "myMembership": "Mi membresía",
+        "bookClass": "Reservar clase",
+        "contactSupport": "Contactar soporte"
+      }
+    },
+    "branchesMap": {
+      "title": "Nuestras Sedes",
+      "loading": "Cargando sedes...",
+      "noToken": "No se encontró sesión activa.",
+      "fetchError": "Error al cargar las sedes.",
+      "connectionError": "Error de conexión.",
+      "goBack": "Volver",
+      "searchPlaceholder": "Buscar sede...",
+      "noBranchesFound": "No se encontraron sedes."
     }
 
   }

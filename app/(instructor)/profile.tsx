@@ -1,8 +1,8 @@
 import { InstructorQRModal } from '@/components/instructor/InstructorQRModal';
 import { ThemedView } from '@/components/themed-view';
 import { UserAvatar } from '@/components/UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,7 @@ export default function InstructorProfileScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const { user, loading, clearUser } = useUser();
+	const { logout } = useAuth();
 	const [qrModalVisible, setQrModalVisible] = useState(false);
 	const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
@@ -38,15 +39,9 @@ export default function InstructorProfileScreen() {
 		: t('instructor.profile.defaultName');
 
 	const handleConfirmLogout = async () => {
-		try {
-			await AsyncStorage.removeItem('token');
-			clearUser();
-		} catch (error) {
-			console.error('Error al eliminar el token en logout:', error);
-		} finally {
-			setLogoutModalVisible(false);
-			router.replace('/(auth)/login');
-		}
+		setLogoutModalVisible(false);
+		clearUser();
+		await logout();
 	};
 
 

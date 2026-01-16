@@ -349,7 +349,8 @@
         "services": "Services",
         "start": "Démarrer",
         "purchase": "Acheter"
-      }
+      },
+      "findBranches": "Trouver des Succursales"
     },
     "enrollClient": {
       "title": "Inscrire un Client",
@@ -1202,6 +1203,29 @@
       "errorTitle": "Cancellation Error",
       "errorMessage": "An error occurred while cancelling the membership.",
       "alreadyCancelled": "This membership is already cancelled."
+    },
+    "chatbot": {
+      "title": "Assistant VitalFit",
+      "online": "En ligne",
+      "inputPlaceholder": "Écrivez votre message...",
+      "welcomeMessage": "Bonjour ! Je suis votre assistant virtuel VitalFit. Comment puis-je vous aider aujourd'hui ?",
+      "staticResponse": "Merci pour votre message. Ceci est une réponse statique. Nous connecterons bientôt le chatbot à un véritable agent.",
+      "quickActions": {
+        "classSchedules": "Horaires des cours",
+        "myMembership": "Mon abonnement",
+        "bookClass": "Réserver un cours",
+        "contactSupport": "Contacter le support"
+      }
+    },
+    "branchesMap": {
+      "title": "Nos Succursales",
+      "loading": "Chargement des succursales...",
+      "noToken": "Aucune session active trouvée.",
+      "fetchError": "Erreur lors du chargement des succursales.",
+      "connectionError": "Erreur de connexion.",
+      "goBack": "Retour",
+      "searchPlaceholder": "Rechercher une succursale...",
+      "noBranchesFound": "Aucune succursale trouvée."
     },
     "classesScreen": {
       "title": "Calendrier des Cours",

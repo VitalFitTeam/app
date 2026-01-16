@@ -59,12 +59,12 @@ export default function BackgroundCarousel({ images, onIndexChange, interval = 3
 			getItemLayout={getItemLayout}
 			viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
 			renderItem={({ item }) => (
-				<View style={{ width, height }}>
+				<View style={{ width, height, backgroundColor: '#000' }}>
 					<Image
 						source={item}
 						style={{
-							width: width * 1,
-							height: height * 1,
+							width,
+							height: height * 1.1,
 							position: 'absolute',
 							top: '-5%',
 						}}

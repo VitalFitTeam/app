@@ -349,7 +349,8 @@
         "services": "Serviços",
         "start": "Iniciar",
         "purchase": "Comprar"
-      }
+      },
+      "findBranches": "Encontrar Unidades"
     },
     "enrollClient": {
       "title": "Inscrever Cliente",
@@ -1203,6 +1204,19 @@
       "errorMessage": "An error occurred while cancelling the membership.",
       "alreadyCancelled": "This membership is already cancelled."
     },
+    "chatbot": {
+      "title": "Assistente VitalFit",
+      "online": "Online",
+      "inputPlaceholder": "Escreva sua mensagem...",
+      "welcomeMessage": "Olá! Sou seu assistente virtual VitalFit. Como posso ajudá-lo hoje?",
+      "staticResponse": "Obrigado pela sua mensagem. Esta é uma resposta estática. Em breve conectaremos o chatbot a um agente real.",
+      "quickActions": {
+        "classSchedules": "Horários das aulas",
+        "myMembership": "Minha assinatura",
+        "bookClass": "Reservar aula",
+        "contactSupport": "Contatar suporte"
+      }
+    },
     "classesScreen": {
       "title": "Calendário de Aulas",
       "calendar": "CALENDÁRIO",
@@ -1210,6 +1224,16 @@
       "month": "Mês",
       "classesOfDay": "AULAS DO DIA",
       "noClasses": "Nenhuma aula agendada para esta data."
+    },
+    "branchesMap": {
+      "title": "Nossas Unidades",
+      "loading": "Carregando unidades...",
+      "noToken": "Nenhuma sessão ativa encontrada.",
+      "fetchError": "Erro ao carregar unidades.",
+      "connectionError": "Erro de conexão.",
+      "goBack": "Voltar",
+      "searchPlaceholder": "Buscar unidade...",
+      "noBranchesFound": "Nenhuma unidade encontrada."
     }
   }
 }
