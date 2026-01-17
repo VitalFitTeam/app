@@ -20,7 +20,6 @@ export default function HomeScreen() {
 	const router = useRouter();
 	const { t } = useTranslation();
 
-
 	const slideTexts = [t('slide1'), t('slide2'), t('slide3')];
 
 	const { isAuthenticated, isLoading, role } = useAuth();
@@ -42,7 +41,7 @@ export default function HomeScreen() {
 		return (
 			<View className='flex-1 items-center justify-center bg-black'>
 				<StatusBar barStyle='light-content' backgroundColor='#000' />
-				<ActivityIndicator size="large" color="#f97316" />
+				<ActivityIndicator size='large' color='#f97316' />
 			</View>
 		);
 	}
@@ -65,8 +64,8 @@ export default function HomeScreen() {
 				style={{ top: '-10%' }}
 				pointerEvents='none'>
 				<Image
-					source={require('../assets/images/Component_7.png')}
-					className='w-100 h-100'
+					source={require('../assets/images/isotipo.png')}
+					className='w-80 h-80'
 					resizeMode='contain'
 				/>
 			</View>
@@ -82,7 +81,6 @@ export default function HomeScreen() {
 					paddingHorizontal: 24,
 					paddingTop: 48,
 				}}>
-
 				<Text className='mb-6 text-center font-heading text-[30px] leading-[36px] text-white'>
 					{slideTexts[index]}
 				</Text>
@@ -91,13 +89,14 @@ export default function HomeScreen() {
 					{[0, 1, 2].map((i) => (
 						<View
 							key={i}
-							className={`mx-2 h-1.5 rounded-full ${i === index ? 'w-5 bg-white' : 'w-1.5 bg-white/40'
-								}`}
+							className={`mx-2 h-1.5 rounded-full ${
+								i === index ? 'w-5 bg-white' : 'w-1.5 bg-white/40'
+							}`}
 						/>
 					))}
 				</View>
 
-				<View className='flex-row justify-center gap-6 mb-4'>
+				<View className='mb-4 flex-row justify-center gap-6'>
 					<Link href='/language' asChild>
 						<TouchableOpacity className='flex-row items-center justify-center py-2'>
 							<Global color='white' size={16} variant='Outline' />
@@ -109,8 +108,7 @@ export default function HomeScreen() {
 
 					<TouchableOpacity
 						onPress={() => router.push('/branches-map')}
-						className='flex-row items-center justify-center py-2'
-					>
+						className='flex-row items-center justify-center py-2'>
 						<Location color='#f97316' size={16} variant='Outline' />
 						<Text className='ml-2 font-body text-sm text-orange-500'>
 							{t('dashboard.findBranches')}
@@ -137,7 +135,6 @@ export default function HomeScreen() {
 						marginTop: 16,
 					}}>
 					<View style={{ flex: 1, marginRight: 8 }}>
-
 						<SignInButton
 							label={t('signIn')}
 							onPress={() => router.replace('/(auth)/login')}

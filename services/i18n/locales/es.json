@@ -118,6 +118,8 @@
       "toast": {
         "errorTitle": "Error",
         "loginErrorTitle": "Error al iniciar sesión",
+        "verifyData": "Por favor verifica tus datos.",
+        "incorrectCredentials": "Usuario o contraseña incorrectos.",
         "emptyFields": "Por favor, ingresa tu correo y contraseña.",
         "invalidEmail": "Por favor, ingresa un correo electrónico válido.",
         "unexpectedError": "Ocurrió un error inesperado. Inténtalo de nuevo.",
@@ -949,6 +951,24 @@
         "paymentReported": "Pago Reportado",
         "sentToVerification": "Tu pago ha sido enviado a verificación.",
         "errorPayment": "Error en el pago"
+      },
+      "defaultTitle": "Membresía VitalFit",
+      "defaultReceiptHelper": "Pago reportado",
+      "cashReceiptHelper": "Pago en sitio/caja",
+      "labels": {
+          "bank_name": "Banco",
+          "account_number": "Nro. Cuenta",
+          "email": "Correo Zelle",
+          "phone": "Teléfono",
+          "phone_number": "Teléfono",
+          "rif": "RIF/Cédula",
+          "beneficiary_name": "Beneficiario",
+          "holder": "Titular",
+          "number": "Número"
+      },
+      "confirmOrder": "Confirmar Pedido",
+      "instructions": {
+        "cash": "Realiza el pago en caja y repórtalo aquí."
       }
     },
     "instructor": {
@@ -1238,6 +1258,21 @@
         "clientProgressBody": "Tu cliente Juan Pérez actualizó su progreso de rutina.",
         "hiitClassBody": "Tienes una clase de HIIT programada para mañana."
       }
+    },
+    "services": {
+      "title": "Servicios",
+      "headerTitle": "SERVICIOS",
+      "subtitle": "Selecciona una sucursal y elige tu servicio.",
+      "serviceFallback": "Servicio VitalFit",
+      "duration": "Duración: {{minutes}} min",
+      "memberPrice": "Socio",
+      "generalPrice": "General",
+      "oneTimePayment": "Pago único"
+    },
+    "errors": {
+      "missingBranch": "No se identificó la sucursal.",
+      "loadPaymentMethods": "No se pudieron cargar los métodos de pago.",
+      "sessionExpired": "Sesión expirada"
     },
     "chatbot": {
       "title": "Asistente VitalFit",

@@ -117,6 +117,8 @@
       "toast": {
         "errorTitle": "Fehler",
         "loginErrorTitle": "Anmeldefehler",
+        "verifyData": "Bitte überprüfen Sie Ihre Daten.",
+        "incorrectCredentials": "Falscher Benutzername oder Passwort.",
         "emptyFields": "Bitte geben Sie E-Mail und Passwort ein.",
         "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
         "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
@@ -923,6 +925,24 @@
         "paymentReported": "Zahlung gemeldet",
         "sentToVerification": "Deine Zahlung wurde zur Verifizierung gesendet.",
         "errorPayment": "Zahlungsfehler"
+      },
+      "defaultTitle": "VitalFit Mitgliedschaft",
+      "defaultReceiptHelper": "Gemeldete Zahlung",
+      "cashReceiptHelper": "Zahlung vor Ort/Kasse",
+      "labels": {
+          "bank_name": "Bank",
+          "account_number": "Kontonummer",
+          "email": "Zelle E-Mail",
+          "phone": "Telefon",
+          "phone_number": "Telefon",
+          "rif": "ID/Dok",
+          "beneficiary_name": "Empfänger",
+          "holder": "Inhaber",
+          "number": "Nummer"
+      },
+      "confirmOrder": "Bestellung bestätigen",
+      "instructions": {
+        "cash": "Bezahlen Sie an der Kasse und melden Sie es hier."
       }
     },
     "instructor": {
@@ -1133,6 +1153,21 @@
         "clientProgressBody": "Ihr Kunde Juan Pérez hat seinen Routinefortschritt aktualisiert.",
         "hiitClassBody": "Sie haben für morgen einen HIIT-Kurs geplant."
       }
+    },
+    "services": {
+      "title": "Dienstleistungen",
+      "headerTitle": "DIENSTLEISTUNGEN",
+      "subtitle": "Wähle einen Standort und wähle deinen Dienst.",
+      "serviceFallback": "VitalFit Dienstleistung",
+      "duration": "Dauer: {{minutes}} Min",
+      "memberPrice": "Mitglied",
+      "generalPrice": "Allgemein",
+      "oneTimePayment": "Einmalzahlung"
+    },
+    "errors": {
+      "missingBranch": "Standort nicht identifiziert.",
+      "loadPaymentMethods": "Zahlungsmethoden konnten nicht geladen werden.",
+      "sessionExpired": "Sitzung abgelaufen"
     },
     "membershipDetails": {
       "title": "Membership Details",

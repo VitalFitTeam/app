@@ -149,13 +149,13 @@ export default function DashboardScreen() {
 
 				{hasMembership ? (
 					<View className='gap-3'>
-						<BirthdayOfferBanner onPress={() => router.replace('/membership-entry')} />
+						<BirthdayOfferBanner />
 
 						<WeeklyChallengeBanner
 							onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
 						/>
 
-						<BirthdayOfferBanner onPress={() => router.replace('/membership-entry')} />
+						<BirthdayOfferBanner />
 
 						<CrossFitBanner
 							imageSource={require('@/assets/images/crossfit.png')}
@@ -165,7 +165,7 @@ export default function DashboardScreen() {
 					</View>
 				) : (
 					<>
-						<BirthdayOfferBanner onPress={() => router.replace('/membership-entry')} />
+						<BirthdayOfferBanner />
 
 						<RNText className='font-heading' style={{ color: '#111827', fontWeight: '700', fontSize: 18, marginTop: 16, marginBottom: 8 }}>
 							{t('dashboard.member.packages')}

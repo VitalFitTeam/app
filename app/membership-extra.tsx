@@ -147,6 +147,7 @@ export default function MembershipExtraScreen() {
               lightColor="#111827"
               darkColor="#111827"
               className="font-body font-bold text-lg mb-1"
+              style={{ fontFamily: 'Montserrat_700Bold' }}
             >
               {getPackageName(item)}
             </ThemedText>
@@ -155,6 +156,7 @@ export default function MembershipExtraScreen() {
               darkColor="#6b7280"
               className="font-body text-xs"
               numberOfLines={2}
+              style={{ fontFamily: 'Montserrat_400Regular' }}
             >
               {getPackageDescription(item)}
             </ThemedText>
@@ -165,18 +167,19 @@ export default function MembershipExtraScreen() {
                lightColor="#f97316"
                darkColor="#f97316"
                className="font-heading font-extrabold text-xl"
+               style={{ fontFamily: 'Montserrat_700Bold' }}
              >
                ${item.price}
              </ThemedText>
              {isSelected ? (
                 <View className="flex-row items-center mt-1">
                     <CheckCircleIcon size={16} color="#f97316" />
-                    <ThemedText className="font-body text-xs text-orange-600 font-bold ml-1">
+                    <ThemedText className="font-body text-xs text-orange-600 font-bold ml-1" style={{ fontFamily: 'Montserrat_700Bold' }}>
                         {t('extras.added')}
                     </ThemedText>
                 </View>
              ) : (
-                <ThemedText className="font-body text-xs text-gray-400 mt-1">
+                <ThemedText className="font-body text-xs text-gray-400 mt-1" style={{ fontFamily: 'Montserrat_400Regular' }}>
                     {t('extras.clickToAdd')}
                 </ThemedText>
              )}
@@ -202,32 +205,32 @@ export default function MembershipExtraScreen() {
 
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
-                <ThemedText className='font-body text-[10px] font-semibold text-gray-800'>1</ThemedText>
+                <ThemedText className='font-body text-[10px] font-semibold text-gray-800' style={{ fontFamily: 'Montserrat_500Medium' }}>1</ThemedText>
               </View>
-              <ThemedText className='font-body text-[11px] text-center text-gray-800'>{t('checkout.steps.options')}</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-gray-800' style={{ fontFamily: 'Montserrat_500Medium' }}>{t('checkout.steps.options')}</ThemedText>
             </View>
 
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-orange-500 border-orange-500'>
-                <ThemedText className='font-body text-[10px] font-semibold text-white'>2</ThemedText>
+                <ThemedText className='font-body text-[10px] font-semibold text-white' style={{ fontFamily: 'Montserrat_500Medium' }}>2</ThemedText>
               </View>
-              <ThemedText className='font-body text-[11px] text-center text-orange-600 font-bold'>{t('checkout.steps.extras')}</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-orange-600 font-bold' style={{ fontFamily: 'Montserrat_500Medium' }}>{t('checkout.steps.extras')}</ThemedText>
             </View>
 
             <View className='items-center flex-1'>
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-white border-neutral-400'>
-                <ThemedText className='font-body text-[10px] font-semibold text-gray-800'>3</ThemedText>
+                <ThemedText className='font-body text-[10px] font-semibold text-gray-800' style={{ fontFamily: 'Montserrat_500Medium' }}>3</ThemedText>
               </View>
-              <ThemedText className='font-body text-[11px] text-center text-gray-800'>{t('checkout.steps.confirmation')}</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-gray-800' style={{ fontFamily: 'Montserrat_500Medium' }}>{t('checkout.steps.confirmation')}</ThemedText>
             </View>
           </View>
         </View>
 
         <View className="mb-4">
-            <ThemedText className="font-heading text-xl font-bold mb-1">
+            <ThemedText className="font-heading text-xl font-bold mb-1" style={{ fontFamily: 'BebasNeue-Regular' }}>
                 {t('extras.additionalPackages')}
             </ThemedText>
-            <ThemedText className="font-body text-sm text-gray-500">
+            <ThemedText className="font-body text-sm text-gray-500" style={{ fontFamily: 'Montserrat_400Regular' }}>
                 {t('extras.subtitle')}
             </ThemedText>
         </View>
@@ -248,7 +251,7 @@ export default function MembershipExtraScreen() {
             onEndReachedThreshold={0.5}
             ListEmptyComponent={
                 <View className="py-10 items-center">
-                    <ThemedText className="font-body text-gray-400 text-center">
+                    <ThemedText className="font-body text-gray-400 text-center" style={{ fontFamily: 'Montserrat_400Regular' }}>
                         {t('extras.noPackagesAvailable')}
                     </ThemedText>
                 </View>
@@ -269,7 +272,7 @@ export default function MembershipExtraScreen() {
                 onPress={onContinue}
             />
             <TouchableOpacity onPress={onContinue} className="mt-3 items-center">
-                <ThemedText className="font-body text-gray-500 text-sm underline">
+                <ThemedText className="font-body text-gray-500 text-sm underline" style={{ fontFamily: 'Montserrat_400Regular' }}>
                     {t('extras.skipExtras')}
                 </ThemedText>
             </TouchableOpacity>

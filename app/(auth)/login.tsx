@@ -107,13 +107,31 @@ export default function LoginScreen() {
             }
         } catch (error: unknown) {
             let errorMessage = t('login.toast.unexpectedError');
-            if (isAPIError(error)) {
-                errorMessage = error.messages.join(', ');
-            } else if (error instanceof Error) {
-                errorMessage = error.message;
+            const errorTitle = t('login.toast.loginErrorTitle');
+            
+            // Check specifically for account not found or unauthorized
+            const errorString = JSON.stringify(error).toLowerCase();
+            const messageString = error instanceof Error ? error.message.toLowerCase() : '';
+            
+            if (errorString.includes('not found') || messageString.includes('not found')) {
+                errorMessage = t('login.toast.verifyData');
+                // Use console.log to avoid yellow box
+                console.log('Login error (handled): Account not found');
+            } else if (errorString.includes('unauthorized') || messageString.includes('unauthorized')) {
+                errorMessage = t('login.toast.incorrectCredentials');
+                // Use console.log to avoid yellow box
+                console.log('Login error (handled): Unauthorized');
+            } else {
+                if (isAPIError(error)) {
+                    errorMessage = error.messages.join(', ');
+                } else if (error instanceof Error) {
+                    errorMessage = error.message;
+                }
+                // Log full error for other cases
+                console.error('Error en el login (detalle completo):', JSON.stringify(error, null, 2));
             }
-            console.error('Error en el login (detalle completo):', JSON.stringify(error, null, 2));
-            showToast('error', t('login.toast.loginErrorTitle'), errorMessage);
+            
+            showToast('error', errorTitle, errorMessage);
         } finally {
             setIsLoading(false);
         }

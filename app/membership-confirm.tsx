@@ -48,6 +48,7 @@ export default function MembershipConfirmScreen() {
     userId?: string;
     branchId?: string;
     packagesJson?: string;
+    servicesJson?: string;
   }>();
 
   const [processing, setProcessing] = useState(false);
@@ -204,11 +205,19 @@ export default function MembershipConfirmScreen() {
     } catch { return []; }
   }, [params.packagesJson]);
 
-  const mainPriceUSD = parseFloat(params.mainItemPrice || '0');
+  const selectedServices = useMemo(() => {
+    try {
+      return params.servicesJson ? JSON.parse(params.servicesJson) : [];
+    } catch { return []; }
+  }, [params.servicesJson]);
+
+  const mainPriceUSD = params.mainItemId ? parseFloat(params.mainItemPrice || '0') : 0;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const packagesTotalUSD = selectedPackages.reduce((sum: number, pkg: any) => sum + (pkg.price || 0), 0);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const servicesTotalUSD = selectedServices.reduce((sum: number, svc: any) => sum + (svc.price || 0), 0);
   
-  const subTotalUSD = mainPriceUSD + packagesTotalUSD;
+  const subTotalUSD = mainPriceUSD + packagesTotalUSD + servicesTotalUSD;
   
   // Cálculo: 100 * 0.21 = 21
   const taxAmountUSD = subTotalUSD * taxRate;
@@ -243,6 +252,12 @@ export default function MembershipConfirmScreen() {
           quantity: 1,
         });
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      selectedServices.forEach((svc: any) => {
+        if (svc.service_id) {
+            invoiceItems.push({ item_id: svc.service_id, item_type: 'service', quantity: 1 });
+        }
+      });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       selectedPackages.forEach((pkg: any) => {
         const pkgId = pkg.packageId || pkg.package_id;
@@ -316,15 +331,17 @@ export default function MembershipConfirmScreen() {
               <View className='w-8 h-8 rounded-full items-center justify-center mb-1 border bg-orange-500 border-orange-500'>
                 <ThemedText className='font-body text-[10px] font-semibold text-white'>3</ThemedText>
               </View>
-              <ThemedText className='font-body text-[11px] text-center text-orange-600 font-bold'>{t('checkout.steps.confirmation')}</ThemedText>
+              <ThemedText className='font-body text-[11px] text-center text-orange-600 font-bold' style={{ fontFamily: 'Montserrat_700Bold' }}>{t('checkout.steps.confirmation')}</ThemedText>
             </View>
           </View>
         </View>
 
-        <ThemedText className="font-heading text-xl font-bold mb-4">{t('confirm.paymentConfig')}</ThemedText>
+        <ThemedText className="font-heading text-2xl mb-4 text-neutral-800 tracking-wide" style={{ fontFamily: 'BebasNeue-Regular' }}>
+            {t('confirm.paymentConfig')}
+        </ThemedText>
 
         <View className="mb-4">
-          <ThemedText className="font-body text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.branch')}</ThemedText>
+          <ThemedText className="font-body text-xs text-gray-500 font-bold uppercase mb-2" style={{ fontFamily: 'Montserrat_700Bold' }}>{t('confirm.branch')}</ThemedText>
           {loadingBranches ? (
             <ActivityIndicator size="small" color="#f97316" />
           ) : (
@@ -335,7 +352,7 @@ export default function MembershipConfirmScreen() {
               >
                 <View className="flex-row items-center">
                     <MapPinIcon size={20} color="#f97316" />
-                    <ThemedText className="font-body ml-3 font-bold text-lg text-gray-800">
+                    <ThemedText className="font-body ml-3 font-bold text-lg text-gray-800" style={{ fontFamily: 'Montserrat_700Bold' }}>
                         {selectedBranchName}
                     </ThemedText>
                 </View>
@@ -369,7 +386,7 @@ export default function MembershipConfirmScreen() {
                                     isSelected ? 'bg-orange-50' : ''
                                 }`}
                               >
-                                <ThemedText className="font-body font-bold">{branch.name}</ThemedText>
+                                <ThemedText className="font-body font-bold" style={{ fontFamily: 'Montserrat_700Bold' }}>{branch.name}</ThemedText>
                                 {isSelected && (
                                     <ThemedText className="font-body text-orange-500 font-bold">✓</ThemedText>
                                 )}
@@ -385,14 +402,14 @@ export default function MembershipConfirmScreen() {
         </View>
 
         <View className="mb-6">
-            <ThemedText className="font-body text-xs text-gray-500 font-bold uppercase mb-2">{t('confirm.currency')}</ThemedText>
+            <ThemedText className="font-body text-xs text-gray-500 font-bold uppercase mb-2" style={{ fontFamily: 'Montserrat_700Bold' }}>{t('confirm.currency')}</ThemedText>
             <TouchableOpacity
                 onPress={() => setCurrencyModalVisible(true)}
                 className="flex-row items-center justify-between border border-gray-300 rounded-xl p-4 bg-white"
             >
                 <View className="flex-row items-center">
                     <CurrencyDollarIcon size={20} color="#f97316" />
-                    <ThemedText className="font-body ml-3 font-bold text-lg text-gray-800">
+                    <ThemedText className="font-body ml-3 font-bold text-lg text-gray-800" style={{ fontFamily: 'Montserrat_700Bold' }}>
                         {currency} ({selectedCurrencySymbol})
                     </ThemedText>
                 </View>
@@ -424,7 +441,7 @@ export default function MembershipConfirmScreen() {
                                       currency === curr.name ? 'bg-orange-50' : ''
                                   }`}
                               >
-                                  <ThemedText className="font-body font-bold">{curr.label}</ThemedText>
+                                  <ThemedText className="font-body font-bold" style={{ fontFamily: 'Montserrat_700Bold' }}>{curr.label}</ThemedText>
                                   {currency === curr.name && (
                                       <ThemedText className="font-body text-orange-500 font-bold">✓</ThemedText>
                                   )}
@@ -437,21 +454,32 @@ export default function MembershipConfirmScreen() {
         </View>
 
         <View className="bg-neutral-50 p-5 rounded-2xl border border-neutral-200 mb-6">
-          <ThemedText className="font-body text-xs text-orange-500 font-bold tracking-widest uppercase mb-3">
+          <ThemedText className="font-body text-xs text-orange-500 font-bold tracking-widest uppercase mb-3" style={{ fontFamily: 'Montserrat_700Bold' }}>
              {t('confirm.detailUSD')}
           </ThemedText>
 
-          <View className="flex-row justify-between mb-2">
-            <ThemedText className="font-body text-neutral-700">{params.mainItemTitle}</ThemedText>
-            <ThemedText className="font-body font-bold text-neutral-900">${mainPriceUSD.toFixed(2)}</ThemedText>
-          </View>
+          
+          {params.mainItemId ? (
+            <View className="flex-row justify-between mb-2">
+                <ThemedText className="font-body text-neutral-700" style={{ fontFamily: 'Montserrat_400Regular' }}>{params.mainItemTitle}</ThemedText>
+                <ThemedText className="font-body font-bold text-neutral-900" style={{ fontFamily: 'Montserrat_700Bold' }}>${mainPriceUSD.toFixed(2)}</ThemedText>
+            </View>
+          ) : null}
 
           <ScrollView className="max-h-48" nestedScrollEnabled={true}>
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {selectedServices.map((svc: any, index: number) => (
+              <View key={`svc-${index}`} className="flex-row justify-between mb-2 pl-2">
+                <ThemedText className="font-body text-neutral-600 text-sm flex-1 mr-2" style={{ fontFamily: 'Montserrat_400Regular' }}>• {svc.name}</ThemedText>
+                <ThemedText className="font-body font-bold text-neutral-800 text-sm" style={{ fontFamily: 'Montserrat_700Bold' }}>${svc.price?.toFixed(2)}</ThemedText>
+              </View>
+            ))}
+
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {selectedPackages.map((pkg: any, index: number) => (
-              <View key={index} className="flex-row justify-between mb-2">
-                <ThemedText className="font-body text-neutral-600 text-sm flex-1 mr-2">+ {pkg.name}</ThemedText>
-                <ThemedText className="font-body font-bold text-neutral-800 text-sm">${pkg.price?.toFixed(2)}</ThemedText>
+              <View key={index} className="flex-row justify-between mb-2 pl-2">
+                <ThemedText className="font-body text-neutral-600 text-sm flex-1 mr-2" style={{ fontFamily: 'Montserrat_400Regular' }}>+ {pkg.name}</ThemedText>
+                <ThemedText className="font-body font-bold text-neutral-800 text-sm" style={{ fontFamily: 'Montserrat_700Bold' }}>${pkg.price?.toFixed(2)}</ThemedText>
               </View>
             ))}
           </ScrollView>
@@ -464,21 +492,21 @@ export default function MembershipConfirmScreen() {
           ) : (
             <View className="flex-row justify-between mb-2">
                 {/* Visualización: muestra el porcentaje entero (21%) */}
-                <ThemedText className="font-body text-neutral-600 text-sm flex-1 mr-2">{t('confirm.tax')} ({formatTaxRate(taxRate)})</ThemedText>
-                <ThemedText className="font-body font-bold text-neutral-800 text-sm">${taxAmountUSD.toFixed(2)}</ThemedText>
+                <ThemedText className="font-body text-neutral-600 text-sm flex-1 mr-2" style={{ fontFamily: 'Montserrat_400Regular' }}>{t('confirm.tax')} ({formatTaxRate(taxRate)})</ThemedText>
+                <ThemedText className="font-body font-bold text-neutral-800 text-sm" style={{ fontFamily: 'Montserrat_700Bold' }}>${taxAmountUSD.toFixed(2)}</ThemedText>
             </View>
           )}
 
           <View className="flex-row justify-between items-center">
-            <ThemedText className="font-body font-bold text-neutral-500">{t('confirm.totalUSD')}</ThemedText>
-            <ThemedText className="font-body font-bold text-lg text-neutral-900">${grandTotalUSD.toFixed(2)}</ThemedText>
+            <ThemedText className="font-body font-bold text-neutral-500" style={{ fontFamily: 'Montserrat_700Bold' }}>{t('confirm.totalUSD')}</ThemedText>
+            <ThemedText className="font-body font-bold text-lg text-neutral-900" style={{ fontFamily: 'Montserrat_700Bold' }}>${grandTotalUSD.toFixed(2)}</ThemedText>
           </View>
         </View>
 
         <View className="mt-2 border-t border-neutral-100 pt-4 mb-8">
           <View className="flex-row justify-between items-end">
             <View className="flex-1 mr-4">
-              <ThemedText className="font-body text-xl text-neutral-500">{t('confirm.totalToPay')}</ThemedText>
+              <ThemedText className="font-body text-xl text-neutral-500" style={{ fontFamily: 'Montserrat_400Regular' }}>{t('confirm.totalToPay')}</ThemedText>
               {currency !== 'USD' && (
                   <ThemedText className="font-body text-xs text-gray-400 mt-1">
                       {t('confirm.approxRate')} {rate.toFixed(2)}
@@ -494,7 +522,7 @@ export default function MembershipConfirmScreen() {
                         <ThemedText className="font-heading text-4xl font-extrabold text-orange-600" style={{ fontFamily: 'BebasNeue-Regular' }}>
                         {selectedCurrencySymbol}{grandTotalConverted.toFixed(2)}
                         </ThemedText>
-                        <ThemedText className="font-body text-sm font-bold text-gray-500">{currency}</ThemedText>
+                        <ThemedText className="font-body text-sm font-bold text-gray-500" style={{ fontFamily: 'Montserrat_700Bold' }}>{currency}</ThemedText>
                     </>
                 )}
             </View>
