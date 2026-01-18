@@ -123,6 +123,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name='community'
                 options={{
+                    href: null,
                     title: t('nav.community'),
                     tabBarIcon: ({ focused }) => (
                         <View
