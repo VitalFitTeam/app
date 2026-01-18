@@ -59,6 +59,7 @@ export default function ClassDetailsScreen() {
     instructorId,
     bookingId,
     startsAt,
+    branchId,
   } = useLocalSearchParams();
 
   const { isReserved, reserve, cancel } = useReservations();
@@ -1056,6 +1057,22 @@ export default function ClassDetailsScreen() {
                   router.back();
                 } catch (error: unknown) {
                   let message = 'Ocurrió un error al reservar la clase.';
+
+                  // Check for 402 Payment Required error
+                  if (isAPIError(error) && error.status === 402) {
+                    showToast(
+                      'error',
+                      'Pago requerido',
+                      'Necesitas adquirir un servicio para reservar esta clase.',
+                    );
+                    // Redirect to services screen with the branch pre-selected
+                    router.push({
+                      pathname: '/services',
+                      params: branchId ? { branchId: String(branchId) } : undefined,
+                    });
+                    return;
+                  }
+
                   if (isAPIError(error)) {
                     message = error.messages.join(', ');
                   } else if (error instanceof Error) {

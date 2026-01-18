@@ -4,7 +4,7 @@ import { useUser } from '@/contexts/UserContext';
 import vitalFitApi from '@/services';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, Modal, ScrollView, TouchableOpacity, View } from 'react-native';
@@ -134,10 +134,13 @@ export default function ServicesScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { user } = useUser();
+  const { branchId: initialBranchId } = useLocalSearchParams();
 
   const [loading, setLoading] = useState(true);
   const [branches, setBranches] = useState<BranchItem[]>([]);
-  const [selectedBranchId, setSelectedBranchId] = useState<string>('');
+  const [selectedBranchId, setSelectedBranchId] = useState<string>(
+    initialBranchId ? String(initialBranchId) : ''
+  );
   const [branchModalVisible, setBranchModalVisible] = useState(false);
   const [loadingBranches, setLoadingBranches] = useState(true);
 
@@ -158,6 +161,7 @@ export default function ServicesScreen() {
             const data = (response as { data?: BranchItem[] }).data || [];
 
             setBranches(data);
+            // Only set default branch if no branch is selected (respects initialBranchId)
             if (data.length > 0 && !selectedBranchId) {
                 setSelectedBranchId(data[0].branch_id);
             }

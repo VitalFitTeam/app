@@ -717,6 +717,7 @@ export default function HorariosScreen() {
                                                 serviceId: classItem.serviceId,
                                                 instructorId: classItem.instructorId,
                                                 startsAt: classItem.startsAt,
+                                                branchId: selectedBranchId,
                                             },
                                         });
                                     }}
@@ -777,6 +778,7 @@ export default function HorariosScreen() {
                                                     instructorId: booking.instructorId,
                                                     bookingId: booking.bookingId,
                                                     startsAt: booking.rawDate,
+                                                    branchId: selectedBranchId,
                                                 },
                                             });
                                         }}

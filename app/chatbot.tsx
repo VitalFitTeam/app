@@ -66,7 +66,7 @@ export default function ChatbotScreen() {
 
 	return (
 		<ThemedView lightColor='#FFFFFF' darkColor='#050816' style={{ flex: 1 }}>
-			<SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
+			<SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right', 'bottom']}>
 				<KeyboardAvoidingView
 					style={{ flex: 1 }}
 					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
