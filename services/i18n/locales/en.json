@@ -1030,7 +1030,10 @@
 			"clients": {
 				"title": "My Clients",
 				"assignRoutine": "Assign New Routine",
-				"viewProgress": "View Progress"
+				"viewProgress": "View Progress",
+				"totalBookings": "Total Bookings",
+				"noClients": "No assigned clients found.",
+				"searchPlaceholder": "Search client..."
 			},
 			"clientProgress": {
 				"title": "Progress",

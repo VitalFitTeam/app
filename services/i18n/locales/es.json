@@ -1025,7 +1025,7 @@
 				"stats": {
 					"monthlyClasses": "Clases Mes",
 					"studentsToday": "Alumnos Hoy",
-					"attendanceRate": "Tasa Asistencia"
+					"attendanceRate": "Tendencia de asistencia"
 				},
 				"myClients": {
 					"title": "Mis Clientes",
@@ -1045,7 +1045,10 @@
 			"clients": {
 				"title": "Mis clientes",
 				"assignRoutine": "Asignar nueva rutina",
-				"viewProgress": "Ver progreso"
+				"viewProgress": "Ver progreso",
+				"totalBookings": "Total Reservas",
+				"noClients": "No se encontraron clientes asignados.",
+				"searchPlaceholder": "Buscar cliente..."
 			},
 			"clientProgress": {
 				"title": "Progreso",
@@ -1243,6 +1246,7 @@
 				}
 			}
 		},
+
 		"instructorProfile": {
 			"title": "Perfil de Instructor",
 			"specialty": "Especialidad",

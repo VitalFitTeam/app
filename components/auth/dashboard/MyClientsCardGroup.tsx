@@ -1,75 +1,60 @@
+import { UserAvatar } from '@/components/UserAvatar';
+import { AssignedClientResponse } from '@/services/vitalfitSdk';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { ChevronRightIcon, UserIcon, UsersIcon } from 'react-native-heroicons/outline';
+import { ChevronRightIcon, UsersIcon } from 'react-native-heroicons/outline';
 
-export function MyClientsCardGroup() {
-  const { t } = useTranslation();
-  const clients = [
-    {
-      id: 1,
-      name: 'Juan Perez',
-      level: `${t('instructor.dashboard.myClients.level')} 5`,
-      program: t('instructor.assignRoutine.programs.maxStrength'),
-      avatar: null,
-    },
-    {
-      id: 2,
-      name: 'Juan Perez',
-      level: `${t('instructor.dashboard.myClients.level')} 5`,
-      program: t('instructor.assignRoutine.programs.maxStrength'),
-      avatar: null,
-    },
-    {
-      id: 3,
-      name: 'Ana García',
-      level: `${t('instructor.dashboard.myClients.level')} 3`,
-      program: t('instructor.assignRoutine.programs.hypertrophy'),
-      avatar: null,
-    },
-    {
-      id: 4,
-      name: 'Luis Martínez',
-      level: `${t('instructor.dashboard.myClients.level')} 2`,
-      program: t('instructor.assignRoutine.programs.endurance'),
-      avatar: null,
-    },
-    {
-      id: 5,
-      name: 'María López',
-      level: `${t('instructor.dashboard.myClients.level')} 4`,
-      program: t('instructor.assignRoutine.programs.powerlifting'),
-      avatar: null,
-    },
-  ];
+interface MyClientsCardGroupProps {
+	clients: AssignedClientResponse[];
+	onClientPress?: (client: AssignedClientResponse) => void;
+}
 
-  return (
-    <View className='mt-6 rounded-2xl bg-white px-4 py-3 border border-[#e5e7eb] shadow-sm'>
-      <View className='flex-row items-center mb-3'>
-        <UsersIcon size={18} color='#f97316' />
-        <Text className='ml-2 text-[14px] font-medium text-[#111827]'>{t('instructor.dashboard.myClients.title')}</Text>
-      </View>
+export function MyClientsCardGroup({ clients, onClientPress }: MyClientsCardGroupProps) {
+	const { t } = useTranslation();
 
-      {clients.map((client) => (
-        <TouchableOpacity
-          key={client.id}
-          className='flex-row items-center justify-between bg-[#F8F9FB] rounded-2xl px-4 py-3 mb-3'
-          activeOpacity={0.8}>
-          <View className='w-10 h-10 rounded-xl bg-[#FED7AA] justify-center items-center mr-3'>
-            <UserIcon size={22} color='#f97316' />
-          </View>
+	return (
+		<View className='mt-6 rounded-2xl border border-[#e5e7eb] bg-white px-4 py-3 shadow-sm'>
+			<View className='mb-3 flex-row items-center'>
+				<UsersIcon size={18} color='#f97316' />
+				<Text className='ml-2 text-[14px] font-medium text-[#111827]'>
+					{t('instructor.dashboard.myClients.title')}
+				</Text>
+			</View>
 
-          <View className='flex-1'>
-            <Text className='text-[14px] font-bold text-[#1F2024]'>{client.name}</Text>
-            <Text className='text-[12px] text-[#71727A]'>{client.level}</Text>
-            <Text className='text-[12px] font-medium text-[#f97316] mt-0.5'>
-              {client.program}
-            </Text>
-          </View>
+			{clients.length === 0 ? (
+				<Text className='py-4 text-center text-gray-500'>
+					{t('instructor.clients.noClients')}
+				</Text>
+			) : (
+				clients.map((client) => {
+					const fullName = `${client.first_name} ${client.last_name}`;
+					const avatarUrl = client.profile_picture_url || undefined;
 
-          <ChevronRightIcon size={12} color='#71727A' />
-        </TouchableOpacity>
-      ))}
-    </View>
-  );
+					return (
+						<TouchableOpacity
+							key={client.user_id}
+							className='mb-3 flex-row items-center justify-between rounded-2xl bg-[#F8F9FB] px-4 py-3'
+							activeOpacity={0.8}
+							onPress={() => onClientPress?.(client)}>
+							<View className='mr-3'>
+								<UserAvatar name={fullName} imageUrl={avatarUrl} size={40} />
+							</View>
+
+							<View className='flex-1'>
+								<Text className='text-[14px] font-bold text-[#1F2024]'>
+									{fullName}
+								</Text>
+								<Text className='mt-0.5 text-[12px] text-[#71727A]'>
+									{`${t('instructor.clients.totalBookings')}: ${client.total_bookings}`}
+								</Text>
+							</View>
+
+							<ChevronRightIcon size={12} color='#71727A' />
+						</TouchableOpacity>
+					);
+				})
+			)}
+		</View>
+	);
 }

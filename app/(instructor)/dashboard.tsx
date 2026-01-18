@@ -6,7 +6,7 @@ import { ClassCard } from '@/components/instructor/ClassCard';
 import { ThemedView } from '@/components/themed-view';
 import { useUser } from '@/contexts/UserContext';
 import vitalFitApi from '@/services';
-import { ClassScheduleItem, KPICard } from '@/services/vitalfitSdk';
+import { AssignedClientResponse, ClassScheduleItem, KPICard } from '@/services/vitalfitSdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
 import { useFocusEffect } from 'expo-router';
@@ -15,9 +15,9 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, BackHandler, ScrollView, Text, View } from 'react-native';
 import { CalendarDaysIcon } from 'react-native-heroicons/mini';
 import {
-	ChatBubbleLeftRightIcon,
-	ChevronRightIcon,
-	UserIcon,
+    ChatBubbleLeftRightIcon,
+    ChevronRightIcon,
+    UserIcon,
 } from 'react-native-heroicons/outline';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -32,15 +32,17 @@ export default function DashboardInstructor() {
 	// Report Data States
 	const [monthlyClasses, setMonthlyClasses] = useState<KPICard | null>(null);
 	const [studentCount, setStudentCount] = useState<KPICard | null>(null);
+	const [attendanceRate, setAttendanceRate] = useState<number>(0);
 	const [todaysClasses, setTodaysClasses] = useState<ClassScheduleItem[]>([]);
 	const [nextClassTime, setNextClassTime] = useState<string | null>(null);
+	const [assignedClients, setAssignedClients] = useState<AssignedClientResponse[]>([]);
 
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const token = await AsyncStorage.getItem('token');
-				if (!token) {
-					console.error('No se encontró token en AsyncStorage');
+				if (!token || !user?.userId) {
+					console.error('No se encontró token en AsyncStorage o ID de usuario');
 					return;
 				}
 
@@ -48,12 +50,22 @@ export default function DashboardInstructor() {
 				const reportApi = vitalFitApi.report;
 
 				if (reportApi) {
-					const [monthlyCount, studentKPI, classesToday, nextClass] = await Promise.all([
+					 
+					const [
+						monthlyCount,
+						studentsTodayRes,
+						classesToday,
+						nextClass,
+						assignedClientsRes,
+						attendanceRateRes,
+					] = await Promise.all([
 						reportApi.instructorMonthlyClassesCount(token).catch((e: unknown) => {
 							console.log('Error fetching monthly count:', e);
 							return null;
 						}),
-						reportApi.instructorStudentCountKPI(token).catch((e: unknown) => {
+						// Use new endpoint for Students Today
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						(reportApi as any).instructorStudentsToday(token).catch((e: unknown) => {
 							console.log('Error fetching student count:', e);
 							return null;
 						}),
@@ -65,12 +77,52 @@ export default function DashboardInstructor() {
 							console.log('Error fetching next class:', e);
 							return null;
 						}),
+						// Fetch first 10 clients for dashboard
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						(vitalFitApi.instructor as any)
+							.getAssignedClients(token, user.userId, {
+								page: 1,
+								limit: 10,
+								sort: 'desc',
+							})
+							.catch((e: unknown) => {
+								console.log('Error fetching assigned clients:', e);
+								return null;
+							}),
+						// Use new endpoint for Attendance Rate
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						(reportApi as any).instructorAttendanceRate(token).catch((e: unknown) => {
+							console.log('Error fetching attendance rate:', e);
+							return null;
+						}),
 					]);
 
 					setMonthlyClasses(monthlyCount && monthlyCount.data ? monthlyCount.data : null);
-					setStudentCount(studentKPI && studentKPI.data ? studentKPI.data : null);
+					// Adapt number response to KPICard format for compatibility or store as number
+					// The component expects KPICard, so we wrap it
+					setStudentCount(
+						studentsTodayRes && studentsTodayRes.data !== undefined
+							? {
+									value: studentsTodayRes.data,
+									title: 'Alumnos hoy',
+									trend_percent: 0,
+									trend_label: '',
+									is_positive: true,
+								}
+							: null,
+					);
+
 					setTodaysClasses(classesToday && classesToday.data ? classesToday.data : []);
 					setNextClassTime(nextClass && nextClass.data ? nextClass.data : null);
+
+					if (assignedClientsRes?.data) {
+						setAssignedClients(assignedClientsRes.data);
+					}
+
+					// Set attendance rate from API, overriding the local calculation
+					if (attendanceRateRes && attendanceRateRes.data !== undefined) {
+						setAttendanceRate(attendanceRateRes.data);
+					}
 				} else {
 					console.error('vitalFitApi.report is undefined');
 				}
@@ -86,7 +138,7 @@ export default function DashboardInstructor() {
 		};
 
 		fetchData();
-	}, [t]);
+	}, [t, user?.userId]); // Added user.userId dependency
 
 	useFocusEffect(
 		useCallback(() => {
@@ -150,16 +202,6 @@ export default function DashboardInstructor() {
 	// Determine upcoming class for display
 	const upcomingClass = todaysClasses.length > 0 ? todaysClasses[0] : null;
 
-	// Calculate Attendance Rate
-	const totalCapacity = todaysClasses.reduce((sum, item) => sum + (item.max_capacity || 0), 0);
-	const totalOccupied = todaysClasses.reduce(
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(sum, item) => sum + ((item as any).occupied || 0),
-		0,
-	);
-	const attendanceRate =
-		totalCapacity > 0 ? Math.round((totalOccupied / totalCapacity) * 100) : 0;
-
 	return (
 		<ThemedView className='flex-1 bg-white px-2 pt-10'>
 			<ScrollView
@@ -200,7 +242,7 @@ export default function DashboardInstructor() {
 
 				<InstructorTabs activeTab={activeTab} onChange={setActiveTab} />
 
-				{activeTab === 'clientes' && <MyClientsCardGroup />}
+				{activeTab === 'clientes' && <MyClientsCardGroup clients={assignedClients} />}
 				{activeTab === 'clases' && (
 					<View className='mt-6 rounded-2xl border border-[#e5e7eb] bg-white px-4 py-3 shadow-sm'>
 						<View className='mb-3 flex-row items-center'>

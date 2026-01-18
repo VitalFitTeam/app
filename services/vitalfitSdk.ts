@@ -1,7 +1,14 @@
-import { BranchClassInfo, ClassScheduleItem, KPICard, VitalFit } from '@vitalfit/sdk';
+// Re-export SDK types
+import {
+	AssignedClientResponse,
+	BranchClassInfo,
+	ClassScheduleItem,
+	KPICard,
+	VitalFit,
+} from '@vitalfit/sdk';
 import Constants from 'expo-constants';
 
-export { BranchClassInfo, ClassScheduleItem, KPICard };
+export { AssignedClientResponse, BranchClassInfo, ClassScheduleItem, KPICard };
 
 const isDevMode =
 	Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL === 'http://localhost:3000/v1' ||
