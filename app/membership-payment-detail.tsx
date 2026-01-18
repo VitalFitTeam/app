@@ -42,14 +42,11 @@ export default function MembershipPaymentDetailScreen() {
 	React.useEffect(() => {
 		const fetchConfig = async () => {
 			try {
-				const token = await AsyncStorage.getItem('token');
-				if (!token) return;
 				// Use the client directly to ensure we hit the correct endpoint
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
 				const response = await vitalFitApi.client.get({
 					url: `/billing/payment-methods/${params.methodId}`,
-					jwt: token,
 				});
 
 				const responseData = response.data || response;
@@ -70,7 +67,8 @@ export default function MembershipPaymentDetailScreen() {
 		} else {
 			setLoadingConfig(false);
 		}
-	}, [params.methodId, showToast, t]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [params.methodId]);
 
 	const handleProcessPayment = async () => {
 		// Validate based on payment type
