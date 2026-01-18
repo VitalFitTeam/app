@@ -101,15 +101,16 @@ export default function LoginScreen() {
             console.log('═══════════════════════════════════════════════════════');
             console.log('📤 SENDING LOGIN REQUEST TO BACKEND');
             console.log('Endpoint: POST /auth/login');
-            console.log('Payload:', JSON.stringify({
-                email,
-                password: '***hidden***',
-                device_token: deviceToken || 'null',
-            }, null, 2));
+            console.log('Full Payload Being Sent:', JSON.stringify(loginPayload, null, 2));
+            console.log('Device token length:', deviceToken?.length || 0);
             console.log('Device token included:', !!deviceToken);
             console.log('═══════════════════════════════════════════════════════');
 
-            const response = await vitalFitApi.auth.login(loginPayload);
+            // Use SDK's client.post directly because auth.login() strips device_token
+            const response = await vitalFitApi.client.post({
+                url: '/auth/login',
+                data: loginPayload,
+            });
 
             console.log('═══════════════════════════════════════════════════════');
             console.log('✅ LOGIN SUCCESSFUL');
@@ -236,14 +237,16 @@ export default function LoginScreen() {
                         console.log('═══════════════════════════════════════════════════════');
                         console.log('📤 SENDING OAUTH LOGIN REQUEST TO BACKEND');
                         console.log('Endpoint: POST /auth/oauth-login');
-                        console.log('Payload:', JSON.stringify({
-                            session_token: clerkToken.substring(0, 30) + '...',
-                            device_token: deviceToken || 'null',
-                        }, null, 2));
+                        console.log('Full Payload Being Sent:', JSON.stringify(oauthPayload, null, 2));
+                        console.log('Device token length:', deviceToken?.length || 0);
                         console.log('Device token included:', !!deviceToken);
                         console.log('═══════════════════════════════════════════════════════');
 
-                        const response = await vitalFitApi.auth.oAuthLogin(oauthPayload);
+                        // Use SDK's client.post directly because auth.oAuthLogin() strips device_token
+                        const response = await vitalFitApi.client.post({
+                            url: '/auth/oauth-login',
+                            data: oauthPayload,
+                        });
 
                         console.log('═══════════════════════════════════════════════════════');
                         console.log('✅ OAUTH LOGIN SUCCESSFUL');
