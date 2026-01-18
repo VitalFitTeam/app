@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Dimensions, FlatList, Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
 import { CalendarIcon, ClockIcon, MapPinIcon, TagIcon, UserIcon } from 'react-native-heroicons/solid';
 
-const DefaultClassImage = require('@/assets/images/Rectangle.png');
+// Removed DefaultClassImage constant
 
 interface ClassItem {
 	id: string;
@@ -15,7 +15,7 @@ interface ClassItem {
 	time: string;
 	instructor: string;
 	branch: string;
-	imageUrl: ImageSourcePropType;
+	imageUrl: ImageSourcePropType | null;
 	rawDate: string;
 }
 
@@ -65,7 +65,7 @@ export const UpcomingClassesCarousel: React.FC = () => {
 			const enrichedClasses: ClassItem[] = await Promise.all(
 				upcomingBookings.map(async (booking) => {
 					let serviceName = booking.service_name || 'Clase';
-					let imageUrl = DefaultClassImage;
+					let imageUrl: ImageSourcePropType | null = null;
 					const instructorName = booking.instructor || 'Instructor';
 					const branchName = booking.branch_name || 'Sucursal';
 					const startTime = new Date(booking.starts_at!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
@@ -174,6 +174,7 @@ const ClassCard: React.FC<{ item: ClassItem; cardWidth: number }> = ({ item, car
 	const { t } = useTranslation();
 	// Local state for cycling details: 0=Time, 1=Instructor, 2=Branch
 	const [activeDetailIndex, setActiveDetailIndex] = useState(0);
+	const [imageError, setImageError] = useState(false);
 
 	React.useEffect(() => {
 		const interval = setInterval(() => {
@@ -240,7 +241,17 @@ const ClassCard: React.FC<{ item: ClassItem; cardWidth: number }> = ({ item, car
 	return (
 		<View style={[styles.card, { width: cardWidth }]}>
 			<View style={styles.imageWrapper}>
-				<Image source={item.imageUrl} style={styles.image} />
+				{item.imageUrl && !imageError ? (
+					<Image 
+						source={item.imageUrl} 
+						style={styles.image} 
+						onError={() => setImageError(true)}
+					/>
+				) : (
+					<View style={styles.fallbackContainer}>
+						<Image source={require('@/assets/images/isotipo.png')} style={styles.fallbackImage} resizeMode='contain' />
+					</View>
+				)}
 			</View>
 
 			<View style={styles.detailsPill}>
@@ -354,6 +365,17 @@ const styles = StyleSheet.create({
 		fontFamily: 'Montserrat_700Bold',
 		fontSize: 11,
 		color: '#FFFFFF',
+	},
+	fallbackContainer: {
+		width: '100%',
+		height: '100%',
+		backgroundColor: '#000000',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	fallbackImage: {
+		width: 160,
+		height: 160,
 	},
 });
 

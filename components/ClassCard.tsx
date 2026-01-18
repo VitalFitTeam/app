@@ -37,6 +37,7 @@ export default function ClassCard({
 }: ClassCardProps) {
 	const { t } = useTranslation();
 	const classData: ClassData = { time, title, instructor, branch, imageUrl };
+	const [imageError, setImageError] = React.useState(false);
 
 	if (variant === 'overlay') {
 		return (
@@ -44,12 +45,23 @@ export default function ClassCard({
 				onPress={() => onPress(classData)}
 				className='rounded-2xl overflow-hidden mb-4 bg-neutral-900'>
 				<View className='h-40 w-full rounded-2xl overflow-hidden'>
-					<Image
-						source={imageUrl}
-						style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-						contentFit='cover'
-						contentPosition='center'
-					/>
+					{imageUrl && !imageError ? (
+						<Image
+							source={imageUrl}
+							style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+							contentFit='cover'
+							contentPosition='center'
+							onError={() => setImageError(true)}
+						/>
+					) : (
+						<View className='absolute inset-0 bg-black justify-center items-center'>
+							<Image
+								source={require('@/assets/images/isotipo.png')}
+								style={{ width: 160, height: 160 }}
+								contentFit='contain'
+							/>
+						</View>
+					)}
 					<View className='absolute inset-0 bg-black/25' />
 					<View className='absolute inset-0 p-4 justify-between'>
 						<View>
@@ -135,12 +147,23 @@ export default function ClassCard({
 				</TouchableOpacity>
 			</View>
 			<View style={{ width: 112, height: 84 }} className='rounded-xl overflow-hidden'>
-				<Image
-					source={imageUrl}
-					style={{ width: '100%', height: '100%' }}
-					contentFit='cover'
-					contentPosition='center'
-				/>
+				{imageUrl && !imageError ? (
+					<Image
+						source={imageUrl}
+						style={{ width: '100%', height: '100%' }}
+						contentFit='cover'
+						contentPosition='center'
+						onError={() => setImageError(true)}
+					/>
+				) : (
+					<View className='w-full h-full bg-black justify-center items-center'>
+						<Image
+							source={require('@/assets/images/isotipo.png')}
+							style={{ width: 60, height: 60 }}
+							contentFit='contain'
+						/>
+					</View>
+				)}
 			</View>
 		</TouchableOpacity>
 	);

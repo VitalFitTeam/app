@@ -117,6 +117,8 @@
       "toast": {
         "errorTitle": "Errore",
         "loginErrorTitle": "Errore di Accesso",
+        "verifyData": "Si prega di verificare i dati.",
+        "incorrectCredentials": "Nome utente o password errati.",
         "emptyFields": "Inserisci email e password.",
         "invalidEmail": "Inserisci un indirizzo email valido.",
         "unexpectedError": "Si è verificato un errore imprevisto. Riprova.",
@@ -923,6 +925,24 @@
         "paymentReported": "Pagamento Segnalato",
         "sentToVerification": "Il tuo pagamento è stato inviato per la verifica.",
         "errorPayment": "Errore di Pagamento"
+      },
+      "defaultTitle": "Abbonamento VitalFit",
+      "defaultReceiptHelper": "Pagamento segnalato",
+      "cashReceiptHelper": "Pagamento in loco/cassa",
+      "labels": {
+          "bank_name": "Banca",
+          "account_number": "N. Conto",
+          "email": "Email Zelle",
+          "phone": "Telefono",
+          "phone_number": "Telefono",
+          "rif": "ID/Doc",
+          "beneficiary_name": "Beneficiario",
+          "holder": "Intestatario",
+          "number": "Numero"
+      },
+      "confirmOrder": "Conferma Ordine",
+      "instructions": {
+        "cash": "Effettua il pagamento alla cassa e segnalalo qui."
       }
     },
     "instructor": {
@@ -1133,6 +1153,21 @@
         "clientProgressBody": "Il tuo cliente Juan Pérez ha aggiornato i progressi della sua routine.",
         "hiitClassBody": "Hai una lezione di HIIT in programma per domani."
       }
+    },
+    "services": {
+      "title": "Servizi",
+      "headerTitle": "SERVIZI",
+      "subtitle": "Seleziona una sede e scegli il tuo servizio.",
+      "serviceFallback": "Servizio VitalFit",
+      "duration": "Durata: {{minutes}} min",
+      "memberPrice": "Membro",
+      "generalPrice": "Generale",
+      "oneTimePayment": "Pagamento unico"
+    },
+    "errors": {
+      "missingBranch": "Sede non identificata.",
+      "loadPaymentMethods": "Impossibile caricare i metodi di pagamento.",
+      "sessionExpired": "Sessione scaduta"
     },
     "membershipDetails": {
       "title": "Membership Details",

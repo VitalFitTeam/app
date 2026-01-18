@@ -58,6 +58,7 @@ export default function ClassDetailsScreen() {
   const [loadingClients, setLoadingClients] = useState(false);
 
   const [currentEnrolled, setCurrentEnrolled] = useState(Number(params.enrolled || 0));
+  const [imageError, setImageError] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -149,7 +150,7 @@ export default function ClassDetailsScreen() {
   // Images
   const heroImageSource = params.serviceImage 
       ? { uri: params.serviceImage } 
-      : require('@/assets/images/rutina.png');
+      : null;
       
   const instructorImageSource = params.instructorImage 
       ? { uri: params.instructorImage } 
@@ -170,11 +171,22 @@ export default function ClassDetailsScreen() {
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.imageWrapper}>
-          <Image
-            source={heroImageSource}
-            style={styles.heroImage}
-            resizeMode='cover'
-          />
+          {heroImageSource && !imageError ? (
+            <Image
+              source={heroImageSource}
+              style={styles.heroImage}
+              resizeMode='cover'
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <View style={[styles.heroImage, { backgroundColor: '#000000', justifyContent: 'center', alignItems: 'center' }]}>
+              <Image
+                source={require('@/assets/images/isotipo.png')}
+                style={{ width: 160, height: 160 }}
+                resizeMode='contain'
+              />
+            </View>
+          )}
         </View>
 
         <View style={styles.content}>

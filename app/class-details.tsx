@@ -65,6 +65,7 @@ export default function ClassDetailsScreen() {
   const { user } = useUser();
   const [serverBookingId, setServerBookingId] = useState<string | null>(null);
   const [currentOccupancyCount, setCurrentOccupancyCount] = useState<number | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const checkBookingStatus = async () => {
@@ -408,7 +409,22 @@ export default function ClassDetailsScreen() {
               Detalles clase
             </ThemedText>
           </View>
-          <Image source={heroSource} style={styles.heroImage} contentFit='cover' />
+          {heroSource && !imageError ? (
+            <Image
+              source={heroSource}
+              style={styles.heroImage}
+              contentFit='cover'
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <View style={[styles.heroImage, { backgroundColor: '#000000', justifyContent: 'center', alignItems: 'center' }]}>
+              <Image
+                source={require('@/assets/images/isotipo.png')}
+                style={{ width: 160, height: 160 }}
+                contentFit='contain'
+              />
+            </View>
+          )}
 
           <ThemedText
             lightColor='#111827'
@@ -813,7 +829,22 @@ export default function ClassDetailsScreen() {
             Detalles clase
           </ThemedText>
         </View>
-        <Image source={heroSource} style={styles.heroImage} contentFit='cover' />
+        {heroSource && !imageError ? (
+          <Image
+            source={heroSource}
+            style={styles.heroImage}
+            contentFit='cover'
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <View style={[styles.heroImage, { backgroundColor: '#000000', justifyContent: 'center', alignItems: 'center' }]}>
+            <Image
+              source={require('@/assets/images/isotipo.png')}
+              style={{ width: 160, height: 160 }}
+              contentFit='contain'
+            />
+          </View>
+        )}
 
         <ThemedText
           lightColor='#111827'
