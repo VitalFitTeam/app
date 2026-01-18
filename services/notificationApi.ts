@@ -33,10 +33,15 @@ export async function registerDeviceToken(
 	deviceToken: string
 ): Promise<void> {
 	try {
-		console.log('Attempting to register device token:', deviceToken);
+		console.log('═══════════════════════════════════════════════════════');
+		console.log('📤 REGISTERING DEVICE TOKEN WITH BACKEND');
+		console.log('Endpoint: POST /notifications/register');
+		console.log('Device Token:', deviceToken);
+		console.log('Platform: expo');
+		console.log('Auth Token (first 20 chars):', token.substring(0, 20) + '...');
+		console.log('═══════════════════════════════════════════════════════');
 
-		// Direct API call - endpoint not implemented yet
-		await vitalFitApi.client.post({
+		const response = await vitalFitApi.client.post({
 			url: '/notifications/register',
 			jwt: token,
 			data: {
@@ -45,18 +50,23 @@ export async function registerDeviceToken(
 			},
 		});
 
-		console.log('Device token registered successfully');
+		console.log('✅ Device token registered successfully with backend');
+		console.log('Response:', response);
 	} catch (error: unknown) {
-		// Endpoint not implemented yet - just log the token for now
-		const apiError = error as { status?: number };
+		const apiError = error as { status?: number; message?: string };
+
+		console.log('❌ Failed to register device token');
+		console.log('Error status:', apiError?.status);
+		console.log('Error details:', error);
+
 		if (apiError?.status === 404) {
-			console.warn('Device registration endpoint not implemented yet');
-			console.log('Device token (save this for testing):', deviceToken);
+			console.warn('⚠️ Device registration endpoint /notifications/register not found (404)');
+			console.log('Device token (save this for manual testing):', deviceToken);
 			// Don't throw error - allow app to continue
 			return;
 		}
 
-		console.error('Error registering device token:', error);
+		console.error('💥 Unexpected error registering device token:', error);
 		// Don't throw - allow app to continue even if registration fails
 	}
 }
@@ -152,9 +162,9 @@ export async function getNotificationSettings(
 			jwt: token,
 		});
 		return settings;
-	} catch (error) {
-		console.error('Error fetching notification settings:', error);
-		// Return default settings if endpoint doesn't exist
+	} catch {
+		// Endpoint not implemented yet - silently return defaults
+		console.log('Notification settings endpoint not available, using defaults');
 		return {
 			classReminders: true,
 			routineUpdates: true,

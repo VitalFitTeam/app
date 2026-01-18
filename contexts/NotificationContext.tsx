@@ -14,7 +14,6 @@ import {
 	getUserNotifications,
 	markAllNotificationsAsRead,
 	markNotificationAsRead,
-	registerDeviceToken,
 	updateNotificationSettings,
 	type NotificationSettings,
 	type PaginatedNotifications,
@@ -77,17 +76,22 @@ export function NotificationProvider({
 	const notificationListener = useRef<Notifications.Subscription | undefined>(undefined);
 	const responseListener = useRef<Notifications.Subscription | undefined>(undefined);
 
-	// Request notification permissions and register device token
+	// Request notification permissions and get device token
+	// Note: Device token is now sent during login, not after
 	const requestPermissions = useCallback(async (): Promise<boolean> => {
 		try {
 			const token = await registerForPushNotificationsAsync();
 			if (token) {
 				setExpoPushToken(token);
 
-				// Register with backend if user is authenticated
-				if (accessToken) {
-					await registerDeviceToken(accessToken, token);
-				}
+				// Log FCM token prominently for debugging
+				console.log('═══════════════════════════════════════════════════════');
+				console.log('📱 FCM DEVICE TOKEN (already sent during login):');
+				console.log(token);
+				console.log('═══════════════════════════════════════════════════════');
+
+				// Device token is sent during login now, no need to register separately
+				// The /notifications/register endpoint is not needed anymore
 				return true;
 			}
 			return false;
@@ -95,7 +99,7 @@ export function NotificationProvider({
 			console.error('Error requesting notification permissions:', error);
 			return false;
 		}
-	}, [accessToken]);
+	}, []);
 
 	// Fetch notifications from API
 	const fetchNotifications = useCallback(
@@ -283,6 +287,7 @@ export function NotificationProvider({
 		// Skip push notification setup in Expo Go
 		if (isExpoGo) {
 			console.log('Running in Expo Go - skipping push notification setup');
+			console.log('⚠️ FCM token NOT available in Expo Go. Use a development build to get the FCM token.');
 			return;
 		}
 
