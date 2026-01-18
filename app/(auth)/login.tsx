@@ -8,6 +8,7 @@ import { useAuth as useAuthContext } from '@/contexts/AuthContext';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services';
+import { registerForPushNotificationsAsync } from '@/services/notificationService';
 import { useClerk, useAuth as useClerkAuth, useOAuth } from '@clerk/clerk-expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
@@ -76,8 +77,45 @@ export default function LoginScreen() {
         setIsLoading(true);
 
         try {
-            const response = await vitalFitApi.auth.login({ email, password });
-            console.log('Login exitoso:', response);
+            // Get FCM device token before login
+            let deviceToken: string | null = null;
+            try {
+                deviceToken = await registerForPushNotificationsAsync();
+                if (deviceToken) {
+                    console.log('═══════════════════════════════════════════════════════');
+                    console.log('📱 FCM TOKEN OBTAINED FOR LOGIN');
+                    console.log('Device Token:', deviceToken);
+                    console.log('═══════════════════════════════════════════════════════');
+                }
+            } catch (tokenError) {
+                console.warn('Could not get FCM token, continuing without it:', tokenError);
+            }
+
+            // Prepare login payload
+            const loginPayload = {
+                email,
+                password,
+                device_token: deviceToken || undefined,
+            };
+
+            console.log('═══════════════════════════════════════════════════════');
+            console.log('📤 SENDING LOGIN REQUEST TO BACKEND');
+            console.log('Endpoint: POST /auth/login');
+            console.log('Full Payload Being Sent:', JSON.stringify(loginPayload, null, 2));
+            console.log('Device token length:', deviceToken?.length || 0);
+            console.log('Device token included:', !!deviceToken);
+            console.log('═══════════════════════════════════════════════════════');
+
+            // Use SDK's client.post directly because auth.login() strips device_token
+            const response = await vitalFitApi.client.post({
+                url: '/auth/login',
+                data: loginPayload,
+            });
+
+            console.log('═══════════════════════════════════════════════════════');
+            console.log('✅ LOGIN SUCCESSFUL');
+            console.log('Response:', response);
+            console.log('═══════════════════════════════════════════════════════');
 
             const token = response.token;
             const refreshToken = response.refresh_token;
@@ -176,11 +214,44 @@ export default function LoginScreen() {
                     try {
                         console.log('Enviando al backend...');
 
-                        const response = await vitalFitApi.auth.oAuthLogin({
-                            session_token: clerkToken
+                        // Get FCM device token before OAuth login
+                        let deviceToken: string | null = null;
+                        try {
+                            deviceToken = await registerForPushNotificationsAsync();
+                            if (deviceToken) {
+                                console.log('═══════════════════════════════════════════════════════');
+                                console.log('📱 FCM TOKEN OBTAINED FOR OAUTH LOGIN');
+                                console.log('Device Token:', deviceToken);
+                                console.log('═══════════════════════════════════════════════════════');
+                            }
+                        } catch (tokenError) {
+                            console.warn('Could not get FCM token for OAuth, continuing without it:', tokenError);
+                        }
+
+                        // Prepare OAuth login payload
+                        const oauthPayload = {
+                            session_token: clerkToken,
+                            device_token: deviceToken || undefined,
+                        };
+
+                        console.log('═══════════════════════════════════════════════════════');
+                        console.log('📤 SENDING OAUTH LOGIN REQUEST TO BACKEND');
+                        console.log('Endpoint: POST /auth/oauth-login');
+                        console.log('Full Payload Being Sent:', JSON.stringify(oauthPayload, null, 2));
+                        console.log('Device token length:', deviceToken?.length || 0);
+                        console.log('Device token included:', !!deviceToken);
+                        console.log('═══════════════════════════════════════════════════════');
+
+                        // Use SDK's client.post directly because auth.oAuthLogin() strips device_token
+                        const response = await vitalFitApi.client.post({
+                            url: '/auth/oauth-login',
+                            data: oauthPayload,
                         });
 
-                        console.log('Respuesta exitosa del backend');
+                        console.log('═══════════════════════════════════════════════════════');
+                        console.log('✅ OAUTH LOGIN SUCCESSFUL');
+                        console.log('Response:', response);
+                        console.log('═══════════════════════════════════════════════════════');
 
                         const backendToken = response.token;
                         const backendRefreshToken = (response as { refresh_token?: string }).refresh_token;
