@@ -30,6 +30,10 @@ export default function MembershipCheckoutScreen() {
     period?: string;
     type?: string;
     servicesJson?: string;
+    // Coming from class-details when user needs to purchase
+    fromClassDetails?: string;
+    preselectedBranchId?: string;
+    preselectedStartDate?: string;
   }>(); 
   const router = useRouter();
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -49,7 +53,8 @@ export default function MembershipCheckoutScreen() {
     formState: { errors },
   } = useForm<MembershipCheckoutData>({
     defaultValues: {
-      startDate: '',
+      // If coming from class-details, pre-select today's date
+      startDate: params.preselectedStartDate || '',
     },
   });
 
@@ -97,17 +102,23 @@ export default function MembershipCheckoutScreen() {
         throw new Error(t('checkout.error.branchNotFound'));
       }
 
+      // Use preselected branch if coming from class-details, otherwise use fetched branch
+      const finalBranchId = params.preselectedBranchId || branchId;
+
       router.push({
         pathname: '/membership-extra',
         params: {
           mainItemId: params.id,
           mainItemTitle: params.title,
           mainItemPrice: params.price,
-          mainItemType: params.type || 'membership', 
+          mainItemType: params.type || 'membership',
           startDate: result.data.startDate,
           userId: userId,
-          branchId: branchId,
-          servicesJson: params.servicesJson, 
+          branchId: finalBranchId,
+          servicesJson: params.servicesJson,
+          // Pass along the flag and preselected branch for confirmation step
+          fromClassDetails: params.fromClassDetails,
+          preselectedBranchId: params.preselectedBranchId,
         },
       } as never);
 

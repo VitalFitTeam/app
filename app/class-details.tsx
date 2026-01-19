@@ -161,12 +161,17 @@ export default function ClassDetailsScreen() {
   const [instructorImageUrl, setInstructorImageUrl] = useState<string | null>(null);
 
   type ApiServiceImage = { image_url?: string; is_primary?: boolean };
-  type ApiServiceDetail = { description?: string; images?: ApiServiceImage[] };
   type ApiInstructorDetail = {
     avatar_url?: string;
     image_url?: string;
     profile_image_url?: string;
   };
+
+  // Store service data for purchase flow
+  const [serviceData, setServiceData] = useState<{
+    name: string;
+    price: number;
+  } | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -176,13 +181,11 @@ export default function ClassDetailsScreen() {
 
         if (serviceId) {
           try {
-            const serviceResp = await vitalFitApi.client.get({
-              url: `/services/${String(serviceId)}`,
-              jwt: token,
-            });
-            const s =
-              (serviceResp as { data?: ApiServiceDetail }).data ??
-              (serviceResp as ApiServiceDetail | undefined);
+            const serviceResp = await vitalFitApi.products.getServiceByID(
+              String(serviceId),
+              token,
+            );
+            const s = 'data' in serviceResp ? serviceResp.data : serviceResp;
             if (s) {
               if (typeof s.description === 'string') {
                 setServiceDescription(s.description);
@@ -191,11 +194,21 @@ export default function ClassDetailsScreen() {
                 ? s.images
                 : [];
               if (images.length > 0) {
-                const primary = images.find((img) => img.is_primary) ?? images[0];
+                const primary = images.find((img: ApiServiceImage) => img.is_primary) ?? images[0];
                 if (primary?.image_url) {
                   setServiceImageUrl(primary.image_url);
                 }
               }
+              
+              // FIX: Included 'title' here. We also use 't' for the fallback 'Servicio'
+              const serviceName = s.name || String(title) || t('common.service', 'Servicio');
+              
+              // ServiceFullDetail doesn't include pricing, so default to 0
+              const servicePrice = 0;
+              setServiceData({
+                name: serviceName,
+                price: servicePrice,
+              });
             }
           } catch (error) {
             console.error('Error cargando servicio para detalle de clase:', error);
@@ -224,7 +237,8 @@ export default function ClassDetailsScreen() {
         // Se ignora el error de carga inicial
       }
     })();
-  }, [serviceId, instructorId]);
+    // FIX: Added 'title' and 't' to the dependencies
+  }, [serviceId, instructorId, title, t]);
 
   const heroSource = useMemo(() => {
     if (serviceImageUrl && /^https?:\/\//i.test(serviceImageUrl)) {
@@ -1065,13 +1079,64 @@ export default function ClassDetailsScreen() {
                   if (isAPIError(error) && error.status === 402) {
                     showToast(
                       'error',
-                      'Pago requerido',
-                      'Necesitas adquirir un servicio para reservar esta clase.',
+                      t('classDetails.toasts.paymentRequired.title'),
+                      t('classDetails.toasts.paymentRequired.message'),
                     );
-                    // Redirect to services screen with the branch pre-selected
+
+                    // Fetch service price from branch services endpoint
+                    let serviceName = serviceData?.name || String(title) || 'Servicio';
+                    let servicePrice = serviceData?.price ?? 0;
+
+                    // If we don't have the price, try to fetch from branch services
+                    if (servicePrice === 0 && branchId && serviceId) {
+                      try {
+                        const branchServicesResp = await vitalFitApi.client.get({
+                          url: `/public/branches/${String(branchId)}/services`,
+                          jwt: authToken || undefined,
+                          params: { page: 1, limit: 50, currency: 'USD' },
+                        });
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const branchServices = (branchServicesResp as any)?.data || [];
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const matchedService = branchServices.find((s: any) =>
+                          String(s.service_id) === String(serviceId)
+                        );
+                        if (matchedService) {
+                          serviceName = matchedService.name || serviceName;
+                          servicePrice =
+                            matchedService.lowest_price_no_member ??
+                            matchedService.lowest_price_member ??
+                            matchedService.price ??
+                            0;
+                        }
+                      } catch (fetchError) {
+                        console.warn('Could not fetch service price from branch:', fetchError);
+                      }
+                    }
+
+                    // Build service object for checkout
+                    const serviceForCheckout = {
+                      service_id: String(serviceId),
+                      name: serviceName,
+                      price: servicePrice,
+                      type: 'service',
+                    };
+
+                    // Get today's date in ISO format for start date
+                    const today = new Date().toISOString();
+
                     router.push({
-                      pathname: '/services',
-                      params: branchId ? { branchId: String(branchId) } : undefined,
+                      pathname: '/membership-checkout',
+                      params: {
+                        title: serviceName,
+                        price: String(servicePrice),
+                        type: 'service',
+                        servicesJson: JSON.stringify([serviceForCheckout]),
+                        // Pass branchId to be used in confirmation step
+                        fromClassDetails: 'true',
+                        preselectedBranchId: branchId ? String(branchId) : '',
+                        preselectedStartDate: today,
+                      },
                     });
                     return;
                   }

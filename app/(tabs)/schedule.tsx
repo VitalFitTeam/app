@@ -86,9 +86,18 @@ export default function HorariosScreen() {
     // Caches to avoid redundant API calls and 429 errors
     const servicesCache = useRef<Record<string, { name: string; image: string }>>({});
     const instructorsCache = useRef<Record<string, string>>({});
+
+    // Helper to format date as YYYY-MM-DD in local timezone
+    const formatLocalDate = (date: Date): string => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     // Start with today's date selected by default
     const [selectedClassesDate, setSelectedClassesDate] = useState<string>(
-        new Date().toISOString().split('T')[0]
+        formatLocalDate(new Date())
     );
 
     const isCloseToBottom = ({
@@ -244,6 +253,8 @@ export default function HorariosScreen() {
                         ? instructorsCache.current[instructorId]
                         : undefined;
                     const serviceData = servicesCache.current[sid];
+                    // Extract rawDate in local timezone
+                    const rawDate = startsAt ? formatLocalDate(new Date(startsAt)) : '';
                     return {
                         classId: item.class_id || '',
                         serviceId: sid,
@@ -257,7 +268,7 @@ export default function HorariosScreen() {
                         imageUrl: serviceData?.image || require('@/assets/images/rutina.png'),
                         capacity: item.max_capacity || 0,
                         occupied: 0, // Initial value
-                        rawDate: String(startsAt).split('T')[0] || '',
+                        rawDate,
                     };
                 });
 
@@ -472,6 +483,8 @@ export default function HorariosScreen() {
                             ? instructorMap[String(instructorId)]
                             : undefined;
 
+                        // Extract rawDate in local timezone
+                        const rawDate = startsAt ? formatLocalDate(new Date(startsAt)) : '';
                         return {
                             bookingId,
                             classId,
@@ -487,7 +500,7 @@ export default function HorariosScreen() {
                                 serviceImageMap[String(sid)] || require('@/assets/images/rutina.png'),
                             capacity: item.max_capacity || 0,
                             occupied: 0,
-                            rawDate: String(startsAt).split('T')[0] || '',
+                            rawDate,
                             startsAt: String(startsAt),
                             createdAt,
                         };

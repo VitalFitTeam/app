@@ -484,6 +484,10 @@
           "userInfoError": "Impossibile recuperare le informazioni utente.",
           "generic": "Si è verificato un errore durante la prenotazione della lezione."
         },
+        "paymentRequired": {
+          "title": "Pagamento Richiesto",
+          "message": "Devi acquistare questo servizio per prenotare questa lezione."
+        },
         "cancelSuccess": {
           "title": "Prenotazione Cancellata",
           "message": "La tua prenotazione è stata cancellata con successo."

@@ -484,6 +484,10 @@
           "userInfoError": "Impossible de récupérer les informations de l'utilisateur.",
           "generic": "Une erreur est survenue lors de la réservation du cours."
         },
+        "paymentRequired": {
+          "title": "Paiement requis",
+          "message": "Vous devez acheter ce service pour réserver ce cours."
+        },
         "cancelSuccess": {
           "title": "Réservation annulée",
           "message": "Votre réservation a été annulée avec succès."

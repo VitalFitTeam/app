@@ -25,8 +25,16 @@ export const WeekCalendar: React.FC<WeekCalendarProps> = ({
 	markedDates = EMPTY_MARKED_DATES,
 	initialDate,
 }) => {
+	// Helper to format date as YYYY-MM-DD in local timezone
+	const formatLocalDate = (date: Date): string => {
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const day = String(date.getDate()).padStart(2, '0');
+		return `${year}-${month}-${day}`;
+	};
+
 	const [selectedDateString, setSelectedDateString] = useState(
-		initialDate !== undefined ? initialDate : new Date().toISOString().split('T')[0],
+		initialDate !== undefined ? initialDate : formatLocalDate(new Date()),
 	);
 	const [weekDays, setWeekDays] = useState<DayData[]>([]);
 
@@ -41,7 +49,7 @@ export const WeekCalendar: React.FC<WeekCalendarProps> = ({
 				const date = new Date(today);
 				date.setDate(today.getDate() + i);
 
-				const dateString = date.toISOString().split('T')[0];
+				const dateString = formatLocalDate(date);
 				const hasEvent = markedDates[dateString]?.marked || false;
 				const dayOfWeek = date.getDay();
 				const labelIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday is 0, map to index 6
@@ -80,7 +88,7 @@ export const WeekCalendar: React.FC<WeekCalendarProps> = ({
 	};
 
 	const isToday = (day: DayData) => {
-		const today = new Date().toISOString().split('T')[0];
+		const today = formatLocalDate(new Date());
 		return day.dateString === today;
 	};
 

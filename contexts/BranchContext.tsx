@@ -59,14 +59,10 @@ export const BranchProvider: React.FC<BranchProviderProps> = ({ children }) => {
 
       if (savedBranchId && branchList.some(b => b.branch_id === savedBranchId)) {
         setSelectedBranchId(savedBranchId);
-        console.log('[BranchContext] Sucursal guardada restaurada:', savedBranchId);
       } else if (branchList.length > 0) {
         const firstBranchId = branchList[0].branch_id;
         setSelectedBranchId(firstBranchId);
         await AsyncStorage.setItem('selected_branch_id', firstBranchId);
-        console.log('[BranchContext] Primera sucursal seleccionada por defecto:', firstBranchId);
-      } else {
-        console.warn('[BranchContext] No hay sucursales disponibles');
       }
 
     } catch (err: unknown) {

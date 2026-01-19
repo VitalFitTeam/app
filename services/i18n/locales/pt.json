@@ -484,6 +484,10 @@
           "userInfoError": "Não foi possível recuperar informações do usuário.",
           "generic": "Ocorreu um erro ao reservar a aula."
         },
+        "paymentRequired": {
+          "title": "Pagamento Necessário",
+          "message": "Você precisa adquirir este serviço para reservar esta aula."
+        },
         "cancelSuccess": {
           "title": "Reserva Cancelada",
           "message": "Sua reserva foi cancelada com sucesso."

@@ -30,6 +30,10 @@ export default function MembershipExtraScreen() {
     startDate?: string;
     userId?: string;
     branchId?: string;
+    servicesJson?: string;
+    // Coming from class-details when user needs to purchase
+    fromClassDetails?: string;
+    preselectedBranchId?: string;
   }>();
 
   const [loading, setLoading] = useState(true);

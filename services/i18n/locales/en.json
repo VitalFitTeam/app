@@ -484,6 +484,10 @@
           "userInfoError": "Could not retrieve user information.",
           "generic": "An error occurred while reserving the class."
         },
+        "paymentRequired": {
+          "title": "Payment Required",
+          "message": "You need to purchase this service to book this class."
+        },
         "cancelSuccess": {
           "title": "Reservation Cancelled",
           "message": "Your reservation has been cancelled successfully."

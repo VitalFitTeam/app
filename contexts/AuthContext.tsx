@@ -44,7 +44,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		vitalFitApi.client.setCallbacks(
 			// onTokenUpdate callback - called when tokens are refreshed
 			async (access: string, refresh: string) => {
-				console.log('[AuthContext] Tokens refreshed by SDK');
 				await AsyncStorage.setItem('token', access);
 				await AsyncStorage.setItem('refresh_token', refresh);
 				setToken(access);
@@ -53,7 +52,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			},
 			// onLogout callback - called when refresh fails
 			async () => {
-				console.log('[AuthContext] Token refresh failed, logging out');
 				await logout();
 			}
 		);

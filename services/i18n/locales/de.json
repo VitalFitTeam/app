@@ -484,6 +484,10 @@
           "userInfoError": "Benutzerinformationen konnten nicht abgerufen werden.",
           "generic": "Ein Fehler ist bei der Reservierung der Klasse aufgetreten."
         },
+        "paymentRequired": {
+          "title": "Zahlung erforderlich",
+          "message": "Sie müssen diesen Service erwerben, um diese Klasse zu buchen."
+        },
         "cancelSuccess": {
           "title": "Reservierung storniert",
           "message": "Ihre Reservierung wurde erfolgreich storniert."
