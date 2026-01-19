@@ -87,7 +87,8 @@
         "absent": "Assente",
         "cancelled": "Cancellato",
         "active": "Attivo",
-        "cancelled_generic": "Cancellato"
+        "cancelled_generic": "Cancellato",
+        "completed": "Completato"
       },
       "client": "Cliente",
       "loading": "Caricamento...",
@@ -97,7 +98,12 @@
       "viewMore": "Vedi altro",
       "availability": "Disponibilità",
       "unknown": "Sconosciuto",
-      "notes": "Note"
+      "notes": "Note",
+      "close": "Chiudi",
+      "reviews": "Recensioni",
+      "unnamedUser": "Utente senza nome",
+      "noProgram": "Nessun programma",
+      "noClientsFound": "Nessun cliente trovato"
     },
     "login": {
       "title": "Accedi",
@@ -398,7 +404,7 @@
       "month": "Mese",
       "calendar": "CALENDARIO",
       "reservations": "Prenotazioni",
-      "spotsOccupied": "posti occupati",
+      "spots": "Posti",
       "myBookings": "Mie Prenotazioni",
       "noBookings": "Non hai ancora prenotazioni.",
       "noClassesBranch": "Nessuna lezione programmata per questa sede.",
@@ -416,6 +422,11 @@
         "hiit": "HIIT",
         "kickBoxing": "Kick Boxing",
         "pilates": "Pilates"
+      },
+      "spotsOccupied": "posti occupati",
+      "errors": {
+        "loadClasses": "Impossibile caricare le lezioni. Riprova.",
+        "loadBookings": "Impossibile caricare le tue prenotazioni. Riprova."
       }
     },
     "scanner": {
@@ -430,17 +441,71 @@
       }
     },
     "classDetails": {
-      "defaultName": "NOME LEZIONE",
-      "defaultInstructor": "Nome Istruttore",
-      "duration": "(1 ora)",
-      "descriptionTitle": "Descrizione Lezione:",
-      "classFull": "Lezione Esaurita",
-      "enrollClient": "Iscrivi Cliente",
-      "clientList": "Lista Clienti",
-      "searchPlaceholder": "Cerca cliente...",
-      "noClientsFound": "Nessun cliente trovato",
-      "viewAllRegistered": "Vedi tutti gli iscritti",
-      "showLess": "Vedi meno"
+      "title": "Dettagli Lezione",
+      "defaultClassName": "Nome Lezione",
+      "defaultInstructorName": "Nome Istruttore",
+      "occupiedSpots": "posti occupati",
+      "level": "Livello: {{level}}",
+      "descriptionLabel": "Descrizione Lezione:",
+      "defaultDescription": "Questo allenamento di forza si concentra sullo sviluppo muscolare e sulla resistenza. Include esercizi con pesi, bande di resistenza e peso corporeo. Ideale per tutti i livelli.",
+      "searchPlaceholder": "Nome Cliente",
+      "clientsListTitle": "Lista Clienti Registrati",
+      "clientsEnrolled": "Clienti Iscritti",
+      "internalNotesTitle": "Note Interne Lezione",
+      "notesPlaceholder": "Aggiungi note su questa lezione...",
+      "saveNotes": "Salva Note",
+      "tabs": {
+        "clients": "Clienti",
+        "attendance": "Fai Appello"
+      },
+      "attendance": {
+        "present": "Presente",
+        "late": "In Ritardo",
+        "absent": "Assente"
+      },
+      "toasts": {
+        "notesSaved": {
+          "title": "Note Salvate",
+          "message": "Le note interne sono state salvate con successo."
+        },
+        "attendanceSaved": {
+          "title": "Presenze Salvate",
+          "message": "Le presenze della lezione sono state salvate con successo."
+        },
+        "bookingSuccess": {
+          "title": "Lezione Prenotata",
+          "message": "La tua lezione è stata prenotata con successo."
+        },
+        "bookingError": {
+          "title": "Impossibile Prenotare",
+          "missingId": "Identificativo lezione mancante.",
+          "userUnknown": "Utente non identificato",
+          "userInfoError": "Impossibile recuperare le informazioni utente.",
+          "generic": "Si è verificato un errore durante la prenotazione della lezione."
+        },
+        "cancelSuccess": {
+          "title": "Prenotazione Cancellata",
+          "message": "La tua prenotazione è stata cancellata con successo."
+        },
+        "cancelError": {
+          "title": "Impossibile Cancellare",
+          "generic": "Si è verificato un errore durante la cancellazione della prenotazione.",
+          "timeLimitTitle": "Tempo Limite Superato",
+          "lateCancellation": "Non è più possibile cancellare perché è passato il tempo limite consentito dalla palestra."
+        }
+      },
+      "saveAttendance": "Salva Presenze",
+      "totalSpots": "posti totali",
+      "limitedSpots": "Posti limitati",
+      "filledWhileBooking": "La lezione si è riempita mentre stavi prenotando.",
+      "pastClass": "Lezione Passata",
+      "membershipRequired": "Hai bisogno di un abbonamento attivo per prenotare",
+      "cancellationPolicy": "“Puoi cancellare fino a 2h prima dell'inizio”",
+      "reserve": "Prenota",
+      "cancelModal": {
+        "title": "Cancellare Prenotazione?",
+        "message": "Perderai il tuo posto in questa lezione. Sei sicuro?"
+      }
     },
     "classes": {
       "description": {
@@ -930,15 +995,15 @@
       "defaultReceiptHelper": "Pagamento segnalato",
       "cashReceiptHelper": "Pagamento in loco/cassa",
       "labels": {
-          "bank_name": "Banca",
-          "account_number": "N. Conto",
-          "email": "Email Zelle",
-          "phone": "Telefono",
-          "phone_number": "Telefono",
-          "rif": "ID/Doc",
-          "beneficiary_name": "Beneficiario",
-          "holder": "Intestatario",
-          "number": "Numero"
+        "bank_name": "Banca",
+        "account_number": "N. Conto",
+        "email": "Email Zelle",
+        "phone": "Telefono",
+        "phone_number": "Telefono",
+        "rif": "ID/Doc",
+        "beneficiary_name": "Beneficiario",
+        "holder": "Intestatario",
+        "number": "Numero"
       },
       "confirmOrder": "Conferma Ordine",
       "instructions": {
