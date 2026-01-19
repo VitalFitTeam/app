@@ -22,7 +22,6 @@ type ClassCardProps = {
 	variant?: 'default' | 'overlay';
 	category?: string;
 	reserved?: boolean;
-    slots?: string;
 };
 
 export default function ClassCard({
@@ -35,7 +34,6 @@ export default function ClassCard({
 	variant = 'default',
 	category,
 	reserved,
-    slots,
 }: ClassCardProps) {
 	const { t } = useTranslation();
 	const classData: ClassData = { time, title, instructor, branch, imageUrl };
@@ -65,7 +63,7 @@ export default function ClassCard({
 						</View>
 					)}
 					<View className='absolute inset-0 bg-black/25' />
-					<View className='absolute inset-0 p-4 pb-8 justify-between'>
+					<View className='absolute inset-0 p-4 justify-between'>
 						<View>
 							<ThemedText
 								className='font-heading'
@@ -89,7 +87,7 @@ export default function ClassCard({
 								darkColor='#E5E7EB'
 								style={{ fontFamily: 'Montserrat_400Regular', fontSize: 11, marginTop: 4 }}
 							>
-								{t('common.availability')}{slots ? `: ${slots}` : ''}
+								{t('common.availability')}
 							</ThemedText>
 						</View>
 						<View className='flex-row items-center justify-between mt-2'>

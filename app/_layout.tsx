@@ -1,5 +1,4 @@
 import { AuthProvider } from '@/contexts/AuthContext';
-import { BranchProvider } from '@/contexts/BranchContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
 import { ReservationsProvider } from '@/contexts/reservations';
 import { UserProvider } from '@/contexts/UserContext';
@@ -60,8 +59,7 @@ export default function RootLayout() {
         <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
             <AuthProvider>
                 <UserProvider>
-                    <BranchProvider>
-                        <NotificationProvider>
+                    <NotificationProvider>
                         <ReservationsProvider>
                             <ThemeProvider value={DefaultTheme}>
                         <Stack>
@@ -245,7 +243,6 @@ export default function RootLayout() {
                     </ThemeProvider>
                 </ReservationsProvider>
                     </NotificationProvider>
-                </BranchProvider>
             </UserProvider>
         </AuthProvider>
         </ClerkProvider>
