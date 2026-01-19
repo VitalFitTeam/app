@@ -56,6 +56,7 @@
 		"common": {
 			"attention": "Attention",
 			"instructor": "Instructor",
+			"capacity": "Capacity",
 			"error": {
 				"connection": "Connection error with the server.",
 				"unexpected": "An unexpected error occurred.",
@@ -99,6 +100,39 @@
 			"unknown": "Unknown",
 			"notes": "Notes",
 			"noClientsFound": "No clients found"
+		},
+		"enrollClient": {
+			"title": "Enroll Client",
+			"defaultClassName": "Class",
+			"placeholders": {
+				"date": "Date",
+				"time": "Time"
+			},
+			"form": {
+				"emailPlaceholder": "example@email.com",
+				"clientId": "Client ID",
+				"clientIdPlaceholder": "Enter ID",
+				"clientName": "Name",
+				"clientNamePlaceholder": "Enter Name"
+			},
+			"button": "Enroll",
+			"error": {
+				"emailRequired": "Email is required",
+				"userNotFound": "User not found",
+				"searchFailed": "Error searching for user",
+				"enrollFailed": "Error enrolling user",
+				"completeFields": "Complete all fields",
+				"classFull": "The class has no spots available",
+				"alreadyEnrolled": "User is already enrolled in this class"
+			},
+			"warning": {
+				"classPast": "This class has already finished or started a while ago",
+				"classStartingSoon": "Class is starting in less than 30 min"
+			},
+			"success": {
+				"title": "Enrollment Successful!",
+				"message": "Client successfully enrolled in:"
+			}
 		},
 		"login": {
 			"title": "Sign In",
@@ -289,10 +323,9 @@
 				}
 			},
 			"stats": {
-				"monthlyCheckins": "Monthly Check-ins",
+				"monthlyTrend": "Monthly Trend",
 				"classesToday": "Today's Classes",
-				"currentCapacity": "Current Capacity",
-				"vsYesterday": "vs Yesterday"
+				"dailyCheckIns": "Check-in Today"
 			},
 			"validateCheckIn": {
 				"title": "Validate Check-in",
@@ -309,7 +342,8 @@
 			"todayClasses": {
 				"title": "Today's Classes",
 				"subtitle": "Schedule and attendance",
-				"registered": "REGISTERED"
+				"registered": "Registered",
+				"noClasses": "No more classes for today"
 			},
 			"classStatus": {
 				"inProgress": "IN PROGRESS",
@@ -355,27 +389,7 @@
 				"purchase": "Purchase"
 			}
 		},
-		"enrollClient": {
-			"title": "Enroll Client",
-			"defaultClassName": "CLASS NAME",
-			"error": {
-				"completeFields": "Please complete all fields"
-			},
-			"placeholders": {
-				"date": "Date",
-				"time": "Time"
-			},
-			"form": {
-				"clientId": "Client ID",
-				"clientIdPlaceholder": "Enter client ID",
-				"clientName": "Client Name",
-				"clientNamePlaceholder": "Enter client name"
-			},
-			"button": "Enroll",
-			"success": {
-				"message": "Client enrolled successfully"
-			}
-		},
+
 		"personalInfo": {
 			"editButton": "Edit Information",
 			"sections": {

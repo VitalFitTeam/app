@@ -18,6 +18,7 @@
 			"classDetails": "Detalles de la Clase",
 			"qr": "QR"
 		},
+
 		"qr": {
 			"title": "Tu Código de Acceso",
 			"instruction": "Muestra este código en recepción para ingresar",
@@ -56,11 +57,15 @@
 		"common": {
 			"attention": "Atención",
 			"instructor": "Instructor",
+			"capacity": "Capacidad",
 			"error": {
 				"connection": "Error de conexión con el servidor.",
 				"unexpected": "Ocurrió un error inesperado.",
 				"unknown": "Error desconocido"
 			},
+			"email": "Correo electrónico",
+			"search": "Buscar",
+			"name": "Nombre",
 			"selectBranch": "Seleccionar sede",
 			"selectYourBranch": "Selecciona tu sede",
 			"accept": "Aceptar",
@@ -99,6 +104,39 @@
 			"unknown": "Desconocido",
 			"notes": "Notas",
 			"noClientsFound": "No se encontraron clientes"
+		},
+		"enrollClient": {
+			"title": "Inscribir Cliente",
+			"defaultClassName": "Clase",
+			"placeholders": {
+				"date": "Fecha",
+				"time": "Hora"
+			},
+			"form": {
+				"emailPlaceholder": "ejemplo@correo.com",
+				"clientId": "ID Cliente",
+				"clientIdPlaceholder": "Ingresa ID",
+				"clientName": "Nombre",
+				"clientNamePlaceholder": "Ingresa Nombre"
+			},
+			"button": "Inscribir",
+			"error": {
+				"emailRequired": "El email es requerido",
+				"userNotFound": "Usuario no encontrado",
+				"searchFailed": "Error al buscar usuario",
+				"enrollFailed": "Error al inscribir usuario",
+				"completeFields": "Completa todos los campos",
+				"classFull": "La clase no tiene cupos disponibles",
+				"alreadyEnrolled": "El usuario ya está inscrito en esta clase"
+			},
+			"warning": {
+				"classPast": "Esta clase ya finalizó o comenzó hace tiempo",
+				"classStartingSoon": "La clase está por comenzar en menos de 30 min"
+			},
+			"success": {
+				"title": "¡Inscripción Exitosa!",
+				"message": "Cliente inscrito correctamente en:"
+			}
 		},
 		"login": {
 			"title": "Iniciar Sesión",
@@ -289,10 +327,9 @@
 				}
 			},
 			"stats": {
-				"monthlyCheckins": "Check-ins Mensual",
+				"monthlyTrend": "Tendencia Mensual",
 				"classesToday": "Clases Hoy",
-				"currentCapacity": "Aforo Actual",
-				"vsYesterday": "vs Ayer"
+				"dailyCheckIns": "Check-in Hoy"
 			},
 			"validateCheckIn": {
 				"title": "Validar Check-in",
@@ -306,10 +343,17 @@
 				"occupied": "% Ocupado",
 				"available": "espacios disponibles"
 			},
+			"upcomingClasses": {
+				"title": "Próximas Clases",
+				"bookNow": "Reservar Ahora",
+				"time": "HORA",
+				"branch": "SUCURSAL"
+			},
 			"todayClasses": {
-				"title": "Clases de Hoy",
-				"subtitle": "Horario y asistencia",
-				"registered": "INSCRITOS"
+				"title": "Próximas Clases",
+				"subtitle": "Aquí tienes las clases programadas para hoy",
+				"registered": "Inscritos",
+				"noClasses": "No hay más clases por hoy"
 			},
 			"classStatus": {
 				"inProgress": "EN CURSO",
@@ -342,12 +386,7 @@
 				"checkIn": "Check in",
 				"purchase": "Comprar"
 			},
-			"upcomingClasses": {
-				"title": "Próximas clases",
-				"time": "Hora",
-				"burn": "Burn",
-				"bookNow": "Reserva tu próxima clase"
-			},
+
 			"upcomingRoutines": {
 				"title": "Próximas rutinas",
 				"services": "Servicios",
@@ -355,27 +394,7 @@
 				"purchase": "Comprar"
 			}
 		},
-		"enrollClient": {
-			"title": "Inscribir Cliente",
-			"defaultClassName": "NOMBRE DE LA CLASE",
-			"error": {
-				"completeFields": "Por favor completa todos los campos"
-			},
-			"placeholders": {
-				"date": "Fecha",
-				"time": "Hora"
-			},
-			"form": {
-				"clientId": "ID del Cliente",
-				"clientIdPlaceholder": "Ingrese el ID del cliente",
-				"clientName": "Nombre del Cliente",
-				"clientNamePlaceholder": "Ingrese el nombre del cliente"
-			},
-			"button": "Inscribir",
-			"success": {
-				"message": "Cliente inscrito exitosamente"
-			}
-		},
+
 		"personalInfo": {
 			"editButton": "Editar Información",
 			"sections": {
