@@ -87,7 +87,8 @@
         "absent": "Abwesend",
         "cancelled": "Storniert",
         "active": "Aktiv",
-        "cancelled_generic": "Storniert"
+        "cancelled_generic": "Storniert",
+        "completed": "Abgeschlossen"
       },
       "client": "Kunde",
       "loading": "Laden...",
@@ -97,7 +98,12 @@
       "viewMore": "Mehr anzeigen",
       "availability": "Verfügbarkeit",
       "unknown": "Unbekannt",
-      "notes": "Notizen"
+      "notes": "Notizen",
+      "close": "Schließen",
+      "reviews": "Bewertungen",
+      "unnamedUser": "Namenloser Benutzer",
+      "noProgram": "Kein Programm",
+      "noClientsFound": "Keine Kunden gefunden"
     },
     "login": {
       "title": "Anmelden",
@@ -398,7 +404,7 @@
       "month": "Monat",
       "calendar": "KALENDER",
       "reservations": "Reservierungen",
-      "spotsOccupied": "Plätze belegt",
+      "spots": "Plätze",
       "myBookings": "Meine Buchungen",
       "noBookings": "Du hast noch keine Buchungen.",
       "noClassesBranch": "Keine Kurse für diesen Standort geplant.",
@@ -416,6 +422,11 @@
         "hiit": "HIIT",
         "kickBoxing": "Kickboxen",
         "pilates": "Pilates"
+      },
+      "spotsOccupied": "belegte Plätze",
+      "errors": {
+        "loadClasses": "Klassen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+        "loadBookings": "Buchungen konnten nicht geladen werden. Bitte versuchen Sie es erneut."
       }
     },
     "scanner": {
@@ -430,17 +441,71 @@
       }
     },
     "classDetails": {
-      "defaultName": "KURSNAME",
-      "defaultInstructor": "Name des Trainers",
-      "duration": "(1 Stunde)",
-      "descriptionTitle": "Kursbeschreibung:",
-      "classFull": "Kurs voll belegt",
-      "enrollClient": "Kunde anmelden",
-      "clientList": "Kundenliste",
-      "searchPlaceholder": "Kunden suchen...",
-      "noClientsFound": "Keine Kunden gefunden",
-      "viewAllRegistered": "Alle registrierten anzeigen",
-      "showLess": "Weniger anzeigen"
+      "title": "Kursdetails",
+      "defaultClassName": "Klassenname",
+      "defaultInstructorName": "Name des Trainers",
+      "occupiedSpots": "belegte Plätze",
+      "level": "Niveau: {{level}}",
+      "descriptionLabel": "Klassenbeschreibung:",
+      "defaultDescription": "Dieses Krafttraining konzentriert sich auf Muskelaufbau und Ausdauer. Beinhaltet Übungen mit Gewichten, Widerstandsbändern und Körpergewicht. Ideal für alle Niveaus.",
+      "searchPlaceholder": "Kundenname",
+      "clientsListTitle": "Liste der registrierten Kunden",
+      "clientsEnrolled": "Eingeschriebene Kunden",
+      "internalNotesTitle": "Interne Klassennotizen",
+      "notesPlaceholder": "Notizen zu dieser Klasse hinzufügen...",
+      "saveNotes": "Notizen speichern",
+      "tabs": {
+        "clients": "Kunden",
+        "attendance": "Anwesenheit"
+      },
+      "attendance": {
+        "present": "Anwesend",
+        "late": "Verspätet",
+        "absent": "Abwesend"
+      },
+      "toasts": {
+        "notesSaved": {
+          "title": "Notizen gespeichert",
+          "message": "Interne Notizen wurden erfolgreich gespeichert."
+        },
+        "attendanceSaved": {
+          "title": "Anwesenheit gespeichert",
+          "message": "Klassenanwesenheit wurde erfolgreich gespeichert."
+        },
+        "bookingSuccess": {
+          "title": "Klasse reserviert",
+          "message": "Ihre Klasse wurde erfolgreich reserviert."
+        },
+        "bookingError": {
+          "title": "Reservierung fehlgeschlagen",
+          "missingId": "Klassenidentifikator fehlt.",
+          "userUnknown": "Benutzer nicht identifiziert",
+          "userInfoError": "Benutzerinformationen konnten nicht abgerufen werden.",
+          "generic": "Ein Fehler ist bei der Reservierung der Klasse aufgetreten."
+        },
+        "cancelSuccess": {
+          "title": "Reservierung storniert",
+          "message": "Ihre Reservierung wurde erfolgreich storniert."
+        },
+        "cancelError": {
+          "title": "Stornierung fehlgeschlagen",
+          "generic": "Ein Fehler ist bei der Stornierung der Reservierung aufgetreten.",
+          "timeLimitTitle": "Zeitlimit überschritten",
+          "lateCancellation": "Stornierung ist nicht mehr möglich, da das Zeitlimit des Studios überschritten wurde."
+        }
+      },
+      "saveAttendance": "Anwesenheit speichern",
+      "totalSpots": "Gesamtplätze",
+      "limitedSpots": "Begrenzte Plätze",
+      "filledWhileBooking": "Die Klasse war voll, während Sie buchten.",
+      "pastClass": "Vergangene Klasse",
+      "membershipRequired": "Sie benötigen eine aktive Mitgliedschaft zum Buchen",
+      "cancellationPolicy": "“Sie können bis zu 2 Stunden vor Beginn stornieren”",
+      "reserve": "Reservieren",
+      "cancelModal": {
+        "title": "Reservierung stornieren?",
+        "message": "Sie verlieren Ihren Platz in dieser Klasse. Sind Sie sicher?"
+      }
     },
     "classes": {
       "description": {
@@ -930,15 +995,15 @@
       "defaultReceiptHelper": "Gemeldete Zahlung",
       "cashReceiptHelper": "Zahlung vor Ort/Kasse",
       "labels": {
-          "bank_name": "Bank",
-          "account_number": "Kontonummer",
-          "email": "Zelle E-Mail",
-          "phone": "Telefon",
-          "phone_number": "Telefon",
-          "rif": "ID/Dok",
-          "beneficiary_name": "Empfänger",
-          "holder": "Inhaber",
-          "number": "Nummer"
+        "bank_name": "Bank",
+        "account_number": "Kontonummer",
+        "email": "Zelle E-Mail",
+        "phone": "Telefon",
+        "phone_number": "Telefon",
+        "rif": "ID/Dok",
+        "beneficiary_name": "Empfänger",
+        "holder": "Inhaber",
+        "number": "Nummer"
       },
       "confirmOrder": "Bestellung bestätigen",
       "instructions": {
