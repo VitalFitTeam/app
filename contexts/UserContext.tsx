@@ -18,6 +18,7 @@ export type UserData = {
 	profilePicture?: string;
 	specialty?: string;
 	roleName?: string;
+	faceAuthEnabled?: boolean;
 };
 
 type UserContextType = {
@@ -75,6 +76,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				specialty: (apiUser as any).instructor_profile?.specialty || (apiUser as any).specialty || '',
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				roleName: (apiUser as any).role?.name || 'Instructor',
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				faceAuthEnabled: (apiUser as any).face_auth_enabled || false,
 			});
 		} catch (err: unknown) {
 			let message = 'Ocurrió un error inesperado al obtener los datos del usuario.';

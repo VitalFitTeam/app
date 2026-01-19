@@ -329,7 +329,8 @@
 			"validateCheckIn": {
 				"title": "Check-in validieren",
 				"searchPlaceholder": "Nach Ausweisnummer suchen",
-				"scanQr": "QR scannen"
+				"scanQr": "QR scannen",
+				"scanFace": "Gesicht scannen"
 			},
 			"capacity": {
 				"title": "Studio-Auslastung",
@@ -1240,6 +1241,50 @@
 			"goBack": "Zurück",
 			"searchPlaceholder": "Standort suchen...",
 			"noBranchesFound": "Keine Standorte gefunden."
+		},
+		"faceEnrollment": {
+			"setupButton": "Face ID einrichten",
+			"modal": {
+				"title": "Gesichtserkennung einrichten",
+				"instruction": "Positionieren Sie Ihr Gesicht im Rahmen",
+				"capturing": "Wird aufgenommen...",
+				"uploading": "Face ID wird eingerichtet...",
+				"confirm": "Bestaetigen",
+				"retake": "Erneut aufnehmen",
+				"capture": "Foto aufnehmen"
+			},
+			"permission": {
+				"message": "Kamerazugriff ist erforderlich, um Face ID einzurichten.",
+				"button": "Berechtigung erteilen"
+			},
+			"toast": {
+				"successTitle": "Face ID eingerichtet!",
+				"successMessage": "Sie koennen jetzt Gesichtserkennung fuer den Check-in verwenden.",
+				"errorTitle": "Einrichtung fehlgeschlagen",
+				"errorMessage": "Face ID konnte nicht eingerichtet werden. Bitte versuchen Sie es erneut."
+			},
+			"errors": {
+				"cameraAccess": "Kamerazugriff nicht moeglich",
+				"captureFailed": "Foto konnte nicht aufgenommen werden",
+				"uploadFailed": "Foto konnte nicht hochgeladen werden"
+			}
+		},
+		"faceCheckIn": {
+			"modal": {
+				"instruction": "Positionieren Sie das Gesicht des Kunden im Rahmen",
+				"processing": "Check-in wird verarbeitet...",
+				"confirm": "Bestaetigen",
+				"retake": "Erneut aufnehmen"
+			},
+			"permission": {
+				"message": "Kamerazugriff ist erforderlich fuer den Gesichts-Check-in.",
+				"button": "Berechtigung erteilen"
+			},
+			"errors": {
+				"cameraAccess": "Kamerazugriff nicht moeglich",
+				"captureFailed": "Fehler beim Aufnehmen des Fotos",
+				"checkInFailed": "Gesichts-Check-in fehlgeschlagen. Bitte versuchen Sie es erneut."
+			}
 		},
 		"classesScreen": {
 			"title": "Kurskalender",

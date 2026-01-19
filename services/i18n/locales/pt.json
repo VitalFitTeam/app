@@ -329,7 +329,8 @@
 			"validateCheckIn": {
 				"title": "Validar Check-in",
 				"searchPlaceholder": "Buscar por documento",
-				"scanQr": "Escanear QR"
+				"scanQr": "Escanear QR",
+				"scanFace": "Escanear Rosto"
 			},
 			"capacity": {
 				"title": "Lotação da Unidade",
@@ -1248,6 +1249,50 @@
 			"goBack": "Voltar",
 			"searchPlaceholder": "Buscar unidade...",
 			"noBranchesFound": "Nenhuma unidade encontrada."
+		},
+		"faceEnrollment": {
+			"setupButton": "Configurar Face ID",
+			"modal": {
+				"title": "Configuracao de reconhecimento facial",
+				"instruction": "Posicione seu rosto no quadro",
+				"capturing": "Capturando...",
+				"uploading": "Configurando Face ID...",
+				"confirm": "Confirmar",
+				"retake": "Tirar novamente",
+				"capture": "Tirar foto"
+			},
+			"permission": {
+				"message": "E necessario acesso a camera para configurar o Face ID.",
+				"button": "Conceder permissao"
+			},
+			"toast": {
+				"successTitle": "Face ID configurado!",
+				"successMessage": "Agora voce pode usar reconhecimento facial para check-in.",
+				"errorTitle": "Falha na configuracao",
+				"errorMessage": "Nao foi possivel configurar o Face ID. Tente novamente."
+			},
+			"errors": {
+				"cameraAccess": "Nao foi possivel acessar a camera",
+				"captureFailed": "Falha ao capturar a foto",
+				"uploadFailed": "Falha ao enviar a foto"
+			}
+		},
+		"faceCheckIn": {
+			"modal": {
+				"instruction": "Posicione o rosto do cliente no quadro",
+				"processing": "Processando check-in...",
+				"confirm": "Confirmar",
+				"retake": "Tirar novamente"
+			},
+			"permission": {
+				"message": "E necessario acesso a camera para o check-in facial.",
+				"button": "Conceder permissao"
+			},
+			"errors": {
+				"cameraAccess": "Nao foi possivel acessar a camera",
+				"captureFailed": "Falha ao capturar a foto",
+				"checkInFailed": "Check-in facial falhou. Tente novamente."
+			}
 		}
 	}
 }

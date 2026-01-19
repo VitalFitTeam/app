@@ -1,4 +1,5 @@
 import { ValidateCheckInCard } from '@/components/auth/dashboard/ValidateCheckInCard';
+import { FaceCheckInModal } from '@/components/recepcionist/FaceCheckInModal';
 import { QRScannerModal } from '@/components/recepcionist/QRScannerModal';
 import { CheckInResultModal } from '@/components/recepcionista/CheckInResultModal';
 import { ThemedText } from '@/components/themed-text';
@@ -18,6 +19,7 @@ export default function CheckInScreen() {
 	const { selectedBranchId } = useBranch();
 	const scrollViewRef = useRef<ScrollView>(null);
 	const [scannerVisible, setScannerVisible] = useState(false);
+	const [faceCheckInVisible, setFaceCheckInVisible] = useState(false);
 	const [resultModalVisible, setResultModalVisible] = useState(false);
 	const [checkInSuccess, setCheckInSuccess] = useState(false);
 	const [checkInUserName, setCheckInUserName] = useState('');
@@ -102,6 +104,29 @@ export default function CheckInScreen() {
 		}
 	};
 
+	const handleFaceCheckInPress = () => {
+		if (!selectedBranchId) {
+			Alert.alert(`${t('common.attention')}`, t('checkIn.error.selectBranch'));
+			return;
+		}
+		setFaceCheckInVisible(true);
+	};
+
+	const handleFaceCheckInSuccess = (userName: string, serviceName: string) => {
+		setCheckInSuccess(true);
+		setCheckInUserName(userName);
+		setCheckInMessage(serviceName);
+		setFaceCheckInVisible(false);
+		setResultModalVisible(true);
+	};
+
+	const handleFaceCheckInError = (errorMessage: string) => {
+		setCheckInSuccess(false);
+		setCheckInMessage(errorMessage);
+		setFaceCheckInVisible(false);
+		setResultModalVisible(true);
+	};
+
 	return (
 		<ThemedView style={styles.container}>
 			<ScrollView ref={scrollViewRef} contentContainerStyle={{ paddingBottom: 100 }}>
@@ -117,7 +142,10 @@ export default function CheckInScreen() {
 				</View>
 
 				<View style={styles.cardWrapper}>
-					<ValidateCheckInCard onScanPress={() => setScannerVisible(true)} />
+					<ValidateCheckInCard
+						onScanPress={() => setScannerVisible(true)}
+						onFaceScanPress={handleFaceCheckInPress}
+					/>
 				</View>
 			</ScrollView>
 
@@ -125,6 +153,14 @@ export default function CheckInScreen() {
 				visible={scannerVisible}
 				onClose={() => setScannerVisible(false)}
 				onScan={handleValidateMembership}
+			/>
+
+			<FaceCheckInModal
+				visible={faceCheckInVisible}
+				onClose={() => setFaceCheckInVisible(false)}
+				onSuccess={handleFaceCheckInSuccess}
+				onError={handleFaceCheckInError}
+				branchId={selectedBranchId}
 			/>
 
 			<CheckInResultModal

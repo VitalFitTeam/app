@@ -3,6 +3,7 @@ import { RecepcionistStatsCardGroup } from '@/components/auth/dashboard/Recepcio
 import { RecepcionistTodayClassCard } from '@/components/auth/dashboard/RecepcionistTodayClassCard';
 import { UserHeader } from '@/components/auth/dashboard/userheader';
 import { ValidateCheckInCard } from '@/components/auth/dashboard/ValidateCheckInCard';
+import { FaceCheckInModal } from '@/components/recepcionist/FaceCheckInModal';
 import { QRScannerModal } from '@/components/recepcionist/QRScannerModal';
 import { BranchSelector } from '@/components/recepcionista/BranchSelector';
 import { CheckInResultModal } from '@/components/recepcionista/CheckInResultModal';
@@ -20,6 +21,7 @@ export default function DashboardRecepcionist() {
 	const { t } = useTranslation();
 	const { user, loading: userLoading } = useUser();
 	const [scannerVisible, setScannerVisible] = useState(false);
+	const [faceCheckInVisible, setFaceCheckInVisible] = useState(false);
 	const { selectedBranchId } = useBranch();
 	const [resultModalVisible, setResultModalVisible] = useState(false);
 	const [checkInSuccess, setCheckInSuccess] = useState(false);
@@ -100,6 +102,29 @@ export default function DashboardRecepcionist() {
 			setCheckInMessage(errorMessage);
 			setResultModalVisible(true);
 		}
+	};
+
+	const handleFaceCheckInPress = () => {
+		if (!selectedBranchId) {
+			Alert.alert(`${t('common.attention')}`, t('checkIn.error.selectBranch'));
+			return;
+		}
+		setFaceCheckInVisible(true);
+	};
+
+	const handleFaceCheckInSuccess = (userName: string, serviceName: string) => {
+		setCheckInSuccess(true);
+		setCheckInUserName(userName);
+		setCheckInMessage(serviceName);
+		setFaceCheckInVisible(false);
+		setResultModalVisible(true);
+	};
+
+	const handleFaceCheckInError = (errorMessage: string) => {
+		setCheckInSuccess(false);
+		setCheckInMessage(errorMessage);
+		setFaceCheckInVisible(false);
+		setResultModalVisible(true);
 	};
 
 	useEffect(() => {
@@ -227,7 +252,10 @@ export default function DashboardRecepcionist() {
 					classesTodayCount={upcomingClasses ? upcomingClasses.length : 0}
 					monthlyTrend={monthlyTrend}
 				/>
-				<ValidateCheckInCard onScanPress={() => setScannerVisible(true)} />
+				<ValidateCheckInCard
+					onScanPress={() => setScannerVisible(true)}
+					onFaceScanPress={handleFaceCheckInPress}
+				/>
 				<GymCapacityCard currentOccupancy={occupancy} maxCapacity={maxCapacity} />
 				<RecepcionistTodayClassCard classes={upcomingClasses.slice(0, 3)} />
 			</ScrollView>
@@ -236,6 +264,14 @@ export default function DashboardRecepcionist() {
 				visible={scannerVisible}
 				onClose={() => setScannerVisible(false)}
 				onScan={handleValidateMembership}
+			/>
+
+			<FaceCheckInModal
+				visible={faceCheckInVisible}
+				onClose={() => setFaceCheckInVisible(false)}
+				onSuccess={handleFaceCheckInSuccess}
+				onError={handleFaceCheckInError}
+				branchId={selectedBranchId}
 			/>
 
 			<CheckInResultModal
