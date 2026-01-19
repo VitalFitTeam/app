@@ -13,10 +13,12 @@ type MonthCalendarProps = {
 		};
 	};
 	initialDate?: string;
+	onMonthChange?: (date: DateData) => void;
 };
 
 export const MonthCalendar: React.FC<MonthCalendarProps> = ({
 	onDateSelect,
+	onMonthChange,
 	markedDates = {},
 	initialDate,
 }) => {
@@ -26,6 +28,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
 				initialDate={initialDate}
 				markedDates={markedDates}
 				onDayPress={(day) => onDateSelect?.(day)}
+				onMonthChange={(month) => onMonthChange?.(month)}
 				theme={{
 					backgroundColor: '#ffffff',
 					calendarBackground: '#ffffff',

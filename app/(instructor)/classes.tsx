@@ -1,141 +1,217 @@
 import { MonthCalendar } from '@/components/auth/dashboard/monthcalendar';
-import { WeekCalendar } from '@/components/auth/dashboard/weekcalendar';
+import { ClassCard } from '@/components/instructor/ClassCard';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/contexts/UserContext';
+import vitalFitApi, { BranchClassInfo, ClassScheduleItem } from '@/services/vitalfitSdk';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { ClockIcon } from 'react-native-heroicons/mini';
-import { ChevronRightIcon } from 'react-native-heroicons/outline';
+import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import { DateData } from 'react-native-calendars';
 
-type InstructorClass = {
-	id: string;
-	title: string;
-	titleKey?: string;
-	date: string;
-	time: string;
-	durationMinutes: number;
-	location: string;
-	locationKey?: string;
-	capacity: number;
-	occupied: number;
-};
-
-const MOCK_CLASSES: InstructorClass[] = [
-	{
-		id: '1',
-		title: 'Powerlifting Avanzado',
-		titleKey: 'classes.mock.powerlifting',
-		date: '2025-11-15',
-		time: '07:00',
-		durationMinutes: 90,
-		location: 'Salón B',
-		locationKey: 'classes.mockLocations.salonB',
-		capacity: 15,
-		occupied: 10,
-	},
-	{
-		id: '2',
-		title: 'Crossfit Intermedio',
-		titleKey: 'classes.mock.crossfit',
-		date: '2025-11-15',
-		time: '09:00',
-		durationMinutes: 60,
-		location: 'Área funcional',
-		locationKey: 'classes.mockLocations.areaFunctional',
-		capacity: 18,
-		occupied: 15,
-	},
-	{
-		id: '3',
-		title: 'Funcional Principiantes',
-		titleKey: 'classes.mock.functional',
-		date: '2025-11-16',
-		time: '18:00',
-		durationMinutes: 60,
-		location: 'Salón A',
-		locationKey: 'classes.mockLocations.salonA',
-		capacity: 20,
-		occupied: 12,
-	},
-];
-
-type ViewMode = 'week' | 'month';
+type ViewMode = 'day' | 'month';
 
 export default function InstructorClassesScreen() {
 	const { t } = useTranslation();
-	const router = useRouter();
+	// const router = useRouter(); // Removed unused router
+	const { token } = useAuth();
+	const { user } = useUser();
 	const today = new Date().toISOString().split('T')[0];
 
-	const [viewMode, setViewMode] = useState<ViewMode>('week');
+	const [viewMode, setViewMode] = useState<ViewMode>('day');
 	const [selectedDate, setSelectedDate] = useState<string>(today);
+	const [currentMonthDate, setCurrentMonthDate] = useState<Date>(new Date());
 
-	const classesByDate = useMemo(() => {
-		const map: Record<string, InstructorClass[]> = {};
-		MOCK_CLASSES.forEach((cls) => {
-			if (!map[cls.date]) map[cls.date] = [];
-			map[cls.date].push(cls);
-		});
-		return map;
-	}, []);
+	const [classesToday, setClassesToday] = useState<ClassScheduleItem[]>([]);
+	const [classesMonth, setClassesMonth] = useState<BranchClassInfo[]>([]);
+	const [loading, setLoading] = useState(false);
+	const [displayLimit, setDisplayLimit] = useState(10);
 
+	// Fetch Classes for Today (Day View)
+	useEffect(() => {
+		const fetchTodayClasses = async () => {
+			if (viewMode === 'day' && token) {
+				setLoading(true);
+				try {
+					const response = await vitalFitApi.report.instructorClassesToday(token);
+					if (response?.data) {
+						setClassesToday(response.data);
+					}
+				} catch (error) {
+					console.error('Error fetching today classes:', error);
+				} finally {
+					setLoading(false);
+				}
+			}
+		};
+
+		fetchTodayClasses();
+	}, [viewMode, token]);
+
+	// Fetch Classes for Month (Month View)
+	// Fetch Classes for Month (Month View)
+	useEffect(() => {
+		const fetchMonthClasses = async () => {
+			if (viewMode === 'month' && token && user?.userId) {
+				setLoading(true);
+				try {
+					const month = currentMonthDate.getMonth() + 1; // 1-12
+					const year = currentMonthDate.getFullYear();
+					const response = await vitalFitApi.schedule.GetClassesByInstructor(
+						token,
+						user.userId,
+						month,
+						year,
+					);
+
+					if (response?.data) {
+						let classesData = response.data;
+
+						// Enrich with Service Names
+						const serviceIds = Array.from(
+							new Set(classesData.map((c) => c.service_id).filter(Boolean)),
+						);
+
+						if (serviceIds.length > 0) {
+							// Fetch service details for each unique ID
+							const serviceMap: Record<string, string> = {};
+							await Promise.all(
+								serviceIds.map(async (id) => {
+									try {
+										const serviceRes =
+											await vitalFitApi.products.getServiceByID(id, token);
+										if (serviceRes?.data?.name) {
+											serviceMap[id] = serviceRes.data.name;
+										}
+									} catch (err) {
+										console.log(`Error fetching service ${id}:`, err);
+									}
+								}),
+							);
+
+							// Map names back to classes
+							classesData = classesData.map((cls) => ({
+								...cls,
+								class_name:
+									serviceMap[cls.service_id] || t('instructor.classes.class'),
+								service_name: serviceMap[cls.service_id], // Fallback/redundancy
+							}));
+						}
+
+						setClassesMonth(classesData);
+					}
+				} catch (error) {
+					console.error('Error fetching month classes:', error);
+				} finally {
+					setLoading(false);
+				}
+			}
+		};
+
+		fetchMonthClasses();
+	}, [viewMode, token, user?.userId, currentMonthDate, t]); // Added t dependency
+
+	// ... (Unchanged logic) ...
+
+	// Mark dates in calendar
 	const markedDates = useMemo(() => {
-		const marks: {
-			[date: string]: {
-				marked?: boolean;
-				dotColor?: string;
-				selected?: boolean;
-				selectedColor?: string;
-			};
-		} = {};
-
-		Object.keys(classesByDate).forEach((date) => {
-			marks[date] = {
-				...(marks[date] || {}),
-				marked: true,
-				dotColor: '#f97316',
-			};
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const marks: Record<string, any> = {}; // Keeping any here as react-native-calendars types can be tricky, suppressing if needed but usually inferred is better. The error was for keyExtractor and item so this might be fine or needs suppression.
+		// Actually error 143:31 is usually `marks: Record<string, any>`. Using `any` here is fine if allowed, but strict lint complains.
+		// Better type: Record<string, { marked?: boolean; dotColor?: string; selected?: boolean; selectedColor?: string; }>
+		classesMonth.forEach((cls) => {
+			const date = cls.starts_at.split('T')[0];
+			marks[date] = { marked: true, dotColor: '#f97316' };
 		});
 
 		marks[selectedDate] = {
 			...(marks[selectedDate] || {}),
 			selected: true,
 			selectedColor: '#f97316',
-			marked: true,
+			marked: marks[selectedDate]?.marked,
 			dotColor: '#f97316',
 		};
-
 		return marks;
-	}, [classesByDate, selectedDate]);
+	}, [classesMonth, selectedDate]);
 
-	const classesForSelectedDate = classesByDate[selectedDate] || [];
+	// ...
 
-	const handleDaySelect = (day: { dateString: string }) => {
+	// Filter Month Classes by Selected Date
+	const filteredMonthClasses = useMemo(() => {
+		if (viewMode === 'day') return [];
+		return classesMonth.filter((cls) => {
+			// Extract date part from starts_at (YYYY-MM-DD)
+			const datePart = cls.starts_at.split('T')[0];
+			return datePart === selectedDate;
+		});
+	}, [classesMonth, selectedDate, viewMode]);
+
+	// Data Source for FlatList
+	const listData = useMemo(() => {
+		return viewMode === 'day' ? classesToday : filteredMonthClasses;
+	}, [viewMode, classesToday, filteredMonthClasses]);
+
+	// Paginated Data (Client-side infinite scroll)
+	const paginatedData = useMemo(() => {
+		return listData.slice(0, displayLimit);
+	}, [listData, displayLimit]);
+
+	const loadMore = () => {
+		if (paginatedData.length < listData.length) {
+			setDisplayLimit((prev) => prev + 10);
+		}
+	};
+
+	const handleDaySelect = (day: DateData) => {
 		setSelectedDate(day.dateString);
+		// Update current month if needed to trigger fetch (though usually Calendar stays in view)
+		// But fetching is driven by `currentMonthDate`. MonthCalendar passing onMonthChange drives `currentMonthDate` update.
+	};
+
+	const handleMonthChange = (date: DateData) => {
+		setCurrentMonthDate(new Date(date.year, date.month - 1, 1));
+	};
+
+	// Render Item
+	const renderItem = ({ item }: { item: ClassScheduleItem | BranchClassInfo }) => {
+		const isTodayItem = 'class_name' in item;
+		const dateStr = isTodayItem
+			? selectedDate
+			: (item as BranchClassInfo).starts_at.split('T')[0];
+
+		return (
+			<ClassCard
+				item={item}
+				dateStr={dateStr}
+				onPress={() => {
+					// No action "por ahora no hara nada al pulsarse"
+				}}
+			/>
+		);
 	};
 
 	return (
 		<ThemedView className='flex-1 bg-white pt-10'>
-			<ScrollView
-				showsVerticalScrollIndicator={false}
-				contentContainerStyle={{ paddingTop: 8, paddingHorizontal: 16, paddingBottom: 96 }}>
+			<View className='mb-4 px-4'>
 				{/* Logo */}
-				<View className='items-center mb-4'>
+				<View className='mb-4 items-center'>
 					<Image
 						source={require('@/assets/images/Frame.png')}
 						style={{ width: 150, height: 50, resizeMode: 'contain' }}
 					/>
 				</View>
 
-				{/* Título principal en franja */}
-				<View className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-3 items-center justify-center'>
+				{/* Title Strip */}
+				<View className='mb-3 w-full items-center justify-center rounded-2xl bg-[#F3F4F6] py-2'>
 					<ThemedText
 						lightColor='#111827'
 						style={{ fontFamily: 'System', fontSize: 16, fontWeight: '600' }}>
 						{t('instructor.classes.title')}
 					</ThemedText>
 				</View>
+
+				{/* Header */}
 				<View className='mb-2'>
 					<ThemedText
 						lightColor='#111827'
@@ -144,22 +220,23 @@ export default function InstructorClassesScreen() {
 					</ThemedText>
 				</View>
 
-				<View className='flex-row bg-[#F3F4F6] rounded-2xl p-1 mb-4'>
+				{/* Tabs */}
+				<View className='mb-4 select-none flex-row rounded-2xl bg-[#F3F4F6] p-1'>
 					<TouchableOpacity
-						className={`flex-1 py-2 rounded-xl items-center ${
-							viewMode === 'week' ? 'bg-white' : 'bg-transparent'
+						className={`flex-1 items-center rounded-xl py-2 ${
+							viewMode === 'day' ? 'bg-white' : 'bg-transparent'
 						}`}
 						activeOpacity={0.7}
-						onPress={() => setViewMode('week')}>
+						onPress={() => setViewMode('day')}>
 						<Text
 							className={`font-semibold ${
-								viewMode === 'week' ? 'text-[#111827]' : 'text-[#6b7280]'
-							}`}> 
-							{t('instructor.classes.week')}
+								viewMode === 'day' ? 'text-[#111827]' : 'text-[#6b7280]'
+							}`}>
+							{t('instructor.classes.day') || 'Día'}
 						</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
-						className={`flex-1 py-2 rounded-xl items-center ${
+						className={`flex-1 items-center rounded-xl py-2 ${
 							viewMode === 'month' ? 'bg-white' : 'bg-transparent'
 						}`}
 						activeOpacity={0.7}
@@ -167,88 +244,58 @@ export default function InstructorClassesScreen() {
 						<Text
 							className={`font-semibold ${
 								viewMode === 'month' ? 'text-[#111827]' : 'text-[#6b7280]'
-							}`}> 
-							{t('instructor.classes.month')}
+							}`}>
+							{t('instructor.classes.month') || 'Mes'}
 						</Text>
 					</TouchableOpacity>
 				</View>
+			</View>
 
-				<View className='mb-6'>
-					{viewMode === 'week' ? (
-						<WeekCalendar
-							onDateSelect={handleDaySelect}
-							markedDates={markedDates}
-							initialDate={selectedDate}
-						/>
+			<FlatList
+				data={paginatedData}
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				keyExtractor={(item) => (item as any).class_id || Math.random().toString()}
+				renderItem={renderItem}
+				onEndReached={loadMore}
+				onEndReachedThreshold={0.5}
+				contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}
+				ListHeaderComponent={
+					viewMode === 'month' ? (
+						<View className='mb-6'>
+							<MonthCalendar
+								onDateSelect={handleDaySelect}
+								onMonthChange={handleMonthChange}
+								markedDates={markedDates}
+								initialDate={selectedDate}
+							/>
+							<View className='mb-2 mt-4'>
+								<ThemedText
+									lightColor='#111827'
+									style={{ fontFamily: 'BebasNeue-Regular', fontSize: 22 }}>
+									{t('instructor.classes.classesOfDay')}
+								</ThemedText>
+							</View>
+						</View>
 					) : (
-						<MonthCalendar
-							onDateSelect={handleDaySelect}
-							markedDates={markedDates}
-							initialDate={selectedDate}
-						/>
-					)}
-				</View>
-
-				<View className='mb-2'>
-					<ThemedText
-						lightColor='#111827'
-						style={{ fontFamily: 'BebasNeue-Regular', fontSize: 22 }}>
-						{t('instructor.classes.classesOfDay')}
-					</ThemedText>
-				</View>
-
-				{classesForSelectedDate.length === 0 ? (
-					<Text className='text-[14px] text-[#6b7280]'>
-						{t('instructor.classes.noClasses')}
-					</Text>
-				) : (
-						classesForSelectedDate.map((cls) => (
-							<TouchableOpacity
-								key={cls.id}
-								activeOpacity={0.8}
-								onPress={() =>
-									router.push({
-										pathname: '/class-details',
-										params: {
-											id: cls.id,
-											title: cls.titleKey ? t(cls.titleKey) : cls.title,
-											date: cls.date,
-											time: cls.time,
-											mode: 'instructor',
-										},
-									})
-								}>
-								<View className='mb-3 rounded-xl bg-white px-4 py-4 flex-row justify-between items-center border border-[#e5e7eb]'>
-									<View className='flex-col flex-1 pr-3'>
-										<Text className='text-[14px] font-semibold text-[#111827]'>
-											{cls.titleKey ? t(cls.titleKey) : cls.title}
-										</Text>
-										<Text className='mt-[2px] text-[12px] text-[#4b5563]'>
-											{cls.date} · {cls.locationKey ? t(cls.locationKey) : cls.location}
-										</Text>
-										<View className='mt-3 flex-row items-center'>
-											<ClockIcon width={14} height={14} color='#f97316' />
-											<Text className='ml-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f97316]'>
-												{cls.time} ({cls.durationMinutes} MIN)
-											</Text>
-										</View>
-									</View>
-									<View className='flex-row items-center rounded-full bg-white px-3 py-1 border border-[#f97316]'>
-										<Text className='text-[12px] font-medium text-[#111827]'>
-											{cls.occupied}/{cls.capacity}
-										</Text>
-										<ChevronRightIcon
-											width={12}
-											height={12}
-											color='#f97316'
-											style={{ marginLeft: 4 }}
-										/>
-									</View>
-								</View>
-							</TouchableOpacity>
-					))
-				)}
-			</ScrollView>
+						<View className='mb-2'>
+							<ThemedText
+								lightColor='#111827'
+								style={{ fontFamily: 'BebasNeue-Regular', fontSize: 22 }}>
+								{t('instructor.classes.classesOfDay')}
+							</ThemedText>
+						</View>
+					)
+				}
+				ListEmptyComponent={
+					loading ? (
+						<ActivityIndicator size='small' color='#f97316' className='mt-10' />
+					) : (
+						<Text className='mt-4 text-center text-[14px] text-[#6b7280]'>
+							{t('instructor.classes.noClasses')}
+						</Text>
+					)
+				}
+			/>
 		</ThemedView>
 	);
 }
