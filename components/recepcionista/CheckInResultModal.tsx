@@ -12,17 +12,17 @@ interface CheckInResultModalProps {
   message?: string;
 }
 
-export function CheckInResultModal({ 
-  visible, 
-  onClose, 
-  success, 
+export function CheckInResultModal({
+  visible,
+  onClose,
+  success,
   userName,
-  message 
+  message
 }: CheckInResultModalProps) {
   const { t } = useTranslation();
   const displayUserName = userName || t('dashboard.defaultUser');
-  const defaultMessage = success 
-    ? `${t('common.client')}: ${displayUserName}\n${t('common.status')}: ${t('common.accessGranted')}` 
+  const displayMessage = success
+    ? message || t('common.accessGranted')
     : message || t('common.accessDenied');
 
   return (
@@ -53,7 +53,7 @@ export function CheckInResultModal({
               )}
             </View>
 
-            <ThemedText 
+            <ThemedText
               className={`text-2xl font-bold mb-2 ${
                 success ? 'text-green-700' : 'text-red-700'
               }`}
@@ -61,8 +61,12 @@ export function CheckInResultModal({
               {success ? t('common.welcome') : t('common.accessDenied')}
             </ThemedText>
 
+            <ThemedText className="text-xl font-semibold text-gray-800 mb-2">
+              {displayUserName}
+            </ThemedText>
+
             <ThemedText className="text-center text-gray-600 text-base leading-6">
-              {defaultMessage}
+              {displayMessage}
             </ThemedText>
           </View>
           <TouchableOpacity

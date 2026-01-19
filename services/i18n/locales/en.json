@@ -302,7 +302,8 @@
       "validateCheckIn": {
         "title": "Validate Check-in",
         "searchPlaceholder": "Search by ID document",
-        "scanQr": "Scan QR"
+        "scanQr": "Scan QR",
+        "scanFace": "Scan Face"
       },
       "capacity": {
         "title": "Gym Capacity",
@@ -1387,6 +1388,50 @@
       "goBack": "Go Back",
       "searchPlaceholder": "Search branch...",
       "noBranchesFound": "No branches found."
+    },
+    "faceEnrollment": {
+      "setupButton": "Set up Face ID",
+      "modal": {
+        "title": "Face Recognition Setup",
+        "instruction": "Position your face in the frame",
+        "capturing": "Capturing...",
+        "uploading": "Setting up Face ID...",
+        "confirm": "Confirm",
+        "retake": "Retake",
+        "capture": "Take Photo"
+      },
+      "permission": {
+        "message": "Camera access is required to set up Face ID.",
+        "button": "Grant Permission"
+      },
+      "toast": {
+        "successTitle": "Face ID Set Up!",
+        "successMessage": "You can now use face recognition for check-in.",
+        "errorTitle": "Setup Failed",
+        "errorMessage": "Could not set up Face ID. Please try again."
+      },
+      "errors": {
+        "cameraAccess": "Could not access camera",
+        "captureFailed": "Failed to capture photo",
+        "uploadFailed": "Failed to upload photo"
+      }
+    },
+    "faceCheckIn": {
+      "modal": {
+        "instruction": "Position client's face in the frame",
+        "processing": "Processing check-in...",
+        "confirm": "Confirm",
+        "retake": "Retake"
+      },
+      "permission": {
+        "message": "Camera access is required for face check-in.",
+        "button": "Grant Permission"
+      },
+      "errors": {
+        "cameraAccess": "Could not access camera",
+        "captureFailed": "Failed to capture photo",
+        "checkInFailed": "Face check-in failed. Please try again."
+      }
     }
   },
   "classesScreen": {

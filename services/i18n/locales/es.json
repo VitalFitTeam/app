@@ -334,7 +334,8 @@
 			"validateCheckIn": {
 				"title": "Validar Check-in",
 				"searchPlaceholder": "Buscar por documento de identidad",
-				"scanQr": "Escanear QR"
+				"scanQr": "Escanear QR",
+				"scanFace": "Escanear Rostro"
 			},
 			"capacity": {
 				"title": "Aforo del Gimnasio",
@@ -1318,6 +1319,50 @@
 			"goBack": "Volver",
 			"searchPlaceholder": "Buscar sede...",
 			"noBranchesFound": "No se encontraron sedes."
+		},
+		"faceEnrollment": {
+			"setupButton": "Configurar Face ID",
+			"modal": {
+				"title": "Configurar Reconocimiento Facial",
+				"instruction": "Posiciona tu rostro en el marco",
+				"capturing": "Capturando...",
+				"uploading": "Configurando Face ID...",
+				"confirm": "Confirmar",
+				"retake": "Volver a tomar",
+				"capture": "Tomar Foto"
+			},
+			"permission": {
+				"message": "Se requiere acceso a la camara para configurar Face ID.",
+				"button": "Conceder Permiso"
+			},
+			"toast": {
+				"successTitle": "Face ID Configurado!",
+				"successMessage": "Ahora puedes usar reconocimiento facial para el check-in.",
+				"errorTitle": "Configuracion Fallida",
+				"errorMessage": "No se pudo configurar Face ID. Intentalo de nuevo."
+			},
+			"errors": {
+				"cameraAccess": "No se pudo acceder a la camara",
+				"captureFailed": "Error al capturar la foto",
+				"uploadFailed": "Error al subir la foto"
+			}
+		},
+		"faceCheckIn": {
+			"modal": {
+				"instruction": "Posiciona el rostro del cliente en el marco",
+				"processing": "Procesando check-in...",
+				"confirm": "Confirmar",
+				"retake": "Volver a tomar"
+			},
+			"permission": {
+				"message": "Se requiere acceso a la camara para el check-in facial.",
+				"button": "Conceder Permiso"
+			},
+			"errors": {
+				"cameraAccess": "No se pudo acceder a la camara",
+				"captureFailed": "Error al capturar la foto",
+				"checkInFailed": "Check-in facial fallido. Intentalo de nuevo."
+			}
 		}
 	}
 }

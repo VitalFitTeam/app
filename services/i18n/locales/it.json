@@ -295,7 +295,8 @@
 			"validateCheckIn": {
 				"title": "Valida Check-in",
 				"searchPlaceholder": "Cerca per documento ID",
-				"scanQr": "Scansiona QR"
+				"scanQr": "Scansiona QR",
+				"scanFace": "Scansiona Viso"
 			},
 			"capacity": {
 				"title": "Capacità Palestra",
@@ -1238,6 +1239,50 @@
 			"goBack": "Indietro",
 			"searchPlaceholder": "Cerca sede...",
 			"noBranchesFound": "Nessuna sede trovata."
+		},
+		"faceEnrollment": {
+			"setupButton": "Configura Face ID",
+			"modal": {
+				"title": "Configurazione riconoscimento facciale",
+				"instruction": "Posiziona il viso nella cornice",
+				"capturing": "Acquisizione in corso...",
+				"uploading": "Configurazione Face ID...",
+				"confirm": "Conferma",
+				"retake": "Riprendi",
+				"capture": "Scatta foto"
+			},
+			"permission": {
+				"message": "E' necessario l'accesso alla fotocamera per configurare Face ID.",
+				"button": "Concedi autorizzazione"
+			},
+			"toast": {
+				"successTitle": "Face ID configurato!",
+				"successMessage": "Ora puoi usare il riconoscimento facciale per il check-in.",
+				"errorTitle": "Configurazione fallita",
+				"errorMessage": "Impossibile configurare Face ID. Riprova."
+			},
+			"errors": {
+				"cameraAccess": "Impossibile accedere alla fotocamera",
+				"captureFailed": "Impossibile scattare la foto",
+				"uploadFailed": "Impossibile caricare la foto"
+			}
+		},
+		"faceCheckIn": {
+			"modal": {
+				"instruction": "Posiziona il viso del cliente nella cornice",
+				"processing": "Elaborazione check-in...",
+				"confirm": "Conferma",
+				"retake": "Riprendi"
+			},
+			"permission": {
+				"message": "E' necessario l'accesso alla fotocamera per il check-in facciale.",
+				"button": "Concedi autorizzazione"
+			},
+			"errors": {
+				"cameraAccess": "Impossibile accedere alla fotocamera",
+				"captureFailed": "Impossibile scattare la foto",
+				"checkInFailed": "Check-in facciale fallito. Riprova."
+			}
 		},
 		"classesScreen": {
 			"title": "Calendario Lezioni",

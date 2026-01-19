@@ -329,7 +329,8 @@
 			"validateCheckIn": {
 				"title": "Valider le Check-in",
 				"searchPlaceholder": "Chercher par document d'identité",
-				"scanQr": "Scanner QR"
+				"scanQr": "Scanner QR",
+				"scanFace": "Scanner Visage"
 			},
 			"capacity": {
 				"title": "Capacité de la Salle",
@@ -1240,6 +1241,50 @@
 			"goBack": "Retour",
 			"searchPlaceholder": "Rechercher une succursale...",
 			"noBranchesFound": "Aucune succursale trouvée."
+		},
+		"faceEnrollment": {
+			"setupButton": "Configurer Face ID",
+			"modal": {
+				"title": "Configuration de la reconnaissance faciale",
+				"instruction": "Positionnez votre visage dans le cadre",
+				"capturing": "Capture en cours...",
+				"uploading": "Configuration de Face ID...",
+				"confirm": "Confirmer",
+				"retake": "Reprendre",
+				"capture": "Prendre une photo"
+			},
+			"permission": {
+				"message": "L'acces a la camera est requis pour configurer Face ID.",
+				"button": "Accorder l'autorisation"
+			},
+			"toast": {
+				"successTitle": "Face ID configure!",
+				"successMessage": "Vous pouvez maintenant utiliser la reconnaissance faciale pour le check-in.",
+				"errorTitle": "Echec de la configuration",
+				"errorMessage": "Impossible de configurer Face ID. Veuillez reessayer."
+			},
+			"errors": {
+				"cameraAccess": "Impossible d'acceder a la camera",
+				"captureFailed": "Echec de la capture de la photo",
+				"uploadFailed": "Echec du telechargement de la photo"
+			}
+		},
+		"faceCheckIn": {
+			"modal": {
+				"instruction": "Positionnez le visage du client dans le cadre",
+				"processing": "Traitement du check-in...",
+				"confirm": "Confirmer",
+				"retake": "Reprendre"
+			},
+			"permission": {
+				"message": "L'acces a la camera est requis pour le check-in facial.",
+				"button": "Accorder l'autorisation"
+			},
+			"errors": {
+				"cameraAccess": "Impossible d'acceder a la camera",
+				"captureFailed": "Echec de la capture de la photo",
+				"checkInFailed": "Check-in facial echoue. Veuillez reessayer."
+			}
 		},
 		"classesScreen": {
 			"title": "Calendrier des Cours",
