@@ -17,12 +17,7 @@ interface Props {
 	onBadgesPress?: () => void;
 }
 
-export const UserHeader: React.FC<Props> = ({
-	name,
-	avatarUrl,
-	notifications,
-	onBadgesPress,
-}) => {
+export const UserHeader: React.FC<Props> = ({ name, avatarUrl, notifications, onBadgesPress }) => {
 	const { t } = useTranslation();
 	const defaultNotifications = [
 		{ id: '1', title: t('dashboard.notifications.mock.classStarting'), time: 'Hace 5 min' },
@@ -32,10 +27,8 @@ export const UserHeader: React.FC<Props> = ({
 	const [showNotifications, setShowNotifications] = useState(false);
 	const firstName = name.split(' ')[0];
 
-
-
 	return (
-		<View className='mt-2 mb-6'>
+		<View className='mb-6 mt-2'>
 			<View style={styles.logoContainer}>
 				<Image
 					source={require('@/assets/images/Frame.png')}
@@ -44,8 +37,8 @@ export const UserHeader: React.FC<Props> = ({
 				/>
 			</View>
 
-			<View className='flex-row justify-between items-center mt-6'>
-				<View className='flex-row items-center flex-1'>
+			<View className='mt-6 flex-row items-center justify-between'>
+				<View className='flex-1 flex-row items-center'>
 					<UserAvatar
 						name={name}
 						imageUrl={avatarUrl}
@@ -67,9 +60,11 @@ export const UserHeader: React.FC<Props> = ({
 				</View>
 
 				<View className='flex-row items-center gap-3'>
-					<TouchableOpacity onPress={onBadgesPress} activeOpacity={0.7}>
-						<Award size={24} color='#333' strokeWidth={2} />
-					</TouchableOpacity>
+					{onBadgesPress && (
+						<TouchableOpacity onPress={onBadgesPress} activeOpacity={0.7}>
+							<Award size={24} color='#333' strokeWidth={2} />
+						</TouchableOpacity>
+					)}
 
 					<TouchableOpacity
 						onPress={() => setShowNotifications(!showNotifications)}
@@ -77,7 +72,7 @@ export const UserHeader: React.FC<Props> = ({
 						activeOpacity={0.7}>
 						<Bell size={24} color='#333' />
 						{activeNotifications.length > 0 && (
-							<View className='absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full' />
+							<View className='absolute right-0 top-0 h-2.5 w-2.5 rounded-full bg-red-500' />
 						)}
 					</TouchableOpacity>
 				</View>
@@ -92,22 +87,26 @@ export const UserHeader: React.FC<Props> = ({
 						activeOpacity={1}
 						onPress={(e) => e.stopPropagation()}
 						style={styles.notificationModal}>
-						<Text className='font-heading text-base font-semibold mb-2'>{t('dashboard.notifications.title')}</Text>
+						<Text className='mb-2 font-heading text-base font-semibold'>
+							{t('dashboard.notifications.title')}
+						</Text>
 						{activeNotifications.length > 0 ? (
 							<FlatList
 								data={activeNotifications}
 								keyExtractor={(item) => item.id}
 								renderItem={({ item }) => (
 									<View className='mb-2'>
-										<Text className='font-body text-gray-800 dark:text-gray-200 font-medium text-sm'>
+										<Text className='font-body text-sm font-medium text-gray-800 dark:text-gray-200'>
 											{item.title}
 										</Text>
-										<Text className='font-body text-gray-400 text-xs'>{item.time}</Text>
+										<Text className='font-body text-xs text-gray-400'>
+											{item.time}
+										</Text>
 									</View>
 								)}
 							/>
 						) : (
-							<Text className='font-body text-gray-400 text-sm'>
+							<Text className='font-body text-sm text-gray-400'>
 								{t('dashboard.notifications.empty')}
 							</Text>
 						)}

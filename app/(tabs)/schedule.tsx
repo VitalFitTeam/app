@@ -32,6 +32,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const PAGE_SIZE = 8;
 
+type BranchItem = {
+    branch_id: string;
+    name: string;
+};
+
 type ClassItem = {
     classId: string;
     serviceId: string;
@@ -86,6 +91,7 @@ export default function HorariosScreen() {
     // Caches to avoid redundant API calls and 429 errors
     const servicesCache = useRef<Record<string, { name: string; image: string }>>({});
     const instructorsCache = useRef<Record<string, string>>({});
+    const bookingInfoByClassId = useRef<Record<string, { bookingId: string; createdAt: string }>>({});
 
     // Helper to format date as YYYY-MM-DD in local timezone
     const formatLocalDate = (date: Date): string => {
@@ -120,6 +126,27 @@ export default function HorariosScreen() {
             }
         }
     };
+
+    useEffect(() => {
+        const initBranches = async () => {
+            try {
+                const token = await AsyncStorage.getItem('token');
+                const response = await vitalFitApi.public.getBranchMap(token || '');
+                const data = (response as { data?: BranchItem[] }).data || [];
+
+                if (data.length > 0 && !selectedBranchId) {
+                    setSelectedBranchId(data[0].branch_id);
+                    setSelectedBranchName(data[0].name);
+                }
+            } catch (error) {
+                console.error('Error cargando sucursales en Schedule:', error);
+            } finally {
+                setLoadingClasses(false);
+            }
+        };
+
+        void initBranches();
+    }, [selectedBranchId]);
 
     useFocusEffect(
         useCallback(() => {
@@ -276,14 +303,14 @@ export default function HorariosScreen() {
                 setVisibleClassesCount(PAGE_SIZE);
             } catch (error) {
                 console.error('Error cargando clases en Schedule:', error);
-                setErrorMessage(t('schedule.errors.loadClasses'));
+                setErrorMessage('No se pudieron cargar las clases. Intenta nuevamente.');
             } finally {
                 setLoadingClasses(false);
             }
         };
 
         void loadClasses();
-    }, [selectedBranchId, refreshKey, t]);
+    }, [selectedBranchId, refreshKey]);
 
     useEffect(() => {
         const loadBookings = async () => {
@@ -320,15 +347,13 @@ export default function HorariosScreen() {
                         ? (rawBookings as { data?: ClientBookingResponse[] }).data
                         : (rawBookings as ClientBookingResponse[])) ?? [];
 
-                const bookingInfoByClassId: Record<string, { bookingId: string; createdAt: string }> = {};
+                bookingInfoByClassId.current = {};
                 bookingsItems.forEach((bk) => {
                     const cId = bk.class_id;
                     const bId = bk.booking_id;
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const created = (bk as any).created_at || '';
 
                     if (cId && bId) {
-                        bookingInfoByClassId[String(cId)] = { bookingId: String(bId), createdAt: String(created) };
+                        bookingInfoByClassId.current[String(cId)] = { bookingId: String(bId), createdAt: '' };
                     }
                 });
 
@@ -363,7 +388,7 @@ export default function HorariosScreen() {
 
                         // Only include items that are actually in the user's bookings
                         const userBranchBookings = branchItems.filter(item =>
-                            bookingInfoByClassId[String(item.class_id)]
+                            bookingInfoByClassId.current[String(item.class_id)]
                         );
 
                         allBranchBookings.push(...userBranchBookings);
@@ -474,7 +499,7 @@ export default function HorariosScreen() {
                         const instructorId = item.instructor_id || '';
 
                         const classId = item.class_id || '';
-                        const bookingInfo = bookingInfoByClassId[String(classId)];
+                        const bookingInfo = bookingInfoByClassId.current[String(classId)];
                         const bookingId = bookingInfo?.bookingId || '';
                         const createdAt = bookingInfo?.createdAt || '';
 
@@ -517,7 +542,7 @@ export default function HorariosScreen() {
                 setVisibleBookingsCount(PAGE_SIZE);
             } catch (error) {
                 console.error('Error cargando reservas del cliente:', error);
-                setBookingsError(t('schedule.errors.loadBookings'));
+                setBookingsError('No se pudieron cargar tus reservas. Intenta nuevamente.');
             } finally {
                 setLoadingBookings(false);
             }
@@ -697,7 +722,7 @@ export default function HorariosScreen() {
                                     branch={classItem.branch}
                                     imageUrl={classItem.imageUrl}
                                     variant='overlay'
-                                    slots={`${classItem.capacity || 0} ${t('schedule.spots')}`}
+                                    category={`${classItem.capacity || 0} Cupos`}
                                     reserved={isReserved(
                                         `${classItem.classId}|${classItem.serviceId}`,
                                     )}
@@ -770,7 +795,10 @@ export default function HorariosScreen() {
                                         branch={booking.branch}
                                         imageUrl={booking.imageUrl}
                                         variant='overlay'
-                                        slots={`${booking.capacity || 0} ${t('schedule.spots')}`}
+                                        category={`${t('common.available')}: ${Math.max(
+                                            (booking.capacity || 0) - (booking.occupied || 0),
+                                            0,
+                                        )} ${t('common.of')} ${booking.capacity || 0}`}
                                         reserved
                                         onPress={(classData) => {
                                             router.push({
