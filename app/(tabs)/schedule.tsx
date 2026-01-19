@@ -4,6 +4,7 @@ import { WeekCalendar } from '@/components/auth/dashboard/weekcalendar';
 import ClassCard from '@/components/ClassCard';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useBranch } from '@/contexts/BranchContext';
 import { useReservations } from '@/contexts/reservations';
 import vitalFitApi from '@/services';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import {
     ActivityIndicator,
     Image,
+    Modal,
     NativeScrollEvent,
     Pressable,
     ScrollView,
@@ -32,10 +34,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const PAGE_SIZE = 8;
 
-type BranchItem = {
-    branch_id: string;
-    name: string;
-};
+
 
 type ClassItem = {
     classId: string;
@@ -66,6 +65,7 @@ type BookingItem = {
     capacity: number;
     occupied: number;
     rawDate: string;
+    createdAt?: string;
 };
 
 export default function HorariosScreen() {
@@ -73,9 +73,10 @@ export default function HorariosScreen() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<'classes' | 'reservas'>('classes');
     const { isReserved } = useReservations();
-    const [branches, setBranches] = useState<BranchItem[]>([]);
-    const [selectedBranchId, setSelectedBranchId] = useState<string>('');
-    const [loadingBranches, setLoadingBranches] = useState(true);
+    
+    // Use global branch context
+    const { branches, selectedBranchId, selectBranch, isLoading: loadingBranches } = useBranch();
+    
     const [branchMenuVisible, setBranchMenuVisible] = useState(false);
     const [classes, setClasses] = useState<ClassItem[]>([]);
     const [loadingClasses, setLoadingClasses] = useState(false);
@@ -116,26 +117,8 @@ export default function HorariosScreen() {
         }
     };
 
-    useEffect(() => {
-        const initBranches = async () => {
-            try {
-                const token = await AsyncStorage.getItem('token');
-                const response = await vitalFitApi.public.getBranchMap(token || '');
-                const data = (response as { data?: BranchItem[] }).data || [];
+    // Branch loading is now handled by BranchContext
 
-                setBranches(data);
-                if (data.length > 0 && !selectedBranchId) {
-                    setSelectedBranchId(data[0].branch_id);
-                }
-            } catch (error) {
-                console.error('Error cargando sucursales en Schedule:', error);
-            } finally {
-                setLoadingBranches(false);
-            }
-        };
-
-        void initBranches();
-    }, [selectedBranchId]);
 
     useFocusEffect(
         useCallback(() => {
@@ -290,14 +273,14 @@ export default function HorariosScreen() {
                 setVisibleClassesCount(PAGE_SIZE);
             } catch (error) {
                 console.error('Error cargando clases en Schedule:', error);
-                setErrorMessage('No se pudieron cargar las clases. Intenta nuevamente.');
+                setErrorMessage(t('schedule.errors.loadClasses'));
             } finally {
                 setLoadingClasses(false);
             }
         };
 
         void loadClasses();
-    }, [selectedBranchId, refreshKey]);
+    }, [selectedBranchId, refreshKey, t]);
 
     useEffect(() => {
         const loadBookings = async () => {
@@ -334,13 +317,15 @@ export default function HorariosScreen() {
                         ? (rawBookings as { data?: ClientBookingResponse[] }).data
                         : (rawBookings as ClientBookingResponse[])) ?? [];
 
-                const bookingIdByClassId: Record<string, string> = {};
+                const bookingInfoByClassId: Record<string, { bookingId: string; createdAt: string }> = {};
                 bookingsItems.forEach((bk) => {
                     const cId = bk.class_id;
                     const bId = bk.booking_id;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const created = (bk as any).created_at || '';
 
                     if (cId && bId) {
-                        bookingIdByClassId[String(cId)] = String(bId);
+                        bookingInfoByClassId[String(cId)] = { bookingId: String(bId), createdAt: String(created) };
                     }
                 });
 
@@ -428,7 +413,7 @@ export default function HorariosScreen() {
                     }
                 }
 
-                const mappedBookings: BookingItem[] = items.map((item) => {
+                const mappedBookings: (BookingItem & { createdAt: string })[] = items.map((item) => {
                     const startsAt = item.starts_at || '';
                     const endsAt = item.ends_at || '';
 
@@ -454,7 +439,9 @@ export default function HorariosScreen() {
                     const instructorId = item.instructor_id || '';
 
                     const classId = item.class_id || '';
-                    const bookingId = bookingIdByClassId[String(classId)] || '';
+                    const bookingInfo = bookingInfoByClassId[String(classId)];
+                    const bookingId = bookingInfo?.bookingId || '';
+                    const createdAt = bookingInfo?.createdAt || '';
 
                     const title = serviceNameMap[String(sid)] || 'Clase';
                     const instructorNameFromMap = instructorId
@@ -477,14 +464,22 @@ export default function HorariosScreen() {
                         capacity: item.max_capacity || 0,
                         occupied: 0,
                         rawDate: String(startsAt).split('T')[0] || '',
+                        createdAt,
                     };
+                });
+                
+                // Sort by createdAt descending (newest bookings first)
+                mappedBookings.sort((a, b) => {
+                    if (!a.createdAt) return 1;
+                    if (!b.createdAt) return -1;
+                    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
                 });
 
                 setBookings(mappedBookings);
                 setVisibleBookingsCount(PAGE_SIZE);
             } catch (error) {
                 console.error('Error cargando reservas del cliente:', error);
-                setBookingsError('No se pudieron cargar tus reservas. Intenta nuevamente.');
+                setBookingsError(t('schedule.errors.loadBookings'));
             } finally {
                 setLoadingBookings(false);
             }
@@ -493,7 +488,7 @@ export default function HorariosScreen() {
         if (activeTab === 'reservas') {
             void loadBookings();
         }
-    }, [activeTab, selectedBranchId, refreshKey]);
+    }, [activeTab, selectedBranchId, refreshKey, t]);
 
     const filteredClasses = useMemo(
         () =>
@@ -549,6 +544,12 @@ export default function HorariosScreen() {
                         {activeTab === 'reservas' ? (
                             <MonthCalendar
                                 initialDate={selectedBookingsDate || undefined}
+                                markedDates={{
+                                    [selectedBookingsDate]: {
+                                        selected: true,
+                                        selectedColor: '#6B7280', // Gray
+                                    },
+                                }}
                                 onDateSelect={(day) => {
                                     if (day?.dateString) {
                                         setSelectedBookingsDate(day.dateString);
@@ -614,59 +615,82 @@ export default function HorariosScreen() {
                         </ThemedText>
 
                         <View style={{ width: '100%', maxWidth: 400, zIndex: 100 }}>
+
+
                             <TouchableOpacity
                                 activeOpacity={0.7}
-                                onPress={() => setBranchMenuVisible(!branchMenuVisible)}
+                                onPress={() => setBranchMenuVisible(true)}
                                 className='flex-row items-center justify-between bg-neutral-100 rounded-xl px-4 py-2.5 border border-neutral-200'>
                                 <ThemedText
                                     className='font-body text-sm font-semibold text-neutral-800'
                                     numberOfLines={1}>
                                     {loadingBranches
-                                        ? 'Cargando...'
+                                        ? t('common.loading')
                                         : branches.find((b) => b.branch_id === selectedBranchId)
                                             ?.name || t('common.selectBranch')}
                                 </ThemedText>
                                 <Ionicons
-                                    name={branchMenuVisible ? 'chevron-up' : 'chevron-down'}
+                                    name='chevron-down'
                                     size={16}
                                     color='#4b5563'
                                 />
                             </TouchableOpacity>
 
-                            {branchMenuVisible && (
-                                <View className='absolute top-12 left-0 right-0 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-50'>
-                                    {branches.map((branch) => {
-                                        const isSelected = branch.branch_id === selectedBranchId;
-                                        return (
-                                            <TouchableOpacity
-                                                key={branch.branch_id}
-                                                className='px-4 py-2'
-                                                onPress={() => {
-                                                    setSelectedBranchId(branch.branch_id);
-                                                    setBranchMenuVisible(false);
-                                                }}>
-                                                <ThemedText
-                                                    className='font-body'
-                                                    style={{
-                                                        fontSize: isSelected ? 16 : 13,
-                                                        fontWeight: isSelected ? '800' : '400',
-                                                        color: isSelected ? '#f97316' : '#111827',
-                                                    }}
-                                                    numberOfLines={1}>
-                                                    {branch.name}
-                                                </ThemedText>
-                                            </TouchableOpacity>
-                                        );
-                                    })}
-                                    {branches.length === 0 && (
-                                        <View className='px-4 py-3'>
-                                            <ThemedText className='font-body text-sm text-neutral-400'>
-                                                {t('schedule.noClassesBranch')}
-                                            </ThemedText>
+                            <Modal
+                                visible={branchMenuVisible}
+                                transparent={true}
+                                animationType="fade"
+                                onRequestClose={() => setBranchMenuVisible(false)}
+                            >
+                                <TouchableOpacity 
+                                    style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20 }}
+                                    activeOpacity={1}
+                                    onPress={() => setBranchMenuVisible(false)}
+                                >
+                                    <View style={{ backgroundColor: 'white', borderRadius: 12, maxHeight: '80%', paddingVertical: 10 }}>
+                                    <View style={{ paddingHorizontal: 16, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: '#e5e5e5', marginBottom: 5 }}>
+                                            <ThemedText className='font-heading text-lg font-bold text-center'>{t('common.selectBranch')}</ThemedText>
                                         </View>
-                                    )}
-                                </View>
-                            )}
+                                        <ScrollView showsVerticalScrollIndicator={true}>
+                                            {branches.map((branch) => {
+                                                const isSelected = branch.branch_id === selectedBranchId;
+                                                return (
+                                                    <TouchableOpacity
+                                                        key={branch.branch_id}
+                                                        className='px-4 py-3 border-b border-neutral-100'
+                                                        onPress={() => {
+                                                            selectBranch(branch.branch_id);
+                                                            setBranchMenuVisible(false);
+                                                        }}>
+                                                        <ThemedText
+                                                            className='font-body'
+                                                            style={{
+                                                                fontSize: 16,
+                                                                fontWeight: isSelected ? '700' : '400',
+                                                                color: isSelected ? '#f97316' : '#111827',
+                                                            }}>
+                                                            {branch.name}
+                                                        </ThemedText>
+                                                    </TouchableOpacity>
+                                                );
+                                            })}
+                                            {branches.length === 0 && (
+                                                <View className='px-4 py-4 items-center'>
+                                                    <ThemedText className='font-body text-sm text-neutral-400'>
+                                                        {t('schedule.noClassesBranch')}
+                                                    </ThemedText>
+                                                </View>
+                                            )}
+                                        </ScrollView>
+                                        <TouchableOpacity 
+                                            onPress={() => setBranchMenuVisible(false)}
+                                            style={{ marginTop: 10, alignSelf: 'center', padding: 10 }}
+                                        >
+                                            <ThemedText style={{ color: '#6b7280' }}>{t('common.close')}</ThemedText>
+                                        </TouchableOpacity>
+                                    </View>
+                                </TouchableOpacity>
+                            </Modal>
                         </View>
                     </View>
 
@@ -699,7 +723,7 @@ export default function HorariosScreen() {
                                     branch={classItem.branch}
                                     imageUrl={classItem.imageUrl}
                                     variant='overlay'
-                                    category={`${classItem.capacity || 0} Cupos`}
+                                    slots={`${classItem.capacity || 0} ${t('schedule.spots')}`}
                                     reserved={isReserved(
                                         `${classItem.classId}|${classItem.serviceId}`,
                                     )}
@@ -760,10 +784,7 @@ export default function HorariosScreen() {
                                         branch={booking.branch}
                                         imageUrl={booking.imageUrl}
                                         variant='overlay'
-                                        category={`${t('common.available')}: ${Math.max(
-                                            (booking.capacity || 0) - (booking.occupied || 0),
-                                            0,
-                                        )} ${t('common.of')} ${booking.capacity || 0}`}
+                                        slots={`${booking.capacity || 0} ${t('schedule.spots')}`}
                                         reserved
                                         onPress={(classData) => {
                                             router.push({
