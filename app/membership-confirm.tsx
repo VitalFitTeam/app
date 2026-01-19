@@ -49,12 +49,18 @@ export default function MembershipConfirmScreen() {
     branchId?: string;
     packagesJson?: string;
     servicesJson?: string;
+    // Coming from class-details when user needs to purchase
+    fromClassDetails?: string;
+    preselectedBranchId?: string;
   }>();
 
   const [processing, setProcessing] = useState(false);
 
   const [branches, setBranches] = useState<BranchItem[]>([]);
-  const [selectedBranchId, setSelectedBranchId] = useState<string>(params.branchId || '');
+  // Prioritize preselectedBranchId from class-details over the generic branchId
+  const [selectedBranchId, setSelectedBranchId] = useState<string>(
+    params.preselectedBranchId || params.branchId || ''
+  );
   const [loadingBranches, setLoadingBranches] = useState(true);
   const [branchModalVisible, setBranchModalVisible] = useState(false);
 
@@ -85,7 +91,9 @@ export default function MembershipConfirmScreen() {
         const data = response.data || response || [];
         setBranches(data as BranchItem[]);
 
-        if (!params.branchId && Array.isArray(data) && data.length > 0) {
+        // Only set default branch if neither preselected nor params branch is set
+        const hasBranchSelected = params.preselectedBranchId || params.branchId;
+        if (!hasBranchSelected && Array.isArray(data) && data.length > 0) {
           setSelectedBranchId(data[0].branch_id);
         }
       } catch (error) {
@@ -95,7 +103,7 @@ export default function MembershipConfirmScreen() {
       }
     };
     init();
-  }, [params.branchId]);
+  }, [params.branchId, params.preselectedBranchId]);
 
   useEffect(() => {
     const fetchRate = async () => {

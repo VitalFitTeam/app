@@ -83,15 +83,7 @@ export function NotificationProvider({
 			const token = await registerForPushNotificationsAsync();
 			if (token) {
 				setExpoPushToken(token);
-
-				// Log FCM token prominently for debugging
-				console.log('═══════════════════════════════════════════════════════');
-				console.log('📱 FCM DEVICE TOKEN (already sent during login):');
-				console.log(token);
-				console.log('═══════════════════════════════════════════════════════');
-
 				// Device token is sent during login now, no need to register separately
-				// The /notifications/register endpoint is not needed anymore
 				return true;
 			}
 			return false;
@@ -281,23 +273,14 @@ export function NotificationProvider({
 
 	// Initialize notifications on mount
 	useEffect(() => {
-		console.log('NotificationContext: useEffect triggered');
-		console.log('accessToken available:', !!accessToken);
-
 		// Skip push notification setup in Expo Go
 		if (isExpoGo) {
-			console.log('Running in Expo Go - skipping push notification setup');
-			console.log('⚠️ FCM token NOT available in Expo Go. Use a development build to get the FCM token.');
 			return;
 		}
 
 		if (accessToken) {
-			console.log('Initializing notifications...');
-
 			// Request permissions and register device
-			requestPermissions().then((granted) => {
-				console.log('Permissions result:', granted);
-			});
+			requestPermissions();
 
 			// Fetch initial data
 			refreshNotifications();
@@ -316,8 +299,6 @@ export function NotificationProvider({
 				notificationListener.current?.remove();
 				responseListener.current?.remove();
 			};
-		} else {
-			console.log('No access token yet, waiting...');
 		}
 	}, [
 		accessToken,

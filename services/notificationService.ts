@@ -33,8 +33,6 @@ export async function registerForPushNotificationsAsync(): Promise<
 
 	// Don't try to get push tokens in Expo Go (SDK 53+)
 	if (isExpoGo) {
-		console.log('⚠️ Push notifications are not supported in Expo Go (SDK 53+)');
-		console.log('📱 Use a development build to test push notifications');
 		return null;
 	}
 
@@ -58,30 +56,25 @@ export async function registerForPushNotificationsAsync(): Promise<
 		}
 
 		if (finalStatus !== 'granted') {
-			console.warn('Failed to get push token for push notification!');
 			return null;
 		}
 
 		try {
 			// Get Expo push token (for Expo's push service)
-			const expoPushToken = await Notifications.getExpoPushTokenAsync({
+			await Notifications.getExpoPushTokenAsync({
 				projectId: '3d30457b-07b3-4a1a-9700-dc7fc3df59f2',
 			});
-			console.log('Expo Push Token:', expoPushToken.data);
 
 			// Get native device push token (FCM for Android, APNs for iOS)
 			const devicePushToken = await Notifications.getDevicePushTokenAsync();
-			console.log('Device Push Token (FCM/APNs):', devicePushToken.data);
 
 			// Use the native device token for backend registration
 			token = devicePushToken.data;
-			console.log('Using Device Push Token for backend:', token);
-			console.log('Copy this token for testing push notifications');
-		} catch (error) {
-			console.error('Error getting push token:', error);
+		} catch {
+			// Error getting push token
 		}
 	} else {
-		console.warn('Must use physical device for Push Notifications');
+		// Must use physical device for Push Notifications
 	}
 
 	return token;

@@ -1,6 +1,6 @@
-import { MonthCalendar } from '@/components/auth/dashboard/monthcalendar';
 import { WeekCalendar } from '@/components/auth/dashboard/weekcalendar';
 
+import BranchSelectionModal from '@/components/BranchSelectionModal';
 import ClassCard from '@/components/ClassCard';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -66,6 +66,8 @@ type BookingItem = {
     capacity: number;
     occupied: number;
     rawDate: string;
+    startsAt: string;
+    createdAt?: string;
 };
 
 export default function HorariosScreen() {
@@ -73,10 +75,9 @@ export default function HorariosScreen() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<'classes' | 'reservas'>('classes');
     const { isReserved } = useReservations();
-    const [branches, setBranches] = useState<BranchItem[]>([]);
     const [selectedBranchId, setSelectedBranchId] = useState<string>('');
-    const [loadingBranches, setLoadingBranches] = useState(true);
-    const [branchMenuVisible, setBranchMenuVisible] = useState(false);
+    const [selectedBranchName, setSelectedBranchName] = useState<string>('');
+    const [branchModalVisible, setBranchModalVisible] = useState(false);
     const [classes, setClasses] = useState<ClassItem[]>([]);
     const [loadingClasses, setLoadingClasses] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -90,10 +91,20 @@ export default function HorariosScreen() {
     // Caches to avoid redundant API calls and 429 errors
     const servicesCache = useRef<Record<string, { name: string; image: string }>>({});
     const instructorsCache = useRef<Record<string, string>>({});
+    const bookingInfoByClassId = useRef<Record<string, { bookingId: string; createdAt: string }>>({});
+
+    // Helper to format date as YYYY-MM-DD in local timezone
+    const formatLocalDate = (date: Date): string => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    // Start with today's date selected by default
     const [selectedClassesDate, setSelectedClassesDate] = useState<string>(
-        new Date().toISOString().split('T')[0],
+        formatLocalDate(new Date())
     );
-    const [selectedBookingsDate, setSelectedBookingsDate] = useState<string>('');
 
     const isCloseToBottom = ({
         layoutMeasurement,
@@ -123,14 +134,14 @@ export default function HorariosScreen() {
                 const response = await vitalFitApi.public.getBranchMap(token || '');
                 const data = (response as { data?: BranchItem[] }).data || [];
 
-                setBranches(data);
                 if (data.length > 0 && !selectedBranchId) {
                     setSelectedBranchId(data[0].branch_id);
+                    setSelectedBranchName(data[0].name);
                 }
             } catch (error) {
                 console.error('Error cargando sucursales en Schedule:', error);
             } finally {
-                setLoadingBranches(false);
+                setLoadingClasses(false);
             }
         };
 
@@ -269,6 +280,8 @@ export default function HorariosScreen() {
                         ? instructorsCache.current[instructorId]
                         : undefined;
                     const serviceData = servicesCache.current[sid];
+                    // Extract rawDate in local timezone
+                    const rawDate = startsAt ? formatLocalDate(new Date(startsAt)) : '';
                     return {
                         classId: item.class_id || '',
                         serviceId: sid,
@@ -282,7 +295,7 @@ export default function HorariosScreen() {
                         imageUrl: serviceData?.image || require('@/assets/images/rutina.png'),
                         capacity: item.max_capacity || 0,
                         occupied: 0, // Initial value
-                        rawDate: String(startsAt).split('T')[0] || '',
+                        rawDate,
                     };
                 });
 
@@ -305,7 +318,7 @@ export default function HorariosScreen() {
             setLoadingBookings(true);
             try {
                 const token = await AsyncStorage.getItem('token');
-                if (!token || !selectedBranchId) {
+                if (!token) {
                     setBookings([]);
                     return;
                 }
@@ -334,35 +347,57 @@ export default function HorariosScreen() {
                         ? (rawBookings as { data?: ClientBookingResponse[] }).data
                         : (rawBookings as ClientBookingResponse[])) ?? [];
 
-                const bookingIdByClassId: Record<string, string> = {};
+                bookingInfoByClassId.current = {};
                 bookingsItems.forEach((bk) => {
                     const cId = bk.class_id;
                     const bId = bk.booking_id;
 
                     if (cId && bId) {
-                        bookingIdByClassId[String(cId)] = String(bId);
+                        bookingInfoByClassId.current[String(cId)] = { bookingId: String(bId), createdAt: '' };
                     }
                 });
 
-                const response = await vitalFitApi.booking.getClientBranchBooking(
-                    String(selectedBranchId),
-                    String(userId),
-                    token,
-                );
+                // Get all branches
+                const branchesResp = await vitalFitApi.public.getBranchMap(token);
+                const allBranches = (branchesResp as { data?: { branch_id: string }[] }).data || [];
 
-                const raw =
-                    (response as
-                        | { data?: BranchScheduleResponse[] }
-                        | BranchScheduleResponse[]
-                        | undefined) ?? [];
-                const itemsFromApi = Array.isArray(
-                    (raw as { data?: BranchScheduleResponse[] }).data,
-                )
-                    ? (raw as { data?: BranchScheduleResponse[] }).data
-                    : (raw as BranchScheduleResponse[]);
-                const items: BranchScheduleResponse[] = Array.isArray(itemsFromApi)
-                    ? itemsFromApi
-                    : [];
+                // Fetch bookings from all branches
+                const allBranchBookings: BranchScheduleResponse[] = [];
+
+                for (const branch of allBranches) {
+                    try {
+                        const response = await vitalFitApi.booking.getClientBranchBooking(
+                            String(branch.branch_id),
+                            String(userId),
+                            token,
+                        );
+
+                        const raw =
+                            (response as
+                                | { data?: BranchScheduleResponse[] }
+                                | BranchScheduleResponse[]
+                                | undefined) ?? [];
+                        const itemsFromApi = Array.isArray(
+                            (raw as { data?: BranchScheduleResponse[] }).data,
+                        )
+                            ? (raw as { data?: BranchScheduleResponse[] }).data
+                            : (raw as BranchScheduleResponse[]);
+                        const branchItems: BranchScheduleResponse[] = Array.isArray(itemsFromApi)
+                            ? itemsFromApi
+                            : [];
+
+                        // Only include items that are actually in the user's bookings
+                        const userBranchBookings = branchItems.filter(item =>
+                            bookingInfoByClassId.current[String(item.class_id)]
+                        );
+
+                        allBranchBookings.push(...userBranchBookings);
+                    } catch {
+                        // Silently continue - some branches might not have bookings
+                    }
+                }
+
+                const items = allBranchBookings;
 
                 const serviceImageMap: Record<string, string> = {};
                 const serviceNameMap: Record<string, string> = {};
@@ -428,56 +463,79 @@ export default function HorariosScreen() {
                     }
                 }
 
-                const mappedBookings: BookingItem[] = items.map((item) => {
-                    const startsAt = item.starts_at || '';
-                    const endsAt = item.ends_at || '';
+                // Filter only upcoming bookings (starts_at >= now)
+                const now = new Date();
 
-                    const extractTime = (value: string) => {
-                        if (!value) return '';
-                        try {
-                            const date = new Date(value);
-                            return date.toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false,
-                            });
-                        } catch {
-                            return '';
-                        }
-                    };
+                const mappedBookings: BookingItem[] = items
+                    .filter((item) => {
+                        const startsAt = item.starts_at;
+                        if (!startsAt) return false;
+                        const classDate = new Date(startsAt);
+                        return classDate >= now;
+                    })
+                    .map((item) => {
+                        const startsAt = item.starts_at || '';
+                        const endsAt = item.ends_at || '';
 
-                    const startTime = extractTime(String(startsAt));
-                    const endTime = extractTime(String(endsAt));
-                    const time = endTime ? `${startTime} - ${endTime}` : startTime;
+                        const extractTime = (value: string) => {
+                            if (!value) return '';
+                            try {
+                                const date = new Date(value);
+                                return date.toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false,
+                                });
+                            } catch {
+                                return '';
+                            }
+                        };
 
-                    const sid = item.service_id || '';
-                    const instructorId = item.instructor_id || '';
+                        const startTime = extractTime(String(startsAt));
+                        const endTime = extractTime(String(endsAt));
+                        const time = endTime ? `${startTime} - ${endTime}` : startTime;
 
-                    const classId = item.class_id || '';
-                    const bookingId = bookingIdByClassId[String(classId)] || '';
+                        const sid = item.service_id || '';
+                        const instructorId = item.instructor_id || '';
 
-                    const title = serviceNameMap[String(sid)] || 'Clase';
-                    const instructorNameFromMap = instructorId
-                        ? instructorMap[String(instructorId)]
-                        : undefined;
+                        const classId = item.class_id || '';
+                        const bookingInfo = bookingInfoByClassId.current[String(classId)];
+                        const bookingId = bookingInfo?.bookingId || '';
+                        const createdAt = bookingInfo?.createdAt || '';
 
-                    return {
-                        bookingId,
-                        classId,
-                        serviceId: sid,
-                        instructorId,
-                        time,
-                        title,
-                        instructor: instructorNameFromMap
-                            ? `Con ${instructorNameFromMap}`
-                            : 'Instructor',
-                        branch: '',
-                        imageUrl:
-                            serviceImageMap[String(sid)] || require('@/assets/images/rutina.png'),
-                        capacity: item.max_capacity || 0,
-                        occupied: 0,
-                        rawDate: String(startsAt).split('T')[0] || '',
-                    };
+                        const title = serviceNameMap[String(sid)] || 'Clase';
+                        const instructorNameFromMap = instructorId
+                            ? instructorMap[String(instructorId)]
+                            : undefined;
+
+                        // Extract rawDate in local timezone
+                        const rawDate = startsAt ? formatLocalDate(new Date(startsAt)) : '';
+                        return {
+                            bookingId,
+                            classId,
+                            serviceId: sid,
+                            instructorId,
+                            time,
+                            title,
+                            instructor: instructorNameFromMap
+                                ? `Con ${instructorNameFromMap}`
+                                : 'Instructor',
+                            branch: '',
+                            imageUrl:
+                                serviceImageMap[String(sid)] || require('@/assets/images/rutina.png'),
+                            capacity: item.max_capacity || 0,
+                            occupied: 0,
+                            rawDate,
+                            startsAt: String(startsAt),
+                            createdAt,
+                        };
+                    });
+
+                // Sort by startsAt ascending (soonest classes first)
+                mappedBookings.sort((a, b) => {
+                    if (!a.startsAt) return 1;
+                    if (!b.startsAt) return -1;
+                    return new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime();
                 });
 
                 setBookings(mappedBookings);
@@ -493,7 +551,7 @@ export default function HorariosScreen() {
         if (activeTab === 'reservas') {
             void loadBookings();
         }
-    }, [activeTab, selectedBranchId, refreshKey]);
+    }, [activeTab, refreshKey, t]);
 
     const filteredClasses = useMemo(
         () =>
@@ -501,16 +559,8 @@ export default function HorariosScreen() {
         [classes, selectedClassesDate],
     );
 
-    const filteredBookings = useMemo(
-        () =>
-            bookings.filter(
-                (item) => !selectedBookingsDate || item.rawDate === selectedBookingsDate,
-            ),
-        [bookings, selectedBookingsDate],
-    );
-
     const visibleClasses = filteredClasses.slice(0, visibleClassesCount);
-    const visibleBookings = filteredBookings.slice(0, visibleBookingsCount);
+    const visibleBookings = bookings.slice(0, visibleBookingsCount);
 
     return (
         <ThemedView lightColor='#FFFFFF' darkColor='#050816' style={{ flex: 1 }}>
@@ -531,43 +581,35 @@ export default function HorariosScreen() {
                         />
                     </View>
 
-                    <View className='mb-2'>
-                        <ThemedText
-                            lightColor='#111827'
-                            darkColor='#ffffff'
-                            className='font-heading'
-                            style={{
-                                fontFamily: 'BebasNeue-Regular',
-                                fontSize: 28,
-                                marginBottom: 8,
-                            }}>
-                            {t('schedule.calendar')}
-                        </ThemedText>
-                    </View>
+                    {activeTab === 'classes' && (
+                        <>
+                            <View className='mb-2'>
+                                <ThemedText
+                                    lightColor='#111827'
+                                    darkColor='#ffffff'
+                                    className='font-heading'
+                                    style={{
+                                        fontFamily: 'BebasNeue-Regular',
+                                        fontSize: 28,
+                                        marginBottom: 8,
+                                    }}>
+                                    {t('schedule.calendar')}
+                                </ThemedText>
+                            </View>
 
-                    <View className='mb-6'>
-                        {activeTab === 'reservas' ? (
-                            <MonthCalendar
-                                initialDate={selectedBookingsDate || undefined}
-                                onDateSelect={(day) => {
-                                    if (day?.dateString) {
-                                        setSelectedBookingsDate(day.dateString);
-                                        setVisibleBookingsCount(PAGE_SIZE);
-                                    }
-                                }}
-                            />
-                        ) : (
-                            <WeekCalendar
-                                initialDate={selectedClassesDate}
-                                onDateSelect={(day) => {
-                                    if (day?.dateString) {
-                                        setSelectedClassesDate(day.dateString);
-                                        setVisibleClassesCount(PAGE_SIZE);
-                                    }
-                                }}
-                            />
-                        )}
-                    </View>
+                            <View className='mb-6'>
+                                <WeekCalendar
+                                    initialDate={selectedClassesDate}
+                                    onDateSelect={(day) => {
+                                        if (day?.dateString) {
+                                            setSelectedClassesDate(day.dateString);
+                                            setVisibleClassesCount(PAGE_SIZE);
+                                        }
+                                    }}
+                                />
+                            </View>
+                        </>
+                    )}
 
                     <View className='flex-row mb-6 border rounded-2xl border-neutral-600 bg-neutral-900/90 p-1'>
                         <Pressable
@@ -600,75 +642,39 @@ export default function HorariosScreen() {
                         </Pressable>
                     </View>
 
-                    <View className='mb-6 z-50'>
-                        <ThemedText
-                            lightColor='#111827'
-                            darkColor='#ffffff'
-                            className='font-heading'
-                            style={{
-                                fontFamily: 'BebasNeue-Regular',
-                                fontSize: 28,
-                                marginBottom: 8,
-                            }}>
-                            {t('schedule.upcomingClasses')}
-                        </ThemedText>
+                    {activeTab === 'classes' && (
+                        <View className='mb-6'>
+                            <ThemedText
+                                lightColor='#111827'
+                                darkColor='#ffffff'
+                                className='font-heading'
+                                style={{
+                                    fontFamily: 'BebasNeue-Regular',
+                                    fontSize: 28,
+                                    marginBottom: 8,
+                                }}>
+                                {t('schedule.upcomingClasses')}
+                            </ThemedText>
 
-                        <View style={{ width: '100%', maxWidth: 400, zIndex: 100 }}>
-                            <TouchableOpacity
-                                activeOpacity={0.7}
-                                onPress={() => setBranchMenuVisible(!branchMenuVisible)}
-                                className='flex-row items-center justify-between bg-neutral-100 rounded-xl px-4 py-2.5 border border-neutral-200'>
-                                <ThemedText
-                                    className='font-body text-sm font-semibold text-neutral-800'
-                                    numberOfLines={1}>
-                                    {loadingBranches
-                                        ? 'Cargando...'
-                                        : branches.find((b) => b.branch_id === selectedBranchId)
-                                            ?.name || t('common.selectBranch')}
-                                </ThemedText>
-                                <Ionicons
-                                    name={branchMenuVisible ? 'chevron-up' : 'chevron-down'}
-                                    size={16}
-                                    color='#4b5563'
-                                />
-                            </TouchableOpacity>
-
-                            {branchMenuVisible && (
-                                <View className='absolute top-12 left-0 right-0 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-50'>
-                                    {branches.map((branch) => {
-                                        const isSelected = branch.branch_id === selectedBranchId;
-                                        return (
-                                            <TouchableOpacity
-                                                key={branch.branch_id}
-                                                className='px-4 py-2'
-                                                onPress={() => {
-                                                    setSelectedBranchId(branch.branch_id);
-                                                    setBranchMenuVisible(false);
-                                                }}>
-                                                <ThemedText
-                                                    className='font-body'
-                                                    style={{
-                                                        fontSize: isSelected ? 16 : 13,
-                                                        fontWeight: isSelected ? '800' : '400',
-                                                        color: isSelected ? '#f97316' : '#111827',
-                                                    }}
-                                                    numberOfLines={1}>
-                                                    {branch.name}
-                                                </ThemedText>
-                                            </TouchableOpacity>
-                                        );
-                                    })}
-                                    {branches.length === 0 && (
-                                        <View className='px-4 py-3'>
-                                            <ThemedText className='font-body text-sm text-neutral-400'>
-                                                {t('schedule.noClassesBranch')}
-                                            </ThemedText>
-                                        </View>
-                                    )}
-                                </View>
-                            )}
+                            <View style={{ width: '100%', maxWidth: 400 }}>
+                                <TouchableOpacity
+                                    activeOpacity={0.7}
+                                    onPress={() => setBranchModalVisible(true)}
+                                    className='flex-row items-center justify-between bg-neutral-100 rounded-xl px-4 py-2.5 border border-neutral-200'>
+                                    <ThemedText
+                                        className='font-body text-sm font-semibold text-neutral-800'
+                                        numberOfLines={1}>
+                                        {selectedBranchName || t('common.selectBranch')}
+                                    </ThemedText>
+                                    <Ionicons
+                                        name='chevron-down'
+                                        size={16}
+                                        color='#4b5563'
+                                    />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
+                    )}
 
                     {activeTab === 'classes' && (
                         <View>
@@ -690,6 +696,23 @@ export default function HorariosScreen() {
                                         {t('schedule.noClassesBranch')}
                                     </ThemedText>
                                 )}
+                            {!loadingClasses &&
+                                !errorMessage &&
+                                !selectedBranchId && (
+                                    <ThemedText className='font-body text-center text-sm text-neutral-500 mb-4'>
+                                        {t('common.selectBranch')}
+                                    </ThemedText>
+                                )}
+                            {!loadingClasses &&
+                                !errorMessage &&
+                                classes.length > 0 &&
+                                visibleClasses.length === 0 && (
+                                    <ThemedText className='font-body text-center text-sm text-neutral-500 mb-4'>
+                                        {selectedClassesDate
+                                            ? t('schedule.noClassesForDate')
+                                            : t('schedule.noClassesBranch')}
+                                    </ThemedText>
+                                )}
                             {visibleClasses.map((classItem, index) => (
                                 <ClassCard
                                     key={classItem.classId || index.toString()}
@@ -703,9 +726,6 @@ export default function HorariosScreen() {
                                     reserved={isReserved(
                                         `${classItem.classId}|${classItem.serviceId}`,
                                     )}
-                                    // Using ID-based reservation check is safer but keeping title|time if that's how isReserved works currently
-                                    // Actually, isReserved logic might rely on context, but let's stick to simple text fix:
-                                    // category={`${classItem.capacity || 0} Cupos`}
                                     onPress={(classData) => {
                                         router.push({
                                             pathname: '/class-details',
@@ -717,6 +737,7 @@ export default function HorariosScreen() {
                                                 serviceId: classItem.serviceId,
                                                 instructorId: classItem.instructorId,
                                                 startsAt: classItem.startsAt,
+                                                branchId: selectedBranchId,
                                             },
                                         });
                                     }}
@@ -726,27 +747,41 @@ export default function HorariosScreen() {
                     )}
 
                     {activeTab === 'reservas' && (
-                        <View>
-                            <ThemedText className='font-heading text-xl font-bold mb-4'>
+                        <View className='pb-8'>
+                            <ThemedText
+                                lightColor='#111827'
+                                darkColor='#ffffff'
+                                className='font-heading'
+                                style={{
+                                    fontFamily: 'BebasNeue-Regular',
+                                    fontSize: 28,
+                                    marginBottom: 16,
+                                }}>
                                 {t('schedule.myBookings')}
                             </ThemedText>
 
                             {loadingBookings && (
-                                <View className='items-center py-4'>
-                                    <ActivityIndicator size='small' color='#f97316' />
+                                <View className='items-center py-12'>
+                                    <ActivityIndicator size='large' color='#f97316' />
                                 </View>
                             )}
 
                             {!loadingBookings && bookingsError && (
-                                <ThemedText className='font-body text-center text-sm text-red-500 mb-4'>
-                                    {bookingsError}
-                                </ThemedText>
+                                <View className='items-center py-12'>
+                                    <Ionicons name='alert-circle-outline' size={48} color='#ef4444' />
+                                    <ThemedText className='font-body text-center text-sm text-red-500 mt-4'>
+                                        {bookingsError}
+                                    </ThemedText>
+                                </View>
                             )}
 
                             {!loadingBookings && !bookingsError && bookings.length === 0 && (
-                                <ThemedText className='font-body text-neutral-500'>
-                                    {t('schedule.noBookings')}
-                                </ThemedText>
+                                <View className='items-center py-12'>
+                                    <Ionicons name='calendar-outline' size={48} color='#9ca3af' />
+                                    <ThemedText className='font-body text-center text-neutral-500 mt-4'>
+                                        {t('schedule.noBookings')}
+                                    </ThemedText>
+                                </View>
                             )}
 
                             {!loadingBookings &&
@@ -776,7 +811,8 @@ export default function HorariosScreen() {
                                                     serviceId: booking.serviceId,
                                                     instructorId: booking.instructorId,
                                                     bookingId: booking.bookingId,
-                                                    startsAt: booking.rawDate,
+                                                    startsAt: booking.startsAt,
+                                                    branchId: selectedBranchId,
                                                 },
                                             });
                                         }}
@@ -786,6 +822,16 @@ export default function HorariosScreen() {
                     )}
                 </ScrollView>
             </SafeAreaView>
+
+            <BranchSelectionModal
+                visible={branchModalVisible}
+                selectedBranchId={selectedBranchId}
+                onSelect={(branchId, branchName) => {
+                    setSelectedBranchId(branchId);
+                    setSelectedBranchName(branchName);
+                }}
+                onClose={() => setBranchModalVisible(false)}
+            />
         </ThemedView>
     );
 }

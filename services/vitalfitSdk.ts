@@ -28,23 +28,5 @@ if (API_URL && (vitalFitApi.client as any).client?.defaults) {
 	console.log('VitalFit SDK baseURL configured to:', API_URL);
 }
 
-// Add request interceptor to log what's actually being sent
-if (vitalFitApi.client?.client?.interceptors) {
-	vitalFitApi.client.client.interceptors.request.use(
-		(config) => {
-			if (config.url?.includes('/auth/login') || config.url?.includes('/auth/oauth-login')) {
-				console.log('🔍 INTERCEPTED REQUEST TO:', config.url);
-				console.log('🔍 Request Method:', config.method);
-				console.log('🔍 Request Headers:', JSON.stringify(config.headers, null, 2));
-				console.log('🔍 Request Data (what SDK is actually sending):', JSON.stringify(config.data, null, 2));
-			}
-			return config;
-		},
-		(error) => {
-			console.error('🔍 Request interceptor error:', error);
-			return Promise.reject(error);
-		}
-	);
-}
 
 export default vitalFitApi;
