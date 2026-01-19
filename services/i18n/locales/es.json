@@ -403,6 +403,7 @@
       "myBookings": "Mis reservas",
       "noBookings": "Aún no tienes reservas.",
       "noClassesBranch": "No hay clases programadas para esta sede.",
+      "noClassesForDate": "No hay clases disponibles para la fecha seleccionada",
       "tabs": {
         "classes": "Clases",
         "reservations": "Reservas",

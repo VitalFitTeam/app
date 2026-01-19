@@ -402,6 +402,7 @@
       "myBookings": "Meine Buchungen",
       "noBookings": "Du hast noch keine Buchungen.",
       "noClassesBranch": "Keine Kurse für diesen Standort geplant.",
+      "noClassesForDate": "Keine Kurse für das ausgewählte Datum verfügbar",
       "tabs": {
         "classes": "Kurse",
         "reservations": "Buchungen",

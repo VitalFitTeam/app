@@ -402,6 +402,7 @@
       "myBookings": "Minhas Reservas",
       "noBookings": "Você ainda não tem reservas.",
       "noClassesBranch": "Nenhuma aula agendada para esta unidade.",
+      "noClassesForDate": "Nenhuma aula disponível para a data selecionada",
       "tabs": {
         "classes": "Aulas",
         "reservations": "Reservas",

@@ -402,6 +402,7 @@
       "myBookings": "Mes Réservations",
       "noBookings": "Vous n'avez pas encore de réservations.",
       "noClassesBranch": "Aucun cours prévu pour cette succursale.",
+      "noClassesForDate": "Aucun cours disponible pour la date sélectionnée",
       "tabs": {
         "classes": "Cours",
         "reservations": "Réservations",

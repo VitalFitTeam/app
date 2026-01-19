@@ -1,6 +1,7 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useAuth } from '@/contexts/AuthContext';
 import { useReservations } from '@/contexts/reservations';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/hooks/useToast';
@@ -46,6 +47,7 @@ const styles = StyleSheet.create({
 
 export default function ClassDetailsScreen() {
   const router = useRouter();
+  const { token: authToken } = useAuth();
   const {
     time,
     title,
@@ -994,8 +996,8 @@ export default function ClassDetailsScreen() {
                 }
 
                 try {
-                  const token = await AsyncStorage.getItem('token');
-                  if (!token) {
+                  // Use authToken from AuthContext (always fresh, automatically refreshed)
+                  if (!authToken) {
                     showToast(
                       'error',
                       'Sesión no válida',
@@ -1014,7 +1016,7 @@ export default function ClassDetailsScreen() {
                   }
 
                   const whoAmI = (await vitalFitApi.user.WhoAmI(
-                    token,
+                    authToken,
                   )) as unknown as {
                     user?: { id?: string; user_id?: string };
                   };
@@ -1032,7 +1034,7 @@ export default function ClassDetailsScreen() {
                   await vitalFitApi.booking.bookClass(
                     { user_id: String(userId) },
                     String(classId),
-                    token,
+                    authToken,
                   );
 
                   const img =
@@ -1073,11 +1075,15 @@ export default function ClassDetailsScreen() {
                     return;
                   }
 
-                  if (isAPIError(error)) {
+                  // Check for 500 Internal Server Error
+                  if (isAPIError(error) && error.status === 500) {
+                    message = 'Error en el servidor. Por favor, intenta nuevamente más tarde.';
+                  } else if (isAPIError(error)) {
                     message = error.messages.join(', ');
                   } else if (error instanceof Error) {
                     message = error.message;
                   }
+
                   console.error('Error al reservar clase:', error);
                   showToast('error', 'No se pudo reservar', message);
                 }

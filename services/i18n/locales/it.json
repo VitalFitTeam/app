@@ -402,6 +402,7 @@
       "myBookings": "Mie Prenotazioni",
       "noBookings": "Non hai ancora prenotazioni.",
       "noClassesBranch": "Nessuna lezione programmata per questa sede.",
+      "noClassesForDate": "Nessuna lezione disponibile per la data selezionata",
       "tabs": {
         "classes": "Lezioni",
         "reservations": "Prenotazioni",
