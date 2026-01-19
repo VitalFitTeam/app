@@ -87,7 +87,8 @@
         "absent": "Absent",
         "cancelled": "Cancelled",
         "active": "Active",
-        "cancelled_generic": "Cancelled"
+        "cancelled_generic": "Cancelled",
+        "completed": "Completed"
       },
       "client": "Client",
       "loading": "Loading...",
@@ -98,7 +99,11 @@
       "availability": "Availability",
       "unknown": "Unknown",
       "notes": "Notes",
-      "noClientsFound": "No clients found"
+      "noClientsFound": "No clients found",
+      "close": "Close",
+      "reviews": "reviews",
+      "unnamedUser": "Unnamed User",
+      "noProgram": "No program"
     },
     "login": {
       "title": "Sign In",
@@ -399,7 +404,7 @@
       "month": "Month",
       "calendar": "CALENDAR",
       "reservations": "Reservations",
-      "spotsOccupied": "spots occupied",
+      "spots": "Spots",
       "myBookings": "My Bookings",
       "noBookings": "You have no bookings yet.",
       "noClassesBranch": "No classes scheduled for this branch.",
@@ -418,6 +423,11 @@
         "hiit": "HIIT",
         "kickBoxing": "Kick Boxing",
         "pilates": "Pilates"
+      },
+      "spotsOccupied": "spots occupied",
+      "errors": {
+        "loadClasses": "Could not load classes. Please try again.",
+        "loadBookings": "Could not load your bookings. Please try again."
       }
     },
     "scanner": {
@@ -432,17 +442,71 @@
       }
     },
     "classDetails": {
-      "defaultName": "CLASS NAME",
-      "defaultInstructor": "Instructor Name",
-      "duration": "(1 hour)",
-      "descriptionTitle": "Class Description:",
-      "classFull": "Class Full",
-      "enrollClient": "Enroll Client",
-      "clientList": "Client List",
-      "searchPlaceholder": "Search client...",
-      "noClientsFound": "No clients found",
-      "viewAllRegistered": "View all registered",
-      "showLess": "Show less"
+      "title": "Class Details",
+      "defaultClassName": "Class Name",
+      "defaultInstructorName": "Instructor Name",
+      "occupiedSpots": "spots occupied",
+      "level": "Level: {{level}}",
+      "descriptionLabel": "Class Description:",
+      "defaultDescription": "This strength training focuses on muscle development and endurance. Includes exercises with weights, resistance bands, and body weight. Ideal for all levels.",
+      "searchPlaceholder": "Client Name",
+      "clientsListTitle": "Registered Client List",
+      "clientsEnrolled": "Clients Enrolled",
+      "internalNotesTitle": "Internal Class Notes",
+      "notesPlaceholder": "Add notes about this class...",
+      "saveNotes": "Save Notes",
+      "tabs": {
+        "clients": "Clients",
+        "attendance": "Take Attendance"
+      },
+      "attendance": {
+        "present": "Present",
+        "late": "Late",
+        "absent": "Absent"
+      },
+      "toasts": {
+        "notesSaved": {
+          "title": "Notes Saved",
+          "message": "Internal notes have been saved successfully."
+        },
+        "attendanceSaved": {
+          "title": "Attendance Saved",
+          "message": "Class attendance has been saved successfully."
+        },
+        "bookingSuccess": {
+          "title": "Class Reserved",
+          "message": "Your class has been reserved successfully."
+        },
+        "bookingError": {
+          "title": "Could Not Reserve",
+          "missingId": "Class identifier is missing.",
+          "userUnknown": "User unidentified",
+          "userInfoError": "Could not retrieve user information.",
+          "generic": "An error occurred while reserving the class."
+        },
+        "cancelSuccess": {
+          "title": "Reservation Cancelled",
+          "message": "Your reservation has been cancelled successfully."
+        },
+        "cancelError": {
+          "title": "Could Not Cancel",
+          "generic": "An error occurred while cancelling the reservation.",
+          "timeLimitTitle": "Time Limit Exceeded",
+          "lateCancellation": "Cancellation is no longer possible because the gym's allowed time limit has passed."
+        }
+      },
+      "saveAttendance": "Save Attendance",
+      "totalSpots": "total spots",
+      "limitedSpots": "Limited spots",
+      "filledWhileBooking": "The class filled up while you were booking.",
+      "pastClass": "Past Class",
+      "membershipRequired": "You need an active membership to book",
+      "cancellationPolicy": "“You can cancel up to 2h before start”",
+      "reserve": "Reserve",
+      "cancelModal": {
+        "title": "Cancel Reservation?",
+        "message": "You will lose your spot in this class. Are you sure?"
+      }
     },
     "classes": {
       "description": {
@@ -942,15 +1006,15 @@
       "defaultReceiptHelper": "Payment reported",
       "cashReceiptHelper": "On-site/Cash payment",
       "labels": {
-          "bank_name": "Bank",
-          "account_number": "Account No.",
-          "email": "Zelle Email",
-          "phone": "Phone",
-          "phone_number": "Phone",
-          "rif": "ID/Doc",
-          "beneficiary_name": "Beneficiary",
-          "holder": "Holder",
-          "number": "Number"
+        "bank_name": "Bank",
+        "account_number": "Account No.",
+        "email": "Zelle Email",
+        "phone": "Phone",
+        "phone_number": "Phone",
+        "rif": "ID/Doc",
+        "beneficiary_name": "Beneficiary",
+        "holder": "Holder",
+        "number": "Number"
       },
       "confirmOrder": "Confirm Order",
       "instructions": {
@@ -1330,5 +1394,3 @@
     "noClasses": "No classes scheduled for this date."
   }
 }
-
-  

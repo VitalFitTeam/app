@@ -87,7 +87,8 @@
         "absent": "Absent",
         "cancelled": "Annulé",
         "active": "Actif",
-        "cancelled_generic": "Annulé"
+        "cancelled_generic": "Annulé",
+        "completed": "Terminé"
       },
       "client": "Client",
       "loading": "Chargement...",
@@ -97,7 +98,12 @@
       "viewMore": "Voir plus",
       "availability": "Disponibilité",
       "unknown": "Inconnu",
-      "notes": "Notes"
+      "notes": "Notes",
+      "close": "Fermer",
+      "reviews": "Avis",
+      "unnamedUser": "Utilisateur sans nom",
+      "noProgram": "Aucun programme",
+      "noClientsFound": "Aucun client trouvé"
     },
     "login": {
       "title": "Se connecter",
@@ -155,7 +161,7 @@
         "unexpectedError": "Une erreur inattendue est survenue. Veuillez réessayer."
       }
     },
-"step2Credentials": {
+    "step2Credentials": {
       "emailLabel": "E-mail",
       "emailPlaceholder": "Entrez votre e-mail",
       "passwordLabel": "Mot de passe",
@@ -297,7 +303,7 @@
         "searchPlaceholder": "Chercher par document d'identité",
         "scanQr": "Scanner QR"
       },
-"capacity": {
+      "capacity": {
         "title": "Capacité de la Salle",
         "subtitle": "Capacité actuelle en temps réel",
         "occupancy": "Occupation",
@@ -398,7 +404,7 @@
       "month": "Mois",
       "calendar": "CALENDRIER",
       "reservations": "Réservations",
-      "spotsOccupied": "places occupées",
+      "spots": "Places",
       "myBookings": "Mes Réservations",
       "noBookings": "Vous n'avez pas encore de réservations.",
       "noClassesBranch": "Aucun cours prévu pour cette succursale.",
@@ -417,6 +423,11 @@
         "hiit": "HIIT",
         "kickBoxing": "Kick Boxing",
         "pilates": "Pilates"
+      },
+      "spotsOccupied": "places occupées",
+      "errors": {
+        "loadClasses": "Impossible de charger les cours. Veuillez réessayer.",
+        "loadBookings": "Impossible de charger vos réservations. Veuillez réessayer."
       }
     },
     "scanner": {
@@ -431,17 +442,71 @@
       }
     },
     "classDetails": {
-      "defaultName": "NOM DU COURS",
-      "defaultInstructor": "Nom de l'instructeur",
-      "duration": "(1 heure)",
-      "descriptionTitle": "Description du Cours :",
-      "classFull": "Cours Complet",
-      "enrollClient": "Inscrire un Client",
-      "clientList": "Liste des clients",
-      "searchPlaceholder": "Rechercher un client...",
-      "noClientsFound": "Aucun client trouvé",
-      "viewAllRegistered": "Voir tous les inscrits",
-      "showLess": "Voir moins"
+      "title": "Détails du cours",
+      "defaultClassName": "Nom du cours",
+      "defaultInstructorName": "Nom de l'instructeur",
+      "occupiedSpots": "places occupées",
+      "level": "Niveau : {{level}}",
+      "descriptionLabel": "Description du Cours :",
+      "defaultDescription": "Cet entraînement de force se concentre sur le développement musculaire et l'endurance. Comprend des exercices avec poids, bandes de résistance et poids du corps. Idéal pour tous les niveaux.",
+      "searchPlaceholder": "Nom du client",
+      "clientsListTitle": "Liste des clients inscrits",
+      "clientsEnrolled": "Clients Inscrits",
+      "internalNotesTitle": "Notes internes du cours",
+      "notesPlaceholder": "Ajouter des notes sur ce cours...",
+      "saveNotes": "Enregistrer les notes",
+      "tabs": {
+        "clients": "Clients",
+        "attendance": "Faire l'appel"
+      },
+      "attendance": {
+        "present": "Présent",
+        "late": "En retard",
+        "absent": "Absent"
+      },
+      "toasts": {
+        "notesSaved": {
+          "title": "Notes enregistrées",
+          "message": "Les notes internes ont été enregistrées avec succès."
+        },
+        "attendanceSaved": {
+          "title": "Présence enregistrée",
+          "message": "La présence du cours a été enregistrée avec succès."
+        },
+        "bookingSuccess": {
+          "title": "Cours Réservé",
+          "message": "Votre cours a été réservé avec succès."
+        },
+        "bookingError": {
+          "title": "Impossible de réserver",
+          "missingId": "L'identifiant du cours est manquant.",
+          "userUnknown": "Utilisateur non identifié",
+          "userInfoError": "Impossible de récupérer les informations de l'utilisateur.",
+          "generic": "Une erreur est survenue lors de la réservation du cours."
+        },
+        "cancelSuccess": {
+          "title": "Réservation annulée",
+          "message": "Votre réservation a été annulée avec succès."
+        },
+        "cancelError": {
+          "title": "Impossible d'annuler",
+          "generic": "Une erreur est survenue lors de l'annulation de la réservation.",
+          "timeLimitTitle": "Temps limite dépassé",
+          "lateCancellation": "L'annulation n'est plus possible car le temps limite autorisé par la salle est dépassé."
+        }
+      },
+      "saveAttendance": "Enregistrer la présence",
+      "totalSpots": "places totales",
+      "limitedSpots": "Places limitées",
+      "filledWhileBooking": "Le cours s'est rempli pendant votre réservation.",
+      "pastClass": "Cours Passé",
+      "membershipRequired": "Vous avez besoin d'un abonnement actif pour réserver",
+      "cancellationPolicy": "“Vous pouvez annuler jusqu'à 2h avant le début”",
+      "reserve": "Réserver",
+      "cancelModal": {
+        "title": "Annuler la réservation ?",
+        "message": "Vous perdrez votre place dans ce cours. Êtes-vous sûr ?"
+      }
     },
     "classes": {
       "description": {
@@ -624,7 +689,7 @@
         "errorTitle": "Erreur"
       }
     },
-"notifications": {
+    "notifications": {
       "title": "Notifications",
       "configure": "Paramètres",
       "timeLabels": {
@@ -931,15 +996,15 @@
       "defaultReceiptHelper": "Paiement signalé",
       "cashReceiptHelper": "Paiement sur place/caisse",
       "labels": {
-          "bank_name": "Banque",
-          "account_number": "N° de Compte",
-          "email": "E-mail Zelle",
-          "phone": "Téléphone",
-          "phone_number": "Téléphone",
-          "rif": "ID/Doc",
-          "beneficiary_name": "Bénéficiaire",
-          "holder": "Titulaire",
-          "number": "Numéro"
+        "bank_name": "Banque",
+        "account_number": "N° de Compte",
+        "email": "E-mail Zelle",
+        "phone": "Téléphone",
+        "phone_number": "Téléphone",
+        "rif": "ID/Doc",
+        "beneficiary_name": "Bénéficiaire",
+        "holder": "Titulaire",
+        "number": "Numéro"
       },
       "confirmOrder": "Confirmer la commande",
       "instructions": {

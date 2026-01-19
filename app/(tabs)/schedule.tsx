@@ -61,6 +61,8 @@ type BookingItem = {
     capacity: number;
     occupied: number;
     rawDate: string;
+    startsAt: string;
+    createdAt?: string;
 };
 
 export default function HorariosScreen() {
@@ -263,14 +265,14 @@ export default function HorariosScreen() {
                 setVisibleClassesCount(PAGE_SIZE);
             } catch (error) {
                 console.error('Error cargando clases en Schedule:', error);
-                setErrorMessage('No se pudieron cargar las clases. Intenta nuevamente.');
+                setErrorMessage(t('schedule.errors.loadClasses'));
             } finally {
                 setLoadingClasses(false);
             }
         };
 
         void loadClasses();
-    }, [selectedBranchId, refreshKey]);
+    }, [selectedBranchId, refreshKey, t]);
 
     useEffect(() => {
         const loadBookings = async () => {
@@ -307,13 +309,15 @@ export default function HorariosScreen() {
                         ? (rawBookings as { data?: ClientBookingResponse[] }).data
                         : (rawBookings as ClientBookingResponse[])) ?? [];
 
-                const bookingIdByClassId: Record<string, string> = {};
+                const bookingInfoByClassId: Record<string, { bookingId: string; createdAt: string }> = {};
                 bookingsItems.forEach((bk) => {
                     const cId = bk.class_id;
                     const bId = bk.booking_id;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const created = (bk as any).created_at || '';
 
                     if (cId && bId) {
-                        bookingIdByClassId[String(cId)] = String(bId);
+                        bookingInfoByClassId[String(cId)] = { bookingId: String(bId), createdAt: String(created) };
                     }
                 });
 
@@ -348,13 +352,12 @@ export default function HorariosScreen() {
 
                         // Only include items that are actually in the user's bookings
                         const userBranchBookings = branchItems.filter(item =>
-                            bookingIdByClassId[String(item.class_id)]
+                            bookingInfoByClassId[String(item.class_id)]
                         );
 
                         allBranchBookings.push(...userBranchBookings);
-                    } catch (error) {
+                    } catch {
                         // Silently continue - some branches might not have bookings
-                        console.log('Error cargando reservas para la sucursal:', error)
                     }
                 }
 
@@ -424,63 +427,84 @@ export default function HorariosScreen() {
                     }
                 }
 
-                const mappedBookings: BookingItem[] = items.map((item) => {
-                    const startsAt = item.starts_at || '';
-                    const endsAt = item.ends_at || '';
+                // Filter only upcoming bookings (starts_at >= now)
+                const now = new Date();
 
-                    const extractTime = (value: string) => {
-                        if (!value) return '';
-                        try {
-                            const date = new Date(value);
-                            return date.toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false,
-                            });
-                        } catch {
-                            return '';
-                        }
-                    };
+                const mappedBookings: BookingItem[] = items
+                    .filter((item) => {
+                        const startsAt = item.starts_at;
+                        if (!startsAt) return false;
+                        const classDate = new Date(startsAt);
+                        return classDate >= now;
+                    })
+                    .map((item) => {
+                        const startsAt = item.starts_at || '';
+                        const endsAt = item.ends_at || '';
 
-                    const startTime = extractTime(String(startsAt));
-                    const endTime = extractTime(String(endsAt));
-                    const time = endTime ? `${startTime} - ${endTime}` : startTime;
+                        const extractTime = (value: string) => {
+                            if (!value) return '';
+                            try {
+                                const date = new Date(value);
+                                return date.toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false,
+                                });
+                            } catch {
+                                return '';
+                            }
+                        };
 
-                    const sid = item.service_id || '';
-                    const instructorId = item.instructor_id || '';
+                        const startTime = extractTime(String(startsAt));
+                        const endTime = extractTime(String(endsAt));
+                        const time = endTime ? `${startTime} - ${endTime}` : startTime;
 
-                    const classId = item.class_id || '';
-                    const bookingId = bookingIdByClassId[String(classId)] || '';
+                        const sid = item.service_id || '';
+                        const instructorId = item.instructor_id || '';
 
-                    const title = serviceNameMap[String(sid)] || 'Clase';
-                    const instructorNameFromMap = instructorId
-                        ? instructorMap[String(instructorId)]
-                        : undefined;
+                        const classId = item.class_id || '';
+                        const bookingInfo = bookingInfoByClassId[String(classId)];
+                        const bookingId = bookingInfo?.bookingId || '';
+                        const createdAt = bookingInfo?.createdAt || '';
 
-                    return {
-                        bookingId,
-                        classId,
-                        serviceId: sid,
-                        instructorId,
-                        time,
-                        title,
-                        instructor: instructorNameFromMap
-                            ? `Con ${instructorNameFromMap}`
-                            : 'Instructor',
-                        branch: '',
-                        imageUrl:
-                            serviceImageMap[String(sid)] || require('@/assets/images/rutina.png'),
-                        capacity: item.max_capacity || 0,
-                        occupied: 0,
-                        rawDate: String(startsAt).split('T')[0] || '',
-                    };
+                        const title = serviceNameMap[String(sid)] || 'Clase';
+                        const instructorNameFromMap = instructorId
+                            ? instructorMap[String(instructorId)]
+                            : undefined;
+
+                        return {
+                            bookingId,
+                            classId,
+                            serviceId: sid,
+                            instructorId,
+                            time,
+                            title,
+                            instructor: instructorNameFromMap
+                                ? `Con ${instructorNameFromMap}`
+                                : 'Instructor',
+                            branch: '',
+                            imageUrl:
+                                serviceImageMap[String(sid)] || require('@/assets/images/rutina.png'),
+                            capacity: item.max_capacity || 0,
+                            occupied: 0,
+                            rawDate: String(startsAt).split('T')[0] || '',
+                            startsAt: String(startsAt),
+                            createdAt,
+                        };
+                    });
+
+                // Sort by startsAt ascending (soonest classes first)
+                mappedBookings.sort((a, b) => {
+                    if (!a.startsAt) return 1;
+                    if (!b.startsAt) return -1;
+                    return new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime();
                 });
 
                 setBookings(mappedBookings);
                 setVisibleBookingsCount(PAGE_SIZE);
             } catch (error) {
                 console.error('Error cargando reservas del cliente:', error);
-                setBookingsError('No se pudieron cargar tus reservas. Intenta nuevamente.');
+                setBookingsError(t('schedule.errors.loadBookings'));
             } finally {
                 setLoadingBookings(false);
             }
@@ -489,7 +513,7 @@ export default function HorariosScreen() {
         if (activeTab === 'reservas') {
             void loadBookings();
         }
-    }, [activeTab, refreshKey]);
+    }, [activeTab, refreshKey, t]);
 
     const filteredClasses = useMemo(
         () =>
@@ -537,15 +561,10 @@ export default function HorariosScreen() {
 
                             <View className='mb-6'>
                                 <WeekCalendar
-                                    initialDate={selectedClassesDate || undefined}
+                                    initialDate={selectedClassesDate}
                                     onDateSelect={(day) => {
                                         if (day?.dateString) {
-                                            // Toggle date selection: if same date clicked, deselect to show all classes
-                                            if (selectedClassesDate === day.dateString) {
-                                                setSelectedClassesDate('');
-                                            } else {
-                                                setSelectedClassesDate(day.dateString);
-                                            }
+                                            setSelectedClassesDate(day.dateString);
                                             setVisibleClassesCount(PAGE_SIZE);
                                         }
                                     }}
@@ -586,7 +605,7 @@ export default function HorariosScreen() {
                     </View>
 
                     {activeTab === 'classes' && (
-                        <View className='mb-6 z-50'>
+                        <View className='mb-6'>
                             <ThemedText
                                 lightColor='#111827'
                                 darkColor='#ffffff'
@@ -641,6 +660,13 @@ export default function HorariosScreen() {
                                 )}
                             {!loadingClasses &&
                                 !errorMessage &&
+                                !selectedBranchId && (
+                                    <ThemedText className='font-body text-center text-sm text-neutral-500 mb-4'>
+                                        {t('common.selectBranch')}
+                                    </ThemedText>
+                                )}
+                            {!loadingClasses &&
+                                !errorMessage &&
                                 classes.length > 0 &&
                                 visibleClasses.length === 0 && (
                                     <ThemedText className='font-body text-center text-sm text-neutral-500 mb-4'>
@@ -658,13 +684,10 @@ export default function HorariosScreen() {
                                     branch={classItem.branch}
                                     imageUrl={classItem.imageUrl}
                                     variant='overlay'
-                                    category={`${classItem.capacity || 0} Cupos`}
+                                    slots={`${classItem.capacity || 0} ${t('schedule.spots')}`}
                                     reserved={isReserved(
                                         `${classItem.classId}|${classItem.serviceId}`,
                                     )}
-                                    // Using ID-based reservation check is safer but keeping title|time if that's how isReserved works currently
-                                    // Actually, isReserved logic might rely on context, but let's stick to simple text fix:
-                                    // category={`${classItem.capacity || 0} Cupos`}
                                     onPress={(classData) => {
                                         router.push({
                                             pathname: '/class-details',
@@ -734,10 +757,7 @@ export default function HorariosScreen() {
                                         branch={booking.branch}
                                         imageUrl={booking.imageUrl}
                                         variant='overlay'
-                                        category={`${t('common.available')}: ${Math.max(
-                                            (booking.capacity || 0) - (booking.occupied || 0),
-                                            0,
-                                        )} ${t('common.of')} ${booking.capacity || 0}`}
+                                        slots={`${booking.capacity || 0} ${t('schedule.spots')}`}
                                         reserved
                                         onPress={(classData) => {
                                             router.push({
@@ -750,7 +770,7 @@ export default function HorariosScreen() {
                                                     serviceId: booking.serviceId,
                                                     instructorId: booking.instructorId,
                                                     bookingId: booking.bookingId,
-                                                    startsAt: booking.rawDate,
+                                                    startsAt: booking.startsAt,
                                                     branchId: selectedBranchId,
                                                 },
                                             });
