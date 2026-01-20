@@ -260,6 +260,13 @@ export default function RootLayout() {
                                             title: '',
                                         }}
                                     />
+                                    <Stack.Screen
+                                        name="client-ai-routines"
+                                        options={{
+                                            headerShown: false,
+                                            title: '',
+                                        }}
+                                    />
                                 </Stack>
                                 <StatusBar style='auto' />
                                 <Toast />

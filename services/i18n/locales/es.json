@@ -518,6 +518,7 @@
 			"retry": "Reintentar",
 			"noRoutines": "No hay rutinas asignadas",
 			"noRoutinesDescription": "Tu instructor te asignará rutinas para seguir.",
+			"viewAiRoutines": "Ver Rutinas Asignadas por IA",
 			"routines": {
 				"yoga": "Yoga",
 				"hiit": "HIIT",
@@ -1290,6 +1291,20 @@
 					"message": "Se cerrará tu sesión actual y deberás iniciar sesión nuevamente.",
 					"cancel": "Cancelar"
 				}
+			},
+			"aiRoutines": {
+				"title": "Rutinas Asignadas por IA",
+				"loading": "Cargando tus rutinas asignadas por IA...",
+				"yourRoutines": "Tus Rutinas de IA",
+				"noRoutines": "Aún no tienes rutinas asignadas por IA.",
+				"startChat": "¡Chatea con nuestra IA para obtener rutinas personalizadas!",
+				"error": "Error",
+				"errorLoadingRoutines": "No se pudieron cargar tus rutinas asignadas por IA",
+				"deleteTitle": "Eliminar Rutina de IA",
+				"deleteMessage": "¿Estás seguro de que deseas eliminar esta rutina asignada por IA?",
+				"deleteSuccess": "Éxito",
+				"routineDeleted": "¡Rutina eliminada exitosamente!",
+				"errorDeleting": "No se pudo eliminar la rutina"
 			}
 		},
 		"validations": {
@@ -1439,6 +1454,14 @@
 			"inputPlaceholder": "Escribe tu mensaje...",
 			"welcomeMessage": "¡Hola! Soy tu asistente virtual de VitalFit. ¿En qué puedo ayudarte hoy?",
 			"staticResponse": "Gracias por tu mensaje. Esta es una respuesta estática. Pronto conectaremos el chatbot con un agente real.",
+			"loadingHistory": "Cargando historial de chat...",
+			"typing": "La IA está escribiendo...",
+			"error": "Error",
+			"errorSending": "Error al enviar mensaje",
+			"errorResponse": "Lo siento, ocurrió un error. Por favor, intenta de nuevo.",
+			"resetSuccess": "Éxito",
+			"resetMessage": "La conversación del chat ha sido reiniciada",
+			"resetError": "No se pudo reiniciar la conversación",
 			"quickActions": {
 				"classSchedules": "Horarios de clases",
 				"myMembership": "Mi membresía",
