@@ -5,14 +5,14 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    ActivityIndicator,
-    BackHandler,
-    Image,
-    Modal,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View,
+	ActivityIndicator,
+	BackHandler,
+	Image,
+	Modal,
+	StyleSheet,
+	TextInput,
+	TouchableOpacity,
+	View,
 } from 'react-native';
 import { CheckCircleIcon, XMarkIcon } from 'react-native-heroicons/solid';
 
@@ -77,7 +77,6 @@ export default function EnrollClientScreen() {
 
 	const handleSearchUser = async () => {
 		if (!email.trim()) {
-			 
 			showToast(
 				'error',
 				t('common.error.unknown'),
@@ -94,7 +93,6 @@ export default function EnrollClientScreen() {
 				setUserData(res.data);
 				setStep(2);
 			} else {
-				 
 				showToast(
 					'error',
 					t('enrollClient.error.userNotFound') || 'Usuario no encontrado',
@@ -102,7 +100,6 @@ export default function EnrollClientScreen() {
 				);
 			}
 		} catch {
-			 
 			showToast(
 				'error',
 				t('enrollClient.error.searchFailed') || 'Error al buscar usuario',
@@ -174,6 +171,8 @@ export default function EnrollClientScreen() {
 				serverMessage = apiError.message;
 			}
 
+			let errorTitle = t('common.error.unexpected') || 'Error';
+
 			if (
 				serverMessage.toLowerCase().includes('limit') ||
 				serverMessage.toLowerCase().includes('capacity') ||
@@ -181,17 +180,24 @@ export default function EnrollClientScreen() {
 			) {
 				errorMsg = t('enrollClient.error.classFull');
 				errorType = 'warning';
+				errorTitle = t('common.attention') || 'Atención';
 			} else if (
 				serverMessage.toLowerCase().includes('already') ||
-				serverMessage.toLowerCase().includes('exist')
+				serverMessage.toLowerCase().includes('exist') ||
+				serverMessage.toLowerCase().includes('ya') ||
+				serverMessage.toLowerCase().includes('inscrito') ||
+				serverMessage.toLowerCase().includes('registrado') ||
+				serverMessage.toLowerCase().includes('server encountered a problem')
 			) {
-				errorMsg = t('enrollClient.error.alreadyEnrolled');
+				errorMsg =
+					t('enrollClient.error.alreadyEnrolled') || 'Ya estás inscrito en esta clase';
 				errorType = 'warning';
+				errorTitle = t('common.information') || 'Información';
 			} else if (serverMessage) {
 				errorMsg = serverMessage;
 			}
 
-			showToast(errorType, t('common.error.unexpected'), errorMsg);
+			showToast(errorType, errorTitle, errorMsg);
 			setEmail(''); // Clear email on failure as well
 		} finally {
 			setLoading(false);

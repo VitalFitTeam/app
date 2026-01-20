@@ -55,6 +55,7 @@
 		},
 		"common": {
 			"attention": "Atención",
+			"information": "Información",
 			"instructor": "Instructor",
 			"capacity": "Capacidad",
 			"error": {
@@ -107,15 +108,7 @@
 			"unknown": "Desconocido",
 			"notes": "Notas",
 			"noClientsFound": "No se encontraron clientes",
-			"weekdaysShort": [
-				"LUN",
-				"MAR",
-				"MIÉ",
-				"JUE",
-				"VIE",
-				"SÁB",
-				"DOM"
-			]
+			"weekdaysShort": ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"]
 		},
 		"enrollClient": {
 			"title": "Inscribir Cliente",
@@ -875,10 +868,7 @@
 			},
 			"startDate": "Fecha de inicio",
 			"benefits": {
-				"free-trial": [
-					"Acceso limitado al gimnasio",
-					"7 días de acceso libre"
-				],
+				"free-trial": ["Acceso limitado al gimnasio", "7 días de acceso libre"],
 				"advanced": [
 					"Acceso ilimitado al gimnasio",
 					"7 sesiones con consultor fitness",
