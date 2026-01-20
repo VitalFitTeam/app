@@ -104,7 +104,7 @@ export default function ClassCard({
 								darkColor='#E5E7EB'
 								style={{ fontFamily: 'Montserrat_400Regular', fontSize: 11, marginTop: 4 }}
 							>
-								{t('common.availability')}
+
 							</ThemedText>
 						</View>
 						<View className='flex-row items-center justify-between mt-2'>
