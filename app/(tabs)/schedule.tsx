@@ -1,3 +1,4 @@
+import { MonthCalendar } from '@/components/auth/dashboard/monthcalendar';
 import { WeekCalendar } from '@/components/auth/dashboard/weekcalendar';
 
 import BranchSelectionModal from '@/components/BranchSelectionModal';
@@ -105,6 +106,9 @@ export default function HorariosScreen() {
     const [selectedClassesDate, setSelectedClassesDate] = useState<string>(
         formatLocalDate(new Date())
     );
+    const [selectedBookingsDate, setSelectedBookingsDate] = useState<string>(
+        formatLocalDate(new Date())
+    );
 
     const isCloseToBottom = ({
         layoutMeasurement,
@@ -172,7 +176,6 @@ export default function HorariosScreen() {
                 const month = dateObj.getMonth() + 1; // 1-12
                 const year = dateObj.getFullYear();
 
-                console.log('[Schedule] Fetching classes for branch:', selectedBranchId, 'with filters - month:', month, 'year:', year, 'date:', selectedClassesDate);
                 const response = await vitalFitApi.schedule.ListBranchesClass(
                     selectedBranchId,
                     token || '',
@@ -188,22 +191,6 @@ export default function HorariosScreen() {
                     ? (raw as { data?: BranchClassInfo[] }).data
                     : (raw as BranchClassInfo[]);
                 const items: BranchClassInfo[] = Array.isArray(itemsFromApi) ? itemsFromApi : [];
-
-                console.log('[Schedule] Received', items.length, 'classes from API for date:', selectedClassesDate);
-
-                // Debug: Check the actual dates of returned classes
-                const uniqueDates = new Set(
-                    items.map(item => item.starts_at ? formatLocalDate(new Date(item.starts_at)) : 'no-date')
-                );
-                console.log('[Schedule] Unique dates in response:', Array.from(uniqueDates));
-                console.log('[Schedule] Classes per date:',
-                    Array.from(uniqueDates).map(date => ({
-                        date,
-                        count: items.filter(item =>
-                            item.starts_at && formatLocalDate(new Date(item.starts_at)) === date
-                        ).length
-                    }))
-                );
 
                 // 3. Prepare Caches & Identification of Missing Data
                 const uniqueServiceIds = Array.from(
@@ -316,7 +303,7 @@ export default function HorariosScreen() {
                         endsAt: String(endsAt || ''),
                         time,
                         title: serviceData?.name || 'Clase',
-                        instructor: instructorName ? `Con ${instructorName}` : 'Instructor',
+                        instructor: instructorName ? `${t('common.with')} ${instructorName}` : t('common.instructor'),
                         branch: '',
                         imageUrl: serviceData?.image || require('@/assets/images/rutina.png'),
                         capacity: item.max_capacity || 0,
@@ -387,33 +374,44 @@ export default function HorariosScreen() {
                 const branchesResp = await vitalFitApi.public.getBranchMap(token);
                 const allBranches = (branchesResp as { data?: { branch_id: string }[] }).data || [];
 
-                // Fetch bookings from all branches
+                // Use selected bookings date for filtering
+                const dateObj = new Date(selectedBookingsDate);
+                const month = dateObj.getMonth() + 1; // 1-12
+                const year = dateObj.getFullYear();
+
+                // Fetch bookings from all branches with date filtering
                 const allBranchBookings: BranchScheduleResponse[] = [];
 
+                // 1. Define the actual function signature based on your network trace
+                type GetClientBranchBookingFn = (
+                    branchId: string,
+                    userId: string,
+                    token: string,
+                    month: number,
+                    year: number,
+                    date: string
+                ) => Promise<{ data?: BranchScheduleResponse[] } | BranchScheduleResponse[] | undefined>;
+
+                // 2. Updated implementation
                 for (const branch of allBranches) {
                     try {
-                        const response = await vitalFitApi.booking.getClientBranchBooking(
+                        // Use the custom signature instead of 'any'
+                        const response = await (vitalFitApi.booking.getClientBranchBooking as GetClientBranchBookingFn)(
                             String(branch.branch_id),
                             String(userId),
                             token,
+                            month,
+                            year,
+                            selectedBookingsDate,
                         );
 
-                        const raw =
-                            (response as
-                                | { data?: BranchScheduleResponse[] }
-                                | BranchScheduleResponse[]
-                                | undefined) ?? [];
-                        const itemsFromApi = Array.isArray(
-                            (raw as { data?: BranchScheduleResponse[] }).data,
-                        )
-                            ? (raw as { data?: BranchScheduleResponse[] }).data
-                            : (raw as BranchScheduleResponse[]);
-                        const branchItems: BranchScheduleResponse[] = Array.isArray(itemsFromApi)
-                            ? itemsFromApi
-                            : [];
+                        // Standardize the response without multiple 'as' casts
+                        const itemsFromApi = Array.isArray(response)
+                            ? response
+                            : response?.data ?? [];
 
-                        // Only include items that are actually in the user's bookings
-                        const userBranchBookings = branchItems.filter(item =>
+                        // Filter and add items
+                        const userBranchBookings = itemsFromApi.filter(item =>
                             bookingInfoByClassId.current[String(item.class_id)]
                         );
 
@@ -489,73 +487,64 @@ export default function HorariosScreen() {
                     }
                 }
 
-                // Filter only upcoming bookings (starts_at >= now)
-                const now = new Date();
+                // Backend now filters by date, so we only need to map the results
+                const mappedBookings: BookingItem[] = items.map((item) => {
+                    const startsAt = item.starts_at || '';
+                    const endsAt = item.ends_at || '';
 
-                const mappedBookings: BookingItem[] = items
-                    .filter((item) => {
-                        const startsAt = item.starts_at;
-                        if (!startsAt) return false;
-                        const classDate = new Date(startsAt);
-                        return classDate >= now;
-                    })
-                    .map((item) => {
-                        const startsAt = item.starts_at || '';
-                        const endsAt = item.ends_at || '';
+                    const extractTime = (value: string) => {
+                        if (!value) return '';
+                        try {
+                            const date = new Date(value);
+                            return date.toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false,
+                            });
+                        } catch {
+                            return '';
+                        }
+                    };
 
-                        const extractTime = (value: string) => {
-                            if (!value) return '';
-                            try {
-                                const date = new Date(value);
-                                return date.toLocaleTimeString([], {
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    hour12: false,
-                                });
-                            } catch {
-                                return '';
-                            }
-                        };
+                    const startTime = extractTime(String(startsAt));
+                    const endTime = extractTime(String(endsAt));
+                    const time = endTime ? `${startTime} - ${endTime}` : startTime;
 
-                        const startTime = extractTime(String(startsAt));
-                        const endTime = extractTime(String(endsAt));
-                        const time = endTime ? `${startTime} - ${endTime}` : startTime;
+                    const sid = item.service_id || '';
+                    const instructorId = item.instructor_id || '';
 
-                        const sid = item.service_id || '';
-                        const instructorId = item.instructor_id || '';
+                    const classId = item.class_id || '';
+                    const bookingInfo = bookingInfoByClassId.current[String(classId)];
+                    const bookingId = bookingInfo?.bookingId || '';
+                    const createdAt = bookingInfo?.createdAt || '';
 
-                        const classId = item.class_id || '';
-                        const bookingInfo = bookingInfoByClassId.current[String(classId)];
-                        const bookingId = bookingInfo?.bookingId || '';
-                        const createdAt = bookingInfo?.createdAt || '';
+                    const title = serviceNameMap[String(sid)] || 'Clase';
+                    const instructorNameFromMap = instructorId
+                        ? instructorMap[String(instructorId)]
+                        : undefined;
 
-                        const title = serviceNameMap[String(sid)] || 'Clase';
-                        const instructorNameFromMap = instructorId
-                            ? instructorMap[String(instructorId)]
-                            : undefined;
-
-                        // Extract rawDate in local timezone
-                        const rawDate = startsAt ? formatLocalDate(new Date(startsAt)) : '';
-                        return {
-                            bookingId,
-                            classId,
-                            serviceId: sid,
-                            instructorId,
-                            time,
-                            title,
-                            instructor: instructorNameFromMap
-                                ? `Con ${instructorNameFromMap}`
-                                : 'Instructor',
-                            branch: '',
-                            imageUrl:
-                                serviceImageMap[String(sid)] || require('@/assets/images/rutina.png'),
-                            capacity: item.max_capacity || 0,
-                            occupied: 0,
-                            rawDate,
-                            startsAt: String(startsAt),
-                            createdAt,
-                        };
-                    });
+                    // Extract rawDate in local timezone
+                    const rawDate = startsAt ? formatLocalDate(new Date(startsAt)) : '';
+                    return {
+                        bookingId,
+                        classId,
+                        serviceId: sid,
+                        instructorId,
+                        time,
+                        title,
+                        instructor: instructorNameFromMap
+                            ? `${t('common.with')} ${instructorNameFromMap}`
+                            : t('common.instructor'),
+                        branch: '',
+                        imageUrl:
+                            serviceImageMap[String(sid)] || require('@/assets/images/rutina.png'),
+                        capacity: item.max_capacity || 0,
+                        occupied: 0,
+                        rawDate,
+                        startsAt: String(startsAt),
+                        createdAt,
+                    };
+                });
 
                 // Sort by startsAt ascending (soonest classes first)
                 mappedBookings.sort((a, b) => {
@@ -577,16 +566,39 @@ export default function HorariosScreen() {
         if (activeTab === 'reservas') {
             void loadBookings();
         }
-    }, [activeTab, refreshKey, t]);
+    }, [activeTab, selectedBookingsDate, refreshKey, t]);
 
     const filteredClasses = useMemo(
-        () =>
-            classes.filter((item) => !selectedClassesDate || item.rawDate === selectedClassesDate),
+        () => {
+            const now = new Date();
+            return classes.filter((item) => {
+                // Filter by selected date
+                if (selectedClassesDate && item.rawDate !== selectedClassesDate) {
+                    return false;
+                }
+
+                // Filter out classes that have already started
+                if (item.startsAt) {
+                    const classStartTime = new Date(item.startsAt);
+                    if (classStartTime <= now) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+        },
         [classes, selectedClassesDate],
     );
 
+    const filteredBookings = useMemo(
+        () =>
+            bookings.filter((item) => !selectedBookingsDate || item.rawDate === selectedBookingsDate),
+        [bookings, selectedBookingsDate],
+    );
+
     const visibleClasses = filteredClasses.slice(0, visibleClassesCount);
-    const visibleBookings = bookings.slice(0, visibleBookingsCount);
+    const visibleBookings = filteredBookings.slice(0, visibleBookingsCount);
 
     return (
         <ThemedView lightColor='#FFFFFF' darkColor='#050816' style={{ flex: 1 }}>
@@ -630,6 +642,36 @@ export default function HorariosScreen() {
                                         if (day?.dateString) {
                                             setSelectedClassesDate(day.dateString);
                                             setVisibleClassesCount(PAGE_SIZE);
+                                        }
+                                    }}
+                                />
+                            </View>
+                        </>
+                    )}
+
+                    {activeTab === 'reservas' && (
+                        <>
+                            <View className='mb-2'>
+                                <ThemedText
+                                    lightColor='#111827'
+                                    darkColor='#ffffff'
+                                    className='font-heading'
+                                    style={{
+                                        fontFamily: 'BebasNeue-Regular',
+                                        fontSize: 28,
+                                        marginBottom: 8,
+                                    }}>
+                                    {t('schedule.calendar')}
+                                </ThemedText>
+                            </View>
+
+                            <View className='mb-6'>
+                                <MonthCalendar
+                                    initialDate={selectedBookingsDate}
+                                    onDateSelect={(day) => {
+                                        if (day?.dateString) {
+                                            setSelectedBookingsDate(day.dateString);
+                                            setVisibleBookingsCount(PAGE_SIZE);
                                         }
                                     }}
                                 />
@@ -802,11 +844,13 @@ export default function HorariosScreen() {
                                 </View>
                             )}
 
-                            {!loadingBookings && !bookingsError && bookings.length === 0 && (
+                            {!loadingBookings && !bookingsError && visibleBookings.length === 0 && (
                                 <View className='items-center py-12'>
                                     <Ionicons name='calendar-outline' size={48} color='#9ca3af' />
                                     <ThemedText className='font-body text-center text-neutral-500 mt-4'>
-                                        {t('schedule.noBookings')}
+                                        {bookings.length === 0
+                                            ? t('schedule.noBookings')
+                                            : t('schedule.noClassesForDate')}
                                     </ThemedText>
                                 </View>
                             )}

@@ -58,6 +58,7 @@
     "common": {
       "attention": "Attention",
       "instructor": "Instructor",
+      "with": "With",
       "error": {
         "connection": "Connection error with the server.",
         "unexpected": "An unexpected error occurred.",
@@ -466,8 +467,18 @@
     },
     "classDetails": {
       "title": "Class Details",
+      "defaultName": "CLASS NAME",
       "defaultClassName": "Class Name",
+      "defaultInstructor": "Instructor Name",
       "defaultInstructorName": "Instructor Name",
+      "duration": "(1 hour)",
+      "descriptionTitle": "Class Description:",
+      "clientList": "Client List",
+      "noClientsFound": "No clients found",
+      "viewAllRegistered": "View all registered",
+      "showLess": "Show less",
+      "classFull": "Class Full",
+      "enrollClient": "Enroll Client",
       "occupiedSpots": "spots occupied",
       "level": "Level: {{level}}",
       "descriptionLabel": "Class Description:",

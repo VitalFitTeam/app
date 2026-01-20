@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 
@@ -22,12 +22,42 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
 	markedDates = {},
 	initialDate,
 }) => {
+	const [selectedDate, setSelectedDate] = useState(initialDate);
+
+	// Get today's date in YYYY-MM-DD format
+	const today = new Date();
+	const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+	// Merge user's markedDates with our selected date and today indicator
+	const mergedMarkedDates = {
+		...markedDates,
+		...(selectedDate && {
+			[selectedDate]: {
+				selected: true,
+				selectedColor: '#F97316',
+				...markedDates[selectedDate],
+			},
+		}),
+		...(todayString !== selectedDate && {
+			[todayString]: {
+				marked: true,
+				dotColor: '#F97316',
+				...markedDates[todayString],
+			},
+		}),
+	};
+
+	const handleDayPress = (day: DateData) => {
+		setSelectedDate(day.dateString);
+		onDateSelect?.(day);
+	};
+
 	return (
 		<View style={styles.wrapper}>
 			<Calendar
 				initialDate={initialDate}
-				markedDates={markedDates}
-				onDayPress={(day) => onDateSelect?.(day)}
+				markedDates={mergedMarkedDates}
+				onDayPress={handleDayPress}
 				onMonthChange={(month) => onMonthChange?.(month)}
 				theme={{
 					backgroundColor: '#ffffff',

@@ -209,7 +209,7 @@ export default function ReceptionistScheduleScreen() {
                 endsAt: String(endsAt || ''),
                 time,
                 title: sInfo.name,
-                instructor: iInfo.name !== 'Instructor' ? `Con ${iInfo.name}` : t('common.unknown'),
+                instructor: iInfo.name !== 'Instructor' ? `${t('common.with')} ${iInfo.name}` : t('common.unknown'),
                 branch: selectedBranch?.name || '',
                 imageUrl: sInfo.image || require('@/assets/images/rutina.png'),
                 capacity: item.max_capacity || 0,

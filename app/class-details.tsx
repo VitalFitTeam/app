@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
 
 export default function ClassDetailsScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { token: authToken } = useAuth();
   const {
     time,
@@ -139,7 +139,7 @@ export default function ClassDetailsScreen() {
         );
       }
 
-      return dateToFormat.toLocaleDateString('es-ES', {
+      return dateToFormat.toLocaleDateString(i18n.language, {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
@@ -147,7 +147,7 @@ export default function ClassDetailsScreen() {
     } catch {
       return '';
     }
-  }, [startsAt]);
+  }, [startsAt, i18n.language]);
 
   const [serviceDescription, setServiceDescription] = useState<string | null>(null);
   const isPast = useMemo(() => {
@@ -381,14 +381,14 @@ export default function ClassDetailsScreen() {
         }
       } catch (error) {
         console.error('Error fetching class participants:', error);
-        showToast('error', 'Error', 'No se pudo cargar la lista de alumnos');
+        showToast('error', t('common.error.title'), t('common.error.generic'));
       } finally {
         setLoadingParticipants(false);
       }
     };
 
     fetchParticipants();
-  }, [isInstructorMode, classId, showToast]);
+  }, [isInstructorMode, classId, showToast, t]);
 
   /* State restored */
   const [activeTab, setActiveTab] = useState<'clientes' | 'pasar-lista'>('clientes');
@@ -404,11 +404,11 @@ export default function ClassDetailsScreen() {
       })
       .map((p) => ({
         id: p.booking_id, // Map booking_id to id for UI
-        name: `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Usuario sin nombre',
+        name: `${p.first_name || ''} ${p.last_name || ''}`.trim() || t('common.unknown'),
         level: 'General', // Default value as API doesn't return level yet
         program: 'Sin programa', // Default value
       }));
-  }, [participants, search]);
+  }, [participants, search, t]);
 
   if (isInstructorMode) {
     return (
@@ -425,7 +425,7 @@ export default function ClassDetailsScreen() {
               lightColor='#111827'
               className='text-base font-semibold'
               style={{ fontFamily: 'System', fontSize: 16, fontWeight: '600' }}>
-              Detalles clase
+              {t('classDetails.title')}
             </ThemedText>
           </View>
           {heroSource && !imageError ? (
@@ -503,7 +503,7 @@ export default function ClassDetailsScreen() {
               style={{ fontFamily: 'Montserrat_500Medium' }}>
               {instructorFirstName || instructorLastName
                 ? `${instructorFirstName ?? ''} ${instructorLastName ?? ''}`.trim()
-                : String(instructor || 'Nombre del Instructor')}
+                : String(instructor || t('classDetails.defaultInstructor'))}
             </ThemedText>
           </View>
 
@@ -523,7 +523,7 @@ export default function ClassDetailsScreen() {
               darkColor='#ffffff'
               className='mb-1'
               style={{ fontFamily: 'Montserrat_600SemiBold' }}>
-              Descripción de la clase:
+              {t('classDetails.descriptionTitle')}
             </ThemedText>
             <ThemedText
               lightColor='#4b5563'
@@ -545,7 +545,7 @@ export default function ClassDetailsScreen() {
               <Text
                 className={`font-semibold font-body ${activeTab === 'clientes' ? 'text-[#111827]' : 'text-[#6b7280]'
                   }`}>
-                Clientes
+                {t('classDetails.tabs.clients')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -558,7 +558,7 @@ export default function ClassDetailsScreen() {
                   ? 'text-[#111827]'
                   : 'text-[#6b7280]'
                   }`}>
-                Pasar lista
+                {t('classDetails.tabs.attendance')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -567,7 +567,7 @@ export default function ClassDetailsScreen() {
             <View className='border border-[#e5e7eb] rounded-2xl px-3 py-2 bg-white flex-row items-center'>
               <MagnifyingGlassIcon width={18} height={18} color='#f97316' />
               <TextInput
-                placeholder='Nombre del cliente'
+                placeholder={t('classDetails.searchPlaceholder')}
                 placeholderTextColor='#9ca3af'
                 value={search}
                 onChangeText={setSearch}
@@ -582,7 +582,7 @@ export default function ClassDetailsScreen() {
                 <View className='flex-row items-center mb-3'>
                   <UsersIcon size={18} color='#f97316' />
                   <Text className='ml-2 text-[14px] font-medium text-[#111827] font-body'>
-                    Lista de clientes inscritos
+                    {t('classDetails.clientsListTitle')}
                   </Text>
                 </View>
 
@@ -613,7 +613,7 @@ export default function ClassDetailsScreen() {
                 <View className='flex-row items-center mb-4'>
                   <UsersIcon size={18} color='#f97316' />
                   <Text className='ml-2 text-[14px] font-medium text-[#111827] font-body'>
-                    Clientes inscritos
+                    {t('classDetails.clientsEnrolled')}
                   </Text>
                 </View>
 
@@ -679,7 +679,7 @@ export default function ClassDetailsScreen() {
                             style={{
                               fontFamily: 'Montserrat_600SemiBold',
                             }}>
-                            Presente
+                            {t('classDetails.attendance.present')}
                           </Text>
                         </TouchableOpacity>
 
@@ -712,7 +712,7 @@ export default function ClassDetailsScreen() {
                             style={{
                               fontFamily: 'Montserrat_600SemiBold',
                             }}>
-                            Tarde
+                            {t('classDetails.attendance.late')}
                           </Text>
                         </TouchableOpacity>
 
@@ -738,7 +738,7 @@ export default function ClassDetailsScreen() {
                             style={{
                               fontFamily: 'Montserrat_600SemiBold',
                             }}>
-                            Ausente
+                            {t('classDetails.attendance.absent')}
                           </Text>
                         </TouchableOpacity>
                       </View>
@@ -754,14 +754,14 @@ export default function ClassDetailsScreen() {
                     darkColor='#ffffff'
                     className='mb-2'
                     style={{ fontFamily: 'Montserrat_600SemiBold' }}>
-                    Notas internas de la clase
+                    {t('classDetails.internalNotesTitle')}
                   </ThemedText>
 
                   <View className='mb-3'>
                     <TextInput
                       multiline
                       numberOfLines={4}
-                      placeholder='Añade notas sobre esta clase...'
+                      placeholder={t('classDetails.notesPlaceholder')}
                       placeholderTextColor='#9ca3af'
                       value={classNotes}
                       onChangeText={setClassNotes}
@@ -790,8 +790,8 @@ export default function ClassDetailsScreen() {
                     onPress={() =>
                       showToast(
                         'success',
-                        'Notas guardadas',
-                        'Las notas internas se han guardado correctamente.',
+                        t('classDetails.toasts.notesSaved.title'),
+                        t('classDetails.toasts.notesSaved.message'),
                       )
                     }>
                     <ThemedText
@@ -799,7 +799,7 @@ export default function ClassDetailsScreen() {
                       darkColor='#f9fafb'
                       className='text-sm'
                       style={{ fontFamily: 'Montserrat_500Medium' }}>
-                      Guardar notas
+                      {t('classDetails.saveNotes')}
                     </ThemedText>
                   </TouchableOpacity>
 
@@ -810,8 +810,8 @@ export default function ClassDetailsScreen() {
                     onPress={() =>
                       showToast(
                         'success',
-                        'Asistencia guardada',
-                        'La asistencia de la clase se ha guardado correctamente.',
+                        t('classDetails.toasts.attendanceSaved.title'),
+                        t('classDetails.toasts.attendanceSaved.message'),
                       )
                     }>
                     <ThemedText
@@ -819,7 +819,7 @@ export default function ClassDetailsScreen() {
                       darkColor='#ffffff'
                       className='text-sm font-semibold'
                       style={{ fontFamily: 'Montserrat_600SemiBold' }}>
-                      Guardar asistencia
+                      {t('classDetails.saveAttendance')}
                     </ThemedText>
                   </TouchableOpacity>
                 </View>
@@ -845,7 +845,7 @@ export default function ClassDetailsScreen() {
             lightColor='#111827'
             className='text-base font-semibold'
             style={{ fontFamily: 'System', fontSize: 16, fontWeight: '600' }}>
-            Detalles clase
+            {t('classDetails.title')}
           </ThemedText>
         </View>
         {heroSource && !imageError ? (
@@ -870,7 +870,7 @@ export default function ClassDetailsScreen() {
           darkColor='#ffffff'
           className='text-3xl font-extrabold mt-4 mb-1'
           style={{ fontFamily: 'BebasNeue-Regular' }}>
-          {String(title || 'Nombre de la clase').toUpperCase()}
+          {String(title || t('classDetails.defaultName')).toUpperCase()}
         </ThemedText>
 
         <View className='mb-1'>
@@ -890,10 +890,10 @@ export default function ClassDetailsScreen() {
             className='text-sm text-gray-500 font-medium'
             style={{ fontFamily: 'Montserrat_500Medium' }}>
             {currentOccupancyCount !== null && capacity
-              ? `${currentOccupancyCount} / ${capacity} cupos ocupados`
+              ? `${currentOccupancyCount} / ${capacity} ${t('classDetails.occupiedSpots')}`
               : capacity
-                ? `${capacity} cupos totales`
-                : 'Cupos limitados'}
+                ? `${capacity} ${t('classDetails.totalSpots')}`
+                : t('classDetails.limitedSpots')}
           </ThemedText>
         </View>
 
@@ -910,7 +910,7 @@ export default function ClassDetailsScreen() {
               lightColor='#b91c1c'
               darkColor='#b91c1c'
               className='text-xs font-medium'>
-              La clase se llenó mientras la reservabas.
+              {t('classDetails.filledWhileBooking')}
             </ThemedText>
           </View>
         )}
@@ -922,7 +922,7 @@ export default function ClassDetailsScreen() {
                 lightColor='#ffffff'
                 darkColor='#ffffff'
                 className='text-xs font-semibold'>
-                Reservada
+                {t('classDetails.reserve')}d
               </ThemedText>
             </View>
           </View>
@@ -949,7 +949,7 @@ export default function ClassDetailsScreen() {
             darkColor='#e5e5e5'
             className='ml-2'
             style={{ fontFamily: 'Montserrat_500Medium' }}>
-            {String(instructor || 'Nombre del Instructor')}
+            {String(instructor || t('classDetails.defaultInstructor'))}
           </ThemedText>
         </View>
 
@@ -959,7 +959,7 @@ export default function ClassDetailsScreen() {
             darkColor='#ffffff'
             className='mb-1'
             style={{ fontFamily: 'Montserrat_600SemiBold' }}>
-            Descripción de la clase:
+            {t('classDetails.descriptionTitle')}
           </ThemedText>
           <ThemedText
             lightColor='#4b5563'
@@ -978,7 +978,7 @@ export default function ClassDetailsScreen() {
                 lightColor='#166534'
                 darkColor='#e5e5e5'
                 className='ml-2 text-xs font-semibold'>
-                Completado
+                {t('common.completed')}
               </ThemedText>
             </View>
           </View>
@@ -987,12 +987,12 @@ export default function ClassDetailsScreen() {
             <PrimaryButton
               title={
                 isPast
-                  ? 'Clase pasada'
+                  ? t('classDetails.pastClass')
                   : effectiveFull
-                    ? 'Clase llena'
+                    ? t('classDetails.classFull')
                     : reserved
-                      ? 'Cancelar'
-                      : 'Reservar'
+                      ? t('common.cancel')
+                      : t('classDetails.reserve')
               }
               disabled={isPast || effectiveFull || (!hasMembership && !reserved)}
               style={{
@@ -1016,8 +1016,8 @@ export default function ClassDetailsScreen() {
                   if (!authToken) {
                     showToast(
                       'error',
-                      'Sesión no válida',
-                      'Inicia sesión nuevamente para reservar la clase.',
+                      t('common.error.sessionExpired'),
+                      t('classDetails.toasts.bookingError.generic'),
                     );
                     return;
                   }
@@ -1025,8 +1025,8 @@ export default function ClassDetailsScreen() {
                   if (!classId) {
                     showToast(
                       'error',
-                      'No se pudo reservar',
-                      'Falta el identificador de la clase.',
+                      t('classDetails.toasts.bookingError.title'),
+                      t('classDetails.toasts.bookingError.missingId'),
                     );
                     return;
                   }
@@ -1041,8 +1041,8 @@ export default function ClassDetailsScreen() {
                   if (!userId) {
                     showToast(
                       'error',
-                      'Usuario no identificado',
-                      'No se pudo obtener la información del usuario.',
+                      t('classDetails.toasts.bookingError.userUnknown'),
+                      t('classDetails.toasts.bookingError.userInfoError'),
                     );
                     return;
                   }
@@ -1068,13 +1068,13 @@ export default function ClassDetailsScreen() {
 
                   showToast(
                     'success',
-                    'Clase reservada',
-                    'Tu clase ha sido reservada correctamente.',
+                    t('classDetails.toasts.bookingSuccess.title'),
+                    t('classDetails.toasts.bookingSuccess.message'),
                   );
 
                   router.back();
                 } catch (error: unknown) {
-                  let message = 'Ocurrió un error al reservar la clase.';
+                  let message = t('classDetails.toasts.bookingError.generic');
 
                   // Check for 402 Payment Required error
                   if (isAPIError(error) && error.status === 402) {
@@ -1144,7 +1144,7 @@ export default function ClassDetailsScreen() {
 
                   // Check for 500 Internal Server Error
                   if (isAPIError(error) && error.status === 500) {
-                    message = 'Error en el servidor. Por favor, intenta nuevamente más tarde.';
+                    message = t('common.error.serverError');
                   } else if (isAPIError(error)) {
                     message = error.messages.join(', ');
                   } else if (error instanceof Error) {
@@ -1152,7 +1152,7 @@ export default function ClassDetailsScreen() {
                   }
 
                   console.error('Error al reservar clase:', error);
-                  showToast('error', 'No se pudo reservar', message);
+                  showToast('error', t('classDetails.toasts.bookingError.title'), message);
                 }
               }}
             />
@@ -1162,7 +1162,7 @@ export default function ClassDetailsScreen() {
                   lightColor='#ef4444'
                   darkColor='#ef4444'
                   className='text-xs font-medium'>
-                  Necesitas una membresía activa para reservar
+                  {t('classDetails.membershipRequired')}
                 </ThemedText>
               </View>
             )}
@@ -1173,7 +1173,7 @@ export default function ClassDetailsScreen() {
             lightColor='#9ca3af'
             darkColor='#9ca3af'
             className='italic text-center text-xs'>
-            “Podrás cancelar hasta 2h antes del inicio”
+            {t('classDetails.cancellationPolicy')}
           </ThemedText>
         </View>
       </ScrollView>
@@ -1206,13 +1206,13 @@ export default function ClassDetailsScreen() {
               lightColor='#111827'
               darkColor='#ffffff'
               className='text-xl font-bold text-center mb-2'>
-              ¿Cancelar reserva?
+              {t('classDetails.cancelModal.title')}
             </ThemedText>
             <ThemedText
               lightColor='#4b5563'
               darkColor='#9ca3af'
               className='text-sm text-center mb-6'>
-              Perderás tu cupo en esta clase. ¿Estás seguro?
+              {t('classDetails.cancelModal.message')}
             </ThemedText>
             <View className='gap-3'>
               <TouchableOpacity
@@ -1223,8 +1223,8 @@ export default function ClassDetailsScreen() {
                     if (!token) {
                       showToast(
                         'error',
-                        'Sesión no válida',
-                        'Inicia sesión nuevamente para cancelar la reserva.',
+                        t('common.error.sessionExpired'),
+                        t('classDetails.toasts.cancelError.generic'),
                       );
                       return;
                     }
@@ -1241,13 +1241,13 @@ export default function ClassDetailsScreen() {
 
                     showToast(
                       'success',
-                      'Reserva cancelada',
-                      'Tu reserva ha sido cancelada correctamente.',
+                      t('classDetails.toasts.cancelSuccess.title'),
+                      t('classDetails.toasts.cancelSuccess.message'),
                     );
 
                     router.back();
                   } catch (error: unknown) {
-                    let message = 'Ocurrió un error al cancelar la reserva.';
+                    let message = t('classDetails.toasts.cancelError.generic');
                     let isLateCancellation = false;
 
                     // Robust error text extraction
@@ -1265,8 +1265,7 @@ export default function ClassDetailsScreen() {
 
                     // Detect restricted time window error globally
                     if (errorString.includes('restricted time window')) {
-                      message =
-                        'Ya no es posible cancelar porque ha pasado el tiempo límite permitido por el gimnasio.';
+                      message = t('classDetails.toasts.cancelError.lateCancellation');
                       isLateCancellation = true;
                     } else if (isAPIError(error)) {
                       message = error.messages.join(', ');
@@ -1279,10 +1278,10 @@ export default function ClassDetailsScreen() {
                         'Cancelación tardía detectada (Handled):',
                         message,
                       );
-                      showToast('error', 'Tiempo límite excedido', message);
+                      showToast('error', t('classDetails.toasts.cancelError.timeLimitTitle'), message);
                     } else {
                       console.error('Error al cancelar reserva:', error);
-                      showToast('error', 'No se pudo cancelar', message);
+                      showToast('error', t('classDetails.toasts.cancelError.title'), message);
                     }
                   }
                 }}
@@ -1292,7 +1291,7 @@ export default function ClassDetailsScreen() {
                   lightColor='#ffffff'
                   darkColor='#ffffff'
                   className='text-base font-bold'>
-                  Aceptar
+                  {t('common.accept')}
                 </ThemedText>
               </TouchableOpacity>
               <TouchableOpacity
@@ -1304,7 +1303,7 @@ export default function ClassDetailsScreen() {
                   lightColor='#111827'
                   darkColor='#ffffff'
                   className='text-base font-bold'>
-                  Volver
+                  {t('common.back')}
                 </ThemedText>
               </TouchableOpacity>
             </View>
