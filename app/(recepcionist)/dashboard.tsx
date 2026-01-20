@@ -65,7 +65,24 @@ export default function DashboardRecepcionist() {
 
 			let userName = t('dashboard.defaultUser');
 
-			if (data?.user?.first_name) {
+			// If we have user_id in response, fetch full user details
+			if (data?.user_id) {
+				try {
+					const userResponse = await vitalFitApi.user.GetUserByID(data.user_id, token || '');
+					const userData = userResponse.data;
+
+					if (userData?.first_name) {
+						userName = `${userData.first_name} ${userData.last_name || ''}`.trim();
+					}
+					console.log('[Dashboard] User details fetched:', userName);
+				} catch (error) {
+					console.error('[Dashboard] Error fetching user details:', error);
+					// Fallback to data from response
+					if (data?.user?.first_name) {
+						userName = `${data.user.first_name} ${data.user.last_name || ''}`.trim();
+					}
+				}
+			} else if (data?.user?.first_name) {
 				userName = `${data.user.first_name} ${data.user.last_name || ''}`.trim();
 			} else if (data?.first_name) {
 				userName = `${data.first_name} ${data.last_name || ''}`.trim();
@@ -75,6 +92,8 @@ export default function DashboardRecepcionist() {
 
 			setCheckInSuccess(true);
 			setCheckInUserName(userName);
+			// Show only the message, not the service name
+			setCheckInMessage(data.message || t('checkIn.successMessage'));
 			setResultModalVisible(true);
 			setScannerVisible(false);
 
@@ -125,6 +144,65 @@ export default function DashboardRecepcionist() {
 		setCheckInMessage(errorMessage);
 		setFaceCheckInVisible(false);
 		setResultModalVisible(true);
+	};
+
+	const handleEmailCheckIn = async (userId: string, userName: string) => {
+		try {
+			const token = await AsyncStorage.getItem('token');
+			if (!token) return;
+			if (!selectedBranchId) {
+				Alert.alert(`${t('common.attention')}`, t('checkIn.error.selectBranch'));
+				return;
+			}
+
+			console.log('[Dashboard] Processing email check-in...', { userId, branchId: selectedBranchId });
+
+			// Use checkInManual for email-based check-ins (not QR code)
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const response = await (vitalFitApi as any).access.checkInManual(token, {
+				user_id: userId,
+				branch_id: selectedBranchId,
+			});
+
+			const data = response.data || response;
+
+			console.log('[Email Check-In] Response:', JSON.stringify(data, null, 2));
+
+			setCheckInSuccess(true);
+			setCheckInUserName(userName);
+			setCheckInMessage(data.service_name || t('checkIn.success.default'));
+			setResultModalVisible(true);
+
+			// Refresh stats after successful check-in
+			const todayRes = await vitalFitApi.report.todayCheckIns(token, selectedBranchId);
+			if (todayRes && typeof todayRes.data === 'number') {
+				setCheckInsTodayCount(todayRes.data);
+			}
+
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
+			console.error('Error in email check-in:', error);
+
+			let errorMessage = t('checkIn.error.default');
+
+			if (isAPIError(error)) {
+				if (error.status === 402) {
+					errorMessage = t('checkIn.error.paymentPending');
+				} else if (error.status === 403) {
+					errorMessage = t('checkIn.error.accessDenied');
+				} else if (error.status === 401) {
+					errorMessage = t('checkIn.error.unauthorized');
+				} else {
+					errorMessage = error.message || t('checkIn.error.default');
+				}
+			} else {
+				errorMessage = error.message || t('common.error.connection');
+			}
+
+			setCheckInSuccess(false);
+			setCheckInMessage(errorMessage);
+			setResultModalVisible(true);
+		}
 	};
 
 	useEffect(() => {
@@ -255,6 +333,8 @@ export default function DashboardRecepcionist() {
 				<ValidateCheckInCard
 					onScanPress={() => setScannerVisible(true)}
 					onFaceScanPress={handleFaceCheckInPress}
+					onEmailCheckIn={handleEmailCheckIn}
+					branchId={selectedBranchId || undefined}
 				/>
 				<GymCapacityCard currentOccupancy={occupancy} maxCapacity={maxCapacity} />
 				<RecepcionistTodayClassCard classes={upcomingClasses.slice(0, 3)} />
