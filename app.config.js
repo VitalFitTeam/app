@@ -6,7 +6,7 @@ export default {
 		slug: 'VitalFit',
 		version: '1.0.0',
 		orientation: 'portrait',
-		icon: './assets/images/isotipo.png',
+		icon: './assets/images/isotipo_apk.png',
 		scheme: 'vitalfit',
 		userInterfaceStyle: 'automatic',
 		newArchEnabled: true,
@@ -17,7 +17,7 @@ export default {
 		android: {
 			adaptiveIcon: {
 				backgroundColor: '#E6F4FE',
-				foregroundImage: './assets/images/android-icon-foreground.png',
+				foregroundImage: './assets/images/isotipo_apk.png',
 				backgroundImage: './assets/images/android-icon-background.png',
 				monochromeImage: './assets/images/android-icon-monochrome.png',
 			},
@@ -36,7 +36,7 @@ export default {
 			[
 				'expo-splash-screen',
 				{
-					image: './assets/images/isotipo.png',
+					image: './assets/images/isotipo_apk.png',
 					imageWidth: 200,
 					resizeMode: 'contain',
 					backgroundColor: '#ffffff',
@@ -54,7 +54,7 @@ export default {
 			[
 				'expo-notifications',
 				{
-					icon: './assets/images/isotipo.png',
+					icon: './assets/images/isotipo_apk.png',
 					color: '#0891B2',
 					mode: 'production',
 				},
