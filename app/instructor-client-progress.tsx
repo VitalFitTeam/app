@@ -1,16 +1,21 @@
 import { ThemedText } from '@/components/themed-text';
+import { ToastNotification } from '@/components/ToastNotification';
+import { useAuth } from '@/contexts/AuthContext';
+import type { UserRoutineResponse } from '@/services/vitalfitSdk';
+import vitalFitApi from '@/services/vitalfitSdk';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { ChevronLeftIcon, UserIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function InstructorClientProgressScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { token } = useAuth();
   const params = useLocalSearchParams<{
     clientId?: string;
     name?: string;
@@ -18,15 +23,63 @@ export default function InstructorClientProgressScreen() {
     program?: string;
   }>();
 
+  const clientId = params.clientId;
   const clientName = params.name ?? t('instructor.assignRoutine.defaultClient');
-  const clientLevel = params.level ?? t('instructor.assignRoutine.defaultLevel');
-  const currentProgram = params.program ?? t('instructor.assignRoutine.defaultProgram');
 
-  const exercises = [
-    { id: 'ex1', title: t('instructor.assignRoutine.exercises.squats'), day: t('instructor.clientProgress.days.monday'), series: 4, reps: 12, time: `5 ${t('instructor.assignRoutine.minutes')}`, done: true },
-    { id: 'ex2', title: t('instructor.assignRoutine.exercises.benchPress'), day: t('instructor.clientProgress.days.monday'), series: 4, reps: 10, time: `6 ${t('instructor.assignRoutine.minutes')}`, done: true },
-    { id: 'ex3', title: t('instructor.assignRoutine.exercises.barbellRow'), day: t('instructor.clientProgress.days.wednesday'), series: 4, reps: 12, time: `5 ${t('instructor.assignRoutine.minutes')}`, done: false },
-  ];
+  const [routines, setRoutines] = useState<UserRoutineResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>('error');
+  const [toastTitle, setToastTitle] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
+
+  const showToast = (type: 'success' | 'error' | 'warning', title: string, message: string) => {
+    setToastType(type);
+    setToastTitle(title);
+    setToastMessage(message);
+    setToastVisible(true);
+  };
+
+  const fetchClientRoutines = React.useCallback(async () => {
+    if (!token || !clientId) return;
+
+    try {
+      setLoading(true);
+      const response = await vitalFitApi.routine.getClientRoutines(clientId, token, {
+        page: 1,
+        limit: 10,
+      });
+      setRoutines(response.data || []);
+    } catch (error) {
+      console.error('Error fetching client routines:', error);
+      showToast('error', t('instructor.assignRoutine.error') || 'Error', t('instructor.assignRoutine.errorLoadingData') || 'Could not load routines');
+    } finally {
+      setLoading(false);
+    }
+  }, [token, clientId, t]);
+
+  useEffect(() => {
+    if (clientId && token) {
+      fetchClientRoutines();
+    }
+  }, [fetchClientRoutines, clientId, token]);
+
+  const currentRoutine = routines[0]; // Show the first active routine
+  const totalRoutines = routines.length;
+  const completedRoutines = routines.filter(r => r.status === 'completed').length;
+
+  if (loading) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }} edges={['top', 'left', 'right']}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator size="large" color="#f97316" />
+          <Text className='font-body' style={{ color: '#6B7280', marginTop: 12 }}>
+            {t('instructor.assignRoutine.loading') || 'Loading...'}
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }} edges={['top', 'left', 'right']}>
@@ -85,37 +138,22 @@ export default function InstructorClientProgressScreen() {
           <Text style={{ color: '#111827', fontSize: 20, fontWeight: '700', marginBottom: 2 }} className="font-body">
             {clientName}
           </Text>
-          <Text style={{ color: '#6b7280', fontSize: 14 }} className="font-body">{clientLevel}</Text>
         </View>
         <View style={{ marginBottom: 16 }}>
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              justifyContent: 'center',
               backgroundColor: '#F3F4F6',
               borderRadius: 20,
               paddingVertical: 14,
               paddingHorizontal: 20,
             }}
           >
-            <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">{clientLevel.replace(t('instructor.assignRoutine.level') + ' ', '') || '1'}</Text>
-              <Text style={{ color: '#4B5563', fontSize: 12 }} className="font-body">{t('instructor.assignRoutine.level')}</Text>
-            </View>
-
-            <View style={{ width: 1, height: 32, backgroundColor: '#D1D5DB' }} />
-
-            <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">4/5</Text>
-              <Text style={{ color: '#4B5563', fontSize: 12 }} className="font-body">{t('instructor.assignRoutine.progress')}</Text>
-            </View>
-
-            <View style={{ width: 1, height: 32, backgroundColor: '#D1D5DB' }} />
-
-            <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">8</Text>
-              <Text style={{ color: '#4B5563', fontSize: 12, textAlign: 'center' }} className="font-body">{t('instructor.clientProgress.workoutsThisWeek')}</Text>
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ color: '#111827', fontSize: 18, fontWeight: '700', marginBottom: 2 }} className="font-body">{totalRoutines}</Text>
+              <Text style={{ color: '#4B5563', fontSize: 12 }} className="font-body">{t('instructor.assignRoutine.currentRoutines')}</Text>
             </View>
           </View>
         </View>
@@ -131,78 +169,78 @@ export default function InstructorClientProgressScreen() {
             <Text style={{ color: '#111827', fontSize: 18, fontWeight: '800', marginBottom: 8 }} className="font-heading">
               {t('instructor.clientProgress.currentRoutine')}
             </Text>
-            <Text style={{ color: '#111827', fontSize: 15, fontWeight: '600', marginBottom: 2 }} className="font-body">
-              {currentProgram}
-            </Text>
-            <Text style={{ color: '#6B7280', fontSize: 13, marginBottom: 10 }} className="font-body">{t('instructor.clientProgress.beginnerLevel')}</Text>
-
-            <Text style={{ color: '#4B5563', fontSize: 13, lineHeight: 18 }} className="font-body">
-              {t('instructor.clientProgress.routineDescription')}
-            </Text>
+            {currentRoutine ? (
+              <>
+                <Text style={{ color: '#111827', fontSize: 15, fontWeight: '600', marginBottom: 2 }} className="font-body">
+                  {currentRoutine.routine_name}
+                </Text>
+                <Text style={{ color: '#6B7280', fontSize: 13, marginBottom: 10 }} className="font-body">
+                  {currentRoutine.level} {currentRoutine.instructor && `• ${currentRoutine.instructor}`}
+                </Text>
+                <Text style={{ color: '#4B5563', fontSize: 13, lineHeight: 18 }} className="font-body">
+                  {t('instructor.assignRoutine.completions')}: {currentRoutine.completion_count}
+                  {currentRoutine.last_completed_at && (
+                    <Text style={{ color: '#6B7280' }}> • Last: {new Date(currentRoutine.last_completed_at).toLocaleDateString()}</Text>
+                  )}
+                </Text>
+              </>
+            ) : (
+              <Text style={{ color: '#6B7280', fontSize: 13 }} className="font-body">
+                {t('instructor.assignRoutine.noRoutines') || 'No active routines'}
+              </Text>
+            )}
           </View>
         </View>
         <View style={{ marginBottom: 16 }}>
-          <Text style={{ color: '#111827', fontWeight: '700', fontSize: 16, marginBottom: 8 }} className="font-heading">{t('instructor.clientProgress.exerciseDetails')}</Text>
+          <Text style={{ color: '#111827', fontWeight: '700', fontSize: 16, marginBottom: 8 }} className="font-heading">
+            {t('instructor.assignRoutine.currentRoutines')}
+          </Text>
 
           <View style={{ height: 8, backgroundColor: '#E5E7EB', borderRadius: 4, overflow: 'hidden', marginBottom: 16 }}>
-            <View style={{ width: '60%', height: '100%', backgroundColor: '#F27F2A' }} />
+            <View style={{ width: `${totalRoutines > 0 ? (completedRoutines / totalRoutines) * 100 : 0}%`, height: '100%', backgroundColor: '#F27F2A' }} />
           </View>
 
-          {exercises.map((ex) => (
-            <LinearGradient
-              key={ex.id}
-              colors={['#3A2618', '#F27F2A', '#3A2618']}
-              locations={[0, 0.5, 1]}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={{ borderRadius: 16, padding: 14, marginBottom: 12 }}
-            >
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
-                <Text style={{ color: '#FFFFFF', fontWeight: '500', fontSize: 16, flex: 1 }} className="font-body">{ex.title}</Text>
-                <View
-                  style={{
-                    paddingHorizontal: 10,
-                    paddingVertical: 4,
-                    borderRadius: 999,
-                    backgroundColor: ex.done ? 'rgba(16,185,129,0.9)' : 'rgba(248,250,252,0.2)',
-                    marginLeft: 8,
-                    alignSelf: 'flex-start',
-                  }}
-                >
-                  <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '600' }} className="font-body">
-                    {ex.done ? t('instructor.clientProgress.completed') : t('instructor.clientProgress.pending')}
+          {routines.length > 0 ? (
+            routines.map((routine) => (
+              <LinearGradient
+                key={routine.user_routine_id}
+                colors={routine.status === 'completed' ? ['#10B981', '#34D399', '#10B981'] : ['#3A2618', '#F27F2A', '#3A2618']}
+                locations={[0, 0.5, 1]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={{ borderRadius: 16, padding: 14, marginBottom: 12, opacity: routine.status === 'completed' ? 0.7 : 1 }}
+              >
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <Text style={{ color: '#FFFFFF', fontWeight: '500', fontSize: 16, flex: 1 }} className="font-body">
+                    {routine.routine_name}
                   </Text>
                 </View>
-              </View>
 
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <View>
-                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">{t('instructor.clientProgress.day')}</Text>
-                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.day}</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <View>
+                    <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">{t('instructor.assignRoutine.level')}</Text>
+                    <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{routine.level}</Text>
+                  </View>
+                  <View>
+                    <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">{t('instructor.assignRoutine.completions')}</Text>
+                    <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{routine.completion_count}</Text>
+                  </View>
+                  <View>
+                    <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">Assigned</Text>
+                    <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">
+                      {new Date(routine.assigned_date).toLocaleDateString()}
+                    </Text>
+                  </View>
                 </View>
-                <View>
-                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">{t('instructor.clientProgress.series')}</Text>
-                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.series}</Text>
-                </View>
-                <View>
-                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">{t('instructor.clientProgress.reps')}</Text>
-                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.reps}</Text>
-                </View>
-                <View>
-                  <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12 }} className="font-body">{t('instructor.clientProgress.time')}</Text>
-                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }} className="font-body">{ex.time}</Text>
-                </View>
-              </View>
-            </LinearGradient>
-          ))}
-        </View>
-        <View style={{ marginBottom: 20 }}>
-          <Text style={{ color: '#6b7280', fontSize: 12, marginBottom: 4 }} className="font-body">{t('instructor.clientProgress.routineNotes')}</Text>
-          <View style={{ borderRadius: 16, borderWidth: 1, borderColor: '#e5e7eb', paddingHorizontal: 12, paddingVertical: 10, backgroundColor: '#F9FAFB' }}>
-            <Text style={{ color: '#4b5563', fontSize: 13 }} className="font-body">
-              {t('instructor.clientProgress.notesExample')}
-            </Text>
-          </View>
+              </LinearGradient>
+            ))
+          ) : (
+            <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+              <Text className='font-body' style={{ color: '#6B7280', textAlign: 'center' }}>
+                {t('instructor.assignRoutine.noRoutines') || 'No routines assigned'}
+              </Text>
+            </View>
+          )}
         </View>
         <TouchableOpacity
           activeOpacity={0.85}
@@ -212,6 +250,14 @@ export default function InstructorClientProgressScreen() {
           <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }} className="font-body">{t('instructor.clientProgress.backToClients')}</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <ToastNotification
+        visible={toastVisible}
+        type={toastType}
+        title={toastTitle}
+        message={toastMessage}
+        onClose={() => setToastVisible(false)}
+      />
     </SafeAreaView>
   );
 }

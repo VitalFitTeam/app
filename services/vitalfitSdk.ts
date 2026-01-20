@@ -5,10 +5,25 @@ import {
 	ClassScheduleItem,
 	KPICard,
 	VitalFit,
+	UserRoutineResponse,
+	Routine,
+	RoutineExercise,
+	RoutineExerciseDTO,
+	Exercise,
 } from '@vitalfit/sdk';
 import Constants from 'expo-constants';
 
-export { AssignedClientResponse, BranchClassInfo, ClassScheduleItem, KPICard };
+export {
+	AssignedClientResponse,
+	BranchClassInfo,
+	ClassScheduleItem,
+	KPICard,
+	UserRoutineResponse,
+	Routine,
+	RoutineExercise,
+	RoutineExerciseDTO,
+	Exercise,
+};
 
 const isDevMode =
 	Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL === 'http://localhost:3000/v1' ||
