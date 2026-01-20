@@ -1,10 +1,14 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ToastNotification } from '@/components/ToastNotification';
+import { useAuth } from '@/contexts/AuthContext';
+import vitalFitApi from '@/services/vitalfitSdk';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+	ActivityIndicator,
 	Image,
 	KeyboardAvoidingView,
 	Platform,
@@ -25,6 +29,9 @@ type Message = {
 export default function ChatbotScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
+	const { token } = useAuth();
+	const scrollViewRef = useRef<ScrollView>(null);
+
 	const [messages, setMessages] = useState<Message[]>([
 		{
 			id: '1',
@@ -34,9 +41,67 @@ export default function ChatbotScreen() {
 		},
 	]);
 	const [inputText, setInputText] = useState('');
+	const [loading, setLoading] = useState(false);
+	const [loadingHistory, setLoadingHistory] = useState(true);
+	const [resetting, setResetting] = useState(false);
+	const [toastVisible, setToastVisible] = useState(false);
+	const [toastType, setToastType] = useState<'success' | 'error' | 'warning'>('error');
+	const [toastTitle, setToastTitle] = useState('');
+	const [toastMessage, setToastMessage] = useState('');
 
-	const handleSend = () => {
-		if (!inputText.trim()) return;
+	const showToast = (type: 'success' | 'error' | 'warning', title: string, message: string) => {
+		setToastType(type);
+		setToastTitle(title);
+		setToastMessage(message);
+		setToastVisible(true);
+	};
+
+	// Load chat history on mount
+	useEffect(() => {
+		const loadHistory = async () => {
+			if (!token) {
+				setLoadingHistory(false);
+				return;
+			}
+
+			try {
+				const response = await vitalFitApi.llm.getHistory(token, {
+					page: 1,
+					limit: 50,
+					sort: 'asc',
+				});
+
+				if (response.data && response.data.length > 0) {
+					const historyMessages: Message[] = response.data.map((msg) => ({
+						id: msg.message_id,
+						text: msg.content,
+						isBot: msg.sender_role === 'assistant',
+						timestamp: new Date(msg.created_at),
+					}));
+
+					// Keep welcome message if no history, otherwise use history
+					setMessages(historyMessages);
+				}
+			} catch (error) {
+				console.error('Error loading chat history:', error);
+				// Keep welcome message on error
+			} finally {
+				setLoadingHistory(false);
+			}
+		};
+
+		loadHistory();
+	}, [token]);
+
+	// Auto-scroll to bottom when new messages arrive
+	useEffect(() => {
+		setTimeout(() => {
+			scrollViewRef.current?.scrollToEnd({ animated: true });
+		}, 100);
+	}, [messages]);
+
+	const handleSend = async () => {
+		if (!inputText.trim() || !token || loading) return;
 
 		const userMessage: Message = {
 			id: Date.now().toString(),
@@ -46,18 +111,75 @@ export default function ChatbotScreen() {
 		};
 
 		setMessages((prev) => [...prev, userMessage]);
+		const messageText = inputText.trim();
 		setInputText('');
+		setLoading(true);
 
-		// Static bot response for now
-		setTimeout(() => {
+		try {
+			const response = await vitalFitApi.llm.chat(
+				{
+					message: messageText,
+				},
+				token
+			);
+
 			const botResponse: Message = {
 				id: (Date.now() + 1).toString(),
-				text: t('chatbot.staticResponse'),
+				text: response.response,
 				isBot: true,
 				timestamp: new Date(),
 			};
+
 			setMessages((prev) => [...prev, botResponse]);
-		}, 1000);
+		} catch (error) {
+			console.error('Error sending message:', error);
+			showToast('error', t('chatbot.error') || 'Error', t('chatbot.errorSending') || 'Failed to send message');
+
+			// Optionally add error message to chat
+			const errorMessage: Message = {
+				id: (Date.now() + 1).toString(),
+				text: t('chatbot.errorResponse') || 'Sorry, I encountered an error. Please try again.',
+				isBot: true,
+				timestamp: new Date(),
+			};
+			setMessages((prev) => [...prev, errorMessage]);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleResetChat = async () => {
+		if (!token || resetting) return;
+
+		try {
+			setResetting(true);
+			await vitalFitApi.llm.resetChat(token);
+
+			// Clear messages and reset to welcome message
+			setMessages([
+				{
+					id: '1',
+					text: t('chatbot.welcomeMessage'),
+					isBot: true,
+					timestamp: new Date(),
+				},
+			]);
+
+			showToast(
+				'success',
+				t('chatbot.resetSuccess') || 'Success',
+				t('chatbot.resetMessage') || 'Chat conversation has been reset'
+			);
+		} catch (error) {
+			console.error('Error resetting chat:', error);
+			showToast(
+				'error',
+				t('chatbot.error') || 'Error',
+				t('chatbot.resetError') || 'Failed to reset conversation'
+			);
+		} finally {
+			setResetting(false);
+		}
 	};
 
 	const formatTime = (date: Date) => {
@@ -136,6 +258,25 @@ export default function ChatbotScreen() {
 							</View>
 						</View>
 
+						<TouchableOpacity
+							onPress={handleResetChat}
+							disabled={resetting}
+							style={{
+								width: 44,
+								height: 44,
+								borderRadius: 22,
+								backgroundColor: 'rgba(255,255,255,0.1)',
+								alignItems: 'center',
+								justifyContent: 'center',
+								marginRight: 8,
+							}}>
+							{resetting ? (
+								<ActivityIndicator size="small" color="#ffffff" />
+							) : (
+								<Ionicons name='refresh' size={20} color='#ffffff' />
+							)}
+						</TouchableOpacity>
+
 						<Image
 							source={require('@/assets/images/Frame.png')}
 							style={{ width: 44, height: 44, resizeMode: 'contain' }}
@@ -144,13 +285,22 @@ export default function ChatbotScreen() {
 
 					{/* Messages */}
 					<ScrollView
+						ref={scrollViewRef}
 						style={{ flex: 1 }}
 						contentContainerStyle={{
 							paddingHorizontal: 16,
 							paddingVertical: 16,
 						}}
 						showsVerticalScrollIndicator={false}>
-						{messages.map((message) => (
+						{loadingHistory ? (
+							<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 40 }}>
+								<ActivityIndicator size="large" color="#f97316" />
+								<ThemedText style={{ color: '#9ca3af', marginTop: 12, fontSize: 14 }}>
+									{t('chatbot.loadingHistory') || 'Loading chat history...'}
+								</ThemedText>
+							</View>
+						) : (
+							messages.map((message) => (
 							<View
 								key={message.id}
 								style={{
@@ -201,7 +351,47 @@ export default function ChatbotScreen() {
 									</ThemedText>
 								</View>
 							</View>
-						))}
+						))
+						)}
+
+						{/* Loading indicator while waiting for AI response */}
+						{loading && (
+							<View
+								style={{
+									flexDirection: 'row',
+									justifyContent: 'flex-start',
+									marginBottom: 12,
+								}}>
+								<View
+									style={{
+										width: 32,
+										height: 32,
+										borderRadius: 16,
+										backgroundColor: '#f97316',
+										alignItems: 'center',
+										justifyContent: 'center',
+										marginRight: 8,
+									}}>
+									<Ionicons name='fitness' size={18} color='#ffffff' />
+								</View>
+								<View
+									style={{
+										backgroundColor: '#f97316',
+										borderRadius: 16,
+										borderTopLeftRadius: 4,
+										paddingHorizontal: 14,
+										paddingVertical: 10,
+										flexDirection: 'row',
+										alignItems: 'center',
+										gap: 8,
+									}}>
+									<ActivityIndicator size="small" color="#ffffff" />
+									<ThemedText style={{ color: '#ffffff', fontSize: 14 }}>
+										{t('chatbot.typing') || 'AI is typing...'}
+									</ThemedText>
+								</View>
+							</View>
+						)}
 					</ScrollView>
 
 					{/* Quick Actions */}
@@ -281,7 +471,7 @@ export default function ChatbotScreen() {
 						</View>
 						<TouchableOpacity
 							onPress={handleSend}
-							disabled={!inputText.trim()}
+							disabled={!inputText.trim() || loading}
 							style={{
 								width: 48,
 								height: 48,
@@ -290,15 +480,27 @@ export default function ChatbotScreen() {
 								alignItems: 'center',
 								justifyContent: 'center',
 							}}>
-							<Ionicons
-								name='send'
-								size={20}
-								color={inputText.trim() ? '#f97316' : '#71717a'}
-							/>
+							{loading ? (
+								<ActivityIndicator size="small" color="#f97316" />
+							) : (
+								<Ionicons
+									name='send'
+									size={20}
+									color={inputText.trim() ? '#f97316' : '#71717a'}
+								/>
+							)}
 						</TouchableOpacity>
 					</View>
 				</KeyboardAvoidingView>
 			</SafeAreaView>
+
+			<ToastNotification
+				visible={toastVisible}
+				type={toastType}
+				title={toastTitle}
+				message={toastMessage}
+				onClose={() => setToastVisible(false)}
+			/>
 		</ThemedView>
 	);
 }

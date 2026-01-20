@@ -508,6 +508,7 @@
 			"retry": "Tentar novamente",
 			"noRoutines": "Nenhuma rotina atribuída",
 			"noRoutinesDescription": "Seu instrutor atribuirá rotinas para você seguir.",
+			"viewAiRoutines": "Ver Rotinas Atribuídas por IA",
 			"routines": {
 				"yoga": "Yoga",
 				"hiit": "HIIT",
@@ -1168,6 +1169,20 @@
 					"message": "Sua sessão atual será encerrada e você precisará entrar novamente.",
 					"cancel": "Cancelar"
 				}
+			},
+			"aiRoutines": {
+				"title": "Rotinas Atribuídas por IA",
+				"loading": "Carregando suas rotinas atribuídas por IA...",
+				"yourRoutines": "Suas Rotinas de IA",
+				"noRoutines": "Ainda não há rotinas atribuídas por IA.",
+				"startChat": "Converse com nossa IA para obter rotinas personalizadas!",
+				"error": "Erro",
+				"errorLoadingRoutines": "Não foi possível carregar suas rotinas atribuídas por IA",
+				"deleteTitle": "Excluir Rotina de IA",
+				"deleteMessage": "Tem certeza de que deseja excluir esta rotina atribuída por IA?",
+				"deleteSuccess": "Sucesso",
+				"routineDeleted": "Rotina excluída com sucesso!",
+				"errorDeleting": "Não foi possível excluir a rotina"
 			}
 		},
 		"validations": {

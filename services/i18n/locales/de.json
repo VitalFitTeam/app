@@ -508,6 +508,7 @@
 			"retry": "Wiederholen",
 			"noRoutines": "Keine Routinen zugewiesen",
 			"noRoutinesDescription": "Ihr Trainer wird Ihnen Routinen zuweisen, denen Sie folgen können.",
+			"viewAiRoutines": "KI-zugewiesene Routinen anzeigen",
 			"routines": {
 				"yoga": "Yoga",
 				"hiit": "HIIT",
@@ -1168,6 +1169,20 @@
 					"message": "Deine aktuelle Sitzung wird beendet und du musst dich erneut anmelden.",
 					"cancel": "Abbrechen"
 				}
+			},
+			"aiRoutines": {
+				"title": "KI-zugewiesene Routinen",
+				"loading": "Lade deine KI-zugewiesenen Routinen...",
+				"yourRoutines": "Deine KI-Routinen",
+				"noRoutines": "Noch keine KI-zugewiesenen Routinen.",
+				"startChat": "Chatte mit unserer KI für personalisierte Routinen!",
+				"error": "Fehler",
+				"errorLoadingRoutines": "KI-zugewiesene Routinen konnten nicht geladen werden",
+				"deleteTitle": "KI-Routine löschen",
+				"deleteMessage": "Möchten Sie diese KI-zugewiesene Routine wirklich löschen?",
+				"deleteSuccess": "Erfolg",
+				"routineDeleted": "Routine erfolgreich gelöscht!",
+				"errorDeleting": "Routine konnte nicht gelöscht werden"
 			}
 		},
 		"validations": {

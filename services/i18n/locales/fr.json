@@ -508,6 +508,7 @@
 			"retry": "Réessayer",
 			"noRoutines": "Aucune routine assignée",
 			"noRoutinesDescription": "Votre instructeur vous assignera des routines à suivre.",
+			"viewAiRoutines": "Voir les Routines Assignées par IA",
 			"routines": {
 				"yoga": "Yoga",
 				"hiit": "HIIT",
@@ -1168,6 +1169,20 @@
 					"message": "Votre session actuelle sera fermée et vous devrez vous reconnecter.",
 					"cancel": "Annuler"
 				}
+			},
+			"aiRoutines": {
+				"title": "Routines Assignées par IA",
+				"loading": "Chargement de vos routines assignées par IA...",
+				"yourRoutines": "Vos Routines IA",
+				"noRoutines": "Aucune routine assignée par IA pour le moment.",
+				"startChat": "Discutez avec notre IA pour obtenir des routines personnalisées !",
+				"error": "Erreur",
+				"errorLoadingRoutines": "Impossible de charger vos routines assignées par IA",
+				"deleteTitle": "Supprimer la Routine IA",
+				"deleteMessage": "Êtes-vous sûr de vouloir supprimer cette routine assignée par IA ?",
+				"deleteSuccess": "Succès",
+				"routineDeleted": "Routine supprimée avec succès !",
+				"errorDeleting": "Impossible de supprimer la routine"
 			}
 		},
 		"validations": {
