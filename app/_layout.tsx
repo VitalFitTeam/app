@@ -269,6 +269,12 @@ export default function RootLayout() {
                                     />
                                     <Stack.Screen
                                         name="badges"
+                                        options={{
+                                            headerShown: false,
+                                            title: '',
+                                        }}
+                                    />
+                                    <Stack.Screen
                                         name="client-ai-routines"
                                         options={{
                                             headerShown: false,
