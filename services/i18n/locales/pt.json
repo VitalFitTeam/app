@@ -28,11 +28,13 @@
 		},
 		"checkIn": {
 			"error": {
+				"title": "Erro de Check-In",
 				"selectBranch": "Por favor, selecione uma unidade antes de escanear.",
 				"default": "O acesso não pôde ser processado.",
 				"paymentPending": "O usuário possui pagamentos pendentes.",
 				"accessDenied": "O usuário não tem permissão para entrar nesta área ou unidade.",
-				"qrExpired": "O código QR expirou. Peça ao usuário para gerar um novo."
+				"qrExpired": "O código QR expirou. Peça ao usuário para gerar um novo.",
+				"unauthorized": "Acesso não autorizado. Verifique as credenciais."
 			},
 			"title": "Check-in de Cliente",
 			"successMessage": "Check-in processado com sucesso",
@@ -333,7 +335,12 @@
 			},
 			"validateCheckIn": {
 				"title": "Validar Check-in",
-				"searchPlaceholder": "Buscar por documento",
+				"searchPlaceholder": "Buscar por email",
+				"checkInByEmail": "Check-In por Email",
+				"searching": "Buscando...",
+				"emailRequired": "O email é obrigatório",
+				"invalidEmail": "Formato de email inválido",
+				"userNotFound": "Nenhum usuário encontrado com este email",
 				"scanQr": "Escanear QR",
 				"scanFace": "Escanear Rosto"
 			},

@@ -28,11 +28,13 @@
 		},
 		"checkIn": {
 			"error": {
+				"title": "Erreur de Check-in",
 				"selectBranch": "Veuillez sélectionner une succursale avant de scanner.",
 				"default": "L'accès n'a pas pu être traité.",
 				"paymentPending": "L'utilisateur a des paiements en attente.",
 				"accessDenied": "L'utilisateur n'a pas la permission d'entrer dans cette zone ou succursale.",
-				"qrExpired": "Le code QR a expiré. Demandez à l'utilisateur d'en générer un nouveau."
+				"qrExpired": "Le code QR a expiré. Demandez à l'utilisateur d'en générer un nouveau.",
+				"unauthorized": "Accès non autorisé. Veuillez vérifier les identifiants."
 			},
 			"title": "Check-in Client",
 			"successMessage": "Check-in traité avec succès",
@@ -333,9 +335,14 @@
 			},
 			"validateCheckIn": {
 				"title": "Valider le Check-in",
-				"searchPlaceholder": "Chercher par document d'identité",
+				"searchPlaceholder": "Chercher par email",
 				"scanQr": "Scanner QR",
-				"scanFace": "Scanner Visage"
+				"scanFace": "Scanner Visage",
+				"checkInByEmail": "Check-in par Email",
+				"searching": "Recherche...",
+				"emailRequired": "L'email est requis",
+				"invalidEmail": "Format d'email invalide",
+				"userNotFound": "Utilisateur non trouvé avec cet email"
 			},
 			"capacity": {
 				"title": "Capacité de la Salle",
