@@ -99,7 +99,8 @@
 			"availability": "Disponibilidade",
 			"unknown": "Desconhecido",
 			"notes": "Notas",
-			"noClientsFound": "Nenhum cliente encontrado"
+			"noClientsFound": "Nenhum cliente encontrado",
+			"weekdaysShort": ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"]
 		},
 		"enrollClient": {
 			"title": "Inscrever Cliente",
@@ -418,6 +419,9 @@
 			"myBookings": "Minhas Reservas",
 			"noBookings": "Você ainda não tem reservas.",
 			"noClassesBranch": "Nenhuma aula agendada para esta unidade.",
+			"noClassesForDate": "Nenhuma aula disponível para a data selecionada",
+			"errorLoadingClasses": "Não foi possível carregar as aulas. Tente novamente.",
+			"errorLoadingBookings": "Não foi possível carregar suas reservas. Tente novamente.",
 			"tabs": {
 				"classes": "Aulas",
 				"reservations": "Reservas",

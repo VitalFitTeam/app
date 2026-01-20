@@ -99,7 +99,8 @@
 			"availability": "Disponibilité",
 			"unknown": "Inconnu",
 			"notes": "Notes",
-			"noClientsFound": "Aucun client trouvé"
+			"noClientsFound": "Aucun client trouvé",
+			"weekdaysShort": ["LUN", "MAR", "MER", "JEU", "VEN", "SAM", "DIM"]
 		},
 		"enrollClient": {
 			"title": "Inscrire Client",
@@ -418,6 +419,9 @@
 			"myBookings": "Mes Réservations",
 			"noBookings": "Vous n'avez pas encore de réservations.",
 			"noClassesBranch": "Aucun cours prévu pour cette succursale.",
+			"noClassesForDate": "Aucun cours disponible pour la date sélectionnée",
+			"errorLoadingClasses": "Impossible de charger les cours. Veuillez réessayer.",
+			"errorLoadingBookings": "Impossible de charger vos réservations. Veuillez réessayer.",
 			"tabs": {
 				"classes": "Cours",
 				"reservations": "Réservations",

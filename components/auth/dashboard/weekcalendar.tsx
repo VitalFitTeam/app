@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { DateData } from 'react-native-calendars';
 
@@ -25,6 +26,7 @@ export const WeekCalendar: React.FC<WeekCalendarProps> = ({
 	markedDates = EMPTY_MARKED_DATES,
 	initialDate,
 }) => {
+	const { t } = useTranslation();
 	// Helper to format date as YYYY-MM-DD in local timezone
 	const formatLocalDate = (date: Date): string => {
 		const year = date.getFullYear();
@@ -42,7 +44,7 @@ export const WeekCalendar: React.FC<WeekCalendarProps> = ({
 		const generateWeekDays = () => {
 			const today = new Date();
 			const days: DayData[] = [];
-			const dayLabels = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM'];
+			const dayLabels = t('common.weekdaysShort', { returnObjects: true }) as string[];
 
 			// Show today + next 6 days (7 days total, looking forward)
 			for (let i = 0; i < 7; i++) {
@@ -67,7 +69,7 @@ export const WeekCalendar: React.FC<WeekCalendarProps> = ({
 		};
 
 		generateWeekDays();
-	}, [markedDates]);
+	}, [markedDates, t]);
 
 	const handleDayPress = (day: DayData) => {
 		setSelectedDateString(day.dateString);
