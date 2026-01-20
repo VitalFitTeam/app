@@ -82,7 +82,7 @@ export function ValidateCheckInCard({
 
 			// Check for user_id in different possible locations
 			const userAny = user as Record<string, unknown>;
-			const userId = user.user_id || userAny.id || userAny.userId;
+			const userId = (user.user_id || userAny.id || userAny.userId) as string;
 
 			console.log('[ValidateCheckInCard] User found:', {
 				userId: userId,
