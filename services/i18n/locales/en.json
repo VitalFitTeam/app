@@ -28,11 +28,13 @@
     },
     "checkIn": {
       "error": {
+        "title": "Check-In Error",
         "selectBranch": "Please select a branch before scanning.",
         "default": "Access could not be processed.",
         "paymentPending": "User has pending payments.",
         "accessDenied": "User does not have permission to enter this area or branch.",
-        "qrExpired": "QR code has expired. Ask the user to generate a new one."
+        "qrExpired": "QR code has expired. Ask the user to generate a new one.",
+        "unauthorized": "Unauthorized access. Please check credentials."
       },
       "title": "Client Check-in",
       "successMessage": "Check-in processed successfully",
@@ -306,9 +308,14 @@
       },
       "validateCheckIn": {
         "title": "Validate Check-in",
-        "searchPlaceholder": "Search by ID document",
+        "searchPlaceholder": "Search by email",
         "scanQr": "Scan QR",
-        "scanFace": "Scan Face"
+        "scanFace": "Scan Face",
+        "checkInByEmail": "Check In by Email",
+        "searching": "Searching...",
+        "emailRequired": "Email is required",
+        "invalidEmail": "Invalid email format",
+        "userNotFound": "User not found with this email"
       },
       "capacity": {
         "title": "Gym Capacity",

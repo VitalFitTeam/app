@@ -4,7 +4,9 @@ import { QRScannerModal } from '@/components/recepcionist/QRScannerModal';
 import { CheckInResultModal } from '@/components/recepcionista/CheckInResultModal';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ToastNotification } from '@/components/ToastNotification';
 import { useBranch } from '@/contexts/BranchContext';
+import { useToast } from '@/hooks/useToast';
 import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAPIError } from '@vitalfit/sdk';
@@ -17,6 +19,7 @@ export default function CheckInScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const { selectedBranchId } = useBranch();
+	const { toastState, showToast, hideToast } = useToast();
 	const scrollViewRef = useRef<ScrollView>(null);
 	const [scannerVisible, setScannerVisible] = useState(false);
 	const [faceCheckInVisible, setFaceCheckInVisible] = useState(false);
@@ -65,7 +68,24 @@ export default function CheckInScreen() {
 
 			let userName = t('dashboard.defaultUser');
 
-			if (data?.user?.first_name) {
+			// If we have user_id in response, fetch full user details
+			if (data?.user_id) {
+				try {
+					const userResponse = await vitalFitApi.user.GetUserByID(data.user_id, token || '');
+					const userData = userResponse.data;
+
+					if (userData?.first_name) {
+						userName = `${userData.first_name} ${userData.last_name || ''}`.trim();
+					}
+					console.log('[Check-In] User details fetched:', userName);
+				} catch (error) {
+					console.error('[Check-In] Error fetching user details:', error);
+					// Fallback to data from response
+					if (data?.user?.first_name) {
+						userName = `${data.user.first_name} ${data.user.last_name || ''}`.trim();
+					}
+				}
+			} else if (data?.user?.first_name) {
 				userName = `${data.user.first_name} ${data.user.last_name || ''}`.trim();
 			} else if (data?.first_name) {
 				userName = `${data.first_name} ${data.last_name || ''}`.trim();
@@ -75,6 +95,8 @@ export default function CheckInScreen() {
 
 			setCheckInSuccess(true);
 			setCheckInUserName(userName);
+			// Show only the message, not the service name
+			setCheckInMessage(data.message || t('checkIn.successMessage'));
 			setResultModalVisible(true);
 			setScannerVisible(false);
 
@@ -127,6 +149,91 @@ export default function CheckInScreen() {
 		setResultModalVisible(true);
 	};
 
+	const handleEmailCheckInError = (errorMessage: string) => {
+		showToast('error', t('checkIn.error.title'), errorMessage);
+	};
+
+	const handleEmailCheckIn = async (userId: string, userName: string) => {
+		try {
+			const token = await AsyncStorage.getItem('token');
+			console.log('[CheckIn] Token retrieved:', token ? `${token.substring(0, 20)}... (length: ${token.length})` : 'null');
+
+			if (!token) {
+				showToast('error', t('checkIn.error.title'), t('common.error.sessionExpired'));
+				return;
+			}
+
+			if (!selectedBranchId) {
+				showToast('error', t('checkIn.error.title'), t('checkIn.error.selectBranch'));
+				return;
+			}
+
+			console.log('[CheckIn] Processing email check-in...', {
+				userId,
+				branchId: selectedBranchId,
+				tokenLength: token.length,
+				tokenSegments: token.split('.').length
+			});
+
+			const checkInData = {
+				user_id: userId,
+				branch_id: selectedBranchId,
+			};
+
+			console.log('[CheckIn] Check-in data:', checkInData);
+
+			// Use checkInManual for email-based check-ins (not QR code)
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const response = await (vitalFitApi as any).access.checkInManual(token, checkInData);
+
+			const data = response.data || response;
+
+			console.log('[Email Check-In] Response:', JSON.stringify(data, null, 2));
+
+			setCheckInSuccess(true);
+			setCheckInUserName(userName);
+			setCheckInMessage(data.service_name || t('checkIn.success.default'));
+			setResultModalVisible(true);
+
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
+			console.error('[CheckIn] Error in email check-in:', error);
+			console.error('[CheckIn] Error details:', {
+				message: error?.message,
+				status: error?.status,
+				name: error?.name,
+				stack: error?.stack
+			});
+
+			let errorMessage = t('checkIn.error.default');
+
+			if (isAPIError(error)) {
+				console.log('[CheckIn] API Error detected - Status:', error.status);
+				if (error.status === 402) {
+					errorMessage = t('checkIn.error.paymentPending');
+				} else if (error.status === 403) {
+					errorMessage = t('checkIn.error.accessDenied');
+				} else if (error.status === 401) {
+					// Check if it's a token issue
+					if (error.message && error.message.includes('token')) {
+						errorMessage = t('common.error.sessionExpired');
+					} else {
+						errorMessage = t('checkIn.error.unauthorized');
+					}
+				} else {
+					errorMessage = error.message || t('checkIn.error.default');
+				}
+			} else if (error?.message) {
+				errorMessage = error.message;
+			} else {
+				errorMessage = t('common.error.connection');
+			}
+
+			console.log('[CheckIn] Showing error:', errorMessage);
+			showToast('error', t('checkIn.error.title'), errorMessage);
+		}
+	};
+
 	return (
 		<ThemedView style={styles.container}>
 			<ScrollView ref={scrollViewRef} contentContainerStyle={{ paddingBottom: 100 }}>
@@ -145,9 +252,20 @@ export default function CheckInScreen() {
 					<ValidateCheckInCard
 						onScanPress={() => setScannerVisible(true)}
 						onFaceScanPress={handleFaceCheckInPress}
+						onEmailCheckIn={handleEmailCheckIn}
+						onEmailCheckInError={handleEmailCheckInError}
+						branchId={selectedBranchId}
 					/>
 				</View>
 			</ScrollView>
+
+			<ToastNotification
+				visible={toastState.visible}
+				type={toastState.type}
+				title={toastState.title}
+				message={toastState.message}
+				onClose={hideToast}
+			/>
 
 			<QRScannerModal
 				visible={scannerVisible}
