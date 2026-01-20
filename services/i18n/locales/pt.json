@@ -28,11 +28,13 @@
 		},
 		"checkIn": {
 			"error": {
+				"title": "Erro de Check-In",
 				"selectBranch": "Por favor, selecione uma unidade antes de escanear.",
 				"default": "O acesso não pôde ser processado.",
 				"paymentPending": "O usuário possui pagamentos pendentes.",
 				"accessDenied": "O usuário não tem permissão para entrar nesta área ou unidade.",
-				"qrExpired": "O código QR expirou. Peça ao usuário para gerar um novo."
+				"qrExpired": "O código QR expirou. Peça ao usuário para gerar um novo.",
+				"unauthorized": "Acesso não autorizado. Verifique as credenciais."
 			},
 			"title": "Check-in de Cliente",
 			"successMessage": "Check-in processado com sucesso",
@@ -104,7 +106,15 @@
 			"unknown": "Desconhecido",
 			"notes": "Notas",
 			"noClientsFound": "Nenhum cliente encontrado",
-			"weekdaysShort": ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"]
+			"weekdaysShort": [
+				"SEG",
+				"TER",
+				"QUA",
+				"QUI",
+				"SEX",
+				"SÁB",
+				"DOM"
+			]
 		},
 		"enrollClient": {
 			"title": "Inscrever Cliente",
@@ -333,7 +343,12 @@
 			},
 			"validateCheckIn": {
 				"title": "Validar Check-in",
-				"searchPlaceholder": "Buscar por documento",
+				"searchPlaceholder": "Buscar por email",
+				"checkInByEmail": "Check-In por Email",
+				"searching": "Buscando...",
+				"emailRequired": "O email é obrigatório",
+				"invalidEmail": "Formato de email inválido",
+				"userNotFound": "Nenhum usuário encontrado com este email",
 				"scanQr": "Escanear QR",
 				"scanFace": "Escanear Rosto"
 			},
@@ -395,7 +410,6 @@
 			},
 			"findBranches": "Encontrar Unidades"
 		},
-
 		"personalInfo": {
 			"editButton": "Editar Informações",
 			"sections": {
@@ -551,10 +565,13 @@
 			"title": "Minhas Medalhas",
 			"currentLevel": "SEU NÍVEL ATUAL",
 			"progressToLevel": "Progresso para o nível {{level}}",
+			"loading": "Carregando medalhas...",
+			"error": "Não foi possível carregar os dados",
+			"backButton": "Voltar",
 			"stats": {
 				"points": "Pontos",
 				"badges": "Medalhas",
-				"referrals": "Indicações"
+				"attendance": "Presenças"
 			},
 			"badgesObtained": "Medalhas Obtidas",
 			"progress": "Progresso",
@@ -566,14 +583,25 @@
 			},
 			"badgeNames": {
 				"firstClass": "Primeira Aula",
+				"beginner": "Iniciante",
+				"dedicated": "Dedicado",
 				"ironWarrior": "Guerreiro de Ferro",
-				"earlyBird": "Madrugador",
+				"athlete": "Atleta",
+				"disciplined": "Disciplinado",
 				"champion": "Campeão",
-				"devoted": "Devoto"
+				"master": "Mestre",
+				"fitnessGod": "Deus do Fitness"
 			},
 			"requirements": {
-				"champion": "Vença mais 6 desafios",
-				"devoted": "Treine por 30 dias seguidos"
+				"firstClass": "Comece sua jornada",
+				"beginner": "Alcance 100 pontos",
+				"dedicated": "Alcance 250 pontos",
+				"ironWarrior": "Alcance 600 pontos",
+				"athlete": "Alcance 1000 pontos",
+				"disciplined": "Alcance 1500 pontos",
+				"champion": "Alcance 2100 pontos",
+				"master": "Alcance 3000 pontos",
+				"fitnessGod": "Alcance 6000 pontos"
 			}
 		},
 		"profileSettings": {
@@ -821,7 +849,10 @@
 			},
 			"startDate": "Data de Início",
 			"benefits": {
-				"free-trial": ["Acesso limitado à academia", "7 dias de acesso gratuito"],
+				"free-trial": [
+					"Acesso limitado à academia",
+					"7 dias de acesso gratuito"
+				],
 				"advanced": [
 					"Acesso ilimitado à academia",
 					"7 sessões com consultor fitness",
@@ -1054,7 +1085,7 @@
 				"completions": "Conclusões",
 				"createNew": "Criar Nova Rotina",
 				"noRoutines": "Nenhuma rotina disponível. Crie uma primeiro.",
-			"exercisesLabel": "exercícios"
+				"exercisesLabel": "exercícios"
 			},
 			"createRoutine": {
 				"title": "Criar Rotina",
