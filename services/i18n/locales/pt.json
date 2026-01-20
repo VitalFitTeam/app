@@ -82,6 +82,7 @@
 			"welcome": "BEM-VINDO",
 			"accessDenied": "ACESSO NEGADO",
 			"accessGranted": "Acesso Permitido",
+
 			"status": {
 				"title": "Status",
 				"assisted": "Presente",
@@ -99,8 +100,11 @@
 			"availability": "Disponibilidade",
 			"unknown": "Desconhecido",
 			"notes": "Notas",
-			"noClientsFound": "Nenhum cliente encontrado"
+			"noClientsFound": "Nenhum cliente encontrado",
+			"saveNotes": "Salvar notas",
+			"saveAttendance": "Salvar presença"
 		},
+
 		"enrollClient": {
 			"title": "Inscrever Cliente",
 			"defaultClassName": "Aula",
@@ -987,11 +991,13 @@
 					"cancel": "Cancelar"
 				}
 			},
+
 			"dashboard": {
 				"defaultName": "Instrutor",
 				"error": {
 					"fetchUser": "Ocorreu um erro inesperado ao recuperar os dados do usuário."
 				},
+				"noClassesToday": "Nenhuma aula agendada para hoje.",
 				"todayClasses": "Aulas de Hoje",
 				"clientMessages": "Mensagens de Clientes"
 			},
@@ -1004,6 +1010,8 @@
 				"noClasses": "Nenhuma aula agendada para esta data."
 			},
 			"clients": {
+				"searchPlaceholder": "Buscar cliente...",
+				"noClients": "Nenhum cliente atribuído.",
 				"title": "Meus Clientes",
 				"assignRoutine": "Atribuir Nova Rotina",
 				"viewProgress": "Ver Progresso"

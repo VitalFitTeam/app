@@ -82,6 +82,7 @@
 			"welcome": "BIENVENUE",
 			"accessDenied": "ACCÈS REFUSÉ",
 			"accessGranted": "Accès Autorisé",
+
 			"status": {
 				"title": "Statut",
 				"assisted": "Présent",
@@ -99,8 +100,11 @@
 			"availability": "Disponibilité",
 			"unknown": "Inconnu",
 			"notes": "Notes",
-			"noClientsFound": "Aucun client trouvé"
+			"noClientsFound": "Aucun client trouvé",
+			"saveNotes": "Enregistrer les notes",
+			"saveAttendance": "Enregistrer la présence"
 		},
+
 		"enrollClient": {
 			"title": "Inscrire Client",
 			"defaultClassName": "Cours",
@@ -987,11 +991,13 @@
 					"cancel": "Annuler"
 				}
 			},
+
 			"dashboard": {
 				"defaultName": "Instructeur",
 				"error": {
 					"fetchUser": "Une erreur inattendue est survenue lors de la récupération des données utilisateur."
 				},
+				"noClassesToday": "Aucun cours prévu aujourd'hui.",
 				"todayClasses": "Cours d'Aujourd'hui",
 				"clientMessages": "Messages Clients"
 			},
@@ -1004,6 +1010,8 @@
 				"noClasses": "Aucun cours prévu pour cette date."
 			},
 			"clients": {
+				"searchPlaceholder": "Rechercher un client...",
+				"noClients": "Aucun client assigné.",
 				"title": "Mes Clients",
 				"assignRoutine": "Assigner Nouvelle Routine",
 				"viewProgress": "Voir Progrès"

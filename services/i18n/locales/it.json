@@ -43,9 +43,10 @@
 			},
 			"clientList": {
 				"title": "Lista Clienti Registrati",
-				"searchPlaceholder": "Cerca cliente per nome"
+				"searchPlaceholder": "Cerca cliente...",
+				"noClients": "Nessun cliente assegnato."
 			},
-			"mock": {
+			"dashboard": {
 				"client": "Cliente",
 				"level": "Livello"
 			},
@@ -56,6 +57,44 @@
 		"common": {
 			"attention": "Attenzione",
 			"instructor": "Istruttore",
+			"toasts": {
+				"bookingSuccess": {
+					"title": "Lezione Prenotata",
+					"message": "La tua lezione è stata prenotata con successo."
+				},
+				"bookingError": {
+					"title": "Impossibile Prenotare",
+					"generic": "Si è verificato un errore durante la prenotazione della lezione.",
+					"serverError": "Errore del server. Riprova più tardi.",
+					"alreadyEnrolled": "Sei già iscritto a questa lezione.",
+					"classFull": "La lezione è al completo.",
+					"paymentRequired": {
+						"title": "Pagamento Richiesto",
+						"message": "È necessario acquistare questo servizio per prenotare."
+					},
+					"sessionInvalid": {
+						"title": "Sessione non valida",
+						"message": "Accedi nuovamente per prenotare la lezione."
+					},
+					"missingId": {
+						"title": "Errore",
+						"message": "Manca l'identificativo della lezione."
+					},
+					"userUnknown": {
+						"title": "Utente non identificato",
+						"message": "Impossibile ottenere le informazioni dell'utente."
+					}
+				},
+				"cancelSuccess": {
+					"title": "Prenotazione Cancellata",
+					"message": "La tua prenotazione è stata cancellata con successo."
+				},
+				"cancelError": {
+					"title": "Impossibile Cancellare",
+					"generic": "Si è verificato un errore durante la cancellazione della prenotazione.",
+					"timeLimit": "La cancellazione non è più possibile perché è trascorso il tempo limite consentito dalla palestra."
+				}
+			},
 			"capacity": "Capienza",
 			"error": {
 				"connection": "Errore di connessione con il server.",
@@ -98,7 +137,18 @@
 			"viewMore": "Vedi altro",
 			"availability": "Disponibilità",
 			"unknown": "Sconosciuto",
-			"notes": "Note"
+			"notes": "Note",
+			"saveNotes": "Salva note",
+			"saveAttendance": "Salva presenze"
+		},
+		"instructor": {
+			"clients": {
+				"searchPlaceholder": "Cerca cliente...",
+				"noClients": "Nessun cliente assegnato."
+			},
+			"dashboard": {
+				"noClassesToday": "Nessuna lezione in programma oggi."
+			}
 		},
 		"login": {
 			"title": "Accedi",
@@ -990,8 +1040,23 @@
 				"error": {
 					"fetchUser": "Si è verificato un errore imprevisto durante il recupero dei dati utente."
 				},
-				"todayClasses": "Lezioni di Oggi",
-				"clientMessages": "Messaggi Clienti"
+				"todayClasses": "Lezioni di oggi",
+				"clientMessages": "Messaggi Clienti",
+				"nextClass": "Prossima Lezione",
+				"noClassesPending": "Nessuna lezione in sospeso",
+				"upcomingClass": "Prossima Lezione",
+				"noClassesToday": "Nessuna lezione programmata per oggi.",
+				"mockMessages": {
+					"adjustPlan": "Possiamo adattare il piano?",
+					"changeSchedule": "Devo cambiare orario",
+					"addDay": "Posso aggiungere un giorno?",
+					"cantAttend": "Non posso venire oggi",
+					"reviewTechnique": "Rivedere tecnica",
+					"yesterday": "Ieri"
+				},
+				"myClients": {
+					"title": "Miei Clienti"
+				}
 			},
 			"classes": {
 				"title": "Calendario Lezioni",
@@ -1003,8 +1068,11 @@
 			},
 			"clients": {
 				"title": "I Miei Clienti",
+				"searchPlaceholder": "Cerca cliente...",
 				"assignRoutine": "Assegna Nuova Routine",
-				"viewProgress": "Vedi Progressi"
+				"viewProgress": "Vedi Progressi",
+				"noClients": "Nessun cliente assegnato ancora.",
+				"totalBookings": "Prenotazioni Totali"
 			}
 		},
 		"client": {

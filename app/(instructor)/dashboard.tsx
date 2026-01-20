@@ -50,7 +50,6 @@ export default function DashboardInstructor() {
 				const reportApi = vitalFitApi.report;
 
 				if (reportApi) {
-					 
 					const [
 						monthlyCount,
 						studentsTodayRes,

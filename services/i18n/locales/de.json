@@ -99,7 +99,9 @@
 			"availability": "Verfügbarkeit",
 			"unknown": "Unbekannt",
 			"notes": "Notizen",
-			"noClientsFound": "Keine Kunden gefunden"
+			"noClientsFound": "Keine Kunden gefunden",
+			"saveNotes": "Notizen speichern",
+			"saveAttendance": "Anwesenheit speichern"
 		},
 		"enrollClient": {
 			"title": "Kunden anmelden",
@@ -449,14 +451,14 @@
 			"defaultName": "KURSNAME",
 			"defaultInstructor": "Name des Trainers",
 			"duration": "(1 Stunde)",
-			"descriptionTitle": "Kursbeschreibung:",
 			"classFull": "Kurs voll belegt",
 			"enrollClient": "Kunde anmelden",
 			"clientList": "Kundenliste",
 			"searchPlaceholder": "Kunden suchen...",
 			"noClientsFound": "Keine Kunden gefunden",
 			"viewAllRegistered": "Alle registrierten anzeigen",
-			"showLess": "Weniger anzeigen"
+			"showLess": "Weniger anzeigen",
+			"descriptionTitle": "Kursbeschreibung:"
 		},
 		"classes": {
 			"description": {

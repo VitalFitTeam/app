@@ -103,7 +103,9 @@
 			"availability": "Disponibilidad",
 			"unknown": "Desconocido",
 			"notes": "Notas",
-			"noClientsFound": "No se encontraron clientes"
+			"noClientsFound": "No se encontraron clientes",
+			"saveNotes": "Guardar notas",
+			"saveAttendance": "Guardar asistencia"
 		},
 		"enrollClient": {
 			"title": "Inscribir Cliente",
@@ -454,14 +456,52 @@
 			"defaultName": "NOMBRE DE LA CLASE",
 			"defaultInstructor": "Nombre del Instructor",
 			"duration": "(1 hora)",
-			"descriptionTitle": "Descripción de la clase:",
 			"classFull": "Clase Llena",
 			"enrollClient": "Inscribir Cliente",
 			"clientList": "Lista de Clientes",
 			"searchPlaceholder": "Buscar cliente...",
 			"noClientsFound": "No se encontraron clientes",
+			"toasts": {
+				"bookingSuccess": {
+					"title": "Clase reservada",
+					"message": "Tu clase ha sido reservada correctamente."
+				},
+				"bookingError": {
+					"title": "No se pudo reservar",
+					"generic": "Ocurrió un error al reservar la clase.",
+					"serverError": "Error en el servidor. Por favor, intenta nuevamente más tarde.",
+					"alreadyEnrolled": "Ya estás inscrito en esta clase.",
+					"classFull": "La clase está llena.",
+					"paymentRequired": {
+						"title": "Pago requerido",
+						"message": "Necesitas comprar este servicio para reservar."
+					},
+					"sessionInvalid": {
+						"title": "Sesión no válida",
+						"message": "Inicia sesión nuevamente para reservar la clase."
+					},
+					"missingId": {
+						"title": "Error",
+						"message": "Falta el identificador de la clase."
+					},
+					"userUnknown": {
+						"title": "Usuario no identificado",
+						"message": "No se pudo obtener la información del usuario."
+					}
+				},
+				"cancelSuccess": {
+					"title": "Reserva cancelada",
+					"message": "Tu reserva ha sido cancelada correctamente."
+				},
+				"cancelError": {
+					"title": "No se pudo cancelar",
+					"generic": "Ocurrió un error al cancelar la reserva.",
+					"timeLimit": "Ya no es posible cancelar porque ha pasado el tiempo límite permitido por el gimnasio."
+				}
+			},
 			"viewAllRegistered": "Ver todos los inscritos",
-			"showLess": "Ver menos"
+			"showLess": "Ver menos",
+			"descriptionTitle": "Descripción de la clase:"
 		},
 		"classes": {
 			"description": {
@@ -1022,12 +1062,12 @@
 				"error": {
 					"fetchUser": "Ocurrió un error inesperado al obtener los datos del usuario."
 				},
-				"todayClasses": "Clases de hoy",
+				"todayClasses": "Clases de Hoy",
 				"clientMessages": "Mensajes de Clientes",
 				"nextClass": "Próxima Clase",
 				"noPending": "Sin pendientes",
-				"noClassesPending": "Sin clases pendientes",
-				"upcomingClass": "Próxima clase",
+				"noClassesPending": "Sin pendientes",
+				"upcomingClass": "Próxima Clase",
 				"noClassesToday": "No hay clases programadas para hoy.",
 				"tabs": {
 					"clients": "Clientes",

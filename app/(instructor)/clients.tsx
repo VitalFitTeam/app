@@ -216,7 +216,7 @@ export default function ClientsScreen() {
 					<MagnifyingGlassIcon size={20} color='#9CA3AF' />
 					<TextInput
 						className='ml-3 flex-1 text-[14px] text-[#1F2024]'
-						placeholder={t('instructor.clients.searchPlaceholder', 'Buscar cliente...')}
+						placeholder={t('instructor.clients.searchPlaceholder')}
 						placeholderTextColor='#9CA3AF'
 						value={searchQuery}
 						onChangeText={setSearchQuery}

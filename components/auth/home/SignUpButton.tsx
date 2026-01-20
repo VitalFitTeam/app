@@ -23,7 +23,9 @@ export function SignUpButton({
 			onPress={onPress}
 			disabled={disabled}
 			style={[styles.base, styles.filled, containerStyle]}>
-			<Text style={[styles.text, textStyle]}>{label}</Text>
+			<Text style={[styles.text, textStyle]} adjustsFontSizeToFit numberOfLines={1}>
+				{label}
+			</Text>
 		</TouchableOpacity>
 	);
 }

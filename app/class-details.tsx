@@ -20,15 +20,16 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   MagnifyingGlassIcon,
   ClockIcon as OutlineClockIcon,
+  MagnifyingGlassIcon as SearchIcon,
   UsersIcon,
-  XMarkIcon
+  XMarkIcon,
 } from 'react-native-heroicons/outline';
 import {
   CheckCircleIcon,
@@ -39,1278 +40,1400 @@ import {
 } from 'react-native-heroicons/solid';
 
 const styles = StyleSheet.create({
-  heroImage: {
-    width: '100%',
-    height: 180,
-    borderRadius: 16,
-  },
+	heroImage: {
+		width: '100%',
+		height: 180,
+		borderRadius: 16,
+	},
 });
 
 export default function ClassDetailsScreen() {
-  const router = useRouter();
-  const { t } = useTranslation();
-  const { token: authToken } = useAuth();
-  const {
-    time,
-    title,
-    instructor,
-    imageUrl,
-    capacity,
-    occupied,
-    mode,
-    classId,
-    serviceId,
-    instructorId,
-    bookingId,
-    startsAt,
-    branchId,
-  } = useLocalSearchParams();
-
-  const { isReserved, reserve, cancel } = useReservations();
-  const { user } = useUser();
-  const [serverBookingId, setServerBookingId] = useState<string | null>(null);
-  const [currentOccupancyCount, setCurrentOccupancyCount] = useState<number | null>(null);
-  const [imageError, setImageError] = useState(false);
-
-  useEffect(() => {
-    const checkBookingStatus = async () => {
-      try {
-        if (!user?.userId || !classId) return;
-        const token = await AsyncStorage.getItem('token');
-        if (!token) return;
-
-        const bookingsResp = await vitalFitApi.booking.getClientBooking(
-          String(user.userId),
-          token,
-        );
-        const bookings = (
-          Array.isArray(
-            (bookingsResp as unknown as { data: ClientBookingResponse[] }).data,
-          )
-            ? (bookingsResp as unknown as { data: ClientBookingResponse[] }).data
-            : bookingsResp
-        ) as ClientBookingResponse[];
-
-        const found = bookings.find((b) => String(b.class_id) === String(classId));
-        if (found?.booking_id) {
-          setServerBookingId(String(found.booking_id));
-        }
-
-        // Fetch Occupancy using correct SDK method
-        try {
-          const occupancyResp = await vitalFitApi.booking.getClassBookingCount(
-            String(classId),
-            token,
-          );
-
-          // Try to find the count in the response - treating as any to be safe until typed
-          // Try to find the count in the response - treating as any to be safe until typed
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const resp = occupancyResp as any;
-          // Possible structures: { count: 5 }, { bookings_count: 5 }, { data: { count: 5 } }
-          const count =
-            resp?.count ??
-            resp?.bookings_count ??
-            resp?.data?.count ??
-            resp?.data?.bookings_count;
-
-          if (typeof count === 'number') {
-            setCurrentOccupancyCount(count);
-          }
-        } catch (e) {
-          console.warn('Could not fetch occupancy count:', e);
-        }
-      } catch (err) {
-        console.warn('Error checking booking status:', err);
-      }
-    };
-    void checkBookingStatus();
-  }, [user?.userId, classId]);
-
-  const hasMembership = user?.membership?.status === 'Active';
-
-  const classDateFormatted = useMemo(() => {
-    try {
-      const dateToFormat = startsAt ? new Date(String(startsAt)) : new Date();
-
-      if (startsAt && String(startsAt).match(/^\d{4}-\d{2}-\d{2}$/)) {
-        dateToFormat.setMinutes(
-          dateToFormat.getMinutes() + dateToFormat.getTimezoneOffset(),
-        );
-      }
-
-      return dateToFormat.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      });
-    } catch {
-      return '';
-    }
-  }, [startsAt]);
-
-  const [serviceDescription, setServiceDescription] = useState<string | null>(null);
-  const isPast = useMemo(() => {
-    if (!startsAt) return false;
-    const now = new Date();
-    const start = new Date(String(startsAt));
-    return start < now;
-  }, [startsAt]);
-  const [serviceImageUrl, setServiceImageUrl] = useState<string | null>(null);
-  const [instructorImageUrl, setInstructorImageUrl] = useState<string | null>(null);
-
-  type ApiServiceImage = { image_url?: string; is_primary?: boolean };
-  type ApiInstructorDetail = {
-    avatar_url?: string;
-    image_url?: string;
-    profile_image_url?: string;
-  };
-
-  // Store service data for purchase flow
-  const [serviceData, setServiceData] = useState<{
-    name: string;
-    price: number;
-  } | null>(null);
-
-  useEffect(() => {
-    void (async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        if (!token) return;
-
-        if (serviceId) {
-          try {
-            const serviceResp = await vitalFitApi.products.getServiceByID(
-              String(serviceId),
-              token,
-            );
-            const s = 'data' in serviceResp ? serviceResp.data : serviceResp;
-            if (s) {
-              if (typeof s.description === 'string') {
-                setServiceDescription(s.description);
-              }
-              const images: ApiServiceImage[] = Array.isArray(s.images)
-                ? s.images
-                : [];
-              if (images.length > 0) {
-                const primary = images.find((img: ApiServiceImage) => img.is_primary) ?? images[0];
-                if (primary?.image_url) {
-                  setServiceImageUrl(primary.image_url);
-                }
-              }
-              
-              // FIX: Included 'title' here. We also use 't' for the fallback 'Servicio'
-              const serviceName = s.name || String(title) || t('common.service', 'Servicio');
-              
-              // ServiceFullDetail doesn't include pricing, so default to 0
-              const servicePrice = 0;
-              setServiceData({
-                name: serviceName,
-                price: servicePrice,
-              });
-            }
-          } catch (error) {
-            console.error('Error cargando servicio para detalle de clase:', error);
-          }
-        }
-
-        if (instructorId) {
-          try {
-            const instResp = await vitalFitApi.client.get({
-              url: `/instructor/${String(instructorId)}`,
-              jwt: token,
-            });
-            const inst =
-              (instResp as { data?: ApiInstructorDetail }).data ??
-              (instResp as ApiInstructorDetail | undefined);
-            const avatar =
-              inst?.avatar_url || inst?.image_url || inst?.profile_image_url;
-            if (typeof avatar === 'string' && avatar.startsWith('http')) {
-              setInstructorImageUrl(avatar);
-            }
-          } catch (error) {
-            console.error('Error cargando instructor para detalle de clase:', error);
-          }
-        }
-      } catch {
-        // Se ignora el error de carga inicial
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceId, instructorId, title]);
-
-  const heroSource = useMemo(() => {
-    if (serviceImageUrl && /^https?:\/\//i.test(serviceImageUrl)) {
-      return { uri: serviceImageUrl };
-    }
-
-    if (typeof imageUrl === 'number') {
-      return imageUrl;
-    }
-
-    const url = imageUrl as string | undefined;
-    if (url && /^https?:\/\//i.test(url)) {
-      return { uri: url };
-    }
-
-    if (!serviceId) {
-      return require('@/assets/images/yoga-w.jpg');
-    }
-
-    return null;
-  }, [imageUrl, serviceImageUrl, serviceId]);
-
-  const description = useMemo(() => {
-    if (serviceDescription) return serviceDescription;
-    if (serviceId) return '';
-    const titleLower = String(title || '').toLowerCase();
-    const map: Record<string, string> = {
-      zumba: 'Clase de baile fitness con ritmos latinos para mejorar resistencia y coordinación. Ideal para todos los niveles y enfocada en divertirse mientras quemas calorías.',
-      spinning:
-        'Entrenamiento en bicicleta estacionaria de alta intensidad que mejora la capacidad cardiovascular y fortalece piernas y glúteos con intervalos y cambios de ritmo.',
-      'yoga flow':
-        'Secuencia fluida de posturas que trabaja fuerza, flexibilidad y respiración consciente. Perfecta para reducir el estrés y mejorar la movilidad general.',
-      crossfit:
-        'Entrenamiento funcional de alta intensidad que combina levantamiento olímpico, gimnasia y trabajo metabólico. Mejora fuerza, potencia y resistencia con WODs variados.',
-    };
-    return (
-      map[titleLower] ||
-      'Entrenamiento diseñado para mejorar tu condición física con foco en técnica y progreso seguro. Incluye trabajo de fuerza, movilidad y resistencia.'
-    );
-  }, [serviceDescription, serviceId, title]);
-
-  const capNum = Number(capacity ?? 25);
-  const occNumInitial = Number(occupied ?? 18);
-  const [forceFull] = useState(false);
-
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const isFullInitial = occNumInitial >= capNum;
-  const effectiveFull = isFullInitial || forceFull;
-
-  const id = useMemo(() => `${String(title || '')}|${String(time || '')}`, [title, time]);
-  const reservedFromContext = isReserved(id);
-  const hasBookingId = Boolean(bookingId);
-  const reserved = reservedFromContext || hasBookingId || Boolean(serverBookingId);
-
-  const { showToast } = useToast();
-  const isCrossfitCompleted = String(title || '').toLowerCase() === 'crossfit' && effectiveFull;
-
-  const timeRange = useMemo(() => {
-    const raw = String(time || '').trim();
-    if (!raw) return '07:00 - 08:00 AM';
-    if (raw.includes('-')) return raw;
-    const m = raw.match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
-    if (!m) return raw;
-    const [, hh, mm, ap] = m;
-    let hour = parseInt(hh, 10) % 12;
-    if (ap.toUpperCase() === 'PM') hour += 12;
-    const start = new Date(2000, 0, 1, hour, parseInt(mm, 10));
-    const end = new Date(start.getTime() + 60 * 60 * 1000);
-    const fmt = (d: Date) => {
-      let h = d.getHours();
-      const minutes = d.getMinutes().toString().padStart(2, '0');
-      const suffix = h >= 12 ? 'PM' : 'AM';
-      h = h % 12;
-      if (h === 0) h = 12;
-      return `${h.toString().padStart(2, '0')}:${minutes} ${suffix}`;
-    };
-    return `${fmt(start)} - ${fmt(end)}`;
-  }, [time]);
-
-  const isInstructorMode = String(mode || '').toLowerCase() === 'instructor';
-
-  /* Instructor logic restored */
-  const [instructorFirstName, setInstructorFirstName] = useState<string | null>(null);
-  const [instructorLastName, setInstructorLastName] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isInstructorMode) return;
-
-    const fetchInstructor = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        if (!token) return;
-
-        const userData = await vitalFitApi.user.WhoAmI(token);
-        setInstructorFirstName(userData?.user?.first_name || null);
-        setInstructorLastName(userData?.user?.last_name || null);
-      } catch {
-        console.error('Error fetching instructor data');
-      }
-    };
-
-    fetchInstructor();
-  }, [isInstructorMode]);
-
-
-  type BookingParticipant = {
-    booking_id: string;
-    created_at: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-    phone: string;
-    status: string;
-    user_id: string;
-  };
-
-  const [participants, setParticipants] = useState<BookingParticipant[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [loadingParticipants, setLoadingParticipants] = useState(false);
-
-  useEffect(() => {
-    if (!isInstructorMode || !classId) return;
-
-    const fetchParticipants = async () => {
-      setLoadingParticipants(true);
-      try {
-        const token = await AsyncStorage.getItem('token');
-        if (!token) return;
-
-        // Fetch bookings for this class
-        const response = await vitalFitApi.booking.getBookingClass(String(classId), token, {
-          page: 1,
-          limit: 50,
-        });
-
-        // Handle PaginatedTotal<BookingParticipant[]> response
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const data = (response as any).data || (response as any).items || [];
-        if (Array.isArray(data)) {
-          setParticipants(data);
-        }
-      } catch (error) {
-        console.error('Error fetching class participants:', error);
-        showToast('error', 'Error', 'No se pudo cargar la lista de alumnos');
-      } finally {
-        setLoadingParticipants(false);
-      }
-    };
-
-    fetchParticipants();
-  }, [isInstructorMode, classId, showToast]);
-
-  /* State restored */
-  const [activeTab, setActiveTab] = useState<'clientes' | 'pasar-lista'>('clientes');
-  const [attendance, setAttendance] = useState<Record<string, 'present' | 'late' | 'absent'>>({});
-  const [search, setSearch] = useState('');
-  const [classNotes, setClassNotes] = useState('');
-
-  const filteredClients = useMemo(() => {
-    return participants
-      .filter((p) => {
-        const fullName = `${p.first_name || ''} ${p.last_name || ''}`.toLowerCase();
-        return fullName.includes(search.toLowerCase().trim());
-      })
-      .map((p) => ({
-        id: p.booking_id, // Map booking_id to id for UI
-        name: `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Usuario sin nombre',
-        level: 'General', // Default value as API doesn't return level yet
-        program: 'Sin programa', // Default value
-      }));
-  }, [participants, search]);
-
-  if (isInstructorMode) {
-    return (
-      <ThemedView lightColor='#FFFFFF' darkColor='#050816' className='flex-1 p-4 pt-12'>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-4 flex-row items-center justify-center'>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => router.back()}
-              className='absolute left-4'>
-              <ChevronLeftIcon width={20} height={20} color='#f97316' />
-            </TouchableOpacity>
-            <ThemedText
-              lightColor='#111827'
-              className='text-base font-semibold'
-              style={{ fontFamily: 'System', fontSize: 16, fontWeight: '600' }}>
-              Detalles clase
-            </ThemedText>
-          </View>
-          {heroSource && !imageError ? (
-            <Image
-              source={heroSource}
-              style={styles.heroImage}
-              contentFit='cover'
-              onError={() => setImageError(true)}
-            />
-          ) : (
-            <View style={[styles.heroImage, { backgroundColor: '#000000', justifyContent: 'center', alignItems: 'center' }]}>
-              <Image
-                source={require('@/assets/images/isotipo.png')}
-                style={{ width: 160, height: 160 }}
-                contentFit='contain'
-              />
-            </View>
-          )}
-
-          <ThemedText
-            lightColor='#111827'
-            darkColor='#ffffff'
-            className='text-3xl font-extrabold mt-4 mb-1'
-            style={{ fontFamily: 'BebasNeue-Regular' }}>
-            {String(title || 'Nombre de la clase').toUpperCase()}
-          </ThemedText>
-
-          <View className='mb-1'>
-            <ThemedText
-              lightColor='#6b7280'
-              darkColor='#d4d4d4'
-              className='text-sm'
-              style={{ fontFamily: 'Montserrat_400Regular' }}>
-              {classDateFormatted}
-            </ThemedText>
-          </View>
-
-          <View className='mb-1'>
-            <ThemedText
-              lightColor='#4b5563'
-              darkColor='#e5e5e5'
-              className='text-sm'
-              style={{ fontFamily: 'Montserrat_500Medium' }}>
-              18 / 25 cupos ocupados
-            </ThemedText>
-          </View>
-
-          <View className='mb-3'>
-            <ThemedText lightColor='#f97316' darkColor='#f97316' className='font-bold'>
-              07:00 - 08:00 AM
-            </ThemedText>
-          </View>
-
-          <View className='flex-row items-center mb-3'>
-            <StarIcon size={16} color='#F59E0B' />
-            <ThemedText
-              lightColor='#4b5563'
-              darkColor='#e5e5e5'
-              className='ml-2 text-sm'
-              style={{ fontFamily: 'Montserrat_400Regular' }}>
-              4.9 (231 reviews)
-            </ThemedText>
-          </View>
-
-          <View className='flex-row items-center mb-4'>
-            <Image
-              source={{ uri: 'https://randomuser.me/api/portraits/men/31.jpg' }}
-              style={{ width: 28, height: 28, borderRadius: 9999 }}
-              contentFit='cover'
-            />
-            <ThemedText
-              lightColor='#4b5563'
-              darkColor='#e5e5e5'
-              className='ml-2'
-              style={{ fontFamily: 'Montserrat_500Medium' }}>
-              {instructorFirstName || instructorLastName
-                ? `${instructorFirstName ?? ''} ${instructorLastName ?? ''}`.trim()
-                : String(instructor || 'Nombre del Instructor')}
-            </ThemedText>
-          </View>
-
-          <View className='mb-2'>
-            <ThemedText
-              lightColor='#f97316'
-              darkColor='#f97316'
-              className='font-semibold'
-              style={{ fontFamily: 'Montserrat_600SemiBold' }}>
-              Nivel: intermedio
-            </ThemedText>
-          </View>
-
-          <View className='mb-4'>
-            <ThemedText
-              lightColor='#111827'
-              darkColor='#ffffff'
-              className='mb-1'
-              style={{ fontFamily: 'Montserrat_600SemiBold' }}>
-              Descripción de la clase:
-            </ThemedText>
-            <ThemedText
-              lightColor='#4b5563'
-              darkColor='#ffffff'
-              className='text-sm leading-relaxed'
-              style={{ fontFamily: 'Montserrat_400Regular' }}>
-              Este entrenamiento de fuerza se enfoca en el desarrollo muscular y la
-              resistencia. Incluye ejercicios con pesas, bandas de resistencia y peso
-              corporal. Ideal para todos los niveles.
-            </ThemedText>
-          </View>
-
-          <View className='flex-row bg-[#F3F4F6] rounded-2xl p-1 mb-3'>
-            <TouchableOpacity
-              className={`flex-1 py-2 rounded-xl items-center ${activeTab === 'clientes' ? 'bg-white' : 'bg-transparent'
-                }`}
-              activeOpacity={0.7}
-              onPress={() => setActiveTab('clientes')}>
-              <Text
-                className={`font-semibold font-body ${activeTab === 'clientes' ? 'text-[#111827]' : 'text-[#6b7280]'
-                  }`}>
-                Clientes
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className={`flex-1 py-2 rounded-xl items-center ${activeTab === 'pasar-lista' ? 'bg-white' : 'bg-transparent'
-                }`}
-              activeOpacity={0.7}
-              onPress={() => setActiveTab('pasar-lista')}>
-              <Text
-                className={`font-semibold font-body ${activeTab === 'pasar-lista'
-                  ? 'text-[#111827]'
-                  : 'text-[#6b7280]'
-                  }`}>
-                Pasar lista
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View className='mb-3'>
-            <View className='border border-[#e5e7eb] rounded-2xl px-3 py-2 bg-white flex-row items-center'>
-              <MagnifyingGlassIcon width={18} height={18} color='#f97316' />
-              <TextInput
-                placeholder='Nombre del cliente'
-                placeholderTextColor='#9ca3af'
-                value={search}
-                onChangeText={setSearch}
-                style={{ fontSize: 14, color: '#111827', marginLeft: 8, flex: 1 }}
-              />
-            </View>
-          </View>
-
-          <View className='mb-6'>
-            {activeTab === 'clientes' ? (
-              <View className='rounded-2xl bg-white px-4 py-3 border border-[#e5e7eb] shadow-sm'>
-                <View className='flex-row items-center mb-3'>
-                  <UsersIcon size={18} color='#f97316' />
-                  <Text className='ml-2 text-[14px] font-medium text-[#111827] font-body'>
-                    Lista de clientes inscritos
-                  </Text>
-                </View>
-
-                {filteredClients.map((client) => (
-                  <TouchableOpacity
-                    key={client.id}
-                    className='flex-row items-center justify-between bg-[#F8F9FB] rounded-2xl px-4 py-4 mb-3'
-                    activeOpacity={0.8}>
-                    <View className='flex-row items-center flex-1'>
-                      <View className='w-10 h-10 rounded-xl bg-[#FED7AA] justify-center items-center mr-3'>
-                        <UserIcon size={22} color='#f97316' />
-                      </View>
-                      <View className='flex-1'>
-                        <Text className='text-[14px] font-bold text-[#1F2024] font-body'>
-                          {client.name}
-                        </Text>
-                        <Text className='text-[12px] text-[#71727A] font-body'>
-                          {client.level}
-                        </Text>
-                      </View>
-                    </View>
-                    <ChevronRightIcon size={12} color='#71727A' />
-                  </TouchableOpacity>
-                ))}
-              </View>
-            ) : (
-              <View className='rounded-2xl bg-white px-4 py-4 border border-[#e5e7eb] shadow-sm'>
-                <View className='flex-row items-center mb-4'>
-                  <UsersIcon size={18} color='#f97316' />
-                  <Text className='ml-2 text-[14px] font-medium text-[#111827] font-body'>
-                    Clientes inscritos
-                  </Text>
-                </View>
-
-                {filteredClients.map((client) => {
-                  const status = attendance[client.id];
-                  return (
-                    <View
-                      key={client.id}
-                      className='bg-[#F8F9FB] rounded-2xl px-4 py-4 mb-4'>
-                      <View className='flex-row items-center mb-2'>
-                        <View className='w-12 h-12 rounded-full bg-[#FED7AA] justify-center items-center mr-3'>
-                          <UserIcon size={26} color='#f97316' />
-                        </View>
-                        <View className='flex-1'>
-                          <Text className='text-[16px] font-bold text-[#1F2024] font-body'>
-                            {client.name}
-                          </Text>
-                          <Text className='text-[12px] text-[#71727A] mb-1 font-body'>
-                            {client.level}
-                          </Text>
-                        </View>
-                      </View>
-
-                      <View className='mb-4'>
-                        <ThemedText
-                          lightColor='#111827'
-                          darkColor='#e5e5e5'
-                          className='text-[15px] font-semibold'
-                          style={{
-                            fontFamily: 'Montserrat_600SemiBold',
-                          }}>
-                          {client.program}
-                        </ThemedText>
-                      </View>
-
-                      <View className='flex-row gap-2'>
-                        <TouchableOpacity
-                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${status === 'present'
-                            ? 'bg-[#f97316]'
-                            : 'bg-white border border-[#f97316]'
-                            }`}
-                          activeOpacity={0.8}
-                          onPress={() =>
-                            setAttendance((prev) => ({
-                              ...prev,
-                              [client.id]: 'present',
-                            }))
-                          }>
-                          <CheckIcon
-                            size={16}
-                            color={
-                              status === 'present'
-                                ? '#ffffff'
-                                : '#f97316'
-                            }
-                            strokeWidth={3}
-                          />
-                          <Text
-                            className={`ml-2 text-[13px] font-body ${status === 'present'
-                              ? 'text-white'
-                              : 'text-[#f97316]'
-                              }`}
-                            style={{
-                              fontFamily: 'Montserrat_600SemiBold',
-                            }}>
-                            Presente
-                          </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 ${status === 'late'
-                            ? 'bg-[#D1D5DB]'
-                            : 'bg-white border border-[#D1D5DB]'
-                            }`}
-                          activeOpacity={0.8}
-                          onPress={() =>
-                            setAttendance((prev) => ({
-                              ...prev,
-                              [client.id]: 'late',
-                            }))
-                          }>
-                          <OutlineClockIcon
-                            size={16}
-                            color={
-                              status === 'late'
-                                ? '#374151'
-                                : '#9ca3af'
-                            }
-                            strokeWidth={2.5}
-                          />
-                          <Text
-                            className={`ml-2 text-[13px] font-body ${status === 'late'
-                              ? 'text-[#374151]'
-                              : 'text-[#9ca3af]'
-                              }`}
-                            style={{
-                              fontFamily: 'Montserrat_600SemiBold',
-                            }}>
-                            Tarde
-                          </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          className={`flex-1 flex-row justify-center items-center rounded-xl py-3 bg-white border ${status === 'absent'
-                            ? 'border-[#374151]'
-                            : 'border-[#e5e7eb]'
-                            }`}
-                          activeOpacity={0.8}
-                          onPress={() =>
-                            setAttendance((prev) => ({
-                              ...prev,
-                              [client.id]: 'absent',
-                            }))
-                          }>
-                          <XMarkIcon
-                            size={16}
-                            color='#374151'
-                            strokeWidth={2.5}
-                          />
-                          <Text
-                            className='ml-2 text-[13px] text-[#374151] font-body'
-                            style={{
-                              fontFamily: 'Montserrat_600SemiBold',
-                            }}>
-                            Ausente
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  );
-                })}
-
-                <View className='h-[1px] bg-[#f97316] w-full mb-4 mt-1' />
-
-                <View className='mt-1'>
-                  <ThemedText
-                    lightColor='#111827'
-                    darkColor='#ffffff'
-                    className='mb-2'
-                    style={{ fontFamily: 'Montserrat_600SemiBold' }}>
-                    Notas internas de la clase
-                  </ThemedText>
-
-                  <View className='mb-3'>
-                    <TextInput
-                      multiline
-                      numberOfLines={4}
-                      placeholder='Añade notas sobre esta clase...'
-                      placeholderTextColor='#9ca3af'
-                      value={classNotes}
-                      onChangeText={setClassNotes}
-                      style={{
-                        borderWidth: 1,
-                        borderColor: '#d1d5db',
-                        borderRadius: 16,
-                        paddingHorizontal: 12,
-                        paddingVertical: 12,
-                        minHeight: 120,
-                        textAlignVertical: 'top',
-                        fontSize: 13,
-                        color: '#111827',
-                      }}
-                    />
-                  </View>
-
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    className='w-full py-3 rounded-2xl mb-3 items-center justify-center'
-                    style={{
-                      backgroundColor: '#4b5563',
-                      borderWidth: 1,
-                      borderColor: '#e5e7eb',
-                    }}
-                    onPress={() =>
-                      showToast(
-                        'success',
-                        'Notas guardadas',
-                        'Las notas internas se han guardado correctamente.',
-                      )
-                    }>
-                    <ThemedText
-                      lightColor='#f9fafb'
-                      darkColor='#f9fafb'
-                      className='text-sm'
-                      style={{ fontFamily: 'Montserrat_500Medium' }}>
-                      Guardar notas
-                    </ThemedText>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    className='w-full py-3 rounded-2xl items-center justify-center'
-                    style={{ backgroundColor: '#f97316' }}
-                    onPress={() =>
-                      showToast(
-                        'success',
-                        'Asistencia guardada',
-                        'La asistencia de la clase se ha guardado correctamente.',
-                      )
-                    }>
-                    <ThemedText
-                      lightColor='#ffffff'
-                      darkColor='#ffffff'
-                      className='text-sm font-semibold'
-                      style={{ fontFamily: 'Montserrat_600SemiBold' }}>
-                      Guardar asistencia
-                    </ThemedText>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-          </View>
-        </ScrollView>
-      </ThemedView>
-    );
-  }
-
-  return (
-    <ThemedView lightColor='#FFFFFF' darkColor='#050816' className='flex-1 p-4 pt-12'>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View className='w-full bg-[#F3F4F6] rounded-2xl py-2 mb-4 flex-row items-center justify-center'>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => router.back()}
-            className='absolute left-4'>
-            <ChevronLeftIcon width={20} height={20} color='#f97316' />
-          </TouchableOpacity>
-          <ThemedText
-            lightColor='#111827'
-            className='text-base font-semibold'
-            style={{ fontFamily: 'System', fontSize: 16, fontWeight: '600' }}>
-            Detalles clase
-          </ThemedText>
-        </View>
-        {heroSource && !imageError ? (
-          <Image
-            source={heroSource}
-            style={styles.heroImage}
-            contentFit='cover'
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <View style={[styles.heroImage, { backgroundColor: '#000000', justifyContent: 'center', alignItems: 'center' }]}>
-            <Image
-              source={require('@/assets/images/isotipo.png')}
-              style={{ width: 160, height: 160 }}
-              contentFit='contain'
-            />
-          </View>
-        )}
-
-        <ThemedText
-          lightColor='#111827'
-          darkColor='#ffffff'
-          className='text-3xl font-extrabold mt-4 mb-1'
-          style={{ fontFamily: 'BebasNeue-Regular' }}>
-          {String(title || 'Nombre de la clase').toUpperCase()}
-        </ThemedText>
-
-        <View className='mb-1'>
-          <ThemedText
-            lightColor='#6b7280'
-            darkColor='#d4d4d4'
-            className='text-sm'
-            style={{ fontFamily: 'Montserrat_400Regular' }}>
-            {classDateFormatted}
-          </ThemedText>
-        </View>
-
-        {/* Occupancy Indicator */}
-        <View className='mb-4 flex-row items-center'>
-          <UserIcon size={16} color='#6b7280' style={{ marginRight: 6 }} />
-          <ThemedText
-            className='text-sm text-gray-500 font-medium'
-            style={{ fontFamily: 'Montserrat_500Medium' }}>
-            {currentOccupancyCount !== null && capacity
-              ? `${currentOccupancyCount} / ${capacity} cupos ocupados`
-              : capacity
-                ? `${capacity} cupos totales`
-                : 'Cupos limitados'}
-          </ThemedText>
-        </View>
-
-        {effectiveFull && !isCrossfitCompleted && (
-          <View
-            className='mb-2 flex-row items-center rounded-2xl px-4 py-2'
-            style={{ backgroundColor: '#fecaca' }}>
-            <View
-              className='items-center justify-center mr-3 rounded-full'
-              style={{ width: 26, height: 26, backgroundColor: '#f97373' }}>
-              <ExclamationCircleIcon size={15} color='#ffffff' />
-            </View>
-            <ThemedText
-              lightColor='#b91c1c'
-              darkColor='#b91c1c'
-              className='text-xs font-medium'>
-              La clase se llenó mientras la reservabas.
-            </ThemedText>
-          </View>
-        )}
-
-        {reserved && (
-          <View className='mb-3'>
-            <View className='self-start bg-emerald-500 px-3 py-1 rounded-full'>
-              <ThemedText
-                lightColor='#ffffff'
-                darkColor='#ffffff'
-                className='text-xs font-semibold'>
-                Reservada
-              </ThemedText>
-            </View>
-          </View>
-        )}
-
-        <View className='mb-3'>
-          <ThemedText lightColor='#f97316' darkColor='#f97316' className='font-bold'>
-            {timeRange}
-          </ThemedText>
-        </View>
-
-        <View className='flex-row items-center mb-4'>
-          <Image
-            source={
-              instructorImageUrl && instructorImageUrl.startsWith('http')
-                ? { uri: instructorImageUrl }
-                : { uri: 'https://randomuser.me/api/portraits/men/32.jpg' }
-            }
-            style={{ width: 28, height: 28, borderRadius: 9999 }}
-            contentFit='cover'
-          />
-          <ThemedText
-            lightColor='#4b5563'
-            darkColor='#e5e5e5'
-            className='ml-2'
-            style={{ fontFamily: 'Montserrat_500Medium' }}>
-            {String(instructor || 'Nombre del Instructor')}
-          </ThemedText>
-        </View>
-
-        <View className='mb-4'>
-          <ThemedText
-            lightColor='#111827'
-            darkColor='#ffffff'
-            className='mb-1'
-            style={{ fontFamily: 'Montserrat_600SemiBold' }}>
-            Descripción de la clase:
-          </ThemedText>
-          <ThemedText
-            lightColor='#4b5563'
-            darkColor='#ffffff'
-            className='text-sm leading-relaxed'
-            style={{ fontFamily: 'Montserrat_400Regular' }}>
-            {description}
-          </ThemedText>
-        </View>
-
-        {isCrossfitCompleted ? (
-          <View className='mb-6 items-center'>
-            <View className='flex-row items-center rounded-full px-4 py-2 bg-emerald-50'>
-              <CheckCircleIcon size={18} color='#22c55e' />
-              <ThemedText
-                lightColor='#166534'
-                darkColor='#e5e5e5'
-                className='ml-2 text-xs font-semibold'>
-                Completado
-              </ThemedText>
-            </View>
-          </View>
-        ) : (
-          <View className='mb-6'>
-            <PrimaryButton
-              title={
-                isPast
-                  ? 'Clase pasada'
-                  : effectiveFull
-                    ? 'Clase llena'
-                    : reserved
-                      ? 'Cancelar'
-                      : 'Reservar'
-              }
-              disabled={isPast || effectiveFull || (!hasMembership && !reserved)}
-              style={{
-                backgroundColor:
-                  isPast || effectiveFull || (!hasMembership && !reserved)
-                    ? '#6b7280'
-                    : reserved
-                      ? '#ef4444'
-                      : '#f97316',
-              }}
-              onPress={async () => {
-                if (effectiveFull) return;
-
-                if (reserved) {
-                  setShowCancelModal(true);
-                  return;
-                }
-
-                try {
-                  // Use authToken from AuthContext (always fresh, automatically refreshed)
-                  if (!authToken) {
-                    showToast(
-                      'error',
-                      'Sesión no válida',
-                      'Inicia sesión nuevamente para reservar la clase.',
-                    );
-                    return;
-                  }
-
-                  if (!classId) {
-                    showToast(
-                      'error',
-                      'No se pudo reservar',
-                      'Falta el identificador de la clase.',
-                    );
-                    return;
-                  }
-
-                  const whoAmI = (await vitalFitApi.user.WhoAmI(
-                    authToken,
-                  )) as unknown as {
-                    user?: { id?: string; user_id?: string };
-                  };
-                  const userId = whoAmI?.user?.id || whoAmI?.user?.user_id;
-
-                  if (!userId) {
-                    showToast(
-                      'error',
-                      'Usuario no identificado',
-                      'No se pudo obtener la información del usuario.',
-                    );
-                    return;
-                  }
-
-                  await vitalFitApi.booking.bookClass(
-                    { user_id: String(userId) },
-                    String(classId),
-                    authToken,
-                  );
-
-                  const img =
-                    typeof heroSource === 'number'
-                      ? heroSource
-                      : (imageUrl as string | number | undefined);
-
-                  await reserve({
-                    id,
-                    title: String(title || ''),
-                    time: String(time || ''),
-                    instructor: String(instructor || ''),
-                    imageUrl: img,
-                  });
-
-                  showToast(
-                    'success',
-                    'Clase reservada',
-                    'Tu clase ha sido reservada correctamente.',
-                  );
-
-                  router.back();
-                } catch (error: unknown) {
-                  let message = 'Ocurrió un error al reservar la clase.';
-
-                  // Check for 402 Payment Required error
-                  if (isAPIError(error) && error.status === 402) {
-                    showToast(
-                      'error',
-                      t('classDetails.toasts.paymentRequired.title'),
-                      t('classDetails.toasts.paymentRequired.message'),
-                    );
-
-                    // Fetch service price from branch services endpoint
-                    let serviceName = serviceData?.name || String(title) || 'Servicio';
-                    let servicePrice = serviceData?.price ?? 0;
-
-                    // If we don't have the price, try to fetch from branch services
-                    if (servicePrice === 0 && branchId && serviceId) {
-                      try {
-                        const branchServicesResp = await vitalFitApi.client.get({
-                          url: `/public/branches/${String(branchId)}/services`,
-                          jwt: authToken || undefined,
-                          params: { page: 1, limit: 50, currency: 'USD' },
-                        });
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const branchServices = (branchServicesResp as any)?.data || [];
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const matchedService = branchServices.find((s: any) =>
-                          String(s.service_id) === String(serviceId)
-                        );
-                        if (matchedService) {
-                          serviceName = matchedService.name || serviceName;
-                          servicePrice =
-                            matchedService.lowest_price_no_member ??
-                            matchedService.lowest_price_member ??
-                            matchedService.price ??
-                            0;
-                        }
-                      } catch (fetchError) {
-                        console.warn('Could not fetch service price from branch:', fetchError);
-                      }
-                    }
-
-                    // Build service object for checkout
-                    const serviceForCheckout = {
-                      service_id: String(serviceId),
-                      name: serviceName,
-                      price: servicePrice,
-                      type: 'service',
-                    };
-
-                    // Get today's date in ISO format for start date
-                    const today = new Date().toISOString();
-
-                    router.push({
-                      pathname: '/membership-checkout',
-                      params: {
-                        title: serviceName,
-                        price: String(servicePrice),
-                        type: 'service',
-                        servicesJson: JSON.stringify([serviceForCheckout]),
-                        // Pass branchId to be used in confirmation step
-                        fromClassDetails: 'true',
-                        preselectedBranchId: branchId ? String(branchId) : '',
-                        preselectedStartDate: today,
-                      },
-                    });
-                    return;
-                  }
-
-                  // Check for 500 Internal Server Error
-                  if (isAPIError(error) && error.status === 500) {
-                    message = 'Error en el servidor. Por favor, intenta nuevamente más tarde.';
-                  } else if (isAPIError(error)) {
-                    message = error.messages.join(', ');
-                  } else if (error instanceof Error) {
-                    message = error.message;
-                  }
-
-                  console.error('Error al reservar clase:', error);
-                  showToast('error', 'No se pudo reservar', message);
-                }
-              }}
-            />
-            {!hasMembership && !reserved && (
-              <View className='mt-2 items-center'>
-                <ThemedText
-                  lightColor='#ef4444'
-                  darkColor='#ef4444'
-                  className='text-xs font-medium'>
-                  Necesitas una membresía activa para reservar
-                </ThemedText>
-              </View>
-            )}
-          </View>
-        )}
-        <View className='items-center justify-center mb-2'>
-          <ThemedText
-            lightColor='#9ca3af'
-            darkColor='#9ca3af'
-            className='italic text-center text-xs'>
-            “Podrás cancelar hasta 2h antes del inicio”
-          </ThemedText>
-        </View>
-      </ScrollView>
-
-      <Modal
-        visible={showCancelModal}
-        transparent
-        animationType='fade'
-        onRequestClose={() => setShowCancelModal(false)}>
-        <TouchableOpacity
-          activeOpacity={1}
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingHorizontal: 24,
-          }}
-          onPress={() => setShowCancelModal(false)}>
-          <View
-            style={{
-              backgroundColor: '#ffffff',
-              borderRadius: 24,
-              paddingVertical: 24,
-              paddingHorizontal: 20,
-              width: '100%',
-              maxWidth: 360,
-            }}>
-            <ThemedText
-              lightColor='#111827'
-              darkColor='#ffffff'
-              className='text-xl font-bold text-center mb-2'>
-              ¿Cancelar reserva?
-            </ThemedText>
-            <ThemedText
-              lightColor='#4b5563'
-              darkColor='#9ca3af'
-              className='text-sm text-center mb-6'>
-              Perderás tu cupo en esta clase. ¿Estás seguro?
-            </ThemedText>
-            <View className='gap-3'>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={async () => {
-                  try {
-                    const token = await AsyncStorage.getItem('token');
-                    if (!token) {
-                      showToast(
-                        'error',
-                        'Sesión no válida',
-                        'Inicia sesión nuevamente para cancelar la reserva.',
-                      );
-                      return;
-                    }
-
-                    if (bookingId || serverBookingId) {
-                      await vitalFitApi.booking.cancelBooking(
-                        String(bookingId || serverBookingId),
-                        token,
-                      );
-                    }
-
-                    await cancel(id);
-                    setShowCancelModal(false);
-
-                    showToast(
-                      'success',
-                      'Reserva cancelada',
-                      'Tu reserva ha sido cancelada correctamente.',
-                    );
-
-                    router.back();
-                  } catch (error: unknown) {
-                    let message = 'Ocurrió un error al cancelar la reserva.';
-                    let isLateCancellation = false;
-
-                    // Robust error text extraction
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const errAny = error as any;
-                    const errorString = (
-                      (errAny?.message || '') +
-                      ' ' +
-                      (Array.isArray(errAny?.messages)
-                        ? errAny.messages.join(' ')
-                        : '') +
-                      ' ' +
-                      String(error)
-                    ).toLowerCase();
-
-                    // Detect restricted time window error globally
-                    if (errorString.includes('restricted time window')) {
-                      message =
-                        'Ya no es posible cancelar porque ha pasado el tiempo límite permitido por el gimnasio.';
-                      isLateCancellation = true;
-                    } else if (isAPIError(error)) {
-                      message = error.messages.join(', ');
-                    } else if (error instanceof Error) {
-                      message = error.message;
-                    }
-
-                    if (isLateCancellation) {
-                      console.warn(
-                        'Cancelación tardía detectada (Handled):',
-                        message,
-                      );
-                      showToast('error', 'Tiempo límite excedido', message);
-                    } else {
-                      console.error('Error al cancelar reserva:', error);
-                      showToast('error', 'No se pudo cancelar', message);
-                    }
-                  }
-                }}
-                className='py-3 rounded-2xl items-center'
-                style={{ backgroundColor: '#f97316' }}>
-                <ThemedText
-                  lightColor='#ffffff'
-                  darkColor='#ffffff'
-                  className='text-base font-bold'>
-                  Aceptar
-                </ThemedText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => setShowCancelModal(false)}
-                className='py-3 rounded-2xl items-center'
-                style={{ backgroundColor: '#e5e7eb' }}>
-                <ThemedText
-                  lightColor='#111827'
-                  darkColor='#ffffff'
-                  className='text-base font-bold'>
-                  Volver
-                </ThemedText>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Modal>
-    </ThemedView>
-  );
+	const router = useRouter();
+	const { t } = useTranslation();
+	const { token: authToken } = useAuth();
+	const {
+		time,
+		title,
+		instructor,
+		imageUrl,
+		capacity,
+		occupied,
+		mode,
+		classId,
+		serviceId,
+		instructorId,
+		bookingId,
+		startsAt,
+		branchId,
+	} = useLocalSearchParams();
+
+	const { isReserved, reserve, cancel } = useReservations();
+	const { user } = useUser();
+	const [serverBookingId, setServerBookingId] = useState<string | null>(null);
+	const [currentOccupancyCount, setCurrentOccupancyCount] = useState<number | null>(null);
+	const [imageError, setImageError] = useState(false);
+	const [isExpanded, setIsExpanded] = useState(false);
+	const [searchQuery, setSearchQuery] = useState('');
+
+	const handleViewAllClients = () => {
+		setIsExpanded(!isExpanded);
+	};
+
+	useEffect(() => {
+		const checkBookingStatus = async () => {
+			try {
+				if (!user?.userId || !classId) return;
+				const token = await AsyncStorage.getItem('token');
+				if (!token) return;
+
+				const bookingsResp = await vitalFitApi.booking.getClientBooking(
+					String(user.userId),
+					token,
+				);
+				const bookings = (
+					Array.isArray(
+						(bookingsResp as unknown as { data: ClientBookingResponse[] }).data,
+					)
+						? (bookingsResp as unknown as { data: ClientBookingResponse[] }).data
+						: bookingsResp
+				) as ClientBookingResponse[];
+
+				const found = bookings.find((b) => String(b.class_id) === String(classId));
+				if (found?.booking_id) {
+					setServerBookingId(String(found.booking_id));
+				}
+
+				// Fetch Occupancy using correct SDK method
+				try {
+					const occupancyResp = await vitalFitApi.booking.getClassBookingCount(
+						String(classId),
+						token,
+					);
+
+					// Try to find the count in the response - treating as any to be safe until typed
+					// Try to find the count in the response - treating as any to be safe until typed
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					const resp = occupancyResp as any;
+					// Possible structures: { count: 5 }, { bookings_count: 5 }, { data: { count: 5 } }
+					const count =
+						resp?.count ??
+						resp?.bookings_count ??
+						resp?.data?.count ??
+						resp?.data?.bookings_count;
+
+					if (typeof count === 'number') {
+						setCurrentOccupancyCount(count);
+					}
+				} catch (e) {
+					console.warn('Could not fetch occupancy count:', e);
+				}
+			} catch (err) {
+				console.warn('Error checking booking status:', err);
+			}
+		};
+		void checkBookingStatus();
+	}, [user?.userId, classId]);
+
+	const hasMembership = user?.membership?.status === 'Active';
+
+	const classDateFormatted = useMemo(() => {
+		try {
+			const dateToFormat = startsAt ? new Date(String(startsAt)) : new Date();
+
+			if (startsAt && String(startsAt).match(/^\d{4}-\d{2}-\d{2}$/)) {
+				dateToFormat.setMinutes(
+					dateToFormat.getMinutes() + dateToFormat.getTimezoneOffset(),
+				);
+			}
+
+			return dateToFormat.toLocaleDateString('es-ES', {
+				day: '2-digit',
+				month: 'long',
+				year: 'numeric',
+			});
+		} catch {
+			return '';
+		}
+	}, [startsAt]);
+
+	const [serviceDescription, setServiceDescription] = useState<string | null>(null);
+	const isPast = useMemo(() => {
+		if (!startsAt) return false;
+		const now = new Date();
+		const start = new Date(String(startsAt));
+		return start < now;
+	}, [startsAt]);
+	const [serviceImageUrl, setServiceImageUrl] = useState<string | null>(null);
+	const [instructorImageUrl, setInstructorImageUrl] = useState<string | null>(null);
+
+	type ApiServiceImage = { image_url?: string; is_primary?: boolean };
+	type ApiInstructorDetail = {
+		avatar_url?: string;
+		image_url?: string;
+		profile_image_url?: string;
+	};
+
+	// Store service data for purchase flow
+	const [serviceData, setServiceData] = useState<{
+		name: string;
+		price: number;
+	} | null>(null);
+
+	useEffect(() => {
+		void (async () => {
+			try {
+				const token = await AsyncStorage.getItem('token');
+				if (!token) return;
+
+				if (serviceId) {
+					try {
+						const serviceResp = await vitalFitApi.products.getServiceByID(
+							String(serviceId),
+							token,
+						);
+						const s = 'data' in serviceResp ? serviceResp.data : serviceResp;
+						if (s) {
+							if (typeof s.description === 'string') {
+								setServiceDescription(s.description);
+							}
+							const images: ApiServiceImage[] = Array.isArray(s.images)
+								? s.images
+								: [];
+							if (images.length > 0) {
+								const primary =
+									images.find((img: ApiServiceImage) => img.is_primary) ??
+									images[0];
+								if (primary?.image_url) {
+									setServiceImageUrl(primary.image_url);
+								}
+							}
+
+							// FIX: Included 'title' here. We also use 't' for the fallback 'Servicio'
+							const serviceName =
+								s.name || String(title) || t('common.service', 'Servicio');
+
+							// ServiceFullDetail doesn't include pricing, so default to 0
+							const servicePrice = 0;
+							setServiceData({
+								name: serviceName,
+								price: servicePrice,
+							});
+						}
+					} catch (error) {
+						console.error('Error cargando servicio para detalle de clase:', error);
+					}
+				}
+
+				if (instructorId) {
+					try {
+						const instResp = await vitalFitApi.client.get({
+							url: `/instructor/${String(instructorId)}`,
+							jwt: token,
+						});
+						const inst =
+							(instResp as { data?: ApiInstructorDetail }).data ??
+							(instResp as ApiInstructorDetail | undefined);
+						const avatar =
+							inst?.avatar_url || inst?.image_url || inst?.profile_image_url;
+						if (typeof avatar === 'string' && avatar.startsWith('http')) {
+							setInstructorImageUrl(avatar);
+						}
+					} catch (error) {
+						console.error('Error cargando instructor para detalle de clase:', error);
+					}
+				}
+			} catch {
+				// Se ignora el error de carga inicial
+			}
+		})();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [serviceId, instructorId, title]);
+
+	const heroSource = useMemo(() => {
+		if (serviceImageUrl && /^https?:\/\//i.test(serviceImageUrl)) {
+			return { uri: serviceImageUrl };
+		}
+
+		if (typeof imageUrl === 'number') {
+			return imageUrl;
+		}
+
+		const url = imageUrl as string | undefined;
+		if (url && /^https?:\/\//i.test(url)) {
+			return { uri: url };
+		}
+
+		if (!serviceId) {
+			return require('@/assets/images/yoga-w.jpg');
+		}
+
+		return null;
+	}, [imageUrl, serviceImageUrl, serviceId]);
+
+	const description = useMemo(() => {
+		if (serviceDescription) return serviceDescription;
+		if (serviceId) return '';
+		const titleLower = String(title || '').toLowerCase();
+		const map: Record<string, string> = {
+			zumba: 'Clase de baile fitness con ritmos latinos para mejorar resistencia y coordinación. Ideal para todos los niveles y enfocada en divertirse mientras quemas calorías.',
+			spinning:
+				'Entrenamiento en bicicleta estacionaria de alta intensidad que mejora la capacidad cardiovascular y fortalece piernas y glúteos con intervalos y cambios de ritmo.',
+			'yoga flow':
+				'Secuencia fluida de posturas que trabaja fuerza, flexibilidad y respiración consciente. Perfecta para reducir el estrés y mejorar la movilidad general.',
+			crossfit:
+				'Entrenamiento funcional de alta intensidad que combina levantamiento olímpico, gimnasia y trabajo metabólico. Mejora fuerza, potencia y resistencia con WODs variados.',
+		};
+		return (
+			map[titleLower] ||
+			'Entrenamiento diseñado para mejorar tu condición física con foco en técnica y progreso seguro. Incluye trabajo de fuerza, movilidad y resistencia.'
+		);
+	}, [serviceDescription, serviceId, title]);
+
+	const capNum = Number(capacity ?? 25);
+	const occNumInitial = Number(occupied ?? 18);
+	const [forceFull] = useState(false);
+
+	const [showCancelModal, setShowCancelModal] = useState(false);
+	const isFullInitial = occNumInitial >= capNum;
+	const effectiveFull = isFullInitial || forceFull;
+
+	const id = useMemo(() => `${String(title || '')}|${String(time || '')}`, [title, time]);
+	const reservedFromContext = isReserved(id);
+	const hasBookingId = Boolean(bookingId);
+	const reserved = reservedFromContext || hasBookingId || Boolean(serverBookingId);
+
+	const { showToast } = useToast();
+	const isCrossfitCompleted = String(title || '').toLowerCase() === 'crossfit' && effectiveFull;
+
+	const timeRange = useMemo(() => {
+		const raw = String(time || '').trim();
+		if (!raw) return '07:00 - 08:00 AM';
+		if (raw.includes('-')) return raw;
+		const m = raw.match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
+		if (!m) return raw;
+		const [, hh, mm, ap] = m;
+		let hour = parseInt(hh, 10) % 12;
+		if (ap.toUpperCase() === 'PM') hour += 12;
+		const start = new Date(2000, 0, 1, hour, parseInt(mm, 10));
+		const end = new Date(start.getTime() + 60 * 60 * 1000);
+		const fmt = (d: Date) => {
+			let h = d.getHours();
+			const minutes = d.getMinutes().toString().padStart(2, '0');
+			const suffix = h >= 12 ? 'PM' : 'AM';
+			h = h % 12;
+			if (h === 0) h = 12;
+			return `${h.toString().padStart(2, '0')}:${minutes} ${suffix}`;
+		};
+		return `${fmt(start)} - ${fmt(end)}`;
+	}, [time]);
+
+	const isInstructorMode = String(mode || '').toLowerCase() === 'instructor';
+
+	/* Instructor logic restored */
+	const [instructorFirstName, setInstructorFirstName] = useState<string | null>(null);
+	const [instructorLastName, setInstructorLastName] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (!isInstructorMode) return;
+
+		const fetchInstructor = async () => {
+			try {
+				const token = await AsyncStorage.getItem('token');
+				if (!token) return;
+
+				const userData = await vitalFitApi.user.WhoAmI(token);
+				setInstructorFirstName(userData?.user?.first_name || null);
+				setInstructorLastName(userData?.user?.last_name || null);
+			} catch {
+				console.error('Error fetching instructor data');
+			}
+		};
+
+		fetchInstructor();
+	}, [isInstructorMode]);
+
+	type BookingParticipant = {
+		booking_id: string;
+		created_at: string;
+		email: string;
+		first_name: string;
+		last_name: string;
+		phone: string;
+		status: string;
+		user_id: string;
+	};
+
+	const [participants, setParticipants] = useState<BookingParticipant[]>([]);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [loadingParticipants, setLoadingParticipants] = useState(false);
+
+	useEffect(() => {
+		if (!isInstructorMode || !classId) return;
+
+		const fetchParticipants = async () => {
+			setLoadingParticipants(true);
+			try {
+				const token = await AsyncStorage.getItem('token');
+				if (!token) return;
+
+				// Fetch bookings for this class
+				const response = await vitalFitApi.booking.getBookingClass(String(classId), token, {
+					page: 1,
+					limit: 50,
+				});
+
+				// Handle PaginatedTotal<BookingParticipant[]> response
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				const data = (response as any).data || (response as any).items || [];
+				if (Array.isArray(data)) {
+					setParticipants(data);
+				}
+			} catch (error) {
+				console.error('Error fetching class participants:', error);
+				showToast('error', 'Error', 'No se pudo cargar la lista de alumnos');
+			} finally {
+				setLoadingParticipants(false);
+			}
+		};
+
+		fetchParticipants();
+	}, [isInstructorMode, classId, showToast]);
+
+	/* State restored */
+	const [activeTab, setActiveTab] = useState<'clientes' | 'pasar-lista'>('clientes');
+	const [attendance, setAttendance] = useState<Record<string, 'present' | 'late' | 'absent'>>({});
+	const [search, setSearch] = useState('');
+	const [classNotes, setClassNotes] = useState('');
+
+	const filteredClients = useMemo(() => {
+		return participants
+			.filter((p) => {
+				const fullName = `${p.first_name || ''} ${p.last_name || ''}`.toLowerCase();
+				return fullName.includes(search.toLowerCase().trim());
+			})
+			.map((p) => ({
+				id: p.booking_id, // Map booking_id to id for UI
+				name: `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Usuario sin nombre',
+				level: 'General', // Default value as API doesn't return level yet
+				program: 'Sin programa', // Default value
+			}));
+	}, [participants, search]);
+
+	if (isInstructorMode) {
+		return (
+			<ThemedView lightColor='#FFFFFF' darkColor='#050816' className='flex-1 p-4 pt-12'>
+				<ScrollView showsVerticalScrollIndicator={false}>
+					<View className='mb-4 w-full flex-row items-center justify-center rounded-2xl bg-[#F3F4F6] py-2'>
+						<TouchableOpacity
+							activeOpacity={0.7}
+							onPress={() => router.back()}
+							className='absolute left-4'>
+							<ChevronLeftIcon width={20} height={20} color='#f97316' />
+						</TouchableOpacity>
+						<ThemedText
+							lightColor='#111827'
+							className='text-base font-semibold'
+							style={{ fontFamily: 'System', fontSize: 16, fontWeight: '600' }}>
+							Detalles clase
+						</ThemedText>
+					</View>
+					{heroSource && !imageError ? (
+						<Image
+							source={heroSource}
+							style={styles.heroImage}
+							contentFit='cover'
+							onError={() => setImageError(true)}
+						/>
+					) : (
+						<View
+							style={[
+								styles.heroImage,
+								{
+									backgroundColor: '#000000',
+									justifyContent: 'center',
+									alignItems: 'center',
+								},
+							]}>
+							<Image
+								source={require('@/assets/images/isotipo.png')}
+								style={{ width: 160, height: 160 }}
+								contentFit='contain'
+							/>
+						</View>
+					)}
+
+					<ThemedText
+						lightColor='#111827'
+						darkColor='#ffffff'
+						className='mb-1 mt-4 text-3xl font-extrabold'
+						style={{ fontFamily: 'BebasNeue-Regular' }}>
+						{String(title || 'Nombre de la clase').toUpperCase()}
+					</ThemedText>
+
+					<View className='mb-1'>
+						<ThemedText
+							lightColor='#6b7280'
+							darkColor='#d4d4d4'
+							className='text-sm'
+							style={{ fontFamily: 'Montserrat_400Regular' }}>
+							{classDateFormatted}
+						</ThemedText>
+					</View>
+
+					<View className='mb-1'>
+						<ThemedText
+							lightColor='#4b5563'
+							darkColor='#e5e5e5'
+							className='text-sm'
+							style={{ fontFamily: 'Montserrat_500Medium' }}>
+							18 / 25 cupos ocupados
+						</ThemedText>
+					</View>
+
+					<View className='mb-3'>
+						<ThemedText lightColor='#f97316' darkColor='#f97316' className='font-bold'>
+							07:00 - 08:00 AM
+						</ThemedText>
+					</View>
+
+					<View className='mb-3 flex-row items-center'>
+						<StarIcon size={16} color='#F59E0B' />
+						<ThemedText
+							lightColor='#4b5563'
+							darkColor='#e5e5e5'
+							className='ml-2 text-sm'
+							style={{ fontFamily: 'Montserrat_400Regular' }}>
+							4.9 (231 reviews)
+						</ThemedText>
+					</View>
+
+					<View className='mb-4 flex-row items-center'>
+						<Image
+							source={{ uri: 'https://randomuser.me/api/portraits/men/31.jpg' }}
+							style={{ width: 28, height: 28, borderRadius: 9999 }}
+							contentFit='cover'
+						/>
+						<ThemedText
+							lightColor='#4b5563'
+							darkColor='#e5e5e5'
+							className='ml-2'
+							style={{ fontFamily: 'Montserrat_500Medium' }}>
+							{instructorFirstName || instructorLastName
+								? `${instructorFirstName ?? ''} ${instructorLastName ?? ''}`.trim()
+								: String(instructor || 'Nombre del Instructor')}
+						</ThemedText>
+						<TouchableOpacity
+							onPress={handleViewAllClients}
+							hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+							<ThemedText
+								lightColor='#f97316'
+								darkColor='#f97316'
+								className='text-sm font-semibold'
+								style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+								{t('classDetails.viewAllRegistered', 'Ver todos los inscritos')}
+							</ThemedText>
+						</TouchableOpacity>
+					</View>
+
+					{/* Search Bar for Clients */}
+					{isExpanded && (
+						<View className='mb-4'>
+							<View
+								className='flex-row items-center rounded-xl px-4 py-2'
+								style={{
+									backgroundColor: '#f3f4f6',
+									borderWidth: 1,
+									borderColor: '#e5e7eb',
+								}}>
+								<SearchIcon size={20} color='#9ca3af' style={{ marginRight: 8 }} />
+								<TextInput
+									placeholder={t(
+										'classDetails.searchPlaceholder',
+										'Buscar cliente...',
+									)}
+									placeholderTextColor='#9ca3af'
+									value={searchQuery}
+									onChangeText={setSearchQuery}
+									style={{
+										flex: 1,
+										fontFamily: 'Montserrat_400Regular',
+										fontSize: 14,
+										color: '#1f2937',
+										paddingVertical: 4, // Better touch target
+									}}
+								/>
+							</View>
+						</View>
+					)}
+
+					<View className='mb-2'>
+						<ThemedText
+							lightColor='#f97316'
+							darkColor='#f97316'
+							className='font-semibold'
+							style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+							Nivel: intermedio
+						</ThemedText>
+					</View>
+
+					<View className='mb-4'>
+						<ThemedText
+							lightColor='#111827'
+							darkColor='#ffffff'
+							className='mb-1'
+							style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+							Descripción de la clase:
+						</ThemedText>
+						<ThemedText
+							lightColor='#4b5563'
+							darkColor='#ffffff'
+							className='text-sm leading-relaxed'
+							style={{ fontFamily: 'Montserrat_400Regular' }}>
+							Este entrenamiento de fuerza se enfoca en el desarrollo muscular y la
+							resistencia. Incluye ejercicios con pesas, bandas de resistencia y peso
+							corporal. Ideal para todos los niveles.
+						</ThemedText>
+					</View>
+
+					<View className='mb-3 flex-row rounded-2xl bg-[#F3F4F6] p-1'>
+						<TouchableOpacity
+							className={`flex-1 items-center rounded-xl py-2 ${
+								activeTab === 'clientes' ? 'bg-white' : 'bg-transparent'
+							}`}
+							activeOpacity={0.7}
+							onPress={() => setActiveTab('clientes')}>
+							<Text
+								className={`font-body font-semibold ${
+									activeTab === 'clientes' ? 'text-[#111827]' : 'text-[#6b7280]'
+								}`}>
+								Clientes
+							</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							className={`flex-1 items-center rounded-xl py-2 ${
+								activeTab === 'pasar-lista' ? 'bg-white' : 'bg-transparent'
+							}`}
+							activeOpacity={0.7}
+							onPress={() => setActiveTab('pasar-lista')}>
+							<Text
+								className={`font-body font-semibold ${
+									activeTab === 'pasar-lista'
+										? 'text-[#111827]'
+										: 'text-[#6b7280]'
+								}`}>
+								Pasar lista
+							</Text>
+						</TouchableOpacity>
+					</View>
+
+					<View className='mb-3'>
+						<View className='flex-row items-center rounded-2xl border border-[#e5e7eb] bg-white px-3 py-2'>
+							<MagnifyingGlassIcon width={18} height={18} color='#f97316' />
+							<TextInput
+								placeholder='Nombre del cliente'
+								placeholderTextColor='#9ca3af'
+								value={search}
+								onChangeText={setSearch}
+								style={{ fontSize: 14, color: '#111827', marginLeft: 8, flex: 1 }}
+							/>
+						</View>
+					</View>
+
+					<View className='mb-6'>
+						{activeTab === 'clientes' ? (
+							<View className='rounded-2xl border border-[#e5e7eb] bg-white px-4 py-3 shadow-sm'>
+								<View className='mb-3 flex-row items-center'>
+									<UsersIcon size={18} color='#f97316' />
+									<Text className='ml-2 font-body text-[14px] font-medium text-[#111827]'>
+										Lista de clientes inscritos
+									</Text>
+								</View>
+
+								{filteredClients.map((client) => (
+									<TouchableOpacity
+										key={client.id}
+										className='mb-3 flex-row items-center justify-between rounded-2xl bg-[#F8F9FB] px-4 py-4'
+										activeOpacity={0.8}>
+										<View className='flex-1 flex-row items-center'>
+											<View className='mr-3 h-10 w-10 items-center justify-center rounded-xl bg-[#FED7AA]'>
+												<UserIcon size={22} color='#f97316' />
+											</View>
+											<View className='flex-1'>
+												<Text className='font-body text-[14px] font-bold text-[#1F2024]'>
+													{client.name}
+												</Text>
+												<Text className='font-body text-[12px] text-[#71727A]'>
+													{client.level}
+												</Text>
+											</View>
+										</View>
+										<ChevronRightIcon size={12} color='#71727A' />
+									</TouchableOpacity>
+								))}
+							</View>
+						) : (
+							<View className='rounded-2xl border border-[#e5e7eb] bg-white px-4 py-4 shadow-sm'>
+								<View className='mb-4 flex-row items-center'>
+									<UsersIcon size={18} color='#f97316' />
+									<Text className='ml-2 font-body text-[14px] font-medium text-[#111827]'>
+										Clientes inscritos
+									</Text>
+								</View>
+
+								{filteredClients.map((client) => {
+									const status = attendance[client.id];
+									return (
+										<View
+											key={client.id}
+											className='mb-4 rounded-2xl bg-[#F8F9FB] px-4 py-4'>
+											<View className='mb-2 flex-row items-center'>
+												<View className='mr-3 h-12 w-12 items-center justify-center rounded-full bg-[#FED7AA]'>
+													<UserIcon size={26} color='#f97316' />
+												</View>
+												<View className='flex-1'>
+													<Text className='font-body text-[16px] font-bold text-[#1F2024]'>
+														{client.name}
+													</Text>
+													<Text className='mb-1 font-body text-[12px] text-[#71727A]'>
+														{client.level}
+													</Text>
+												</View>
+											</View>
+
+											<View className='mb-4'>
+												<ThemedText
+													lightColor='#111827'
+													darkColor='#e5e5e5'
+													className='text-[15px] font-semibold'
+													style={{
+														fontFamily: 'Montserrat_600SemiBold',
+													}}>
+													{client.program}
+												</ThemedText>
+											</View>
+
+											<View className='flex-row gap-2'>
+												<TouchableOpacity
+													className={`flex-1 flex-row items-center justify-center rounded-xl py-3 ${
+														status === 'present'
+															? 'bg-[#f97316]'
+															: 'border border-[#f97316] bg-white'
+													}`}
+													activeOpacity={0.8}
+													onPress={() =>
+														setAttendance((prev) => ({
+															...prev,
+															[client.id]: 'present',
+														}))
+													}>
+													<CheckIcon
+														size={16}
+														color={
+															status === 'present'
+																? '#ffffff'
+																: '#f97316'
+														}
+														strokeWidth={3}
+													/>
+													<Text
+														className={`ml-2 font-body text-[13px] ${
+															status === 'present'
+																? 'text-white'
+																: 'text-[#f97316]'
+														}`}
+														style={{
+															fontFamily: 'Montserrat_600SemiBold',
+														}}>
+														Presente
+													</Text>
+												</TouchableOpacity>
+
+												<TouchableOpacity
+													className={`flex-1 flex-row items-center justify-center rounded-xl py-3 ${
+														status === 'late'
+															? 'bg-[#D1D5DB]'
+															: 'border border-[#D1D5DB] bg-white'
+													}`}
+													activeOpacity={0.8}
+													onPress={() =>
+														setAttendance((prev) => ({
+															...prev,
+															[client.id]: 'late',
+														}))
+													}>
+													<OutlineClockIcon
+														size={16}
+														color={
+															status === 'late'
+																? '#374151'
+																: '#9ca3af'
+														}
+														strokeWidth={2.5}
+													/>
+													<Text
+														className={`ml-2 font-body text-[13px] ${
+															status === 'late'
+																? 'text-[#374151]'
+																: 'text-[#9ca3af]'
+														}`}
+														style={{
+															fontFamily: 'Montserrat_600SemiBold',
+														}}>
+														Tarde
+													</Text>
+												</TouchableOpacity>
+
+												<TouchableOpacity
+													className={`flex-1 flex-row items-center justify-center rounded-xl border bg-white py-3 ${
+														status === 'absent'
+															? 'border-[#374151]'
+															: 'border-[#e5e7eb]'
+													}`}
+													activeOpacity={0.8}
+													onPress={() =>
+														setAttendance((prev) => ({
+															...prev,
+															[client.id]: 'absent',
+														}))
+													}>
+													<XMarkIcon
+														size={16}
+														color='#374151'
+														strokeWidth={2.5}
+													/>
+													<Text
+														className='ml-2 font-body text-[13px] text-[#374151]'
+														style={{
+															fontFamily: 'Montserrat_600SemiBold',
+														}}>
+														Ausente
+													</Text>
+												</TouchableOpacity>
+											</View>
+										</View>
+									);
+								})}
+
+								<View className='mb-4 mt-1 h-[1px] w-full bg-[#f97316]' />
+
+								<View className='mt-1'>
+									<ThemedText
+										lightColor='#111827'
+										darkColor='#ffffff'
+										className='mb-2'
+										style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+										Notas internas de la clase
+									</ThemedText>
+
+									<View className='mb-3'>
+										<TextInput
+											multiline
+											numberOfLines={4}
+											placeholder='Añade notas sobre esta clase...'
+											placeholderTextColor='#9ca3af'
+											value={classNotes}
+											onChangeText={setClassNotes}
+											style={{
+												borderWidth: 1,
+												borderColor: '#d1d5db',
+												borderRadius: 16,
+												paddingHorizontal: 12,
+												paddingVertical: 12,
+												minHeight: 120,
+												textAlignVertical: 'top',
+												fontSize: 13,
+												color: '#111827',
+											}}
+										/>
+									</View>
+
+									<TouchableOpacity
+										activeOpacity={0.8}
+										className='mb-3 w-full items-center justify-center rounded-2xl py-3'
+										style={{
+											backgroundColor: '#4b5563',
+											borderWidth: 1,
+											borderColor: '#e5e7eb',
+										}}
+										onPress={() =>
+											showToast(
+												'success',
+												'Notas guardadas',
+												'Las notas internas se han guardado correctamente.',
+											)
+										}>
+										<ThemedText
+											lightColor='#f9fafb'
+											darkColor='#f9fafb'
+											className='text-sm'
+											style={{ fontFamily: 'Montserrat_500Medium' }}>
+											{t('common.saveNotes', 'Guardar notas')}
+										</ThemedText>
+									</TouchableOpacity>
+
+									<TouchableOpacity
+										activeOpacity={0.8}
+										className='w-full items-center justify-center rounded-2xl py-3'
+										style={{ backgroundColor: '#f97316' }}
+										onPress={() =>
+											showToast(
+												'success',
+												'Asistencia guardada',
+												'La asistencia de la clase se ha guardado correctamente.',
+											)
+										}>
+										<ThemedText
+											lightColor='#ffffff'
+											darkColor='#ffffff'
+											className='text-sm font-semibold'
+											style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+											{t('common.saveAttendance', 'Guardar asistencia')}
+										</ThemedText>
+									</TouchableOpacity>
+								</View>
+							</View>
+						)}
+					</View>
+				</ScrollView>
+			</ThemedView>
+		);
+	}
+
+	return (
+		<ThemedView lightColor='#FFFFFF' darkColor='#050816' className='flex-1 p-4 pt-12'>
+			<ScrollView showsVerticalScrollIndicator={false}>
+				<View className='mb-4 w-full flex-row items-center justify-center rounded-2xl bg-[#F3F4F6] py-2'>
+					<TouchableOpacity
+						activeOpacity={0.7}
+						onPress={() => router.back()}
+						className='absolute left-4'>
+						<ChevronLeftIcon width={20} height={20} color='#f97316' />
+					</TouchableOpacity>
+					<ThemedText
+						lightColor='#111827'
+						className='text-base font-semibold'
+						style={{ fontFamily: 'System', fontSize: 16, fontWeight: '600' }}>
+						Detalles clase
+					</ThemedText>
+				</View>
+				{heroSource && !imageError ? (
+					<Image
+						source={heroSource}
+						style={styles.heroImage}
+						contentFit='cover'
+						onError={() => setImageError(true)}
+					/>
+				) : (
+					<View
+						style={[
+							styles.heroImage,
+							{
+								backgroundColor: '#000000',
+								justifyContent: 'center',
+								alignItems: 'center',
+							},
+						]}>
+						<Image
+							source={require('@/assets/images/isotipo.png')}
+							style={{ width: 160, height: 160 }}
+							contentFit='contain'
+						/>
+					</View>
+				)}
+
+				<ThemedText
+					lightColor='#111827'
+					darkColor='#ffffff'
+					className='mb-1 mt-4 text-3xl font-extrabold'
+					style={{ fontFamily: 'BebasNeue-Regular' }}>
+					{String(title || 'Nombre de la clase').toUpperCase()}
+				</ThemedText>
+
+				<View className='mb-1'>
+					<ThemedText
+						lightColor='#6b7280'
+						darkColor='#d4d4d4'
+						className='text-sm'
+						style={{ fontFamily: 'Montserrat_400Regular' }}>
+						{classDateFormatted}
+					</ThemedText>
+				</View>
+
+				{/* Occupancy Indicator */}
+				<View className='mb-4 flex-row items-center'>
+					<UserIcon size={16} color='#6b7280' style={{ marginRight: 6 }} />
+					<ThemedText
+						className='text-sm font-medium text-gray-500'
+						style={{ fontFamily: 'Montserrat_500Medium' }}>
+						{currentOccupancyCount !== null && capacity
+							? `${currentOccupancyCount} / ${capacity} cupos ocupados`
+							: capacity
+								? `${capacity} cupos totales`
+								: 'Cupos limitados'}
+					</ThemedText>
+				</View>
+
+				{effectiveFull && !isCrossfitCompleted && (
+					<View
+						className='mb-2 flex-row items-center rounded-2xl px-4 py-2'
+						style={{ backgroundColor: '#fecaca' }}>
+						<View
+							className='mr-3 items-center justify-center rounded-full'
+							style={{ width: 26, height: 26, backgroundColor: '#f97373' }}>
+							<ExclamationCircleIcon size={15} color='#ffffff' />
+						</View>
+						<ThemedText
+							lightColor='#b91c1c'
+							darkColor='#b91c1c'
+							className='text-xs font-medium'>
+							La clase se llenó mientras la reservabas.
+						</ThemedText>
+					</View>
+				)}
+
+				{reserved && (
+					<View className='mb-3'>
+						<View className='self-start rounded-full bg-emerald-500 px-3 py-1'>
+							<ThemedText
+								lightColor='#ffffff'
+								darkColor='#ffffff'
+								className='text-xs font-semibold'>
+								Reservada
+							</ThemedText>
+						</View>
+					</View>
+				)}
+
+				<View className='mb-3'>
+					<ThemedText lightColor='#f97316' darkColor='#f97316' className='font-bold'>
+						{timeRange}
+					</ThemedText>
+				</View>
+
+				<View className='mb-4 flex-row items-center'>
+					<Image
+						source={
+							instructorImageUrl && instructorImageUrl.startsWith('http')
+								? { uri: instructorImageUrl }
+								: { uri: 'https://randomuser.me/api/portraits/men/32.jpg' }
+						}
+						style={{ width: 28, height: 28, borderRadius: 9999 }}
+						contentFit='cover'
+					/>
+					<ThemedText
+						lightColor='#4b5563'
+						darkColor='#e5e5e5'
+						className='ml-2'
+						style={{ fontFamily: 'Montserrat_500Medium' }}>
+						{String(instructor || 'Nombre del Instructor')}
+					</ThemedText>
+				</View>
+
+				<View className='mb-4'>
+					<ThemedText
+						lightColor='#111827'
+						darkColor='#ffffff'
+						className='mb-1'
+						style={{ fontFamily: 'Montserrat_600SemiBold' }}>
+						{t('classDetails.descriptionTitle', 'Descripción de la clase:')}
+					</ThemedText>
+					<ThemedText
+						lightColor='#4b5563'
+						darkColor='#ffffff'
+						className='text-sm leading-relaxed'
+						style={{ fontFamily: 'Montserrat_400Regular' }}>
+						{description}
+					</ThemedText>
+				</View>
+
+				{isCrossfitCompleted ? (
+					<View className='mb-6 items-center'>
+						<View className='flex-row items-center rounded-full bg-emerald-50 px-4 py-2'>
+							<CheckCircleIcon size={18} color='#22c55e' />
+							<ThemedText
+								lightColor='#166534'
+								darkColor='#e5e5e5'
+								className='ml-2 text-xs font-semibold'>
+								Completado
+							</ThemedText>
+						</View>
+					</View>
+				) : (
+					<View className='mb-6'>
+						<PrimaryButton
+							title={
+								isPast
+									? 'Clase pasada'
+									: effectiveFull
+										? 'Clase llena'
+										: reserved
+											? 'Cancelar'
+											: 'Reservar'
+							}
+							disabled={isPast || effectiveFull || (!hasMembership && !reserved)}
+							style={{
+								backgroundColor:
+									isPast || effectiveFull || (!hasMembership && !reserved)
+										? '#6b7280'
+										: reserved
+											? '#ef4444'
+											: '#f97316',
+							}}
+							onPress={async () => {
+								if (effectiveFull) return;
+
+								if (reserved) {
+									setShowCancelModal(true);
+									return;
+								}
+
+								try {
+									// Use authToken from AuthContext (always fresh, automatically refreshed)
+									if (!authToken) {
+										showToast(
+											'error',
+											'Sesión no válida',
+											'Inicia sesión nuevamente para reservar la clase.',
+										);
+										return;
+									}
+
+									if (!classId) {
+										showToast(
+											'error',
+											'No se pudo reservar',
+											'Falta el identificador de la clase.',
+										);
+										return;
+									}
+
+									const whoAmI = (await vitalFitApi.user.WhoAmI(
+										authToken,
+									)) as unknown as {
+										user?: { id?: string; user_id?: string };
+									};
+									const userId = whoAmI?.user?.id || whoAmI?.user?.user_id;
+
+									if (!userId) {
+										showToast(
+											'error',
+											'Usuario no identificado',
+											'No se pudo obtener la información del usuario.',
+										);
+										return;
+									}
+
+									await vitalFitApi.booking.bookClass(
+										{ user_id: String(userId) },
+										String(classId),
+										authToken,
+									);
+
+									const img =
+										typeof heroSource === 'number'
+											? heroSource
+											: (imageUrl as string | number | undefined);
+
+									await reserve({
+										id,
+										title: String(title || ''),
+										time: String(time || ''),
+										instructor: String(instructor || ''),
+										imageUrl: img,
+									});
+
+									showToast(
+										'success',
+										'Clase reservada',
+										'Tu clase ha sido reservada correctamente.',
+									);
+
+									router.back();
+								} catch (error: unknown) {
+									let message = 'Ocurrió un error al reservar la clase.';
+
+									// Check for 402 Payment Required error
+									if (isAPIError(error) && error.status === 402) {
+										showToast(
+											'error',
+											t('classDetails.toasts.paymentRequired.title'),
+											t('classDetails.toasts.paymentRequired.message'),
+										);
+
+										// Fetch service price from branch services endpoint
+										let serviceName =
+											serviceData?.name || String(title) || 'Servicio';
+										let servicePrice = serviceData?.price ?? 0;
+
+										// If we don't have the price, try to fetch from branch services
+										if (servicePrice === 0 && branchId && serviceId) {
+											try {
+												const branchServicesResp =
+													await vitalFitApi.client.get({
+														url: `/public/branches/${String(branchId)}/services`,
+														jwt: authToken || undefined,
+														params: {
+															page: 1,
+															limit: 50,
+															currency: 'USD',
+														},
+													});
+												interface BranchServiceItem {
+													service_id: number;
+													name: string;
+													price: number;
+													lowest_price_no_member: number;
+													lowest_price_member: number;
+												}
+
+												const branchServices =
+													(
+														branchServicesResp as {
+															data: BranchServiceItem[];
+														}
+													)?.data || [];
+
+												const matchedService = branchServices.find(
+													(s: BranchServiceItem) =>
+														String(s.service_id) === String(serviceId),
+												);
+												if (matchedService) {
+													serviceName =
+														matchedService.name || serviceName;
+													servicePrice =
+														matchedService.lowest_price_no_member ??
+														matchedService.lowest_price_member ??
+														matchedService.price ??
+														0;
+												}
+											} catch (fetchError) {
+												console.warn(
+													'Could not fetch service price from branch:',
+													fetchError,
+												);
+											}
+										}
+
+										// Build service object for checkout
+										const serviceForCheckout = {
+											service_id: String(serviceId),
+											name: serviceName,
+											price: servicePrice,
+											type: 'service',
+										};
+
+										// Get today's date in ISO format for start date
+										const today = new Date().toISOString();
+
+										router.push({
+											pathname: '/membership-checkout',
+											params: {
+												title: serviceName,
+												price: String(servicePrice),
+												type: 'service',
+												servicesJson: JSON.stringify([serviceForCheckout]),
+												// Pass branchId to be used in confirmation step
+												fromClassDetails: 'true',
+												preselectedBranchId: branchId
+													? String(branchId)
+													: '',
+												preselectedStartDate: today,
+											},
+										});
+										return;
+									}
+
+									// Check for 500 Internal Server Error
+									if (isAPIError(error)) {
+										if (error.status === 500) {
+											message = t(
+												'classDetails.toasts.bookingError.serverError',
+											); // Assuming shared or using classDetails specific
+										} else if (
+											error.message
+												?.toLowerCase()
+												.includes('already enrolled') ||
+											error.message
+												?.toLowerCase()
+												.includes('already registered') ||
+											error.messages
+												?.join(' ')
+												.toLowerCase()
+												.includes('already enrolled')
+										) {
+											message = t(
+												'classDetails.toasts.bookingError.alreadyEnrolled',
+											);
+										} else {
+											message = error.messages.join(', ');
+										}
+									} else if (error instanceof Error) {
+										message = error.message;
+									}
+
+									showToast(
+										'error',
+										t('classDetails.toasts.bookingError.title'),
+										message,
+									);
+								}
+							}}
+						/>
+						{!hasMembership && !reserved && (
+							<View className='mt-2 items-center'>
+								<ThemedText
+									lightColor='#ef4444'
+									darkColor='#ef4444'
+									className='text-xs font-medium'>
+									Necesitas una membresía activa para reservar
+								</ThemedText>
+							</View>
+						)}
+					</View>
+				)}
+				<View className='mb-2 items-center justify-center'>
+					<ThemedText
+						lightColor='#9ca3af'
+						darkColor='#9ca3af'
+						className='text-center text-xs italic'>
+						“Podrás cancelar hasta 2h antes del inicio”
+					</ThemedText>
+				</View>
+			</ScrollView>
+
+			<Modal
+				visible={showCancelModal}
+				transparent
+				animationType='fade'
+				onRequestClose={() => setShowCancelModal(false)}>
+				<TouchableOpacity
+					activeOpacity={1}
+					style={{
+						flex: 1,
+						backgroundColor: 'rgba(0,0,0,0.5)',
+						justifyContent: 'center',
+						alignItems: 'center',
+						paddingHorizontal: 24,
+					}}
+					onPress={() => setShowCancelModal(false)}>
+					<View
+						style={{
+							backgroundColor: '#ffffff',
+							borderRadius: 24,
+							paddingVertical: 24,
+							paddingHorizontal: 20,
+							width: '100%',
+							maxWidth: 360,
+						}}>
+						<ThemedText
+							lightColor='#111827'
+							darkColor='#ffffff'
+							className='mb-2 text-center text-xl font-bold'>
+							¿Cancelar reserva?
+						</ThemedText>
+						<ThemedText
+							lightColor='#4b5563'
+							darkColor='#9ca3af'
+							className='mb-6 text-center text-sm'>
+							Perderás tu cupo en esta clase. ¿Estás seguro?
+						</ThemedText>
+						<View className='gap-3'>
+							<TouchableOpacity
+								activeOpacity={0.8}
+								onPress={async () => {
+									try {
+										const token = await AsyncStorage.getItem('token');
+										if (!token) {
+											showToast(
+												'error',
+												'Sesión no válida',
+												'Inicia sesión nuevamente para cancelar la reserva.',
+											);
+											return;
+										}
+
+										if (bookingId || serverBookingId) {
+											await vitalFitApi.booking.cancelBooking(
+												String(bookingId || serverBookingId),
+												token,
+											);
+										}
+
+										await cancel(id);
+										setShowCancelModal(false);
+
+										showToast(
+											'success',
+											'Reserva cancelada',
+											'Tu reserva ha sido cancelada correctamente.',
+										);
+
+										router.back();
+									} catch (error: unknown) {
+										let message = 'Ocurrió un error al cancelar la reserva.';
+										let isLateCancellation = false;
+
+										// Robust error text extraction
+										// eslint-disable-next-line @typescript-eslint/no-explicit-any
+										const errAny = error as any;
+										const errorString = (
+											(errAny?.message || '') +
+											' ' +
+											(Array.isArray(errAny?.messages)
+												? errAny.messages.join(' ')
+												: '') +
+											' ' +
+											String(error)
+										).toLowerCase();
+
+										// Detect restricted time window error globally
+										if (errorString.includes('restricted time window')) {
+											message =
+												'Ya no es posible cancelar porque ha pasado el tiempo límite permitido por el gimnasio.';
+											isLateCancellation = true;
+										} else if (isAPIError(error)) {
+											message = error.messages.join(', ');
+										} else if (error instanceof Error) {
+											message = error.message;
+										}
+
+										if (isLateCancellation) {
+											console.warn(
+												'Cancelación tardía detectada (Handled):',
+												message,
+											);
+											showToast('error', 'Tiempo límite excedido', message);
+										} else {
+											console.error('Error al cancelar reserva:', error);
+											showToast('error', 'No se pudo cancelar', message);
+										}
+									}
+								}}
+								className='items-center rounded-2xl py-3'
+								style={{ backgroundColor: '#f97316' }}>
+								<ThemedText
+									lightColor='#ffffff'
+									darkColor='#ffffff'
+									className='text-base font-bold'>
+									Aceptar
+								</ThemedText>
+							</TouchableOpacity>
+							<TouchableOpacity
+								activeOpacity={0.8}
+								onPress={() => setShowCancelModal(false)}
+								className='items-center rounded-2xl py-3'
+								style={{ backgroundColor: '#e5e7eb' }}>
+								<ThemedText
+									lightColor='#111827'
+									darkColor='#ffffff'
+									className='text-base font-bold'>
+									Volver
+								</ThemedText>
+							</TouchableOpacity>
+						</View>
+					</View>
+				</TouchableOpacity>
+			</Modal>
+		</ThemedView>
+	);
 }
