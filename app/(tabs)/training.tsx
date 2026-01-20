@@ -3,14 +3,16 @@ import { ThemedView } from '@/components/themed-view';
 import { ToastNotification } from '@/components/ToastNotification';
 import type { UserRoutineResponse } from '@/services/vitalfitSdk';
 import vitalFitApi from '@/services/vitalfitSdk';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Image, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { SparklesIcon } from 'react-native-heroicons/solid';
 
 export default function EntrenamientoScreen() {
     const { t } = useTranslation();
+    const router = useRouter();
     const [routines, setRoutines] = useState<UserRoutineResponse[]>([]);
     const [loading, setLoading] = useState(true);
     const [toastVisible, setToastVisible] = useState(false);
@@ -114,6 +116,27 @@ export default function EntrenamientoScreen() {
                         />
                     </View>
 
+                    {/* AI Routines Button */}
+                    <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() => router.push('/client-ai-routines')}
+                        style={{
+                            borderRadius: 16,
+                            paddingHorizontal: 16,
+                            paddingVertical: 14,
+                            backgroundColor: '#F27F2A',
+                            marginBottom: 16,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <SparklesIcon width={20} height={20} color='#FFFFFF' />
+                        <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700', marginLeft: 8 }} className="font-body">
+                            {t('training.viewAiRoutines') || 'View AI-Assigned Routines'}
+                        </Text>
+                    </TouchableOpacity>
+
                     {/* Loading state */}
                     {loading && (
                         <View style={{ paddingVertical: 40, alignItems: 'center' }}>
@@ -131,7 +154,7 @@ export default function EntrenamientoScreen() {
                             id={routine.user_routine_id}
                             routineId={routine.routine_id}
                             title={routine.routine_name}
-                            subtitle={`${routine.level}${routine.instructor ? ` - ${routine.instructor}` : ''}`}
+                            subtitle={routine.level}
                             progressPercent={0}
                             instructor={routine.instructor}
                             completionCount={routine.completion_count}

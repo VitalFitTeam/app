@@ -50,7 +50,6 @@ export default function BirthdayOfferBanner() {
                      const bannerData = (bannerDataRaw.data || bannerDataRaw) as RandomBanner;
 
                      if (bannerData && bannerData.image_url) {
-                        console.log('Banner received:', bannerData); // Debug log
 
                          // Relaxed filter: check ID OR URL match (and handle potential whitespace)
                          const forbiddenId = '184ae346-b6e0-4985-af14-8c9777eb8cab';
@@ -61,7 +60,7 @@ export default function BirthdayOfferBanner() {
                              (bannerData.image_url?.includes(forbiddenUrlPart));
                         
                          if (isForbidden) {
-                             console.log(`Attempt ${attempts}: Forbidden banner found. Skipping...`);
+
                              continue; // Try again
                          }
                          
@@ -92,8 +91,8 @@ export default function BirthdayOfferBanner() {
                                         setCategoryName(serviceData.category.name);
                                     }
                                 }
-                            } catch (e) {
-                                console.log('Error fetching service details:', e);
+                            } catch {
+                                // Ignore parsing errors
                             }
                          }
                          break; // Exit loop efficiently
@@ -101,8 +100,7 @@ export default function BirthdayOfferBanner() {
                          // No banner data
                          break;
                      }
-                 } catch (e) {
-                     console.error('Error fetching banner attempt ' + attempts, e);
+                 } catch {
                      break; // Don't retry on API error to avoid unexpected behavior
                  }
              }

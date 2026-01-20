@@ -1,5 +1,4 @@
 import BirthdayOfferBanner from '@/components/auth/dashboard/BirthdayOfferBanner';
-import ChallengesSection from '@/components/auth/dashboard/challengessection';
 import CrossFitBanner from '@/components/auth/dashboard/CrossFitBanner';
 import { MembershipCard } from '@/components/auth/dashboard/membershipcard';
 import { QRModal } from '@/components/auth/dashboard/QRModal';
@@ -72,20 +71,6 @@ export default function DashboardScreen() {
 		}, [])
 	);
 
-	const mockChallenges = [
-		{ id: '1', title: t('dashboard.member.completedChallenges'), current: 2, total: 5, iconType: 'trophy' as const },
-		{
-			id: '2',
-			title: t('dashboard.member.weeklyTraining'),
-			current: 8,
-			total: 10,
-			iconType: 'dumbbell' as const,
-		},
-		{ id: '3', title: t('dashboard.member.progress'), current: 4, total: 5, iconType: 'target' as const },
-	];
-
-
-
 	const mockRoutines = [
 		{
 			id: '1',
@@ -122,10 +107,11 @@ export default function DashboardScreen() {
 				<UserHeader
 					name={displayName}
 					avatarUrl={user?.profilePicture}
-					onBadgesPress={() => console.log('Abrir vista de medallas/insignias')}
+					role={user?.roleName}
+					onBadgesPress={() => router.replace('/badges')}
+					onNotificationPress={() => router.replace('/notifications')}
+					hasUnreadNotifications={false}
 				/>
-
-				<ChallengesSection challenges={mockChallenges} />
 
 				<MembershipCard
 					hasMembership={hasMembership}
@@ -152,7 +138,7 @@ export default function DashboardScreen() {
 						<BirthdayOfferBanner />
 
 						<WeeklyChallengeBanner
-							onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
+							onPress={() => router.replace('/training')}
 						/>
 
 						<BirthdayOfferBanner />

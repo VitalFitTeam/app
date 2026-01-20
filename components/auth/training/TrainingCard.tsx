@@ -131,7 +131,9 @@ export default function TrainingCard({ id, routineId, title, subtitle, instructo
         <View className="flex-row items-start justify-between">
           <View style={{ flexShrink: 1, paddingRight: 12 }}>
             <Text className='font-body' style={{ color: '#D1D5DB', fontSize: 12, marginBottom: 2 }}>{subtitle}</Text>
-            <Text className='font-body' style={{ color: '#9CA3AF', fontSize: 12 }}>{instructor}</Text>
+            <Text className='font-body' style={{ color: '#9CA3AF', fontSize: 12 }}>
+              {instructor === 'Unknown' ? 'AI Generated' : instructor}
+            </Text>
           </View>
           <View className="flex-row items-center" style={{ flexShrink: 0 }}>
             <Text className='font-body' style={{ color: '#FFFFFF', fontSize: 10 }}>Completions: {completionCount}</Text>
