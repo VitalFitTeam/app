@@ -1,6 +1,6 @@
 import { ThemedView } from '@/components/themed-view';
 import { useNotifications } from '@/contexts/NotificationContext';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -10,6 +10,7 @@ import {
   View,
   ActivityIndicator,
   RefreshControl,
+  BackHandler,
 } from 'react-native';
 import { ChevronLeftIcon } from 'react-native-heroicons/solid';
 import { format, isToday, isYesterday } from 'date-fns';
@@ -31,6 +32,23 @@ export default function NotificationsScreen() {
     await refreshNotifications();
     setRefreshing(false);
   };
+
+  // Handle Android back button
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        router.back();
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress
+      );
+
+      return () => subscription.remove();
+    }, [router])
+  );
 
   const handleOpenSettings = () => {
     router.push('/profile/notifications-settings');

@@ -248,7 +248,7 @@ export default function ProfileScreen() {
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3"
           onPress={() => {
-            router.push('/profile/notifications');
+            router.replace('/profile/notifications');
           }}
         >
           <View className="flex-row items-center">
