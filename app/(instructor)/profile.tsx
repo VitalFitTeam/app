@@ -13,7 +13,8 @@ import {
 	ChevronRightIcon,
 	GlobeAltIcon,
 	ShieldCheckIcon,
-	UserCircleIcon
+	UserCircleIcon,
+	ClipboardDocumentListIcon
 } from 'react-native-heroicons/outline';
 
 export default function InstructorProfileScreen() {
@@ -127,6 +128,21 @@ export default function InstructorProfileScreen() {
 							<BellIcon width={18} height={18} color='#f97316' />
 						</View>
 						<Text className='text-[13px] text-[#f97316]'>{t('instructor.profile.notifications')}</Text>
+					</View>
+					<ChevronRightIcon width={16} height={16} color='#f97316' />
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					activeOpacity={0.8}
+					className='w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3'
+					onPress={() => {
+						router.push('/instructor-my-routines');
+					}}>
+					<View className='flex-row items-center'>
+						<View className='w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3'>
+							<ClipboardDocumentListIcon width={18} height={18} color='#f97316' />
+						</View>
+						<Text className='text-[13px] text-[#f97316]'>{t('instructor.profile.myRoutines')}</Text>
 					</View>
 					<ChevronRightIcon width={16} height={16} color='#f97316' />
 				</TouchableOpacity>

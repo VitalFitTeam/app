@@ -1,26 +1,79 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import vitalFitApi from '@/services/vitalfitSdk';
+import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
 export type TrainingCardProps = {
   id: string;
+  routineId?: string;
   title: string;
   subtitle: string;
-  progressPercent: number; 
+  progressPercent: number;
   instructor?: string;
+  completionCount?: number;
+  totalExercises?: number;
+  refreshKey?: number;
   onPress?: () => void;
 };
 
-const days = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+type ProgressExercise = {
+  isCompleted: boolean;
+};
 
-export default function TrainingCard({ id, title, subtitle, progressPercent, instructor = 'Instructor', onPress }: TrainingCardProps) {
+export default function TrainingCard({ id, routineId, title, subtitle, instructor = 'Instructor', completionCount = 0, refreshKey = 0, onPress }: TrainingCardProps) {
   const router = useRouter();
+  const { token } = useAuth();
+  const [cachedProgress, setCachedProgress] = useState(0);
+
+  const loadCachedProgress = React.useCallback(async () => {
+    try {
+      if (!routineId || !token) return;
+
+      // Fetch routine details to get total exercises
+      const routineData = await vitalFitApi.routine.getRoutineById(routineId, token);
+      const totalExercisesCount = routineData?.exercises?.length || 0;
+
+      // Load cached progress
+      const cachedData = await AsyncStorage.getItem(`routine_progress_${routineId}`);
+      if (cachedData && totalExercisesCount > 0) {
+        const progressArray: ProgressExercise[] = JSON.parse(cachedData);
+        const completedExercises = progressArray.filter((ex) => ex.isCompleted).length;
+        const percentage = (completedExercises / totalExercisesCount) * 100;
+        setCachedProgress(Math.round(percentage));
+      } else {
+        setCachedProgress(0);
+      }
+    } catch (error) {
+      console.error('Error loading cached progress:', error);
+      setCachedProgress(0);
+    }
+  }, [routineId, token]);
+
+  useEffect(() => {
+    loadCachedProgress();
+  }, [loadCachedProgress, refreshKey]);
+
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      router.push({
+        pathname: '/routine/details',
+        params: {
+          id: routineId || id,
+          userRoutineId: id
+        }
+      });
+    }
+  };
 
   return (
     <TouchableOpacity
       activeOpacity={0.85}
-      onPress={onPress ? onPress : () => router.push({ pathname: '/routine/details', params: { id } })}
+      onPress={handlePress}
       className="w-full rounded-2xl overflow-hidden bg-white mb-4"
       style={{ shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 5 }}
     >
@@ -43,7 +96,7 @@ export default function TrainingCard({ id, title, subtitle, progressPercent, ins
             const stroke = 4;
             const radius = (size - stroke) / 2;
             const circumference = 2 * Math.PI * radius;
-            const progress = Math.max(0, Math.min(100, progressPercent));
+            const progress = Math.max(0, Math.min(100, cachedProgress));
             const dash = (progress / 100) * circumference;
             const gap = circumference - dash;
             return (
@@ -70,7 +123,7 @@ export default function TrainingCard({ id, title, subtitle, progressPercent, ins
               </Svg>
             );
           })()}
-          <Text className='font-body' style={{ position: 'absolute', color: '#F27F2A', fontWeight: '700', fontSize: 11 }}>{Math.round(progressPercent)}%</Text>
+          <Text className='font-body' style={{ position: 'absolute', color: '#F27F2A', fontWeight: '700', fontSize: 11 }}>{cachedProgress}%</Text>
         </View>
       </View>
 
@@ -81,16 +134,7 @@ export default function TrainingCard({ id, title, subtitle, progressPercent, ins
             <Text className='font-body' style={{ color: '#9CA3AF', fontSize: 12 }}>{instructor}</Text>
           </View>
           <View className="flex-row items-center" style={{ flexShrink: 0 }}>
-            {days.map((d, i) => {
-              const activeIndices = [1, 3, 5, 6]; 
-              const active = activeIndices.includes(i);
-              return (
-                <View key={`${d}-${i}`} style={{ alignItems: 'center', marginLeft: 10 }}>
-                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: active ? '#F27F2A' : '#FFFFFF', marginBottom: 2 }} />
-                  <Text className='font-body' style={{ color: '#FFFFFF', fontSize: 10 }}>{d}</Text>
-                </View>
-              );
-            })}
+            <Text className='font-body' style={{ color: '#FFFFFF', fontSize: 10 }}>Completions: {completionCount}</Text>
           </View>
         </View>
       </View>
