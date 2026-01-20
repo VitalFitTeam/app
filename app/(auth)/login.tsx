@@ -81,12 +81,6 @@ export default function LoginScreen() {
             let deviceToken: string | null = null;
             try {
                 deviceToken = await registerForPushNotificationsAsync();
-                if (deviceToken) {
-                    console.log('═══════════════════════════════════════════════════════');
-                    console.log('📱 FCM TOKEN OBTAINED FOR LOGIN');
-                    console.log('Device Token:', deviceToken);
-                    console.log('═══════════════════════════════════════════════════════');
-                }
             } catch (tokenError) {
                 console.warn('Could not get FCM token, continuing without it:', tokenError);
             }
@@ -98,24 +92,11 @@ export default function LoginScreen() {
                 device_token: deviceToken || undefined,
             };
 
-            console.log('═══════════════════════════════════════════════════════');
-            console.log('📤 SENDING LOGIN REQUEST TO BACKEND');
-            console.log('Endpoint: POST /auth/login');
-            console.log('Full Payload Being Sent:', JSON.stringify(loginPayload, null, 2));
-            console.log('Device token length:', deviceToken?.length || 0);
-            console.log('Device token included:', !!deviceToken);
-            console.log('═══════════════════════════════════════════════════════');
-
             // Use SDK's client.post directly because auth.login() strips device_token
             const response = await vitalFitApi.client.post({
                 url: '/auth/login',
                 data: loginPayload,
             });
-
-            console.log('═══════════════════════════════════════════════════════');
-            console.log('✅ LOGIN SUCCESSFUL');
-            console.log('Response:', response);
-            console.log('═══════════════════════════════════════════════════════');
 
             const token = response.token;
             const refreshToken = response.refresh_token;
@@ -123,12 +104,10 @@ export default function LoginScreen() {
             if (token && refreshToken) {
                 // Use AuthContext to store tokens
                 await authLogin(token, refreshToken);
-                console.log('Tokens guardados en AsyncStorage');
 
                 await fetchUser();
 
                 await new Promise(resolve => setTimeout(resolve, 300));
-                console.log('Delay completado, token debe estar disponible');
 
                 const whoamiResponse = await vitalFitApi.user.WhoAmI(token);
                 const role = whoamiResponse.user?.role?.name?.toLowerCase();
@@ -180,7 +159,6 @@ export default function LoginScreen() {
         try {
             try {
                 await signOut();
-                console.log('Sesión previa de Clerk cerrada');
             } catch {
                 console.log('No había sesión previa para cerrar');
             }
@@ -192,38 +170,22 @@ export default function LoginScreen() {
             if (createdSessionId && setActive) {
                 await setActive({ session: createdSessionId });
 
-                console.log('Sesión activada con ID:', createdSessionId);
-
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
                 const clerkToken = await getToken({ template: 'vitalfit-backend' });
 
                 if (clerkToken) {
-                    console.log('Session Token de Clerk obtenido con template vitalfit-backend');
-                    console.log('Token (primeros 100 chars):', clerkToken.substring(0, 100));
 
                     try {
-                        const payload = JSON.parse(atob(clerkToken.split('.')[1]));
-                        console.log('Email:', payload.email);
-                        console.log('User ID:', payload.sub);
-                        console.log('Payload completo:', JSON.stringify(payload, null, 2));
+                        JSON.parse(atob(clerkToken.split('.')[1]));
                     } catch (decodeError) {
                         console.error('Error al decodificar JWT:', decodeError);
                     }
-
                     try {
-                        console.log('Enviando al backend...');
-
                         // Get FCM device token before OAuth login
                         let deviceToken: string | null = null;
                         try {
                             deviceToken = await registerForPushNotificationsAsync();
-                            if (deviceToken) {
-                                console.log('═══════════════════════════════════════════════════════');
-                                console.log('📱 FCM TOKEN OBTAINED FOR OAUTH LOGIN');
-                                console.log('Device Token:', deviceToken);
-                                console.log('═══════════════════════════════════════════════════════');
-                            }
                         } catch (tokenError) {
                             console.warn('Could not get FCM token for OAuth, continuing without it:', tokenError);
                         }
@@ -234,24 +196,11 @@ export default function LoginScreen() {
                             device_token: deviceToken || undefined,
                         };
 
-                        console.log('═══════════════════════════════════════════════════════');
-                        console.log('📤 SENDING OAUTH LOGIN REQUEST TO BACKEND');
-                        console.log('Endpoint: POST /auth/oauth-login');
-                        console.log('Full Payload Being Sent:', JSON.stringify(oauthPayload, null, 2));
-                        console.log('Device token length:', deviceToken?.length || 0);
-                        console.log('Device token included:', !!deviceToken);
-                        console.log('═══════════════════════════════════════════════════════');
-
                         // Use SDK's client.post directly because auth.oAuthLogin() strips device_token
                         const response = await vitalFitApi.client.post({
                             url: '/auth/oauth-login',
                             data: oauthPayload,
                         });
-
-                        console.log('═══════════════════════════════════════════════════════');
-                        console.log('✅ OAUTH LOGIN SUCCESSFUL');
-                        console.log('Response:', response);
-                        console.log('═══════════════════════════════════════════════════════');
 
                         const backendToken = response.token;
                         const backendRefreshToken = (response as { refresh_token?: string }).refresh_token;
@@ -259,20 +208,15 @@ export default function LoginScreen() {
                         if (backendToken) {
                             // Use AuthContext to store tokens
                             await authLogin(backendToken, backendRefreshToken);
-                            console.log('Token de backend guardado');
-
                             // Store OAuth flag to indicate user signed in with Google
                             await AsyncStorage.setItem('is_oauth_user', 'true');
-                            console.log('OAuth flag stored');
 
                             await fetchUser();
 
                             await new Promise(resolve => setTimeout(resolve, 1000));
-                            console.log('Delay completado, verificando token...');
 
                             const savedToken = await AsyncStorage.getItem('token');
                             if (savedToken) {
-                                console.log('Token verificado en AsyncStorage');
 
                                 const whoamiResponse = await vitalFitApi.user.WhoAmI(backendToken);
                                 const role = whoamiResponse.user?.role?.name?.toLowerCase();
@@ -306,7 +250,6 @@ export default function LoginScreen() {
                                 showToast('error', 'Error de autenticación', backendError.messages.join(', '));
                             }
                         } else if (backendError instanceof Error && backendError.message?.includes('Usuario no encontrado')) {
-                            console.log('Usuario no registrado, redirigiendo al flujo de registro');
                             showToast('success', 'Cuenta no registrada', 'Vamos a completar tu registro con Google');
                             router.replace('/(auth)/register?oauth=google');
                         } else {

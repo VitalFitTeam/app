@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
 		fontSize: 28,
 		color: '#000000',
 		marginBottom: 12,
-		marginLeft: 16,
+		textAlign: 'center',
 	},
 	listContainer: {
 		paddingHorizontal: 16,
@@ -305,6 +305,7 @@ const styles = StyleSheet.create({
 		height: '100%',
 		borderRadius: 18,
 		overflow: 'hidden',
+		right: 15,
 	},
 	image: {
 		width: '100%',
@@ -314,8 +315,8 @@ const styles = StyleSheet.create({
 	detailsPill: {
 		position: 'absolute',
 		bottom: 10,
-		left: 10,
-		right: 10,
+		left: 0,
+		right: 30,
 		backgroundColor: 'rgba(20, 20, 20, 0.85)',
 		borderRadius: 12,
 		borderWidth: 0.5,

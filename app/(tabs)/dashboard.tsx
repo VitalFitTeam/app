@@ -107,8 +107,9 @@ export default function DashboardScreen() {
 				<UserHeader
 					name={displayName}
 					avatarUrl={user?.profilePicture}
-					onBadgesPress={() => console.log('Abrir vista de medallas/insignias')}
-					onNotificationPress={() => router.replace('/profile/notifications')}
+					role={user?.roleName}
+					onBadgesPress={() => router.replace('/badges')}
+					onNotificationPress={() => router.replace('/notifications')}
 					hasUnreadNotifications={false}
 				/>
 
@@ -137,7 +138,7 @@ export default function DashboardScreen() {
 						<BirthdayOfferBanner />
 
 						<WeeklyChallengeBanner
-							onPress={() => console.log('Abrir challenge:', 'plank-challenge')}
+							onPress={() => router.replace('/training')}
 						/>
 
 						<BirthdayOfferBanner />

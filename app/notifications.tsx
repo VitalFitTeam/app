@@ -1,19 +1,19 @@
 import { ThemedView } from '@/components/themed-view';
 import { useNotifications } from '@/contexts/NotificationContext';
+import { format, isToday, isYesterday } from 'date-fns';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  ActivityIndicator,
+  BackHandler,
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
-  ActivityIndicator,
-  RefreshControl,
-  BackHandler,
 } from 'react-native';
 import { ChevronLeftIcon } from 'react-native-heroicons/solid';
-import { format, isToday, isYesterday } from 'date-fns';
 
 export default function NotificationsScreen() {
   const router = useRouter();
@@ -33,11 +33,18 @@ export default function NotificationsScreen() {
     setRefreshing(false);
   };
 
-  // Handle Android back button
+  const handleBack = React.useCallback(() => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/dashboard');
+    }
+  }, [router]);
+
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
-        router.back();
+        handleBack(); 
         return true;
       };
 
@@ -47,7 +54,7 @@ export default function NotificationsScreen() {
       );
 
       return () => subscription.remove();
-    }, [router])
+    }, [handleBack])
   );
 
   const handleOpenSettings = () => {
@@ -161,7 +168,7 @@ export default function NotificationsScreen() {
           style={{ position: 'relative' }}>
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => router.back()}
+            onPress={handleBack}
             style={{ position: 'absolute', left: 12, top: 8, bottom: 8, justifyContent: 'center' }}>
             <ChevronLeftIcon width={20} height={20} color='#f97316' />
           </TouchableOpacity>

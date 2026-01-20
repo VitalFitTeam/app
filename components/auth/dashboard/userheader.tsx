@@ -6,6 +6,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 interface Props {
 	name: string;
 	avatarUrl?: string;
+	role?: string;
 	onBadgesPress?: () => void;
 	onNotificationPress?: () => void;
 	hasUnreadNotifications?: boolean;
@@ -14,11 +15,13 @@ interface Props {
 export const UserHeader: React.FC<Props> = ({
 	name,
 	avatarUrl,
+	role,
 	onBadgesPress,
 	onNotificationPress,
 	hasUnreadNotifications = false
 }) => {
 	const firstName = name.split(' ')[0];
+	const userRole = role?.toLowerCase();
 
 	return (
 		<View className='mb-6 mt-2'>
@@ -59,15 +62,17 @@ export const UserHeader: React.FC<Props> = ({
 						</TouchableOpacity>
 					)}
 
-					<TouchableOpacity
-						onPress={onNotificationPress}
-						className='relative'
-						activeOpacity={0.7}>
-						<Bell size={24} color='#333' />
-						{hasUnreadNotifications && (
-							<View className='absolute right-0 top-0 h-2.5 w-2.5 rounded-full bg-red-500' />
-						)}
-					</TouchableOpacity>
+					{userRole === 'client' && (
+						<TouchableOpacity
+							onPress={onNotificationPress}
+							className='relative'
+							activeOpacity={0.7}>
+							<Bell size={24} color='#333' />
+							{hasUnreadNotifications && (
+								<View className='absolute right-0 top-0 h-2.5 w-2.5 rounded-full bg-red-500' />
+							)}
+						</TouchableOpacity>
+					)}
 				</View>
 			</View>
 		</View>

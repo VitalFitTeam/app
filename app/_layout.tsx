@@ -260,6 +260,20 @@ export default function RootLayout() {
                                             title: '',
                                         }}
                                     />
+                                    <Stack.Screen
+                                        name="notifications"
+                                        options={{
+                                            headerShown: false,
+                                            title: '',
+                                        }}
+                                    />
+                                    <Stack.Screen
+                                        name="badges"
+                                        options={{
+                                            headerShown: false,
+                                            title: '',
+                                        }}
+                                    />
                                 </Stack>
                                 <StatusBar style='auto' />
                                 <Toast />

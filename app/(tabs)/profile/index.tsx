@@ -13,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
   ArrowRightOnRectangleIcon,
-  BellIcon,
   CameraIcon,
   ChevronRightIcon,
   CreditCardIcon,
@@ -21,7 +20,6 @@ import {
   QrCodeIcon,
   ShieldCheckIcon,
   TicketIcon,
-  TrophyIcon,
   UserCircleIcon
 } from 'react-native-heroicons/outline';
 
@@ -216,22 +214,6 @@ export default function ProfileScreen() {
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3"
           onPress={() => {
-            router.push('/profile/insignias');
-          }}
-        >
-          <View className="flex-row items-center">
-            <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
-              <TrophyIcon width={18} height={18} color="#f97316" />
-            </View>
-            <Text className="text-[13px] text-[#f97316]">{t('client.profile.badges')}</Text>
-          </View>
-          <ChevronRightIcon width={16} height={16} color="#f97316" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3"
-          onPress={() => {
             router.push('/profile/language');
           }}
         >
@@ -240,22 +222,6 @@ export default function ProfileScreen() {
               <LanguageIcon width={18} height={18} color="#f97316" />
             </View>
             <Text className="text-[13px] text-[#f97316]">{t('client.profile.language')}</Text>
-          </View>
-          <ChevronRightIcon width={16} height={16} color="#f97316" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className="w-full flex-row items-center justify-between rounded-2xl bg-white border border-[#f97316] px-4 py-3 mb-3"
-          onPress={() => {
-            router.replace('/profile/notifications');
-          }}
-        >
-          <View className="flex-row items-center">
-            <View className="w-8 h-8 rounded-full bg-[#F3F4F6] items-center justify-center mr-3">
-              <BellIcon width={18} height={18} color="#f97316" />
-            </View>
-            <Text className="text-[13px] text-[#f97316]">{t('client.profile.notifications')}</Text>
           </View>
           <ChevronRightIcon width={16} height={16} color="#f97316" />
         </TouchableOpacity>
