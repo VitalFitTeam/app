@@ -28,11 +28,13 @@
 		},
 		"checkIn": {
 			"error": {
+				"title": "Check-in Fehler",
 				"selectBranch": "Bitte wählen Sie einen Standort aus, bevor Sie scannen.",
 				"default": "Zutritt konnte nicht verarbeitet werden.",
 				"paymentPending": "Benutzer hat ausstehende Zahlungen.",
 				"accessDenied": "Benutzer hat keine Berechtigung, diesen Bereich oder Standort zu betreten.",
-				"qrExpired": "QR-Code ist abgelaufen. Bitten Sie den Benutzer, einen neuen zu generieren."
+				"qrExpired": "QR-Code ist abgelaufen. Bitten Sie den Benutzer, einen neuen zu generieren.",
+				"unauthorized": "Unbefugter Zugriff. Bitte überprüfen Sie die Anmeldedaten."
 			},
 			"title": "Kunden-Check-in",
 			"successMessage": "Check-in erfolgreich verarbeitet",
@@ -341,9 +343,14 @@
 			},
 			"validateCheckIn": {
 				"title": "Check-in validieren",
-				"searchPlaceholder": "Nach Ausweisnummer suchen",
+				"searchPlaceholder": "Nach E-Mail suchen",
 				"scanQr": "QR scannen",
-				"scanFace": "Gesicht scannen"
+				"scanFace": "Gesicht scannen",
+				"checkInByEmail": "Check-in per E-Mail",
+				"searching": "Suchen...",
+				"emailRequired": "E-Mail ist erforderlich",
+				"invalidEmail": "Ungültiges E-Mail-Format",
+				"userNotFound": "Benutzer mit dieser E-Mail nicht gefunden"
 			},
 			"capacity": {
 				"title": "Studio-Auslastung",

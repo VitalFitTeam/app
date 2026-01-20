@@ -14,6 +14,7 @@ export interface FaceCheckInResponse {
 	check_in_time: string;
 	message: string;
 	service_name: string;
+	user_id?: string;
 	user?: {
 		first_name: string;
 		last_name: string;

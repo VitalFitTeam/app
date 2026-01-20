@@ -166,9 +166,19 @@ export default function HorariosScreen() {
             try {
                 const token = await AsyncStorage.getItem('token');
 
+                // Use the date parameter to filter classes by the selected date
+                // Extract month and year from the selected date to pass all parameters
+                const dateObj = new Date(selectedClassesDate);
+                const month = dateObj.getMonth() + 1; // 1-12
+                const year = dateObj.getFullYear();
+
+                console.log('[Schedule] Fetching classes for branch:', selectedBranchId, 'with filters - month:', month, 'year:', year, 'date:', selectedClassesDate);
                 const response = await vitalFitApi.schedule.ListBranchesClass(
                     selectedBranchId,
                     token || '',
+                    month,
+                    year,
+                    selectedClassesDate,
                 );
 
                 const raw =
@@ -178,6 +188,22 @@ export default function HorariosScreen() {
                     ? (raw as { data?: BranchClassInfo[] }).data
                     : (raw as BranchClassInfo[]);
                 const items: BranchClassInfo[] = Array.isArray(itemsFromApi) ? itemsFromApi : [];
+
+                console.log('[Schedule] Received', items.length, 'classes from API for date:', selectedClassesDate);
+
+                // Debug: Check the actual dates of returned classes
+                const uniqueDates = new Set(
+                    items.map(item => item.starts_at ? formatLocalDate(new Date(item.starts_at)) : 'no-date')
+                );
+                console.log('[Schedule] Unique dates in response:', Array.from(uniqueDates));
+                console.log('[Schedule] Classes per date:',
+                    Array.from(uniqueDates).map(date => ({
+                        date,
+                        count: items.filter(item =>
+                            item.starts_at && formatLocalDate(new Date(item.starts_at)) === date
+                        ).length
+                    }))
+                );
 
                 // 3. Prepare Caches & Identification of Missing Data
                 const uniqueServiceIds = Array.from(
@@ -310,7 +336,7 @@ export default function HorariosScreen() {
         };
 
         void loadClasses();
-    }, [selectedBranchId, refreshKey, t]);
+    }, [selectedBranchId, selectedClassesDate, refreshKey, t]);
 
     useEffect(() => {
         const loadBookings = async () => {
