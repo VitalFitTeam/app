@@ -1,5 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { Image } from 'expo-image';
+import i18n from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { TouchableOpacity, View } from 'react-native';
@@ -22,6 +23,7 @@ type ClassCardProps = {
 	variant?: 'default' | 'overlay';
 	category?: string;
 	reserved?: boolean;
+	date?: string;
 };
 
 export default function ClassCard({
@@ -34,10 +36,25 @@ export default function ClassCard({
 	variant = 'default',
 	category,
 	reserved,
+	date,
 }: ClassCardProps) {
 	const { t } = useTranslation();
 	const classData: ClassData = { time, title, instructor, branch, imageUrl };
 	const [imageError, setImageError] = React.useState(false);
+
+	const formatDate = (dateString?: string) => {
+		if (!dateString) return t('common.today');
+		const date = new Date(dateString + 'T00:00:00'); // Add time to ensure correct parsing
+		const today = new Date();
+		const isToday = date.toDateString() === today.toDateString();
+		if (isToday) return t('common.today');
+		
+		return date.toLocaleDateString(i18n.language, { 
+			weekday: 'long', 
+			day: 'numeric', 
+			month: 'short' 
+		});
+	};
 
 	if (variant === 'overlay') {
 		return (
@@ -79,7 +96,7 @@ export default function ClassCard({
 								darkColor='#E0E0E0'
 								style={{ fontFamily: 'Montserrat_500Medium', fontSize: 14, marginTop: 2 }}
 							>
-								{t('common.today')}, {time}
+								{formatDate(date)}, {time}
 							</ThemedText>
 							<ThemedText
 								className='font-body'

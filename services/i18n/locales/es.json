@@ -107,7 +107,8 @@
 			"availability": "Disponibilidad",
 			"unknown": "Desconocido",
 			"notes": "Notas",
-			"noClientsFound": "No se encontraron clientes"
+			"noClientsFound": "No se encontraron clientes",
+			"weekdaysShort": ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"]
 		},
 		"enrollClient": {
 			"title": "Inscribir Cliente",
@@ -426,7 +427,10 @@
 			"spotsOccupied": "cupos ocupados",
 			"myBookings": "Mis reservas",
 			"noBookings": "Aún no tienes reservas.",
-			"noClassesBranch": "No hay clases programadas para esta sede.",
+			"noClassesBranch": "Ninguna lección programada para esta sede.",
+			"noClassesForDate": "No hay clases disponibles para la fecha seleccionada",
+			"errorLoadingClasses": "No se pudieron cargar las clases. Intenta nuevamente.",
+			"errorLoadingBookings": "No se pudieron cargar tus reservas. Intenta nuevamente.",
 			"tabs": {
 				"classes": "Clases",
 				"reservations": "Reservas",
