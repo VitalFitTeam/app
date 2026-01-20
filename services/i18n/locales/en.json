@@ -108,7 +108,15 @@
       "reviews": "reviews",
       "unnamedUser": "Unnamed User",
       "noProgram": "No program",
-      "weekdaysShort": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+      "weekdaysShort": [
+        "MON",
+        "TUE",
+        "WED",
+        "THU",
+        "FRI",
+        "SAT",
+        "SUN"
+      ]
     },
     "login": {
       "title": "Sign In",
@@ -620,10 +628,13 @@
       "title": "My Badges",
       "currentLevel": "YOUR CURRENT LEVEL",
       "progressToLevel": "Progress to level {{level}}",
+      "loading": "Loading badges...",
+      "error": "Could not load data",
+      "backButton": "Back",
       "stats": {
         "points": "Points",
         "badges": "Badges",
-        "referrals": "Referrals"
+        "attendance": "Attendance"
       },
       "badgesObtained": "Badges Obtained",
       "progress": "Progress",
@@ -635,14 +646,25 @@
       },
       "badgeNames": {
         "firstClass": "First Class",
+        "beginner": "Beginner",
+        "dedicated": "Dedicated",
         "ironWarrior": "Iron Warrior",
-        "earlyBird": "Early Bird",
+        "athlete": "Athlete",
+        "disciplined": "Disciplined",
         "champion": "Champion",
-        "devoted": "Devoted"
+        "master": "Master",
+        "fitnessGod": "Fitness God"
       },
       "requirements": {
-        "champion": "Win 6 extra challenges",
-        "devoted": "Train 30 days straight"
+        "firstClass": "Start your journey",
+        "beginner": "Reach 100 points",
+        "dedicated": "Reach 250 points",
+        "ironWarrior": "Reach 600 points",
+        "athlete": "Reach 1000 points",
+        "disciplined": "Reach 1500 points",
+        "champion": "Reach 2100 points",
+        "master": "Reach 3000 points",
+        "fitnessGod": "Reach 6000 points"
       }
     },
     "profileSettings": {

@@ -104,7 +104,15 @@
 			"unknown": "Inconnu",
 			"notes": "Notes",
 			"noClientsFound": "Aucun client trouvé",
-			"weekdaysShort": ["LUN", "MAR", "MER", "JEU", "VEN", "SAM", "DIM"]
+			"weekdaysShort": [
+				"LUN",
+				"MAR",
+				"MER",
+				"JEU",
+				"VEN",
+				"SAM",
+				"DIM"
+			]
 		},
 		"enrollClient": {
 			"title": "Inscrire Client",
@@ -395,7 +403,6 @@
 			},
 			"findBranches": "Trouver des Succursales"
 		},
-
 		"personalInfo": {
 			"editButton": "Modifier les Informations",
 			"sections": {
@@ -551,10 +558,13 @@
 			"title": "Mes Badges",
 			"currentLevel": "VOTRE NIVEAU ACTUEL",
 			"progressToLevel": "Progression vers le niveau {{level}}",
+			"loading": "Chargement des badges...",
+			"error": "Impossible de charger les données",
+			"backButton": "Retour",
 			"stats": {
 				"points": "Points",
 				"badges": "Badges",
-				"referrals": "Parrainages"
+				"attendance": "Présence"
 			},
 			"badgesObtained": "Badges Obtenus",
 			"progress": "Progrès",
@@ -566,14 +576,25 @@
 			},
 			"badgeNames": {
 				"firstClass": "Premier Cours",
+				"beginner": "Débutant",
+				"dedicated": "Dévoué",
 				"ironWarrior": "Guerrier de Fer",
-				"earlyBird": "Lève-tôt",
+				"athlete": "Athlète",
+				"disciplined": "Discipliné",
 				"champion": "Champion",
-				"devoted": "Dévoué"
+				"master": "Maître",
+				"fitnessGod": "Dieu du Fitness"
 			},
 			"requirements": {
-				"champion": "Gagnez 6 défis supplémentaires",
-				"devoted": "Entraînez-vous 30 jours de suite"
+				"firstClass": "Commencez votre voyage",
+				"beginner": "Atteignez 100 points",
+				"dedicated": "Atteignez 250 points",
+				"ironWarrior": "Atteignez 600 points",
+				"athlete": "Atteignez 1000 points",
+				"disciplined": "Atteignez 1500 points",
+				"champion": "Atteignez 2100 points",
+				"master": "Atteignez 3000 points",
+				"fitnessGod": "Atteignez 6000 points"
 			}
 		},
 		"profileSettings": {
@@ -821,7 +842,10 @@
 			},
 			"startDate": "Date de Début",
 			"benefits": {
-				"free-trial": ["Accès salle limité", "7 jours d'accès gratuit"],
+				"free-trial": [
+					"Accès salle limité",
+					"7 jours d'accès gratuit"
+				],
 				"advanced": [
 					"Accès salle illimité",
 					"7 séances avec consultant fitness",
@@ -1054,7 +1078,7 @@
 				"completions": "Complétions",
 				"createNew": "Créer une Nouvelle Routine",
 				"noRoutines": "Aucune routine disponible. Créez-en une d'abord.",
-			"exercisesLabel": "exercices"
+				"exercisesLabel": "exercices"
 			},
 			"createRoutine": {
 				"title": "Créer une Routine",

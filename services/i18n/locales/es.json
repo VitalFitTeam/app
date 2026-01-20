@@ -18,7 +18,6 @@
 			"classDetails": "Detalles de la Clase",
 			"qr": "QR"
 		},
-
 		"qr": {
 			"title": "Tu Código de Acceso",
 			"instruction": "Muestra este código en recepción para ingresar",
@@ -108,7 +107,15 @@
 			"unknown": "Desconocido",
 			"notes": "Notas",
 			"noClientsFound": "No se encontraron clientes",
-			"weekdaysShort": ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"]
+			"weekdaysShort": [
+				"LUN",
+				"MAR",
+				"MIÉ",
+				"JUE",
+				"VIE",
+				"SÁB",
+				"DOM"
+			]
 		},
 		"enrollClient": {
 			"title": "Inscribir Cliente",
@@ -392,7 +399,6 @@
 				"checkIn": "Check in",
 				"purchase": "Comprar"
 			},
-
 			"upcomingRoutines": {
 				"title": "Próximas rutinas",
 				"services": "Servicios",
@@ -400,7 +406,6 @@
 				"purchase": "Comprar"
 			}
 		},
-
 		"personalInfo": {
 			"editButton": "Editar Información",
 			"sections": {
@@ -561,12 +566,15 @@
 			"title": "Mis insignias",
 			"currentLevel": "TU NIVEL ACTUAL",
 			"progressToLevel": "Progreso al nivel {{level}}",
+			"loading": "Cargando insignias...",
+			"error": "No se pudieron cargar los datos",
+			"backButton": "Volver",
 			"stats": {
 				"points": "Puntos",
 				"badges": "Insignias",
-				"referrals": "Referidos"
+				"attendance": "Asistencias"
 			},
-			"badgesObtained": "Badges obtenidos",
+			"badgesObtained": "Insignias obtenidas",
 			"progress": "Progreso",
 			"rarity": {
 				"common": "Común",
@@ -575,15 +583,26 @@
 				"legendary": "Legendario"
 			},
 			"badgeNames": {
-				"firstClass": "Primera clase",
+				"firstClass": "Primera Clase",
+				"beginner": "Principiante",
+				"dedicated": "Dedicado",
 				"ironWarrior": "Guerrero de Hierro",
-				"earlyBird": "Madrugador",
-				"champion": "Champion",
-				"devoted": "Devoted"
+				"athlete": "Atleta",
+				"disciplined": "Disciplinado",
+				"champion": "Campeón",
+				"master": "Maestro",
+				"fitnessGod": "Dios del Fitness"
 			},
 			"requirements": {
-				"champion": "Gana 6 retos extra",
-				"devoted": "Entrena 30 días seguidos"
+				"firstClass": "Comienza tu viaje",
+				"beginner": "Alcanza 100 puntos",
+				"dedicated": "Alcanza 250 puntos",
+				"ironWarrior": "Alcanza 600 puntos",
+				"athlete": "Alcanza 1000 puntos",
+				"disciplined": "Alcanza 1500 puntos",
+				"champion": "Alcanza 2100 puntos",
+				"master": "Alcanza 3000 puntos",
+				"fitnessGod": "Alcanza 6000 puntos"
 			}
 		},
 		"profileSettings": {
@@ -856,7 +875,10 @@
 			},
 			"startDate": "Fecha de inicio",
 			"benefits": {
-				"free-trial": ["Acceso limitado al gimnasio", "7 días de acceso libre"],
+				"free-trial": [
+					"Acceso limitado al gimnasio",
+					"7 días de acceso libre"
+				],
 				"advanced": [
 					"Acceso ilimitado al gimnasio",
 					"7 sesiones con consultor fitness",
@@ -1417,7 +1439,6 @@
 				}
 			}
 		},
-
 		"instructorProfile": {
 			"title": "Perfil de Instructor",
 			"specialty": "Especialidad",
