@@ -107,7 +107,8 @@
       "close": "Close",
       "reviews": "reviews",
       "unnamedUser": "Unnamed User",
-      "noProgram": "No program"
+      "noProgram": "No program",
+      "weekdaysShort": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
     },
     "login": {
       "title": "Sign In",
@@ -413,6 +414,8 @@
       "myBookings": "My Bookings",
       "noBookings": "You have no bookings yet.",
       "noClassesBranch": "No classes scheduled for this branch.",
+      "errorLoadingClasses": "Could not load classes. Please try again.",
+      "errorLoadingBookings": "Could not load your bookings. Please try again.",
       "noClassesForDate": "No classes available for the selected date",
       "tabs": {
         "classes": "Classes",

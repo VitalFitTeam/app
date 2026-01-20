@@ -303,14 +303,14 @@ export default function HorariosScreen() {
                 setVisibleClassesCount(PAGE_SIZE);
             } catch (error) {
                 console.error('Error cargando clases en Schedule:', error);
-                setErrorMessage('No se pudieron cargar las clases. Intenta nuevamente.');
+                setErrorMessage(t('schedule.errorLoadingClasses'));
             } finally {
                 setLoadingClasses(false);
             }
         };
 
         void loadClasses();
-    }, [selectedBranchId, refreshKey]);
+    }, [selectedBranchId, refreshKey, t]);
 
     useEffect(() => {
         const loadBookings = async () => {
@@ -542,7 +542,7 @@ export default function HorariosScreen() {
                 setVisibleBookingsCount(PAGE_SIZE);
             } catch (error) {
                 console.error('Error cargando reservas del cliente:', error);
-                setBookingsError('No se pudieron cargar tus reservas. Intenta nuevamente.');
+                setBookingsError(t('schedule.errorLoadingBookings'));
             } finally {
                 setLoadingBookings(false);
             }
@@ -722,7 +722,8 @@ export default function HorariosScreen() {
                                     branch={classItem.branch}
                                     imageUrl={classItem.imageUrl}
                                     variant='overlay'
-                                    category={`${classItem.capacity || 0} Cupos`}
+                                    category=""
+                                    date={classItem.rawDate}
                                     reserved={isReserved(
                                         `${classItem.classId}|${classItem.serviceId}`,
                                     )}
@@ -795,10 +796,8 @@ export default function HorariosScreen() {
                                         branch={booking.branch}
                                         imageUrl={booking.imageUrl}
                                         variant='overlay'
-                                        category={`${t('common.available')}: ${Math.max(
-                                            (booking.capacity || 0) - (booking.occupied || 0),
-                                            0,
-                                        )} ${t('common.of')} ${booking.capacity || 0}`}
+                                        category=""
+                                        date={booking.rawDate}
                                         reserved
                                         onPress={(classData) => {
                                             router.push({

@@ -103,7 +103,8 @@
 			"availability": "Verfügbarkeit",
 			"unknown": "Unbekannt",
 			"notes": "Notizen",
-			"noClientsFound": "Keine Kunden gefunden"
+			"noClientsFound": "Keine Kunden gefunden",
+			"weekdaysShort": ["MO", "DI", "MI", "DO", "FR", "SA", "SO"]
 		},
 		"enrollClient": {
 			"title": "Kunden anmelden",
@@ -422,6 +423,9 @@
 			"myBookings": "Meine Buchungen",
 			"noBookings": "Du hast noch keine Buchungen.",
 			"noClassesBranch": "Keine Kurse für diesen Standort geplant.",
+			"noClassesForDate": "Keine Kurse für das ausgewählte Datum verfügbar",
+			"errorLoadingClasses": "Kurse konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+			"errorLoadingBookings": "Buchungen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
 			"tabs": {
 				"classes": "Kurse",
 				"reservations": "Buchungen",
