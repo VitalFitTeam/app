@@ -65,7 +65,7 @@ export default function HomeScreen() {
 				pointerEvents='none'>
 				<Image
 					source={require('../assets/images/isotipo.png')}
-					className='w-80 h-80'
+					className='h-80 w-80'
 					resizeMode='contain'
 				/>
 			</View>
@@ -100,7 +100,11 @@ export default function HomeScreen() {
 					<Link href='/language' asChild>
 						<TouchableOpacity className='flex-row items-center justify-center py-2'>
 							<Global color='white' size={16} variant='Outline' />
-							<Text className='ml-2 font-body text-sm text-white'>
+							<Text
+								className='ml-2 font-body text-sm text-white'
+								adjustsFontSizeToFit
+								numberOfLines={1}
+								minimumFontScale={0.5}>
 								{t('languageLabel')}
 							</Text>
 						</TouchableOpacity>
@@ -110,7 +114,11 @@ export default function HomeScreen() {
 						onPress={() => router.push('/branches-map')}
 						className='flex-row items-center justify-center py-2'>
 						<Location color='#f97316' size={16} variant='Outline' />
-						<Text className='ml-2 font-body text-sm text-orange-500'>
+						<Text
+							className='ml-2 font-body text-sm text-orange-500'
+							adjustsFontSizeToFit
+							numberOfLines={1}
+							minimumFontScale={0.5}>
 							{t('dashboard.findBranches')}
 						</Text>
 					</TouchableOpacity>

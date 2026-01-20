@@ -23,7 +23,13 @@ export function SignUpButton({
 			onPress={onPress}
 			disabled={disabled}
 			style={[styles.base, styles.filled, containerStyle]}>
-			<Text style={[styles.text, textStyle]}>{label}</Text>
+			<Text
+				style={[styles.text, textStyle]}
+				adjustsFontSizeToFit
+				numberOfLines={1}
+				minimumFontScale={0.7}>
+				{label}
+			</Text>
 		</TouchableOpacity>
 	);
 }
@@ -34,6 +40,7 @@ const PADDING_V = 8;
 const styles = StyleSheet.create({
 	base: {
 		height: BUTTON_H,
+		width: '100%',
 		borderRadius: 25,
 		paddingVertical: PADDING_V,
 		paddingHorizontal: 16,

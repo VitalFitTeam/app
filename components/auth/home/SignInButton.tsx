@@ -27,20 +27,24 @@ export function SignInButton({
 			onPressIn={() => setPressed(true)}
 			onPressOut={() => setPressed(false)}
 			style={[styles.base, styles.outline, containerStyle, pressed && styles.pressed]}>
-			<Text style={[styles.text, styles.textOutline, textStyle]}>{label}</Text>
+			<Text
+				style={[styles.text, styles.textOutline, textStyle]}
+				adjustsFontSizeToFit
+				numberOfLines={1}
+				minimumFontScale={0.7}>
+				{label}
+			</Text>
 		</TouchableOpacity>
 	);
 }
 
 const BUTTON_H = 46;
-const PADDING_V = 8;
 
 const styles = StyleSheet.create({
 	base: {
 		height: BUTTON_H,
+		width: '100%',
 		borderRadius: 25,
-		paddingVertical: PADDING_V,
-		paddingHorizontal: 16,
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: 'transparent',
@@ -55,7 +59,6 @@ const styles = StyleSheet.create({
 	text: {
 		color: '#FFFFFF',
 		fontSize: 18,
-		lineHeight: BUTTON_H - PADDING_V * 2,
 		fontFamily: 'Montserrat-ExtraBold',
 		textAlign: 'center',
 		includeFontPadding: false,
