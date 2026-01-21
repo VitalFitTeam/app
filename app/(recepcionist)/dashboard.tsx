@@ -13,7 +13,7 @@ import { useUser } from '@/contexts/UserContext';
 import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ClassScheduleItem, isAPIError } from '@vitalfit/sdk';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
 
@@ -68,7 +68,10 @@ export default function DashboardRecepcionist() {
 			// If we have user_id in response, fetch full user details
 			if (data?.user_id) {
 				try {
-					const userResponse = await vitalFitApi.user.GetUserByID(data.user_id, token || '');
+					const userResponse = await vitalFitApi.user.GetUserByID(
+						data.user_id,
+						token || '',
+					);
 					const userData = userResponse.data;
 
 					if (userData?.first_name) {
@@ -155,7 +158,10 @@ export default function DashboardRecepcionist() {
 				return;
 			}
 
-			console.log('[Dashboard] Processing email check-in...', { userId, branchId: selectedBranchId });
+			console.log('[Dashboard] Processing email check-in...', {
+				userId,
+				branchId: selectedBranchId,
+			});
 
 			// Use checkInManual for email-based check-ins (not QR code)
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -226,79 +232,76 @@ export default function DashboardRecepcionist() {
 		fetchUpcomingClasses();
 	}, [selectedBranchId]);
 
-	useEffect(() => {
-		const fetchStats = async () => {
-			if (!selectedBranchId) return;
-			try {
-				const token = await AsyncStorage.getItem('token');
-				if (!token) return;
+	const fetchStats = useCallback(async () => {
+		if (!selectedBranchId) return;
+		try {
+			const token = await AsyncStorage.getItem('token');
+			if (!token) return;
 
-				// 1. Fetch 'Check-ins Today' (Daily Check-ins)
-				const checkInsRes = await vitalFitApi.report.todayCheckIns(token, selectedBranchId);
-				if (checkInsRes && typeof checkInsRes.data === 'number') {
-					setCheckInsTodayCount(checkInsRes.data);
-				}
+			// 1. Fetch 'Check-ins Today' (Daily Check-ins)
+			console.log(`[Dashboard] Fetching stats for branch: ${selectedBranchId}`);
+			const checkInsRes = await vitalFitApi.report.todayCheckIns(token, selectedBranchId);
+			console.log('[Dashboard] Check-ins response:', JSON.stringify(checkInsRes, null, 2));
 
-				// 2. Fetch 'Occupancy KPI' (Monthly Occupancy)
-				const occupancyKpiRes = await vitalFitApi.report.occupancyKPI(
-					token,
-					selectedBranchId,
-				);
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const kpiData = (occupancyKpiRes as any).data || occupancyKpiRes;
-
-				if (
-					kpiData &&
-					(typeof kpiData.trend_percent === 'number' ||
-						typeof kpiData.trend_percent === 'string')
-				) {
-					const val =
-						typeof kpiData.trend_percent === 'string'
-							? parseFloat(kpiData.trend_percent)
-							: kpiData.trend_percent;
-					if (!isNaN(val)) {
-						setMonthlyTrend(Math.round(val));
-					}
-				}
-			} catch (error) {
-				console.error('Error fetching stats:', error);
+			if (checkInsRes && typeof checkInsRes.data === 'number') {
+				setCheckInsTodayCount(checkInsRes.data);
 			}
-		};
 
+			// 2. Fetch 'Occupancy KPI' (Monthly Occupancy)
+			const occupancyKpiRes = await vitalFitApi.report.occupancyKPI(token, selectedBranchId);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const kpiData = (occupancyKpiRes as any).data || occupancyKpiRes;
+
+			if (
+				kpiData &&
+				(typeof kpiData.trend_percent === 'number' ||
+					typeof kpiData.trend_percent === 'string')
+			) {
+				const val =
+					typeof kpiData.trend_percent === 'string'
+						? parseFloat(kpiData.trend_percent)
+						: kpiData.trend_percent;
+				if (!isNaN(val)) {
+					setMonthlyTrend(Math.round(val));
+				}
+			}
+		} catch (error) {
+			console.error('Error fetching stats:', error);
+		}
+	}, [selectedBranchId]);
+
+	const fetchCapacity = useCallback(async () => {
+		if (!selectedBranchId) return;
+		try {
+			const token = await AsyncStorage.getItem('token');
+			if (!token) return;
+
+			// 1. Get Occupancy
+			const occupancyRes = await vitalFitApi.report.currentOccupancy(token, selectedBranchId);
+			if (occupancyRes && typeof occupancyRes.data === 'number') {
+				setOccupancy(occupancyRes.data);
+			}
+
+			// 2. Get Branch Details (Max Capacity)
+			const branchRes = await vitalFitApi.branch.getBranchById(selectedBranchId, token);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const branchData = (branchRes as any).data || branchRes;
+
+			if (branchData && typeof branchData.max_capacity === 'number') {
+				setMaxCapacity(branchData.max_capacity);
+			}
+		} catch (error) {
+			console.error('Error fetching gym capacity:', error);
+		}
+	}, [selectedBranchId]);
+
+	useEffect(() => {
 		fetchStats();
-	}, [selectedBranchId]);
+	}, [fetchStats]);
 
 	useEffect(() => {
-		const fetchGymCapacity = async () => {
-			if (!selectedBranchId) return;
-			try {
-				const token = await AsyncStorage.getItem('token');
-				if (!token) return;
-
-				// 1. Get Occupancy
-				const occupancyRes = await vitalFitApi.report.currentOccupancy(
-					token,
-					selectedBranchId,
-				);
-				if (occupancyRes && typeof occupancyRes.data === 'number') {
-					setOccupancy(occupancyRes.data);
-				}
-
-				// 2. Get Branch Details (Max Capacity)
-				const branchRes = await vitalFitApi.branch.getBranchById(selectedBranchId, token);
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const branchData = (branchRes as any).data || branchRes;
-
-				if (branchData && typeof branchData.max_capacity === 'number') {
-					setMaxCapacity(branchData.max_capacity);
-				}
-			} catch (error) {
-				console.error('Error fetching gym capacity:', error);
-			}
-		};
-
-		fetchGymCapacity();
-	}, [selectedBranchId]);
+		fetchCapacity();
+	}, [fetchCapacity]);
 
 	if (userLoading && !user) {
 		return (
@@ -312,7 +315,7 @@ export default function DashboardRecepcionist() {
 		<ThemedView className='flex-1 bg-white px-4 pt-10 dark:bg-neutral-950'>
 			<ScrollView
 				showsVerticalScrollIndicator={false}
-				contentContainerStyle={{ paddingBottom: 100 }}>
+				contentContainerStyle={{ paddingBottom: 150 }}>
 				<UserHeader name={displayName} avatarUrl={user?.profilePicture || undefined} />
 
 				<View
