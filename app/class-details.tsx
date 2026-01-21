@@ -66,6 +66,18 @@ export default function ClassDetailsScreen() {
     branchId,
   } = useLocalSearchParams();
 
+  // Debug: Log all class parameters
+  console.log('[DEBUG] Class Details Params:', {
+    classId,
+    serviceId,
+    instructorId,
+    bookingId,
+    branchId,
+    title,
+    time,
+    startsAt,
+  });
+
   const { isReserved, reserve, cancel } = useReservations();
   const { user } = useUser();
   const [serverBookingId, setServerBookingId] = useState<string | null>(null);
@@ -1031,6 +1043,15 @@ export default function ClassDetailsScreen() {
                     return;
                   }
 
+                  console.log('[DEBUG] Booking class with classId:', classId);
+                  console.log('[DEBUG] Class details:', {
+                    title,
+                    serviceId,
+                    instructorId,
+                    branchId,
+                    startsAt,
+                  });
+
                   const whoAmI = (await vitalFitApi.user.WhoAmI(
                     authToken,
                   )) as unknown as {
@@ -1047,11 +1068,22 @@ export default function ClassDetailsScreen() {
                     return;
                   }
 
-                  await vitalFitApi.booking.bookClass(
-                    { user_id: String(userId) },
-                    String(classId),
-                    authToken,
-                  );
+                  console.log('[DEBUG] Booking with userId:', userId, 'classId:', classId);
+
+                  // Make the actual booking API call
+                  try {
+                    await vitalFitApi.booking.bookClass(
+                      { user_id: String(userId) },
+                      String(classId),
+                      authToken,
+                    );
+                  } catch (bookingError: unknown) {
+                    // Log the raw error to help diagnose the server issue
+                    console.error('[DEBUG] Raw booking API error:', JSON.stringify(bookingError, null, 2));
+                    throw bookingError; // Re-throw to be handled by outer catch
+                  }
+
+                  console.log('[DEBUG] Booking successful');
 
                   const img =
                     typeof heroSource === 'number'
@@ -1074,6 +1106,16 @@ export default function ClassDetailsScreen() {
 
                   router.back();
                 } catch (error: unknown) {
+                  console.error('[DEBUG] Full booking error:', error);
+                  console.error('[DEBUG] Error type:', typeof error);
+                  console.error('[DEBUG] Error constructor:', error?.constructor?.name);
+
+                  // Log additional details
+                  if (isAPIError(error)) {
+                    console.error('[DEBUG] API Error status:', error.status);
+                    console.error('[DEBUG] API Error messages:', error.messages);
+                  }
+
                   let message = t('classDetails.toasts.bookingError.generic');
 
                   // Check for 402 Payment Required error
@@ -1144,7 +1186,12 @@ export default function ClassDetailsScreen() {
 
                   // Check for 500 Internal Server Error
                   if (isAPIError(error) && error.status === 500) {
-                    message = t('common.error.serverError');
+                    console.error('[DEBUG] Server 500 error - this is a backend issue');
+                    console.error('[DEBUG] Possible causes: DB constraint, missing data on server, or server bug');
+
+                    // Provide a more helpful error message to the user
+                    message = t('common.error.serverError') ||
+                      'Error del servidor al procesar la reserva. Por favor contacta al administrador o intenta con otra clase.';
                   } else if (isAPIError(error)) {
                     message = error.messages.join(', ');
                   } else if (error instanceof Error) {

@@ -52,15 +52,21 @@ export default function CheckInScreen() {
 			}
 			const branchId = selectedBranchId;
 
-			console.log('Enviando Check-In...', {
+			console.log('[QR Check-In] Sending request...', {
 				qrJwtLong: qrJwtLong.substring(0, 20) + '...',
 				branchId,
+				tokenLength: token.length,
 			});
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const response = await (vitalFitApi as any).access.checkIn(token, {
+
+			const checkInPayload = {
 				qr_jwt: qrJwtLong,
 				branch_id: branchId,
-			});
+			};
+
+			console.log('[QR Check-In] Full payload:', JSON.stringify(checkInPayload, null, 2));
+
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const response = await (vitalFitApi as any).access.checkIn(token, checkInPayload);
 
 			const data = response.data || response;
 
@@ -102,23 +108,45 @@ export default function CheckInScreen() {
 
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
-			console.error('Error en Check-In:', error);
+			console.error('[QR Check-In] Error occurred:', error);
+			console.error('[QR Check-In] Error details:', {
+				message: error?.message,
+				messages: error?.messages,
+				status: error?.status,
+				name: error?.name,
+				response: error?.response,
+				data: error?.data,
+			});
+
+			// Log the full error object as JSON
+			try {
+				console.error('[QR Check-In] Full error JSON:', JSON.stringify(error, null, 2));
+			} catch {
+				console.error('[QR Check-In] Could not stringify error');
+			}
 
 			let errorMessage = t('checkIn.error.default');
 
 			if (isAPIError(error)) {
+				console.log('[QR Check-In] API Error detected - Status:', error.status);
+				console.log('[QR Check-In] API Error messages:', error.messages);
+
 				if (error.status === 402) {
 					errorMessage = t('checkIn.error.paymentPending');
 				} else if (error.status === 403) {
 					errorMessage = t('checkIn.error.accessDenied');
+					// Log additional context for 403 errors
+					console.error('[QR Check-In] 403 Error - Access Denied. This might be a backend permission issue.');
 				} else if (error.status === 401) {
 					errorMessage = t('checkIn.error.qrExpired');
 				} else {
-					errorMessage = error.message || t('checkIn.error.default');
+					errorMessage = error.message || error.messages?.join(', ') || t('checkIn.error.default');
 				}
 			} else {
 				errorMessage = error.message || t('common.error.connection');
 			}
+
+			console.log('[QR Check-In] Final error message to display:', errorMessage);
 
 			setCheckInSuccess(false);
 			setCheckInMessage(errorMessage);
@@ -254,7 +282,7 @@ export default function CheckInScreen() {
 						onFaceScanPress={handleFaceCheckInPress}
 						onEmailCheckIn={handleEmailCheckIn}
 						onEmailCheckInError={handleEmailCheckInError}
-						branchId={selectedBranchId}
+						branchId={selectedBranchId ?? undefined}
 					/>
 				</View>
 			</ScrollView>

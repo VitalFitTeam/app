@@ -1,3 +1,4 @@
+import { useUser } from '@/contexts/UserContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -9,6 +10,14 @@ type FloatingChatButtonProps = {
 
 export function FloatingChatButton({ bottomOffset = 80 }: FloatingChatButtonProps) {
 	const router = useRouter();
+	const { user } = useUser();
+
+	// Only show chatbot button if user has an active membership
+	const hasMembership = user?.membership?.status === 'Active';
+
+	if (!hasMembership) {
+		return null;
+	}
 
 	return (
 		<View style={[styles.container, { bottom: bottomOffset }]}>
