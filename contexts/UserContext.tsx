@@ -19,6 +19,7 @@ export type UserData = {
 	specialty?: string;
 	roleName?: string;
 	faceAuthEnabled?: boolean;
+	category?: string;
 };
 
 type UserContextType = {
@@ -61,6 +62,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 			const normalizedGender =
 				apiUser.gender === 'male' ? 'M' : apiUser.gender === 'female' ? 'F' : '';
 
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const rawCategory = (apiUser as any).ClientProfile?.category;
+			const normalizedCategory = rawCategory === 'AtRisk' ? 'Regular' : rawCategory;
+
 			setUser({
 				userId: apiUser.user_id || '',
 				firstName: apiUser.first_name || '',
@@ -78,6 +83,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				roleName: (apiUser as any).role?.name || 'Instructor',
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				faceAuthEnabled: (apiUser as any).face_auth_enabled || false,
+				category: normalizedCategory || undefined,
 			});
 		} catch (err: unknown) {
 			let message = 'Ocurrió un error inesperado al obtener los datos del usuario.';

@@ -159,12 +159,37 @@ export default function ConfirmEmailScreen() {
         }
     };
 
-    const handleResendCode = () => {
-        showToast(
-            'success',
-            t('confirmEmail.toast.resendTitle'),
-            t('confirmEmail.toast.resendMessage')
-        );
+    const handleResendCode = async () => {
+        try {
+            const email = await AsyncStorage.getItem('temp_email');
+
+            if (!email) {
+                showToast(
+                    'error',
+                    t('confirmEmail.toast.errorTitle'),
+                    t('confirmEmail.toast.emailNotFound')
+                );
+                return;
+            }
+
+            await vitalFitApi.user.resendActivateOtp(email);
+
+            showToast(
+                'success',
+                t('confirmEmail.toast.resendTitle'),
+                t('confirmEmail.toast.resendMessage')
+            );
+        } catch (error: unknown) {
+            let errorMessage = t('confirmEmail.toast.resendError');
+
+            if (isAPIError(error)) {
+                errorMessage = error.messages.join(', ');
+            } else if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+
+            showToast('error', t('confirmEmail.toast.errorTitle'), errorMessage);
+        }
     };
 
     return (
