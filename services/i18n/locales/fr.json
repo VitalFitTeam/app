@@ -58,6 +58,7 @@
 		"common": {
 			"attention": "Attention",
 			"instructor": "Instructeur",
+			"with": "Avec",
 			"capacity": "Capacité",
 			"error": {
 				"connection": "Erreur de connexion avec le serveur.",
