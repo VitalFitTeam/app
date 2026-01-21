@@ -1,6 +1,6 @@
-// .prettierrc.js
+// .prettierrc.mjs
 /** @type {import("prettier").Config} */
-module.exports = {
+export default {
 	arrowParens: 'always',
 	bracketSpacing: true,
 	bracketSameLine: true,
