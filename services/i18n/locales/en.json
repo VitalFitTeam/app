@@ -28,11 +28,13 @@
     },
     "checkIn": {
       "error": {
+        "title": "Check-In Error",
         "selectBranch": "Please select a branch before scanning.",
         "default": "Access could not be processed.",
         "paymentPending": "User has pending payments.",
         "accessDenied": "User does not have permission to enter this area or branch.",
-        "qrExpired": "QR code has expired. Ask the user to generate a new one."
+        "qrExpired": "QR code has expired. Ask the user to generate a new one.",
+        "unauthorized": "Unauthorized access. Please check credentials."
       },
       "title": "Client Check-in",
       "successMessage": "Check-in processed successfully",
@@ -56,6 +58,7 @@
     "common": {
       "attention": "Attention",
       "instructor": "Instructor",
+      "with": "With",
       "error": {
         "connection": "Connection error with the server.",
         "unexpected": "An unexpected error occurred.",
@@ -108,7 +111,15 @@
       "reviews": "reviews",
       "unnamedUser": "Unnamed User",
       "noProgram": "No program",
-      "weekdaysShort": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+      "weekdaysShort": [
+        "MON",
+        "TUE",
+        "WED",
+        "THU",
+        "FRI",
+        "SAT",
+        "SUN"
+      ]
     },
     "login": {
       "title": "Sign In",
@@ -306,9 +317,14 @@
       },
       "validateCheckIn": {
         "title": "Validate Check-in",
-        "searchPlaceholder": "Search by ID document",
+        "searchPlaceholder": "Search by email",
         "scanQr": "Scan QR",
-        "scanFace": "Scan Face"
+        "scanFace": "Scan Face",
+        "checkInByEmail": "Check In by Email",
+        "searching": "Searching...",
+        "emailRequired": "Email is required",
+        "invalidEmail": "Invalid email format",
+        "userNotFound": "User not found with this email"
       },
       "capacity": {
         "title": "Gym Capacity",
@@ -451,8 +467,18 @@
     },
     "classDetails": {
       "title": "Class Details",
+      "defaultName": "CLASS NAME",
       "defaultClassName": "Class Name",
+      "defaultInstructor": "Instructor Name",
       "defaultInstructorName": "Instructor Name",
+      "duration": "(1 hour)",
+      "descriptionTitle": "Class Description:",
+      "clientList": "Client List",
+      "noClientsFound": "No clients found",
+      "viewAllRegistered": "View all registered",
+      "showLess": "Show less",
+      "classFull": "Class Full",
+      "enrollClient": "Enroll Client",
       "occupiedSpots": "spots occupied",
       "level": "Level: {{level}}",
       "descriptionLabel": "Class Description:",
@@ -620,10 +646,13 @@
       "title": "My Badges",
       "currentLevel": "YOUR CURRENT LEVEL",
       "progressToLevel": "Progress to level {{level}}",
+      "loading": "Loading badges...",
+      "error": "Could not load data",
+      "backButton": "Back",
       "stats": {
         "points": "Points",
         "badges": "Badges",
-        "referrals": "Referrals"
+        "attendance": "Attendance"
       },
       "badgesObtained": "Badges Obtained",
       "progress": "Progress",
@@ -635,14 +664,25 @@
       },
       "badgeNames": {
         "firstClass": "First Class",
+        "beginner": "Beginner",
+        "dedicated": "Dedicated",
         "ironWarrior": "Iron Warrior",
-        "earlyBird": "Early Bird",
+        "athlete": "Athlete",
+        "disciplined": "Disciplined",
         "champion": "Champion",
-        "devoted": "Devoted"
+        "master": "Master",
+        "fitnessGod": "Fitness God"
       },
       "requirements": {
-        "champion": "Win 6 extra challenges",
-        "devoted": "Train 30 days straight"
+        "firstClass": "Start your journey",
+        "beginner": "Reach 100 points",
+        "dedicated": "Reach 250 points",
+        "ironWarrior": "Reach 600 points",
+        "athlete": "Reach 1000 points",
+        "disciplined": "Reach 1500 points",
+        "champion": "Reach 2100 points",
+        "master": "Reach 3000 points",
+        "fitnessGod": "Reach 6000 points"
       }
     },
     "profileSettings": {

@@ -28,11 +28,13 @@
 		},
 		"checkIn": {
 			"error": {
+				"title": "Errore Check-In",
 				"selectBranch": "Seleziona una sede prima di scansionare.",
 				"default": "Impossibile elaborare l'accesso.",
 				"paymentPending": "L'utente ha pagamenti in sospeso.",
 				"accessDenied": "L'utente non ha il permesso di accedere a questa area o sede.",
-				"qrExpired": "Il codice QR è scaduto. Chiedi all'utente di generarne uno nuovo."
+				"qrExpired": "Il codice QR è scaduto. Chiedi all'utente di generarne uno nuovo.",
+				"unauthorized": "Accesso non autorizzato. Verifica le credenziali."
 			},
 			"title": "Check-in Cliente",
 			"successMessage": "Check-in elaborato con successo",
@@ -56,6 +58,7 @@
 		"common": {
 			"attention": "Attenzione",
 			"instructor": "Istruttore",
+			"with": "Con",
 			"capacity": "Capienza",
 			"error": {
 				"connection": "Errore di connessione con il server.",
@@ -103,7 +106,15 @@
 			"availability": "Disponibilità",
 			"unknown": "Sconosciuto",
 			"notes": "Note",
-			"weekdaysShort": ["LUN", "MAR", "MER", "GIO", "VEN", "SAB", "DOM"]
+			"weekdaysShort": [
+				"LUN",
+				"MAR",
+				"MER",
+				"GIO",
+				"VEN",
+				"SAB",
+				"DOM"
+			]
 		},
 		"login": {
 			"title": "Accedi",
@@ -299,7 +310,12 @@
 			},
 			"validateCheckIn": {
 				"title": "Valida Check-in",
-				"searchPlaceholder": "Cerca per documento ID",
+				"searchPlaceholder": "Cerca per email",
+				"checkInByEmail": "Check-In per Email",
+				"searching": "Ricerca in corso...",
+				"emailRequired": "L'email è obbligatoria",
+				"invalidEmail": "Formato email non valido",
+				"userNotFound": "Nessun utente trovato con questa email",
 				"scanQr": "Scansiona QR",
 				"scanFace": "Scansiona Viso"
 			},
@@ -549,10 +565,13 @@
 			"title": "I miei Badge",
 			"currentLevel": "IL TUO LIVELLO ATTUALE",
 			"progressToLevel": "Progresso verso il livello {{level}}",
+			"loading": "Caricamento badge...",
+			"error": "Impossibile caricare i dati",
+			"backButton": "Indietro",
 			"stats": {
 				"points": "Punti",
 				"badges": "Badge",
-				"referrals": "Inviti"
+				"attendance": "Presenze"
 			},
 			"badgesObtained": "Badge Ottenuti",
 			"progress": "Progresso",
@@ -563,15 +582,26 @@
 				"legendary": "Leggendario"
 			},
 			"badgeNames": {
-				"firstClass": "Prima Lezione",
+				"firstClass": "Prima Classe",
+				"beginner": "Principiante",
+				"dedicated": "Dedicato",
 				"ironWarrior": "Guerriero d'Acciaio",
-				"earlyBird": "Mattiniero",
+				"athlete": "Atleta",
+				"disciplined": "Disciplinato",
 				"champion": "Campione",
-				"devoted": "Fedele"
+				"master": "Maestro",
+				"fitnessGod": "Dio del Fitness"
 			},
 			"requirements": {
-				"champion": "Vinci altre 6 sfide",
-				"devoted": "Allenati per 30 giorni consecutivi"
+				"firstClass": "Inizia il tuo viaggio",
+				"beginner": "Raggiungi 100 punti",
+				"dedicated": "Raggiungi 250 punti",
+				"ironWarrior": "Raggiungi 600 punti",
+				"athlete": "Raggiungi 1000 punti",
+				"disciplined": "Raggiungi 1500 punti",
+				"champion": "Raggiungi 2100 punti",
+				"master": "Raggiungi 3000 punti",
+				"fitnessGod": "Raggiungi 6000 punti"
 			}
 		},
 		"profileSettings": {
@@ -819,7 +849,10 @@
 			},
 			"startDate": "Data Inizio",
 			"benefits": {
-				"free-trial": ["Accesso limitato alla palestra", "7 giorni di accesso gratuito"],
+				"free-trial": [
+					"Accesso limitato alla palestra",
+					"7 giorni di accesso gratuito"
+				],
 				"advanced": [
 					"Accesso illimitato alla palestra",
 					"7 sessioni con consulente fitness",
@@ -1052,7 +1085,7 @@
 				"completions": "Completamenti",
 				"createNew": "Crea Nuova Routine",
 				"noRoutines": "Nessuna routine disponibile. Creane una prima.",
-			"exercisesLabel": "esercizi"
+				"exercisesLabel": "esercizi"
 			},
 			"createRoutine": {
 				"title": "Crea Routine",

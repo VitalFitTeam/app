@@ -37,7 +37,7 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 				console.log('Longitud del Token QR:', response.token.length);
 				setQrValue(response.token);
 				setError(null);
-				setRemainingSeconds(120);
+				setRemainingSeconds(30);
 			} else {
 				console.warn('Respuesta QrToken sin token:', response);
 				setQrValue(null);
@@ -71,7 +71,7 @@ export const QRModal: React.FC<Props> = ({ visible, onClose, token, userName }) 
 			setRemainingSeconds((prev) => {
 				if (prev <= 1) {
 					fetchQrToken();
-					return 120;
+					return 30;
 				}
 				return prev - 1;
 			});

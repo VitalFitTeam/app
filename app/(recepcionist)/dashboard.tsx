@@ -13,7 +13,7 @@ import { useUser } from '@/contexts/UserContext';
 import vitalFitApi from '@/services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ClassScheduleItem, isAPIError } from '@vitalfit/sdk';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
 
@@ -65,7 +65,27 @@ export default function DashboardRecepcionist() {
 
 			let userName = t('dashboard.defaultUser');
 
-			if (data?.user?.first_name) {
+			// If we have user_id in response, fetch full user details
+			if (data?.user_id) {
+				try {
+					const userResponse = await vitalFitApi.user.GetUserByID(
+						data.user_id,
+						token || '',
+					);
+					const userData = userResponse.data;
+
+					if (userData?.first_name) {
+						userName = `${userData.first_name} ${userData.last_name || ''}`.trim();
+					}
+					console.log('[Dashboard] User details fetched:', userName);
+				} catch (error) {
+					console.error('[Dashboard] Error fetching user details:', error);
+					// Fallback to data from response
+					if (data?.user?.first_name) {
+						userName = `${data.user.first_name} ${data.user.last_name || ''}`.trim();
+					}
+				}
+			} else if (data?.user?.first_name) {
 				userName = `${data.user.first_name} ${data.user.last_name || ''}`.trim();
 			} else if (data?.first_name) {
 				userName = `${data.first_name} ${data.last_name || ''}`.trim();
@@ -75,6 +95,8 @@ export default function DashboardRecepcionist() {
 
 			setCheckInSuccess(true);
 			setCheckInUserName(userName);
+			// Show only the message, not the service name
+			setCheckInMessage(data.message || t('checkIn.successMessage'));
 			setResultModalVisible(true);
 			setScannerVisible(false);
 
@@ -127,6 +149,68 @@ export default function DashboardRecepcionist() {
 		setResultModalVisible(true);
 	};
 
+	const handleEmailCheckIn = async (userId: string, userName: string) => {
+		try {
+			const token = await AsyncStorage.getItem('token');
+			if (!token) return;
+			if (!selectedBranchId) {
+				Alert.alert(`${t('common.attention')}`, t('checkIn.error.selectBranch'));
+				return;
+			}
+
+			console.log('[Dashboard] Processing email check-in...', {
+				userId,
+				branchId: selectedBranchId,
+			});
+
+			// Use checkInManual for email-based check-ins (not QR code)
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const response = await (vitalFitApi as any).access.checkInManual(token, {
+				user_id: userId,
+				branch_id: selectedBranchId,
+			});
+
+			const data = response.data || response;
+
+			console.log('[Email Check-In] Response:', JSON.stringify(data, null, 2));
+
+			setCheckInSuccess(true);
+			setCheckInUserName(userName);
+			setCheckInMessage(data.service_name || t('checkIn.success.default'));
+			setResultModalVisible(true);
+
+			// Refresh stats after successful check-in
+			const todayRes = await vitalFitApi.report.todayCheckIns(token, selectedBranchId);
+			if (todayRes && typeof todayRes.data === 'number') {
+				setCheckInsTodayCount(todayRes.data);
+			}
+
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
+			console.error('Error in email check-in:', error);
+
+			let errorMessage = t('checkIn.error.default');
+
+			if (isAPIError(error)) {
+				if (error.status === 402) {
+					errorMessage = t('checkIn.error.paymentPending');
+				} else if (error.status === 403) {
+					errorMessage = t('checkIn.error.accessDenied');
+				} else if (error.status === 401) {
+					errorMessage = t('checkIn.error.unauthorized');
+				} else {
+					errorMessage = error.message || t('checkIn.error.default');
+				}
+			} else {
+				errorMessage = error.message || t('common.error.connection');
+			}
+
+			setCheckInSuccess(false);
+			setCheckInMessage(errorMessage);
+			setResultModalVisible(true);
+		}
+	};
+
 	useEffect(() => {
 		const fetchUpcomingClasses = async () => {
 			if (!selectedBranchId) return;
@@ -148,79 +232,76 @@ export default function DashboardRecepcionist() {
 		fetchUpcomingClasses();
 	}, [selectedBranchId]);
 
-	useEffect(() => {
-		const fetchStats = async () => {
-			if (!selectedBranchId) return;
-			try {
-				const token = await AsyncStorage.getItem('token');
-				if (!token) return;
+	const fetchStats = useCallback(async () => {
+		if (!selectedBranchId) return;
+		try {
+			const token = await AsyncStorage.getItem('token');
+			if (!token) return;
 
-				// 1. Fetch 'Check-ins Today' (Daily Check-ins)
-				const checkInsRes = await vitalFitApi.report.todayCheckIns(token, selectedBranchId);
-				if (checkInsRes && typeof checkInsRes.data === 'number') {
-					setCheckInsTodayCount(checkInsRes.data);
-				}
+			// 1. Fetch 'Check-ins Today' (Daily Check-ins)
+			console.log(`[Dashboard] Fetching stats for branch: ${selectedBranchId}`);
+			const checkInsRes = await vitalFitApi.report.todayCheckIns(token, selectedBranchId);
+			console.log('[Dashboard] Check-ins response:', JSON.stringify(checkInsRes, null, 2));
 
-				// 2. Fetch 'Occupancy KPI' (Monthly Occupancy)
-				const occupancyKpiRes = await vitalFitApi.report.occupancyKPI(
-					token,
-					selectedBranchId,
-				);
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const kpiData = (occupancyKpiRes as any).data || occupancyKpiRes;
-
-				if (
-					kpiData &&
-					(typeof kpiData.trend_percent === 'number' ||
-						typeof kpiData.trend_percent === 'string')
-				) {
-					const val =
-						typeof kpiData.trend_percent === 'string'
-							? parseFloat(kpiData.trend_percent)
-							: kpiData.trend_percent;
-					if (!isNaN(val)) {
-						setMonthlyTrend(Math.round(val));
-					}
-				}
-			} catch (error) {
-				console.error('Error fetching stats:', error);
+			if (checkInsRes && typeof checkInsRes.data === 'number') {
+				setCheckInsTodayCount(checkInsRes.data);
 			}
-		};
 
+			// 2. Fetch 'Occupancy KPI' (Monthly Occupancy)
+			const occupancyKpiRes = await vitalFitApi.report.occupancyKPI(token, selectedBranchId);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const kpiData = (occupancyKpiRes as any).data || occupancyKpiRes;
+
+			if (
+				kpiData &&
+				(typeof kpiData.trend_percent === 'number' ||
+					typeof kpiData.trend_percent === 'string')
+			) {
+				const val =
+					typeof kpiData.trend_percent === 'string'
+						? parseFloat(kpiData.trend_percent)
+						: kpiData.trend_percent;
+				if (!isNaN(val)) {
+					setMonthlyTrend(Math.round(val));
+				}
+			}
+		} catch (error) {
+			console.error('Error fetching stats:', error);
+		}
+	}, [selectedBranchId]);
+
+	const fetchCapacity = useCallback(async () => {
+		if (!selectedBranchId) return;
+		try {
+			const token = await AsyncStorage.getItem('token');
+			if (!token) return;
+
+			// 1. Get Occupancy
+			const occupancyRes = await vitalFitApi.report.currentOccupancy(token, selectedBranchId);
+			if (occupancyRes && typeof occupancyRes.data === 'number') {
+				setOccupancy(occupancyRes.data);
+			}
+
+			// 2. Get Branch Details (Max Capacity)
+			const branchRes = await vitalFitApi.branch.getBranchById(selectedBranchId, token);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const branchData = (branchRes as any).data || branchRes;
+
+			if (branchData && typeof branchData.max_capacity === 'number') {
+				setMaxCapacity(branchData.max_capacity);
+			}
+		} catch (error) {
+			console.error('Error fetching gym capacity:', error);
+		}
+	}, [selectedBranchId]);
+
+	useEffect(() => {
 		fetchStats();
-	}, [selectedBranchId]);
+	}, [fetchStats]);
 
 	useEffect(() => {
-		const fetchGymCapacity = async () => {
-			if (!selectedBranchId) return;
-			try {
-				const token = await AsyncStorage.getItem('token');
-				if (!token) return;
-
-				// 1. Get Occupancy
-				const occupancyRes = await vitalFitApi.report.currentOccupancy(
-					token,
-					selectedBranchId,
-				);
-				if (occupancyRes && typeof occupancyRes.data === 'number') {
-					setOccupancy(occupancyRes.data);
-				}
-
-				// 2. Get Branch Details (Max Capacity)
-				const branchRes = await vitalFitApi.branch.getBranchById(selectedBranchId, token);
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const branchData = (branchRes as any).data || branchRes;
-
-				if (branchData && typeof branchData.max_capacity === 'number') {
-					setMaxCapacity(branchData.max_capacity);
-				}
-			} catch (error) {
-				console.error('Error fetching gym capacity:', error);
-			}
-		};
-
-		fetchGymCapacity();
-	}, [selectedBranchId]);
+		fetchCapacity();
+	}, [fetchCapacity]);
 
 	if (userLoading && !user) {
 		return (
@@ -234,7 +315,7 @@ export default function DashboardRecepcionist() {
 		<ThemedView className='flex-1 bg-white px-4 pt-10 dark:bg-neutral-950'>
 			<ScrollView
 				showsVerticalScrollIndicator={false}
-				contentContainerStyle={{ paddingBottom: 100 }}>
+				contentContainerStyle={{ paddingBottom: 150 }}>
 				<UserHeader name={displayName} avatarUrl={user?.profilePicture || undefined} />
 
 				<View
@@ -255,6 +336,8 @@ export default function DashboardRecepcionist() {
 				<ValidateCheckInCard
 					onScanPress={() => setScannerVisible(true)}
 					onFaceScanPress={handleFaceCheckInPress}
+					onEmailCheckIn={handleEmailCheckIn}
+					branchId={selectedBranchId || undefined}
 				/>
 				<GymCapacityCard currentOccupancy={occupancy} maxCapacity={maxCapacity} />
 				<RecepcionistTodayClassCard classes={upcomingClasses.slice(0, 3)} />

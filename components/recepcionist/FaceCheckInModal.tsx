@@ -51,13 +51,37 @@ export const FaceCheckInModal: React.FC<Props> = ({ visible, onClose, onSuccess,
 			const response = await checkInWithFace(capturedImage, branchId);
 			setCapturedImage(null);
 
-			// Extract user name from response
 			let userName = t('dashboard.defaultUser');
-			if (response.user?.first_name) {
+
+			// If we have user_id in response, fetch full user details
+			if (response.user_id) {
+				try {
+					const vitalFitApi = (await import('@/services')).default;
+					const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+					const token = await AsyncStorage.getItem('token');
+
+					if (token) {
+						const userResponse = await vitalFitApi.user.GetUserByID(response.user_id, token);
+						const userData = userResponse.data;
+
+						if (userData?.first_name) {
+							userName = `${userData.first_name} ${userData.last_name || ''}`.trim();
+						}
+						console.log('[FaceCheckIn] User details fetched:', userName);
+					}
+				} catch (error) {
+					console.error('[FaceCheckIn] Error fetching user details:', error);
+					// Fallback to data from response
+					if (response.user?.first_name) {
+						userName = `${response.user.first_name} ${response.user.last_name || ''}`.trim();
+					}
+				}
+			} else if (response.user?.first_name) {
 				userName = `${response.user.first_name} ${response.user.last_name || ''}`.trim();
 			}
 
-			onSuccess(userName, response.service_name || '');
+			// Pass message only, not service_name
+			onSuccess(userName, response.message || t('checkIn.successMessage'));
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : t('faceCheckIn.errors.checkInFailed');
 			onError(errorMessage);

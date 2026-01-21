@@ -69,7 +69,7 @@ export const createRegisterSchema = (t: TFunction) =>
 						if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
 							age--;
 						}
-						return age >= 18;
+						return age >= 12;
 					},
 					{ message: t('validations.birthDate.adult') },
 				),

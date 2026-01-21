@@ -28,11 +28,13 @@
 		},
 		"checkIn": {
 			"error": {
+				"title": "Check-in Fehler",
 				"selectBranch": "Bitte wählen Sie einen Standort aus, bevor Sie scannen.",
 				"default": "Zutritt konnte nicht verarbeitet werden.",
 				"paymentPending": "Benutzer hat ausstehende Zahlungen.",
 				"accessDenied": "Benutzer hat keine Berechtigung, diesen Bereich oder Standort zu betreten.",
-				"qrExpired": "QR-Code ist abgelaufen. Bitten Sie den Benutzer, einen neuen zu generieren."
+				"qrExpired": "QR-Code ist abgelaufen. Bitten Sie den Benutzer, einen neuen zu generieren.",
+				"unauthorized": "Unbefugter Zugriff. Bitte überprüfen Sie die Anmeldedaten."
 			},
 			"title": "Kunden-Check-in",
 			"successMessage": "Check-in erfolgreich verarbeitet",
@@ -56,6 +58,7 @@
 		"common": {
 			"attention": "Achtung",
 			"instructor": "Trainer",
+			"with": "Mit",
 			"capacity": "Kapazität",
 			"error": {
 				"connection": "Verbindungsfehler zum Server.",
@@ -104,7 +107,15 @@
 			"unknown": "Unbekannt",
 			"notes": "Notizen",
 			"noClientsFound": "Keine Kunden gefunden",
-			"weekdaysShort": ["MO", "DI", "MI", "DO", "FR", "SA", "SO"]
+			"weekdaysShort": [
+				"MO",
+				"DI",
+				"MI",
+				"DO",
+				"FR",
+				"SA",
+				"SO"
+			]
 		},
 		"enrollClient": {
 			"title": "Kunden anmelden",
@@ -333,9 +344,14 @@
 			},
 			"validateCheckIn": {
 				"title": "Check-in validieren",
-				"searchPlaceholder": "Nach Ausweisnummer suchen",
+				"searchPlaceholder": "Nach E-Mail suchen",
 				"scanQr": "QR scannen",
-				"scanFace": "Gesicht scannen"
+				"scanFace": "Gesicht scannen",
+				"checkInByEmail": "Check-in per E-Mail",
+				"searching": "Suchen...",
+				"emailRequired": "E-Mail ist erforderlich",
+				"invalidEmail": "Ungültiges E-Mail-Format",
+				"userNotFound": "Benutzer mit dieser E-Mail nicht gefunden"
 			},
 			"capacity": {
 				"title": "Studio-Auslastung",
@@ -395,7 +411,6 @@
 			},
 			"findBranches": "Filialen finden"
 		},
-
 		"personalInfo": {
 			"editButton": "Informationen bearbeiten",
 			"sections": {
@@ -551,10 +566,13 @@
 			"title": "Meine Abzeichen",
 			"currentLevel": "DEIN AKTUELLER LEVEL",
 			"progressToLevel": "Fortschritt zu Level {{level}}",
+			"loading": "Lade Abzeichen...",
+			"error": "Fehler beim Laden der Daten",
+			"backButton": "Zurück",
 			"stats": {
 				"points": "Punkte",
 				"badges": "Abzeichen",
-				"referrals": "Empfehlungen"
+				"attendance": "Anwesenheit"
 			},
 			"badgesObtained": "Erhaltene Abzeichen",
 			"progress": "Fortschritt",
@@ -565,15 +583,26 @@
 				"legendary": "Legendär"
 			},
 			"badgeNames": {
-				"firstClass": "Erster Kurs",
-				"ironWarrior": "Eiserner Krieger",
-				"earlyBird": "Früher Vogel",
+				"firstClass": "Erste Klasse",
+				"beginner": "Anfänger",
+				"dedicated": "Engagiert",
+				"ironWarrior": "Eisenkrieger",
+				"athlete": "Athlet",
+				"disciplined": "Diszipliniert",
 				"champion": "Champion",
-				"devoted": "Hingebungsvoll"
+				"master": "Meister",
+				"fitnessGod": "Fitness-Gott"
 			},
 			"requirements": {
-				"champion": "Gewinne 6 weitere Challenges",
-				"devoted": "Trainiere 30 Tage am Stück"
+				"firstClass": "Beginne deine Reise",
+				"beginner": "Erreiche 100 Punkte",
+				"dedicated": "Erreiche 250 Punkte",
+				"ironWarrior": "Erreiche 600 Punkte",
+				"athlete": "Erreiche 1000 Punkte",
+				"disciplined": "Erreiche 1500 Punkte",
+				"champion": "Erreiche 2100 Punkte",
+				"master": "Erreiche 3000 Punkte",
+				"fitnessGod": "Erreiche 6000 Punkte"
 			}
 		},
 		"profileSettings": {
@@ -821,7 +850,10 @@
 			},
 			"startDate": "Startdatum",
 			"benefits": {
-				"free-trial": ["Eingeschränkter Studiozugang", "7 Tage kostenloser Zugang"],
+				"free-trial": [
+					"Eingeschränkter Studiozugang",
+					"7 Tage kostenloser Zugang"
+				],
 				"advanced": [
 					"Unbegrenzter Studiozugang",
 					"7 Einheiten mit Fitnessberater",
@@ -1054,7 +1086,7 @@
 				"completions": "Abschlüsse",
 				"createNew": "Neue Routine erstellen",
 				"noRoutines": "Keine Routinen verfügbar. Erstellen Sie zuerst eine.",
-			"exercisesLabel": "Übungen"
+				"exercisesLabel": "Übungen"
 			},
 			"createRoutine": {
 				"title": "Routine Erstellen",

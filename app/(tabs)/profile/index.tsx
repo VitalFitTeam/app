@@ -6,7 +6,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useReservations } from '@/contexts/reservations';
 import { useUser } from '@/contexts/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -114,15 +113,8 @@ export default function ProfileScreen() {
             </>
           ) : (
             <>
-              <View className="flex-row items-center mt-1">
-                <Text className="text-[13px] text-[#6b7280] mr-1">{t('client.profile.level')} 24</Text>
-                <Image
-                  source={require('@/assets/images/medal2.png')}
-                  style={{ width: 14, height: 14 }}
-                  contentFit="contain"
-                />
-              </View>
-              <Text className="text-[13px] text-[#f97316] mt-0.5">{t('client.profile.premium')}</Text>
+
+              <Text className="text-[13px] text-[#f97316] mt-0.5">{user?.category || t('client.profile.premium')}</Text>
             </>
           )}
         </View>
