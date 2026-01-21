@@ -7,16 +7,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Alert, ScrollView, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, ScrollView, TouchableOpacity, View } from 'react-native';
 import { BanknotesIcon, BuildingLibraryIcon, CreditCardIcon, DevicePhoneMobileIcon } from 'react-native-heroicons/outline';
 import { CheckCircleIcon } from 'react-native-heroicons/solid';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Constants from 'expo-constants';
 
 interface BranchPaymentMethod {
   method_id: string;
   branch_id: string;
   name: string;
   type: string;
+  process_type?: string;
   is_active: boolean;
   description?: string;
 }
@@ -75,7 +77,7 @@ export default function MembershipPaymentScreen() {
     loadPaymentMethods();
   }, [params.branchId, t]);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!selectedMethodId) {
       showToast('warning', t('common.attention'), t('payment.toast.selectMethod'));
       return;
@@ -83,8 +85,99 @@ export default function MembershipPaymentScreen() {
 
     const selectedMethod = methods.find(m => m.method_id === selectedMethodId);
     const methodName = selectedMethod?.name || '';
-    
-    // Route EVERYTHING to the generic detail screen
+
+    // For Card type payments, fetch full details to check process_type
+    if (selectedMethod?.type === 'Card') {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+          showToast('error', t('common.error.title'), t('errors.sessionExpired'));
+          return;
+        }
+
+        // Fetch full payment method details to get process_type
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const methodDetails = await vitalFitApi.client.get({
+          url: `/billing/payment-methods/${selectedMethodId}`,
+          jwt: token,
+        });
+
+        const detailsData = methodDetails?.data || methodDetails;
+        const processType = detailsData?.processing_type || detailsData?.process_type;
+
+        // Check if it's a Gateway (Stripe) payment
+        if (processType === 'Gateway') {
+          try {
+            let checkoutUrl: string | null = null;
+
+            // Try SDK first
+            try {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              const sdkResponse = await vitalFitApi.client.post({
+                url: '/billing/checkout',
+                jwt: token,
+                body: {
+                  invoice_id: params.invoiceId
+                }
+              });
+
+              checkoutUrl = sdkResponse?.url || sdkResponse?.data?.url || sdkResponse?.checkout_url;
+            } catch {
+              // SDK failed, fallback to fetch
+              console.log('[Stripe Checkout] SDK failed, using fetch fallback');
+
+              const API_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_URL || process.env.EXPO_PUBLIC_API_URL;
+              if (!API_URL) {
+                throw new Error('API URL not configured');
+              }
+
+              const fetchResponse = await fetch(`${API_URL}/billing/checkout`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  invoice_id: params.invoiceId
+                })
+              });
+
+              if (!fetchResponse.ok) {
+                throw new Error(`Checkout failed with status ${fetchResponse.status}`);
+              }
+
+              const response = await fetchResponse.json();
+              checkoutUrl = response?.url || response?.data?.url || response?.checkout_url;
+            }
+
+            if (checkoutUrl) {
+              // Open Stripe checkout in browser
+              await Linking.openURL(checkoutUrl);
+
+              // Navigate back to dashboard after opening checkout
+              setTimeout(() => {
+                router.replace('/(tabs)/dashboard');
+              }, 1000);
+            } else {
+              throw new Error('No checkout URL received from server');
+            }
+          } catch (checkoutError) {
+            console.error('[Stripe Checkout] Error:', checkoutError);
+            throw checkoutError;
+          }
+          return;
+        }
+      } catch (error) {
+        console.error('Error creating Stripe checkout:', error);
+        const msg = error instanceof Error ? error.message : t('common.error.unknown');
+        showToast('error', t('common.error.title'), msg);
+        return;
+      }
+    }
+
+    // For all other payment methods, route to the generic detail screen
     router.push({
         pathname: '/membership-payment-detail',
         params: {
