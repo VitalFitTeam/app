@@ -74,8 +74,11 @@ export default defineConfig({
 	webServer: {
 		command: 'npm run web',
 		url: 'http://localhost:8081',
-		timeout: 120 * 1000,
+		timeout: 300 * 1000,
 		reuseExistingServer: !process.env.CI,
+		env: {
+			EXPO_PUBLIC_IMGBB_API_KEY: process.env.EXPO_PUBLIC_IMGBB_API_KEY || 'dummy-key-for-ci',
+		},
 	},
 	// ...
 });
