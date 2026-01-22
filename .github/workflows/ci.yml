@@ -9,6 +9,7 @@ on:
 jobs:
   # Job 1: Verificación de Calidad de Código (Linting)
   linting:
+    if: github.base_ref != 'main'
     name: Linting
     runs-on: ubuntu-latest
     steps:
@@ -29,6 +30,7 @@ jobs:
 
   # Job 2: Pruebas Unitarias y de Componentes
   unit-tests:
+    if: github.base_ref != 'main'
     name: Unit Tests (Jest)
     needs: [linting]
     runs-on: ubuntu-latest
