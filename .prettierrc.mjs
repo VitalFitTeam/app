@@ -12,5 +12,6 @@ export default {
 	tabWidth: 4,
 	endOfLine: 'lf',
 	trailingComma: 'all',
-	plugins: ['prettier-plugin-tailwindcss'],
+	// Temporarily disabled due to ESM compatibility issues in CI
+	// plugins: ['prettier-plugin-tailwindcss'],
 };
